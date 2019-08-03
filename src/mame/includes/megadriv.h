@@ -10,6 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2612intf.h"
 #include "sound/sn76496.h"
+#include "sound/gb.h"
 #include "video/315_5313.h"
 
 /* Megadrive Console Specific */
@@ -49,6 +50,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_z80snd(*this,"genesis_snd_z80"),
 		m_ymsnd(*this,"ymsnd"),
+		m_gbsnd(*this, "gbsnd"),
 		m_scan_timer(*this, "md_scan_timer"),
 		m_vdp(*this,"gen_vdp"),
 		m_megadrive_ram(*this,"megadrive_ram"),
@@ -58,6 +60,7 @@ public:
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
 	optional_device<ym2612_device> m_ymsnd;
+	optional_device<gameboy_sound_device> m_gbsnd;
 	optional_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;

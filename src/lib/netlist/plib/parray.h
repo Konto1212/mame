@@ -24,7 +24,8 @@ namespace plib {
 	struct sizeabs
 	{
 		static constexpr std::size_t ABS() { return (SIZE < 0) ? static_cast<std::size_t>(0 - SIZE) : static_cast<std::size_t>(SIZE); }
-		using container = typename std::array<FT, ABS()> ;
+		static const std::size_t tsize = ABS();
+		using container = typename std::array<FT, tsize>;
 	};
 
 	template <typename FT>

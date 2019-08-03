@@ -47,3 +47,9 @@ regtests/chdman/temp
 regtests/jedutil/output
 /CMakeLists.txt
 /samples
+/src/mamidimemo/obj/Debug
+/src/wrapper/Debug
+/src/mamidimemo/obj/Release
+/src/wrapper/Release
+/src/wrapper/wrapper.vcxproj.user
+/src/wrapper/wrapper.vcxproj.filters

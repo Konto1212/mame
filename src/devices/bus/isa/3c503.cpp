@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:Carl
 #include "emu.h"
 #include "3c503.h"

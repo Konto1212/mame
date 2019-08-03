@@ -280,6 +280,7 @@ void running_machine::start()
 //-------------------------------------------------
 //  run - execute the machine
 //-------------------------------------------------
+void StartMamidimemoMain();
 
 int running_machine::run(bool quiet)
 {
@@ -344,6 +345,8 @@ int running_machine::run(bool quiet)
 		// break out to our async javascript loop and halt
 		emscripten_set_running_machine(this);
 #endif
+
+		StartMamidimemoMain();
 
 		// run the CPUs until a reset or exit
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
@@ -1440,3 +1443,18 @@ void running_machine::emscripten_load(const char *name) {
 }
 
 #endif /* defined(EMSCRIPTEN) */
+
+#include <windows.h>
+
+typedef void(CALLBACK* MainWrapperProc)(HMODULE);
+
+void StartMamidimemoMain()
+{
+	HMODULE hModule = LoadLibrary("wrapper.dll");
+	FARPROC proc = GetProcAddress(hModule, "_MainWarpper@4");
+	if (proc != NULL)
+	{
+		MainWrapperProc main = reinterpret_cast<MainWrapperProc>(proc);
+		main(GetModuleHandle(NULL));
+	}
+}

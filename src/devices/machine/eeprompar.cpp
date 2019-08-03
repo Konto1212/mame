@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
@@ -161,7 +161,7 @@ READ8_MEMBER(eeprom_parallel_28xx_device::read)
 {
 	if (m_oe == 1)
 	{
-		LOG("%s: Read attempted while /OE inactive (offset = %X)\n", machine().describe_context(), offset);
+		//LOG("%s: Read attempted while /OE inactive (offset = %X)\n", machine().describe_context(), offset);
 		return space.unmap();
 	}
 

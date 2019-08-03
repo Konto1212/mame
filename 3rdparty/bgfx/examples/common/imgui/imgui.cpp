@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2014-2015 Daniel Collin. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */

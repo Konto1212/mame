@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
 #ifndef MAME_MACHINE_Z8038_H

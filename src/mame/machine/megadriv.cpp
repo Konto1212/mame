@@ -906,8 +906,8 @@ void md_base_state::md_ntsc(machine_config &config)
 	m_vdp->lv6_irq().set(FUNC(md_base_state::vdp_lv6irqline_callback_genesis_68k));
 	m_vdp->lv4_irq().set(FUNC(md_base_state::vdp_lv4irqline_callback_genesis_68k));
 	m_vdp->set_screen("megadriv");
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -926,6 +926,10 @@ void md_base_state::md_ntsc(machine_config &config)
 	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7); /* 7.67 MHz */
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(1, "rspeaker", 0.50);
+
+	DMG_APU(config, m_gbsnd, XTAL(4'194'304));
+	m_gbsnd->add_route(0, "lspeaker", 0.50);
+	m_gbsnd->add_route(1, "rspeaker", 0.50);
 }
 
 void md_cons_state::dcat16_megadriv_base(machine_config &config)
