@@ -53,3 +53,5 @@ regtests/jedutil/output
 /src/wrapper/Release
 /src/wrapper/wrapper.vcxproj.user
 /src/wrapper/wrapper.vcxproj.filters
+Release(but Debug .NET)
+Release(but Debug .NET)

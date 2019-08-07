@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Melanchall.DryWetMidi.Devices;
+using Melanchall.DryWetMidi.Smf;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -6,11 +9,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using zanac.mamidimemo.mame;
+using zanac.mamidimemo.Properties;
 
 namespace zanac.mamidimemo
 {
     public static class Program
     {
+
+        private static Thread mainThread;
+
+
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
         /// </summary>
@@ -19,17 +27,29 @@ namespace zanac.mamidimemo
         {
             MameIF.Initialize(parentModule);
 
-            Form1 f = new Form1();
-            f.Show();
-            /*
-            Thread t = new Thread(new ThreadStart(() =>
+            mainThread = new Thread(new ThreadStart(() =>
             {
+                Settings.Default.Reload();
+
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
-                Application.Run(new Form1());
+                Application.Run(new FormMain());
+
+                Settings.Default.Save();
             }));
-            t.Start();*/
+            mainThread.Start();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static int HasExited()
+        {
+            if (mainThread == null)
+                return 1;
+            return (mainThread.ThreadState != ThreadState.Running) ? 1 : 0;
         }
     }
 }

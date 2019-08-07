@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("mamidimemo")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("mamidimemo")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTitle("MAmidiMEmo")]
+[assembly: AssemblyDescription("Virtual MIDI Chiptune sound module")]
+[assembly: AssemblyConfiguration("-")]
+[assembly: AssemblyCompany("-")]
+[assembly: AssemblyProduct("MAmidiMEmo")]
+[assembly: AssemblyCopyright("Copyright ©  2019 Itoken")]
+[assembly: AssemblyTrademark("-")]
 [assembly: AssemblyCulture("")]
 
 // ComVisible を false に設定すると、このアセンブリ内の型は COM コンポーネントから

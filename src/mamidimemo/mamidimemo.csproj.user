@@ -13,4 +13,9 @@
     <StartProgram>E:\mame_src\mame\mamidimemo.exe</StartProgram>
     <StartArguments>megadrij -window -cart "E:\mame_src\Sonic the Hedgehog%28Japan%29.md"</StartArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release%28but Debug .NET%29|AnyCPU'">
+    <StartProgram>E:\mame_src\mame\mamidimemo.exe</StartProgram>
+    <StartWorkingDirectory>E:\mame_src\mame</StartWorkingDirectory>
+    <StartArguments>megadrij -window -cart "E:\mame_src\Sonic the Hedgehog%28Japan%29.md"</StartArguments>
+  </PropertyGroup>
 </Project>

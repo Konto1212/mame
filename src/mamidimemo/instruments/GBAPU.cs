@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -18,6 +19,13 @@ namespace zanac.mamidimemo.instruments
     /// </summary>
     public class GBAPU : InstrumentBase
     {
+        public override string Name => "GBAPU";
+
+        public override InstrumentType InstrumentType => InstrumentType.GBAPU;
+
+        [Browsable(false)]
+        public override string ImageKey => "GBAPU";
+
         /// <summary>
         /// 
         /// </summary>
@@ -57,15 +65,6 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
-        public uint UnitNumber
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         static GBAPU()
         {
             IntPtr funcPtr = MameIF.GetProcAddress("gb_apu_write");
@@ -81,9 +80,8 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
-        public GBAPU(uint unitNumber)
+        public GBAPU(uint unitNumber) : base(unitNumber)
         {
-            UnitNumber = unitNumber;
             this.soundManager = new GBSoundManager(this);
         }
 
@@ -136,16 +134,6 @@ namespace zanac.mamidimemo.instruments
 
             private GBAPU parentModule;
 
-            public SevenBitNumber[] PitchBendRanges;
-
-            public SevenBitNumber[] ProgramNumbers;
-
-            public SevenBitNumber[] Volumes;
-
-            public SevenBitNumber[] Expressions;
-
-            public SevenBitNumber[] Panpots;
-
             public GBAPUTimbre[] Timbres;
 
             /// <summary>
@@ -154,37 +142,6 @@ namespace zanac.mamidimemo.instruments
             /// <param name="parent"></param>
             public GBSoundManager(GBAPU parent)
             {
-                ProgramNumbers = new SevenBitNumber[] {
-                    (SevenBitNumber)0, (SevenBitNumber)0, (SevenBitNumber)0,
-                    (SevenBitNumber)0, (SevenBitNumber)0, (SevenBitNumber)0,
-                    (SevenBitNumber)0, (SevenBitNumber)0, (SevenBitNumber)0,
-                    (SevenBitNumber)0, (SevenBitNumber)0, (SevenBitNumber)0,
-                    (SevenBitNumber)0, (SevenBitNumber)0, (SevenBitNumber)0, (SevenBitNumber)0 };
-                Volumes = new SevenBitNumber[] {
-                    (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127,
-                    (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127,
-                    (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127,
-                    (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127,
-                    (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127  };
-                Expressions = new SevenBitNumber[] {
-                    (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127,
-                    (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127,
-                    (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127,
-                    (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127,
-                    (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127, (SevenBitNumber)127  };
-                Panpots = new SevenBitNumber[] {
-                    (SevenBitNumber)64, (SevenBitNumber)64, (SevenBitNumber)64,
-                    (SevenBitNumber)64, (SevenBitNumber)64, (SevenBitNumber)64,
-                    (SevenBitNumber)64, (SevenBitNumber)64, (SevenBitNumber)64,
-                    (SevenBitNumber)64, (SevenBitNumber)64, (SevenBitNumber)64,
-                    (SevenBitNumber)64, (SevenBitNumber)64, (SevenBitNumber)64, (SevenBitNumber)64};
-                PitchBendRanges = new SevenBitNumber[] {
-                    (SevenBitNumber)2, (SevenBitNumber)2, (SevenBitNumber)2,
-                    (SevenBitNumber)2, (SevenBitNumber)2, (SevenBitNumber)2,
-                    (SevenBitNumber)2, (SevenBitNumber)2, (SevenBitNumber)2,
-                    (SevenBitNumber)2, (SevenBitNumber)2, (SevenBitNumber)2,
-                    (SevenBitNumber)2, (SevenBitNumber)2, (SevenBitNumber)2, (SevenBitNumber)2};
-
                 this.parentModule = parent;
 
                 Timbres = new GBAPUTimbre[128];
@@ -204,7 +161,7 @@ namespace zanac.mamidimemo.instruments
                 switch (midiEvent.ControlNumber)
                 {
                     case 39:    //Volume
-                        Volumes[midiEvent.Channel] = midiEvent.ControlValue;
+                        parentModule.Volumes[midiEvent.Channel] = midiEvent.ControlValue;
                         break;
                 }
             }
@@ -241,7 +198,7 @@ namespace zanac.mamidimemo.instruments
             {
                 int emptySlot = -1;
 
-                var pn = ProgramNumbers[note.Channel];
+                var pn = parentModule.ProgramNumbers[note.Channel];
 
                 var timbre = parentModule.soundManager.Timbres[pn];
                 switch (timbre.SoundType)
@@ -314,7 +271,7 @@ namespace zanac.mamidimemo.instruments
             public GbSound(GBAPU parentModule, NoteOnEvent noteOnEvent, int slot) : base(noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
-                this.programNumber = parentModule.soundManager.ProgramNumbers[noteOnEvent.Channel];
+                this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
                 this.Timbre = parentModule.soundManager.Timbres[programNumber];
             }
 
@@ -342,7 +299,7 @@ namespace zanac.mamidimemo.instruments
                             Console.WriteLine(freq);
 
                             //Volume
-                            byte vol = parentModule.soundManager.Volumes[NoteOnEvent.Channel];
+                            byte vol = parentModule.Volumes[NoteOnEvent.Channel];
                             vol = (byte)((vol >> 3) & 0xf);
                             GbApi_write?.Invoke(parentModule.UnitNumber, reg + 2, (byte)((vol << 4) | 0x00));
 
@@ -353,10 +310,7 @@ namespace zanac.mamidimemo.instruments
                                 byte mask = (byte)(0x11 << Slot);
                                 byte ccpan = (byte)(cpan.Value & (byte)~mask);
 
-                                byte pan = parentModule.soundManager.Panpots[NoteOnEvent.Channel];
-                                
-                                pan = 0;
-
+                                byte pan = parentModule.Panpots[NoteOnEvent.Channel];
                                 if (pan < 32)
                                     pan = 0x10;
                                 else if (pan > 96)
@@ -388,7 +342,7 @@ namespace zanac.mamidimemo.instruments
             /// <param name="slot"></param>
             public void SetTimbre(int slot)
             {
-                var pn = parentModule.soundManager.ProgramNumbers[NoteOnEvent.Channel];
+                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                 var timbre = parentModule.soundManager.Timbres[pn];
 
             }

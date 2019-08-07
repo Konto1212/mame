@@ -27,11 +27,11 @@
 
 /*----------- defined in machine/megadriv.c -----------*/
 
-INPUT_PORTS_EXTERN( md_common );
-INPUT_PORTS_EXTERN( megadriv );
-INPUT_PORTS_EXTERN( megadri6 );
-INPUT_PORTS_EXTERN( ssf2mdb );
-INPUT_PORTS_EXTERN( mk3mdb );
+INPUT_PORTS_EXTERN(md_common);
+INPUT_PORTS_EXTERN(megadriv);
+INPUT_PORTS_EXTERN(megadri6);
+INPUT_PORTS_EXTERN(ssf2mdb);
+INPUT_PORTS_EXTERN(mk3mdb);
 
 struct genesis_z80_vars
 {
@@ -47,20 +47,37 @@ class md_base_state : public driver_device
 public:
 	md_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_z80snd(*this,"genesis_snd_z80"),
-		m_ymsnd(*this,"ymsnd"),
-		m_gbsnd(*this, "gbsnd"),
+		m_maincpu(*this, "maincpu"),
+		m_z80snd(*this, "genesis_snd_z80"),
+		m_ymsnd(*this, "ymsnd"),
 		m_scan_timer(*this, "md_scan_timer"),
-		m_vdp(*this,"gen_vdp"),
-		m_megadrive_ram(*this,"megadrive_ram"),
+		m_vdp(*this, "gen_vdp"),
+		m_megadrive_ram(*this, "megadrive_ram"),
 		m_io_reset(*this, "RESET")
-	{ }
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			int didx = 0;
+			std::string num = std::to_string(i);
+
+			//YM2612
+			strcpy(device_names[didx][i], (std::string("ym2612_") + num).c_str());
+			m_ym2612[i] = new optional_device<ym2612_device>(*this, device_names[didx][i]);
+			didx++;
+			//GB APU
+			strcpy(device_names[didx][i], (std::string("gbsnd_") + num).c_str());
+			m_gbsnd[i] = new optional_device<gameboy_sound_device>(*this, device_names[didx][i]);
+			didx++;
+		}
+	}
+
+	char device_names[2][8][100];
+	optional_device<ym2612_device> *m_ym2612[8];
+	optional_device<gameboy_sound_device> *m_gbsnd[8];
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
 	optional_device<ym2612_device> m_ymsnd;
-	optional_device<gameboy_sound_device> m_gbsnd;
 	optional_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
@@ -83,20 +100,20 @@ public:
 	void megadriv_init_common();
 
 	void megadriv_z80_bank_w(uint16_t data);
-	DECLARE_WRITE16_MEMBER( megadriv_68k_z80_bank_write );
+	DECLARE_WRITE16_MEMBER(megadriv_68k_z80_bank_write);
 	DECLARE_WRITE8_MEMBER(megadriv_z80_z80_bank_w);
-	DECLARE_READ16_MEMBER( megadriv_68k_io_read );
-	DECLARE_WRITE16_MEMBER( megadriv_68k_io_write );
-	DECLARE_READ16_MEMBER( megadriv_68k_read_z80_ram );
-	DECLARE_WRITE16_MEMBER( megadriv_68k_write_z80_ram );
-	DECLARE_READ16_MEMBER( megadriv_68k_check_z80_bus );
-	DECLARE_WRITE16_MEMBER( megadriv_68k_req_z80_bus );
-	DECLARE_WRITE16_MEMBER ( megadriv_68k_req_z80_reset );
-	DECLARE_READ8_MEMBER( z80_read_68k_banked_data );
-	DECLARE_WRITE8_MEMBER( z80_write_68k_banked_data );
-	DECLARE_WRITE8_MEMBER( megadriv_z80_vdp_write );
-	DECLARE_READ8_MEMBER( megadriv_z80_vdp_read );
-	DECLARE_READ8_MEMBER( megadriv_z80_unmapped_read );
+	DECLARE_READ16_MEMBER(megadriv_68k_io_read);
+	DECLARE_WRITE16_MEMBER(megadriv_68k_io_write);
+	DECLARE_READ16_MEMBER(megadriv_68k_read_z80_ram);
+	DECLARE_WRITE16_MEMBER(megadriv_68k_write_z80_ram);
+	DECLARE_READ16_MEMBER(megadriv_68k_check_z80_bus);
+	DECLARE_WRITE16_MEMBER(megadriv_68k_req_z80_bus);
+	DECLARE_WRITE16_MEMBER(megadriv_68k_req_z80_reset);
+	DECLARE_READ8_MEMBER(z80_read_68k_banked_data);
+	DECLARE_WRITE8_MEMBER(z80_write_68k_banked_data);
+	DECLARE_WRITE8_MEMBER(megadriv_z80_vdp_write);
+	DECLARE_READ8_MEMBER(megadriv_z80_vdp_read);
+	DECLARE_READ8_MEMBER(megadriv_z80_unmapped_read);
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
 
 	/* Megadrive / Genesis has 3 I/O ports */
@@ -112,7 +129,7 @@ public:
 	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
 	WRITE_LINE_MEMBER(vdp_lv4irqline_callback_genesis_68k);
 
-	TIMER_CALLBACK_MEMBER( io_timeout_timer_callback );
+	TIMER_CALLBACK_MEMBER(io_timeout_timer_callback);
 	void megadrive_reset_io();
 	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_6button);
 	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_3button);
@@ -130,9 +147,9 @@ public:
 
 	void megadriv_stop_scanline_timer();
 
-	DECLARE_MACHINE_START( megadriv );
-	DECLARE_MACHINE_RESET( megadriv );
-	DECLARE_VIDEO_START( megadriv );
+	DECLARE_MACHINE_START(megadriv);
+	DECLARE_MACHINE_RESET(megadriv);
+	DECLARE_VIDEO_START(megadriv);
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
 
@@ -154,8 +171,8 @@ class md_cons_state : public md_base_state
 public:
 	md_cons_state(const machine_config &mconfig, device_type type, const char *tag) :
 		md_base_state(mconfig, type, tag),
-		m_32x(*this,"sega32x"),
-		m_segacd(*this,"segacd"),
+		m_32x(*this, "sega32x"),
+		m_segacd(*this, "segacd"),
 		m_cart(*this, "mdslot"),
 		m_tmss(*this, "tmss")
 	{ }
@@ -177,14 +194,14 @@ public:
 	READ8_MEMBER(mess_md_io_read_data_port);
 	WRITE16_MEMBER(mess_md_io_write_data_port);
 
-	DECLARE_MACHINE_START( md_common );     // setup ioport_port
-	DECLARE_MACHINE_START( ms_megadriv );   // setup ioport_port + install cartslot handlers
-	DECLARE_MACHINE_START( ms_megacd );     // setup ioport_port + dma delay for cd
-	DECLARE_MACHINE_RESET( ms_megadriv );
+	DECLARE_MACHINE_START(md_common);     // setup ioport_port
+	DECLARE_MACHINE_START(ms_megadriv);   // setup ioport_port + install cartslot handlers
+	DECLARE_MACHINE_START(ms_megacd);     // setup ioport_port + dma delay for cd
+	DECLARE_MACHINE_RESET(ms_megadriv);
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_console);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_32x_cart);
 
 	void _32x_scanline_callback(int x, uint32_t priority, uint32_t &lineptr);
 	void _32x_interrupt_callback(int scanline, int irq6);

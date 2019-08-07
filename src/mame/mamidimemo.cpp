@@ -24,7 +24,8 @@ extern "C"
 		if (rm == nullptr)
 			return;
 
-		ym2612_device *ym2612 = dynamic_cast<ym2612_device *>(rm->device("ymsnd"));
+		std::string num = std::to_string(unitNumber);
+		ym2612_device *ym2612 = dynamic_cast<ym2612_device *>(rm->device((std::string("ym2612_") + num).c_str()));
 		if (ym2612 == nullptr)
 			return;
 
@@ -40,7 +41,8 @@ extern "C"
 		if (rm == nullptr)
 			return;
 
-		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->device("gbsnd"));
+		std::string num = std::to_string(unitNumber);
+		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->device((std::string("gbsnd_") + num).c_str()));
 		if (gb_apu == nullptr)
 			return;
 
@@ -56,7 +58,8 @@ extern "C"
 		if (rm == nullptr)
 			return 0;
 
-		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->device("gbsnd"));
+		std::string num = std::to_string(unitNumber);
+		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->device((std::string("gbsnd_") + num).c_str()));
 		if (gb_apu == nullptr)
 			return 0;
 

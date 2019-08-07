@@ -1,4 +1,5 @@
-﻿using Melanchall.DryWetMidi.Smf;
+﻿using Melanchall.DryWetMidi.Common;
+using Melanchall.DryWetMidi.Smf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,22 @@ namespace zanac.mamidimemo.instruments
     /// </summary>
     public class SoundManagerBase
     {
+      
+        /// <summary>
+        /// 
+        /// </summary>
+        public SoundManagerBase()
+        {
+           
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="midiEvent"></param>
+        public virtual void PitchBend(PitchBendEvent midiEvent)
+        {
+        }
 
         /// <summary>
         /// 
@@ -21,6 +38,7 @@ namespace zanac.mamidimemo.instruments
         /// <param name="value"></param>
         public virtual void ControlChange(ControlChangeEvent midiEvent)
         {
+
         }
 
         /// <summary>
