@@ -55,6 +55,7 @@ public:
 		m_megadrive_ram(*this, "megadrive_ram"),
 		m_io_reset(*this, "RESET")
 	{
+		//mamidimemo
 		for (int i = 0; i < 8; i++)
 		{
 			int didx = 0;
@@ -68,12 +69,18 @@ public:
 			strcpy(device_names[didx][i], (std::string("gbsnd_") + num).c_str());
 			m_gbsnd[i] = new optional_device<gameboy_sound_device>(*this, device_names[didx][i]);
 			didx++;
+			//sn76496(PSG)
+			strcpy(device_names[didx][i], (std::string("sn76496_") + num).c_str());
+			m_sn76496[i] = new optional_device<sn76496_base_device>(*this, device_names[didx][i]);
+			didx++;
 		}
 	}
 
-	char device_names[2][8][100];
+	char device_names[3][8][100];
 	optional_device<ym2612_device> *m_ym2612[8];
 	optional_device<gameboy_sound_device> *m_gbsnd[8];
+	optional_device<sn76496_base_device> *m_sn76496[8];
+	
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;

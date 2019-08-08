@@ -70,6 +70,12 @@ namespace zanac.mamidimemo
                 var item = listViewIntruments.Items.Add(lvi);
                 item.Tag = inst;
             }
+            foreach (var inst in InstrumentManager.List_sn76496)
+            {
+                var lvi = new ListViewItem(inst.Name, inst.ImageKey);
+                var item = listViewIntruments.Items.Add(lvi);
+                item.Tag = inst;
+            }
         }
 
         /// <summary>
@@ -126,6 +132,19 @@ namespace zanac.mamidimemo
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void listViewIntruments_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            List<InstrumentBase> insts = new List<InstrumentBase>();
+            foreach (ListViewItem item in listViewIntruments.SelectedItems)
+                insts.Add((InstrumentBase)item.Tag);
+            propertyGrid.SelectedObjects = insts.ToArray();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addYM2612ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InstrumentManager.AddInstrument(InstrumentType.YM2612);
@@ -136,12 +155,19 @@ namespace zanac.mamidimemo
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void listViewIntruments_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        private void addSN76496ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            List<InstrumentBase> insts = new List<InstrumentBase>();
-            foreach (ListViewItem item in listViewIntruments.SelectedItems)
-                insts.Add((InstrumentBase)item.Tag);
-            propertyGrid.SelectedObjects = insts.ToArray();
+            InstrumentManager.AddInstrument(InstrumentType.SN76496);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripMenuItemExit_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

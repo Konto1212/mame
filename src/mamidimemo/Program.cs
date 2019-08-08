@@ -39,6 +39,7 @@ namespace zanac.mamidimemo
                 Settings.Default.Save();
             }));
             mainThread.Start();
+            while (mainThread.ThreadState != ThreadState.Running) ;
         }
 
         /// <summary>
@@ -50,6 +51,26 @@ namespace zanac.mamidimemo
             if (mainThread == null)
                 return 1;
             return (mainThread.ThreadState != ThreadState.Running) ? 1 : 0;
+        }
+
+        static ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static void SoundUpdating()
+        {
+            lockSlim.EnterWriteLock();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static void SoundUpdated()
+        {
+            lockSlim.ExitWriteLock();
         }
     }
 }

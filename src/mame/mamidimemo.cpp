@@ -5,11 +5,13 @@
 #include "..\devices\sound\fm.h"
 #include "..\devices\sound\2612intf.h"
 #include "..\devices\sound\gb.h"
+#include "..\devices\sound\sn76496.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
 extern "C"
 {
+	//memodimemo
 
 	DllExport void ym2612_write(unsigned int unitNumber, unsigned int address, unsigned char data)
 	{
@@ -64,6 +66,24 @@ extern "C"
 			return 0;
 
 		return gb_apu->sound_r(address);
+	}
+
+
+	DllExport void sn76496_write(unsigned int unitNumber, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		sn76496_base_device *sn76496 = dynamic_cast<sn76496_base_device *>(rm->device((std::string("sn76496_") + num).c_str()));
+		if (sn76496 == nullptr)
+			return;
+
+		sn76496->write(data);
 	}
 }
 

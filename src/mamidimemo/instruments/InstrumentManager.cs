@@ -12,6 +12,8 @@ namespace zanac.mamidimemo.instruments
 
         public static List<GBAPU> List_gbapu = new List<GBAPU>();
 
+        public static List<SN76496> List_sn76496 = new List<SN76496>();
+
         public static event EventHandler<EventArgs> InstrumentAdded;
 
         public static event EventHandler<EventArgs> InstrumentRemoved;
@@ -48,6 +50,18 @@ namespace zanac.mamidimemo.instruments
                         }
                         break;
                     }
+                case InstrumentType.SN76496:
+                    {
+                        lock (List_sn76496)
+                        {
+                            if (List_sn76496.Count < 7)
+                            {
+                                List_sn76496.Add(new SN76496((uint)List_sn76496.Count));
+                                InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
+                            }
+                        }
+                        break;
+                    }
             }
         }
 
@@ -68,9 +82,16 @@ namespace zanac.mamidimemo.instruments
                     List_gbapu.Remove((GBAPU)instrument);
                     InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                     break;
+                case InstrumentType.SN76496:
+                    List_sn76496.Remove((SN76496)instrument);
+                    InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
+                    break;
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         static InstrumentManager()
         {
             midi.MidiManager.MidiEventReceived += MidiManager_MidiEventReceived;
@@ -87,6 +108,8 @@ namespace zanac.mamidimemo.instruments
                 List_ym2612.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
             lock (List_gbapu)
                 List_gbapu.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
+            lock (List_sn76496)
+                List_sn76496.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
         }
 
     }

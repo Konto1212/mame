@@ -10,8 +10,12 @@ using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.MusicTheory;
 using Melanchall.DryWetMidi.Smf;
+using zanac.mamidimemo.ComponentModel;
 using zanac.mamidimemo.mame;
 using zanac.mamidimemo.midi;
+
+//https://www.plutiedev.com/ym2612-registers
+//http://www.smspower.org/maxim/Documents/YM2612#regb4
 
 namespace zanac.mamidimemo.instruments
 {
@@ -61,8 +65,16 @@ namespace zanac.mamidimemo.instruments
         private static void Ym2612WriteData(uint unitNumber, byte address, int op, int slot, byte data)
         {
             uint reg = (uint)(slot / 3) * 2;
-            Ym2612_write?.Invoke(unitNumber, reg + 0, (byte)(address + (op * 4) + (slot % 3)));
-            Ym2612_write?.Invoke(unitNumber, reg + 1, data);
+            try
+            {
+                Program.SoundUpdating();
+                Ym2612_write(unitNumber, reg + 0, (byte)(address + (op * 4) + (slot % 3)));
+                Ym2612_write(unitNumber, reg + 1, data);
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
         }
 
         /// <summary>
@@ -96,183 +108,178 @@ namespace zanac.mamidimemo.instruments
         private void setPresetInstruments()
         {
             //Brass Section.dmp
-            Timbres[0].SoundType = SoundType.FM;
-
             Timbres[0].FMS = 1;
             Timbres[0].AMS = 0;
             Timbres[0].FB = 7;
             Timbres[0].ALG = 3;
 
-            Timbres[0]._Op1.AR = 31;
-            Timbres[0]._Op1.D1R = 6;
-            Timbres[0]._Op1.SL = 15;
-            Timbres[0]._Op1.D2R = 0;
-            Timbres[0]._Op1.RR = 7;
+            Timbres[0].f_Op1.AR = 31;
+            Timbres[0].f_Op1.D1R = 6;
+            Timbres[0].f_Op1.SL = 15;
+            Timbres[0].f_Op1.D2R = 0;
+            Timbres[0].f_Op1.RR = 7;
 
-            Timbres[0]._Op1.MUL = 1;
-            Timbres[0]._Op1.RS = 0;
-            Timbres[0]._Op1.DT1 = 7;
-            Timbres[0]._Op1.AM = 0;
-            Timbres[0]._Op1.SSG_EG = 0;
-            Timbres[0]._Op1.TL = 20;
+            Timbres[0].f_Op1.MUL = 1;
+            Timbres[0].f_Op1.RS = 0;
+            Timbres[0].f_Op1.DT1 = 7;
+            Timbres[0].f_Op1.AM = 0;
+            Timbres[0].f_Op1.SSG_EG = 0;
+            Timbres[0].f_Op1.TL = 20;
 
-            Timbres[0]._Op2.AR = 31;
-            Timbres[0]._Op2.D1R = 7;
-            Timbres[0]._Op2.SL = 4;
-            Timbres[0]._Op2.D2R = 0;
-            Timbres[0]._Op2.RR = 15;
+            Timbres[0].f_Op2.AR = 31;
+            Timbres[0].f_Op2.D1R = 7;
+            Timbres[0].f_Op2.SL = 4;
+            Timbres[0].f_Op2.D2R = 0;
+            Timbres[0].f_Op2.RR = 15;
 
-            Timbres[0]._Op2.MUL = 2;
-            Timbres[0]._Op2.RS = 0;
-            Timbres[0]._Op2.DT1 = 6;
-            Timbres[0]._Op2.AM = 0;
-            Timbres[0]._Op2.SSG_EG = 0;
-            Timbres[0]._Op2.TL = 21;
+            Timbres[0].f_Op2.MUL = 2;
+            Timbres[0].f_Op2.RS = 0;
+            Timbres[0].f_Op2.DT1 = 6;
+            Timbres[0].f_Op2.AM = 0;
+            Timbres[0].f_Op2.SSG_EG = 0;
+            Timbres[0].f_Op2.TL = 21;
 
-            Timbres[0]._Op3.AR = 31;
-            Timbres[0]._Op3.D1R = 7;
-            Timbres[0]._Op3.SL = 4;
-            Timbres[0]._Op3.D2R = 0;
-            Timbres[0]._Op3.RR = 15;
+            Timbres[0].f_Op3.AR = 31;
+            Timbres[0].f_Op3.D1R = 7;
+            Timbres[0].f_Op3.SL = 4;
+            Timbres[0].f_Op3.D2R = 0;
+            Timbres[0].f_Op3.RR = 15;
 
-            Timbres[0]._Op3.MUL = 1;
-            Timbres[0]._Op3.RS = 0;
-            Timbres[0]._Op3.DT1 = 2;
-            Timbres[0]._Op3.AM = 0;
-            Timbres[0]._Op3.SSG_EG = 0;
-            Timbres[0]._Op3.TL = 12;
+            Timbres[0].f_Op3.MUL = 1;
+            Timbres[0].f_Op3.RS = 0;
+            Timbres[0].f_Op3.DT1 = 2;
+            Timbres[0].f_Op3.AM = 0;
+            Timbres[0].f_Op3.SSG_EG = 0;
+            Timbres[0].f_Op3.TL = 12;
 
-            Timbres[0]._Op4.AR = 31;
-            Timbres[0]._Op4.D1R = 0;
-            Timbres[0]._Op4.SL = 0;
-            Timbres[0]._Op4.D2R = 0;
-            Timbres[0]._Op4.RR = 15;
+            Timbres[0].f_Op4.AR = 31;
+            Timbres[0].f_Op4.D1R = 0;
+            Timbres[0].f_Op4.SL = 0;
+            Timbres[0].f_Op4.D2R = 0;
+            Timbres[0].f_Op4.RR = 15;
 
-            Timbres[0]._Op4.MUL = 1;
-            Timbres[0]._Op4.RS = 0;
-            Timbres[0]._Op4.DT1 = 4;
-            Timbres[0]._Op4.AM = 0;
-            Timbres[0]._Op4.SSG_EG = 0;
-            Timbres[0]._Op4.TL = 12;
+            Timbres[0].f_Op4.MUL = 1;
+            Timbres[0].f_Op4.RS = 0;
+            Timbres[0].f_Op4.DT1 = 4;
+            Timbres[0].f_Op4.AM = 0;
+            Timbres[0].f_Op4.SSG_EG = 0;
+            Timbres[0].f_Op4.TL = 12;
 
             //Additive Chimes A.dmp
-            Timbres[2].SoundType = SoundType.FM;
-
             Timbres[2].FMS = 0;
             Timbres[2].AMS = 0;
             Timbres[2].FB = 0;
             Timbres[2].ALG = 7;
 
-            Timbres[2]._Op1.AR = 31;
-            Timbres[2]._Op1.D1R = 4;
-            Timbres[2]._Op1.SL = 15;
-            Timbres[2]._Op1.D2R = 0;
-            Timbres[2]._Op1.RR = 4;
+            Timbres[2].f_Op1.AR = 31;
+            Timbres[2].f_Op1.D1R = 4;
+            Timbres[2].f_Op1.SL = 15;
+            Timbres[2].f_Op1.D2R = 0;
+            Timbres[2].f_Op1.RR = 4;
 
-            Timbres[2]._Op1.MUL = 1;
-            Timbres[2]._Op1.RS = 0;
-            Timbres[2]._Op1.DT1 = 4;
-            Timbres[2]._Op1.AM = 0;
-            Timbres[2]._Op1.SSG_EG = 0;
-            Timbres[2]._Op1.TL = 20;
+            Timbres[2].f_Op1.MUL = 1;
+            Timbres[2].f_Op1.RS = 0;
+            Timbres[2].f_Op1.DT1 = 4;
+            Timbres[2].f_Op1.AM = 0;
+            Timbres[2].f_Op1.SSG_EG = 0;
+            Timbres[2].f_Op1.TL = 20;
 
-            Timbres[2]._Op2.AR = 31;
-            Timbres[2]._Op2.D1R = 7;
-            Timbres[2]._Op2.SL = 15;
-            Timbres[2]._Op2.D2R = 0;
-            Timbres[2]._Op2.RR = 5;
+            Timbres[2].f_Op2.AR = 31;
+            Timbres[2].f_Op2.D1R = 7;
+            Timbres[2].f_Op2.SL = 15;
+            Timbres[2].f_Op2.D2R = 0;
+            Timbres[2].f_Op2.RR = 5;
 
-            Timbres[2]._Op2.MUL = 4;
-            Timbres[2]._Op2.RS = 0;
-            Timbres[2]._Op2.DT1 = 4;
-            Timbres[2]._Op2.AM = 0;
-            Timbres[2]._Op2.SSG_EG = 0;
-            Timbres[2]._Op2.TL = 20;
+            Timbres[2].f_Op2.MUL = 4;
+            Timbres[2].f_Op2.RS = 0;
+            Timbres[2].f_Op2.DT1 = 4;
+            Timbres[2].f_Op2.AM = 0;
+            Timbres[2].f_Op2.SSG_EG = 0;
+            Timbres[2].f_Op2.TL = 20;
 
-            Timbres[2]._Op3.AR = 31;
-            Timbres[2]._Op3.D1R = 10;
-            Timbres[2]._Op3.SL = 15;
-            Timbres[2]._Op3.D2R = 0;
-            Timbres[2]._Op3.RR = 6;
+            Timbres[2].f_Op3.AR = 31;
+            Timbres[2].f_Op3.D1R = 10;
+            Timbres[2].f_Op3.SL = 15;
+            Timbres[2].f_Op3.D2R = 0;
+            Timbres[2].f_Op3.RR = 6;
 
-            Timbres[2]._Op3.MUL = 7;
-            Timbres[2]._Op3.RS = 0;
-            Timbres[2]._Op3.DT1 = 4;
-            Timbres[2]._Op3.AM = 0;
-            Timbres[2]._Op3.SSG_EG = 0;
-            Timbres[2]._Op3.TL = 20;
+            Timbres[2].f_Op3.MUL = 7;
+            Timbres[2].f_Op3.RS = 0;
+            Timbres[2].f_Op3.DT1 = 4;
+            Timbres[2].f_Op3.AM = 0;
+            Timbres[2].f_Op3.SSG_EG = 0;
+            Timbres[2].f_Op3.TL = 20;
 
-            Timbres[2]._Op4.AR = 31;
-            Timbres[2]._Op4.D1R = 13;
-            Timbres[2]._Op4.SL = 15;
-            Timbres[2]._Op4.D2R = 0;
-            Timbres[2]._Op4.RR = 7;
+            Timbres[2].f_Op4.AR = 31;
+            Timbres[2].f_Op4.D1R = 13;
+            Timbres[2].f_Op4.SL = 15;
+            Timbres[2].f_Op4.D2R = 0;
+            Timbres[2].f_Op4.RR = 7;
 
-            Timbres[2]._Op4.MUL = 10;
-            Timbres[2]._Op4.RS = 0;
-            Timbres[2]._Op4.DT1 = 0;
-            Timbres[2]._Op4.AM = 0;
-            Timbres[2]._Op4.SSG_EG = 0;
-            Timbres[2]._Op4.TL = 20;
+            Timbres[2].f_Op4.MUL = 10;
+            Timbres[2].f_Op4.RS = 0;
+            Timbres[2].f_Op4.DT1 = 0;
+            Timbres[2].f_Op4.AM = 0;
+            Timbres[2].f_Op4.SSG_EG = 0;
+            Timbres[2].f_Op4.TL = 20;
 
             //DX Piano1
-            Timbres[1].SoundType = SoundType.FM;
             Timbres[1].FMS = 0;
             Timbres[1].AMS = 0;
             Timbres[1].FB = 0;
             Timbres[1].ALG = 1;
 
-            Timbres[1]._Op1.AR = 31;
-            Timbres[1]._Op1.D1R = 9;
-            Timbres[1]._Op1.SL = 15;
-            Timbres[1]._Op1.D2R = 0;
-            Timbres[1]._Op1.RR = 5;
+            Timbres[1].f_Op1.AR = 31;
+            Timbres[1].f_Op1.D1R = 9;
+            Timbres[1].f_Op1.SL = 15;
+            Timbres[1].f_Op1.D2R = 0;
+            Timbres[1].f_Op1.RR = 5;
 
-            Timbres[1]._Op1.MUL = 9;
-            Timbres[1]._Op1.RS = 2;
-            Timbres[1]._Op1.DT1 = 7;
-            Timbres[1]._Op1.AM = 0;
-            Timbres[1]._Op1.SSG_EG = 0;
-            Timbres[1]._Op1.TL = 60;
+            Timbres[1].f_Op1.MUL = 9;
+            Timbres[1].f_Op1.RS = 2;
+            Timbres[1].f_Op1.DT1 = 7;
+            Timbres[1].f_Op1.AM = 0;
+            Timbres[1].f_Op1.SSG_EG = 0;
+            Timbres[1].f_Op1.TL = 60;
 
-            Timbres[1]._Op2.AR = 31;
-            Timbres[1]._Op2.D1R = 9;
-            Timbres[1]._Op2.SL = 15;
-            Timbres[1]._Op2.D2R = 0;
-            Timbres[1]._Op2.RR = 5;
+            Timbres[1].f_Op2.AR = 31;
+            Timbres[1].f_Op2.D1R = 9;
+            Timbres[1].f_Op2.SL = 15;
+            Timbres[1].f_Op2.D2R = 0;
+            Timbres[1].f_Op2.RR = 5;
 
-            Timbres[1]._Op2.MUL = 9;
-            Timbres[1]._Op2.RS = 2;
-            Timbres[1]._Op2.DT1 = 1;
-            Timbres[1]._Op2.AM = 0;
-            Timbres[1]._Op2.SSG_EG = 0;
-            Timbres[1]._Op2.TL = 60;
+            Timbres[1].f_Op2.MUL = 9;
+            Timbres[1].f_Op2.RS = 2;
+            Timbres[1].f_Op2.DT1 = 1;
+            Timbres[1].f_Op2.AM = 0;
+            Timbres[1].f_Op2.SSG_EG = 0;
+            Timbres[1].f_Op2.TL = 60;
 
-            Timbres[1]._Op3.AR = 31;
-            Timbres[1]._Op3.D1R = 7;
-            Timbres[1]._Op3.SL = 15;
-            Timbres[1]._Op3.D2R = 0;
-            Timbres[1]._Op3.RR = 5;
+            Timbres[1].f_Op3.AR = 31;
+            Timbres[1].f_Op3.D1R = 7;
+            Timbres[1].f_Op3.SL = 15;
+            Timbres[1].f_Op3.D2R = 0;
+            Timbres[1].f_Op3.RR = 5;
 
-            Timbres[1]._Op3.MUL = 0;
-            Timbres[1]._Op3.RS = 2;
-            Timbres[1]._Op3.DT1 = 4;
-            Timbres[1]._Op3.AM = 0;
-            Timbres[1]._Op3.SSG_EG = 0;
-            Timbres[1]._Op3.TL = 28;
+            Timbres[1].f_Op3.MUL = 0;
+            Timbres[1].f_Op3.RS = 2;
+            Timbres[1].f_Op3.DT1 = 4;
+            Timbres[1].f_Op3.AM = 0;
+            Timbres[1].f_Op3.SSG_EG = 0;
+            Timbres[1].f_Op3.TL = 28;
 
-            Timbres[1]._Op4.AR = 31;
-            Timbres[1]._Op4.D1R = 3;
-            Timbres[1]._Op4.SL = 15;
-            Timbres[1]._Op4.D2R = 0;
-            Timbres[1]._Op4.RR = 5;
+            Timbres[1].f_Op4.AR = 31;
+            Timbres[1].f_Op4.D1R = 3;
+            Timbres[1].f_Op4.SL = 15;
+            Timbres[1].f_Op4.D2R = 0;
+            Timbres[1].f_Op4.RR = 5;
 
-            Timbres[1]._Op4.MUL = 0;
-            Timbres[1]._Op4.RS = 2;
-            Timbres[1]._Op4.DT1 = 4;
-            Timbres[1]._Op4.AM = 0;
-            Timbres[1]._Op4.SSG_EG = 0;
-            Timbres[1]._Op4.TL = 10;
+            Timbres[1].f_Op4.MUL = 0;
+            Timbres[1].f_Op4.RS = 2;
+            Timbres[1].f_Op4.DT1 = 4;
+            Timbres[1].f_Op4.AM = 0;
+            Timbres[1].f_Op4.SSG_EG = 0;
+            Timbres[1].f_Op4.TL = 10;
         }
 
         /// <summary>
@@ -347,15 +354,7 @@ namespace zanac.mamidimemo.instruments
                 {
                     if (t.NoteOnEvent.Channel == midiEvent.Channel)
                     {
-                        switch (t.Timbre.SoundType)
-                        {
-                            case SoundType.FM:
-                                t.UpdateFmPitch();
-                                break;
-                            case SoundType.PSG:
-                                //TODO:
-                                break;
-                        }
+                        t.UpdateFmPitch();
                     }
                 }
             }
@@ -377,15 +376,7 @@ namespace zanac.mamidimemo.instruments
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
-                                switch (t.Timbre.SoundType)
-                                {
-                                    case SoundType.FM:
-                                        t.UpdateFmVolume();
-                                        break;
-                                    case SoundType.PSG:
-                                        //TODO:
-                                        break;
-                                }
+                                t.UpdateFmVolume();
                             }
                         }
                         break;
@@ -394,15 +385,7 @@ namespace zanac.mamidimemo.instruments
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
-                                switch (t.Timbre.SoundType)
-                                {
-                                    case SoundType.FM:
-                                        t.UpdatePanpot();
-                                        break;
-                                    case SoundType.PSG:
-                                        //TODO:
-                                        break;
-                                }
+                                t.UpdatePanpot();
                             }
                         }
                         break;
@@ -411,15 +394,7 @@ namespace zanac.mamidimemo.instruments
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
-                                switch (t.Timbre.SoundType)
-                                {
-                                    case SoundType.FM:
-                                        t.UpdateFmVolume();
-                                        break;
-                                    case SoundType.PSG:
-                                        //TODO:
-                                        break;
-                                }
+                                t.UpdateFmVolume();
                             }
                         }
                         break;
@@ -438,15 +413,7 @@ namespace zanac.mamidimemo.instruments
 
                 YM2612Sound snd = new YM2612Sound(parentModule, note, emptySlot);
                 allOnSounds.Add(snd);
-                switch (snd.Timbre.SoundType)
-                {
-                    case SoundType.FM:
-                        fmOnSounds.Add(snd);
-                        break;
-                    case SoundType.PSG:
-                        psgOnSounds.Add(snd);
-                        break;
-                }
+                fmOnSounds.Add(snd);
                 FormMain.OutputLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
                 snd.On();
             }
@@ -462,19 +429,7 @@ namespace zanac.mamidimemo.instruments
                 var pn = parentModule.ProgramNumbers[note.Channel];
 
                 var timbre = parentModule.Timbres[pn];
-                switch (timbre.SoundType)
-                {
-                    case SoundType.FM:
-                        {
-                            emptySlot = SearchEmptySlot(fmOnSounds.ToList<SoundBase>(), 6);
-                            break;
-                        }
-                    case SoundType.PSG:
-                        {
-                            emptySlot = SearchEmptySlot(psgOnSounds.ToList<SoundBase>(), 3);
-                            break;
-                        }
-                }
+                emptySlot = SearchEmptySlot(fmOnSounds.ToList<SoundBase>(), 6);
                 return emptySlot;
             }
 
@@ -543,27 +498,15 @@ namespace zanac.mamidimemo.instruments
             /// </summary>
             public override void On()
             {
-                switch (Timbre.SoundType)
-                {
-                    case SoundType.FM:
-                        {
-                            //
-                            SetFmTimbre();
-                            //Freq
-                            UpdateFmPitch();
-                            //Volume
-                            UpdateFmVolume();
-                            //On
-                            uint reg = (uint)(Slot / 3) * 2;
-                            Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(0xf0 | (reg << 1) | (byte)(Slot % 3)));
-                            break;
-                        }
-                    case SoundType.PSG:
-                        {
-
-                            break;
-                        }
-                }
+                //
+                SetFmTimbre();
+                //Freq
+                UpdateFmPitch();
+                //Volume
+                UpdateFmVolume();
+                //On
+                uint reg = (uint)(Slot / 3) * 2;
+                Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(0xf0 | (reg << 1) | (byte)(Slot % 3)));
             }
 
 
@@ -617,7 +560,7 @@ namespace zanac.mamidimemo.instruments
                 foreach (int op in ops)
                 {
                     //$40+: total level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(127 - Math.Round((127 - timbre.GetOperator(op).TL) * vol * vel)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(127 - Math.Round((127 - timbre.GetOperator(op).TL) * vol * vel * exp)));
                 }
             }
 
@@ -665,7 +608,7 @@ namespace zanac.mamidimemo.instruments
                     var doctave = NoteOnEvent.GetNoteOctave() - nnOn.GetNoteOctave() + 1;
                     nfreq = nfreq / (double)doctave;
 
-                    var dfreq = (nfreq - cfreq) * ((double)pitch / (double)8192);
+                    var dfreq = (nfreq - cfreq) * ((double)-pitch / (double)8192);
                     var freq = (ushort)Math.Round(cfreq + dfreq);
                     byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 3);
 
@@ -737,20 +680,8 @@ namespace zanac.mamidimemo.instruments
             /// </summary>
             public override void Off()
             {
-                switch (Timbre.SoundType)
-                {
-                    case SoundType.FM:
-                        {
-                            uint reg = (uint)(Slot / 3) * 2;
-                            Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(0x00 | (reg << 1) | (byte)(Slot % 3)));
-                            break;
-                        }
-                    case SoundType.PSG:
-                        {
-
-                            break;
-                        }
-                }
+                uint reg = (uint)(Slot / 3) * 2;
+                Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(0x00 | (reg << 1) | (byte)(Slot % 3)));
             }
 
             /// <summary>
@@ -812,119 +743,117 @@ namespace zanac.mamidimemo.instruments
         [TypeConverter(typeof(ValueTypeTypeConverter<YM2612Timbre>))]
         public struct YM2612Timbre
         {
-            public SoundType SoundType;
-
             #region FM Symth
 
-            public byte _FB;
+            public byte f_FB;
 
             public byte FB
             {
                 get
                 {
-                    return _FB;
+                    return f_FB;
                 }
                 set
                 {
-                    _FB = value;
+                    f_FB = (byte)(value & 7);
                 }
             }
 
-            public byte _ALG;
+            public byte f_ALG;
 
             public byte ALG
             {
                 get
                 {
-                    return _ALG;
+                    return f_ALG;
                 }
                 set
                 {
-                    _ALG = value;
+                    f_ALG = (byte)(value & 7);
                 }
             }
 
-            public byte _AMS;
+            public byte f_AMS;
 
             public byte AMS
             {
                 get
                 {
-                    return _AMS;
+                    return f_AMS;
                 }
                 set
                 {
-                    _AMS = value;
+                    f_AMS = (byte)(value & 3);
                 }
             }
 
-            public byte _FMS;
+            public byte f_FMS;
 
             public byte FMS
             {
                 get
                 {
-                    return _FMS;
+                    return f_FMS;
                 }
                 set
                 {
-                    _FMS = value;
+                    f_FMS = (byte)(value & 7);
                 }
             }
 
-            public YM2612Operator _Op1;
+            public YM2612Operator f_Op1;
 
             public YM2612Operator Op1
             {
                 get
                 {
-                    return _Op1;
+                    return f_Op1;
                 }
                 set
                 {
-                    _Op1 = value;
+                    f_Op1 = value;
                 }
             }
 
-            public YM2612Operator _Op2;
+            public YM2612Operator f_Op2;
 
             public YM2612Operator Op2
             {
                 get
                 {
-                    return _Op2;
+                    return f_Op2;
                 }
                 set
                 {
-                    _Op2 = value;
+                    f_Op2 = value;
                 }
             }
 
-            public YM2612Operator _Op3;
+            public YM2612Operator f_Op3;
 
             public YM2612Operator Op3
             {
                 get
                 {
-                    return _Op3;
+                    return f_Op3;
                 }
                 set
                 {
-                    _Op3 = value;
+                    f_Op3 = value;
                 }
             }
 
-            public YM2612Operator _Op4;
+            public YM2612Operator f_Op4;
 
             public YM2612Operator Op4
             {
                 get
                 {
-                    return _Op4;
+                    return f_Op4;
                 }
                 set
                 {
-                    _Op4 = value;
+                    f_Op4 = value;
                 }
             }
 
@@ -960,224 +889,190 @@ namespace zanac.mamidimemo.instruments
             /// <summary>
             /// Detune1(0-7)
             /// </summary>
-            public byte _DT1;
+            public byte f_DT1;
 
             public byte DT1
             {
                 get
                 {
-                    return _DT1;
+                    return f_DT1;
                 }
                 set
                 {
-                    _DT1 = value;
+                    f_DT1 = (byte)(value & 7);
                 }
             }
 
             /// <summary>
             /// Multiply(0-15)
             /// </summary>
-            public byte _MUL;
+            public byte f_MUL;
 
             public byte MUL
             {
                 get
                 {
-                    return _MUL;
+                    return f_MUL;
                 }
                 set
                 {
-                    _MUL = value;
+                    f_MUL = (byte)(value & 15);
                 }
             }
 
             /// <summary>
             /// Total Level(0-127)
             /// </summary>
-            public byte _TL;
+            public byte f_TL;
 
             public byte TL
             {
                 get
                 {
-                    return _TL;
+                    return f_TL;
                 }
                 set
                 {
-                    _TL = (byte)(value & 127);
+                    f_TL = (byte)(value & 127);
                 }
             }
 
             /// <summary>
             /// Rate Scaling(0-3)
             /// </summary>
-            public byte _RS;
+            public byte f_RS;
 
             public byte RS
             {
                 get
                 {
-                    return _RS;
+                    return f_RS;
                 }
                 set
                 {
-                    _RS = (byte)(value & 3);
+                    f_RS = (byte)(value & 3);
                 }
             }
 
             /// <summary>
             /// Attack Rate(0-31)
             /// </summary>
-            public byte _AR;
+            public byte f_AR;
 
             public byte AR
             {
                 get
                 {
-                    return _AR;
+                    return f_AR;
                 }
                 set
                 {
-                    _AR = (byte)(value & 31);
+                    f_AR = (byte)(value & 31);
                 }
             }
 
             /// <summary>
             /// amplitude modulation sensivity(0-1)
             /// </summary>
-            public byte _AM;
+            public byte f_AM;
 
             public byte AM
             {
                 get
                 {
-                    return _AM;
+                    return f_AM;
                 }
                 set
                 {
-                    _AM = (byte)(value & 1);
+                    f_AM = (byte)(value & 1);
                 }
             }
 
             /// <summary>
             /// 1st decay rate(0-31)
             /// </summary>
-            public byte _D1R;
+            public byte f_D1R;
 
             public byte D1R
             {
                 get
                 {
-                    return _D1R;
+                    return f_D1R;
                 }
                 set
                 {
-                    _D1R = (byte)(value & 31);
+                    f_D1R = (byte)(value & 31);
                 }
             }
 
             /// <summary>
             /// 2nd decay rate(0-31)
             /// </summary>
-            public byte _D2R;
+            public byte f_D2R;
 
             public byte D2R
             {
                 get
                 {
-                    return _D2R;
+                    return f_D2R;
                 }
                 set
                 {
-                    _D2R = (byte)(value & 31);
+                    f_D2R = (byte)(value & 31);
                 }
             }
 
             /// <summary>
             /// sustain level(0-15)
             /// </summary>
-            public byte _SL;
+            public byte f_SL;
 
             public byte SL
             {
                 get
                 {
-                    return _SL;
+                    return f_SL;
                 }
                 set
                 {
-                    _SL = (byte)(value & 15);
+                    f_SL = (byte)(value & 15);
                 }
             }
 
             /// <summary>
             /// release rate(0-15)
             /// </summary>
-            public byte _RR;
+            public byte f_RR;
 
             public byte RR
             {
                 get
                 {
-                    return _RR;
+                    return f_RR;
                 }
                 set
                 {
-                    _RR = (byte)(value & 15);
+                    f_RR = (byte)(value & 15);
                 }
             }
 
             /// <summary>
             /// SSG-EG(0-15)
             /// </summary>
-            public byte _SSG_EG;
+            public byte f_SSG_EG;
 
             public byte SSG_EG
             {
                 get
                 {
-                    return _SSG_EG;
+                    return f_SSG_EG;
                 }
                 set
                 {
-                    _SSG_EG = (byte)(value & 15);
+                    f_SSG_EG = (byte)(value & 15);
                 }
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public enum SoundType
-        {
-            FM,
-            PSG,
-        }
-
-        public class ValueTypeTypeConverter<T> : ExpandableObjectConverter where T : struct
-        {
-            public override bool GetCreateInstanceSupported(ITypeDescriptorContext context)
-            {
-                return true;
-            }
-
-            public override object CreateInstance(ITypeDescriptorContext context, IDictionary propertyValues)
-            {
-                if (propertyValues == null)
-                    throw new ArgumentNullException("propertyValues");
-
-                T ret = default(T);
-                object boxed = ret;
-                foreach (DictionaryEntry entry in propertyValues)
-                {
-                    PropertyInfo pi = ret.GetType().GetProperty(entry.Key.ToString());
-                    if (pi != null && pi.CanWrite)
-                    {
-                        pi.SetValue(boxed, Convert.ChangeType(entry.Value, pi.PropertyType), null);
-                    }
-                }
-                return (T)boxed;
-            }
-        }
     }
 }

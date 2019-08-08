@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\ValueTypeTypeConverter.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,6 +79,7 @@
     <Compile Include="instruments\InstrumentType.cs" />
     <Compile Include="instruments\SoundBase.cs" />
     <Compile Include="instruments\SoundManagerBase.cs" />
+    <Compile Include="instruments\SN76496.cs" />
     <Compile Include="instruments\YM2612.cs" />
     <Compile Include="mame\MameIf.cs" />
     <Compile Include="midi\MidiManager.cs" />

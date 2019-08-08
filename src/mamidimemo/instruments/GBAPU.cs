@@ -12,6 +12,11 @@ using Melanchall.DryWetMidi.Smf;
 using zanac.mamidimemo.mame;
 using zanac.mamidimemo.midi;
 
+//http://bgb.bircd.org/pandocs.htm#soundcontrolregisters
+//https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+//http://mydocuments.g2.xrea.com/
+//http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
+
 namespace zanac.mamidimemo.instruments
 {
     /// <summary>
@@ -47,16 +52,49 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
-        private static delegate_gb_apu_write GbApi_write
+        private static void GbApuWriteData(uint unitNumber, uint address, byte data)
         {
-            get;
-            set;
+            try
+            {
+                Program.SoundUpdating();
+                GbApu_write(unitNumber, address, data);
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private static delegate_gb_apu_read GbApi_read
+        private static delegate_gb_apu_write GbApu_write
+        {
+            get;
+            set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static byte GbApuReadData(uint unitNumber, uint address)
+        {
+            try
+            {
+                Program.SoundUpdating();
+                return GbApu_read(unitNumber, address);
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_gb_apu_read GbApu_read
         {
             get;
             set;
@@ -69,10 +107,10 @@ namespace zanac.mamidimemo.instruments
         {
             IntPtr funcPtr = MameIF.GetProcAddress("gb_apu_write");
             if (funcPtr != IntPtr.Zero)
-            {
-                GbApi_write = (delegate_gb_apu_write)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_gb_apu_write));
-                GbApi_read = (delegate_gb_apu_read)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_gb_apu_read));
-            }
+                GbApu_write = (delegate_gb_apu_write)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_gb_apu_write));
+            funcPtr = MameIF.GetProcAddress("gb_apu_read");
+            if (funcPtr != IntPtr.Zero)
+                GbApu_read = (delegate_gb_apu_read)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_gb_apu_read));
         }
 
         private GBSoundManager soundManager;
@@ -147,8 +185,17 @@ namespace zanac.mamidimemo.instruments
                 Timbres = new GBAPUTimbre[128];
 
                 //Sound On
-                GbApi_write?.Invoke(parentModule.UnitNumber, 0x16, 0x80);
-                GbApi_write?.Invoke(parentModule.UnitNumber, 0x14, 0x77);
+                try
+                {
+                    Program.SoundUpdating();
+                    GbApuWriteData(parentModule.UnitNumber, 0x16, 0x80);
+                    GbApuWriteData(parentModule.UnitNumber, 0x14, 0x77);
+                }
+                finally
+                {
+                    Program.SoundUpdated();
+                }
+
             }
 
             /// <summary>
@@ -287,8 +334,8 @@ namespace zanac.mamidimemo.instruments
                         {
                             uint reg = (uint)(Slot * 5);
 
-                            GbApi_write?.Invoke(parentModule.UnitNumber, reg, 0x00);
-                            GbApi_write?.Invoke(parentModule.UnitNumber, reg + 1, 0x00);
+                            GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
+                            GbApuWriteData(parentModule.UnitNumber, reg + 1, 0x00);
 
 
                             //SetTimbre(Slot);
@@ -301,10 +348,10 @@ namespace zanac.mamidimemo.instruments
                             //Volume
                             byte vol = parentModule.Volumes[NoteOnEvent.Channel];
                             vol = (byte)((vol >> 3) & 0xf);
-                            GbApi_write?.Invoke(parentModule.UnitNumber, reg + 2, (byte)((vol << 4) | 0x00));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 2, (byte)((vol << 4) | 0x00));
 
                             //Pan
-                            byte? cpan = GbApi_read?.Invoke(parentModule.UnitNumber, 0x15);
+                            byte? cpan = GbApu_read?.Invoke(parentModule.UnitNumber, 0x15);
                             if (cpan.HasValue)
                             {
                                 byte mask = (byte)(0x11 << Slot);
@@ -320,11 +367,11 @@ namespace zanac.mamidimemo.instruments
                                 pan = (byte)(pan << Slot);
                                 ccpan |= pan;
 
-                                GbApi_write?.Invoke(parentModule.UnitNumber, 0x15, ccpan);
+                                GbApuWriteData(parentModule.UnitNumber, 0x15, ccpan);
                             }
 
-                            GbApi_write?.Invoke(parentModule.UnitNumber, reg + 3, (byte)(freq & 0xff));
-                            GbApi_write?.Invoke(parentModule.UnitNumber, reg + 4, (byte)(0x80 | ((freq >> 8) & 0x03)));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(freq & 0xff));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(0x80 | ((freq >> 8) & 0x03)));
 
                             break;
                         }
@@ -358,7 +405,7 @@ namespace zanac.mamidimemo.instruments
                         {
                             uint reg = (uint)(Slot * 5);
 
-                            GbApi_write?.Invoke(parentModule.UnitNumber, reg + 2, 0x00);
+                            GbApuWriteData(parentModule.UnitNumber, reg + 2, 0x00);
 
                             break;
                         }

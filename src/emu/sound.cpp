@@ -1082,8 +1082,13 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 //  and send it to the OSD layer
 //-------------------------------------------------
 
+void SoundUpdating();
+void SoundUpdated();
+
 void sound_manager::update(void *ptr, int param)
 {
+	SoundUpdating();
+
 	VPRINTF(("sound_update\n"));
 
 	g_profiler.start(PROFILER_SOUND);
@@ -1152,4 +1157,6 @@ void sound_manager::update(void *ptr, int param)
 		stream->apply_sample_rate_changes();
 
 	g_profiler.stop();
+
+	SoundUpdated();
 }

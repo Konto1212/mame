@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 using zanac.mamidimemo.instruments;
 using zanac.mamidimemo.Properties;
 
+//https://www.g200kg.com/jp/docs/tech/index.html
+//http://lib.roland.co.jp/support/jp/manuals/res/1809744/MT-32_j2.pdf
+//https://nickfever.com/Music/midi-cc-list
+
 namespace zanac.mamidimemo.midi
 {
     public static class MidiManager
