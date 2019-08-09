@@ -55,6 +55,7 @@
             this.addYM2612ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addSN76496ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addNAMCOCUS30ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addYM2151ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -190,6 +191,7 @@
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addYM2151ToolStripMenuItem,
             this.addYM2612ToolStripMenuItem,
             this.addSN76496ToolStripMenuItem,
             this.addNAMCOCUS30ToolStripMenuItem});
@@ -213,6 +215,12 @@
             this.addNAMCOCUS30ToolStripMenuItem.Name = "addNAMCOCUS30ToolStripMenuItem";
             resources.ApplyResources(this.addNAMCOCUS30ToolStripMenuItem, "addNAMCOCUS30ToolStripMenuItem");
             this.addNAMCOCUS30ToolStripMenuItem.Click += new System.EventHandler(this.addNAMCOCUS30ToolStripMenuItem_Click);
+            // 
+            // addYM2151ToolStripMenuItem
+            // 
+            this.addYM2151ToolStripMenuItem.Name = "addYM2151ToolStripMenuItem";
+            resources.ApplyResources(this.addYM2151ToolStripMenuItem, "addYM2151ToolStripMenuItem");
+            this.addYM2151ToolStripMenuItem.Click += new System.EventHandler(this.addYM2151ToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -262,6 +270,7 @@
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.ToolStripMenuItem addSN76496ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addNAMCOCUS30ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addYM2151ToolStripMenuItem;
     }
 }
 

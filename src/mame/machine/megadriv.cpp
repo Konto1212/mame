@@ -930,6 +930,10 @@ void md_base_state::md_ntsc(machine_config &config)
 	//mamidimemo
 
 	for (int i = 0; i < 8; i++) {
+		YM2151(config, *m_ym2151[i], XTAL(3'579'545));
+		(*m_ym2151[i])->add_route(0, "lspeaker", 1.00);
+		(*m_ym2151[i])->add_route(1, "rspeaker", 1.00);
+
 		YM2612(config, *m_ym2612[i], MASTER_CLOCK_NTSC / 7); /* 7.67 MHz */
 		(*m_ym2612[i])->add_route(0, "lspeaker", 1.00);
 		(*m_ym2612[i])->add_route(1, "rspeaker", 1.00);

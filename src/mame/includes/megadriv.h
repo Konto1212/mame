@@ -9,6 +9,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2612intf.h"
+#include "sound/ym2151.h"
 #include "sound/gb.h"
 #include "sound/sn76496.h"
 #include "sound/namco.h"
@@ -62,6 +63,10 @@ public:
 			int didx = 0;
 			std::string num = std::to_string(i);
 
+			//YM2151
+			strcpy(device_names[didx][i], (std::string("ym2151_") + num).c_str());
+			m_ym2151[i] = new optional_device<ym2151_device>(*this, device_names[didx][i]);
+			didx++;
 			//YM2612
 			strcpy(device_names[didx][i], (std::string("ym2612_") + num).c_str());
 			m_ym2612[i] = new optional_device<ym2612_device>(*this, device_names[didx][i]);
@@ -81,7 +86,8 @@ public:
 		}
 	}
 
-	char device_names[4][8][100];
+	char device_names[5][8][100];
+	optional_device<ym2151_device> *m_ym2151[8];
 	optional_device<ym2612_device> *m_ym2612[8];
 	optional_device<gameboy_sound_device> *m_gbsnd[8];
 	optional_device<sn76496_base_device> *m_sn76496[8];

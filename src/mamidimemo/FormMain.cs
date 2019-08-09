@@ -169,6 +169,9 @@ namespace zanac.mamidimemo
             Close();
         }
 
-
+        private void addYM2151ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.YM2151);
+        }
     }
 }

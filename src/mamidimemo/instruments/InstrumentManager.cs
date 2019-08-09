@@ -8,6 +8,8 @@ namespace zanac.mamidimemo.instruments
 {
     public static class InstrumentManager
     {
+        public static List<YM2151> List_ym2151 = new List<YM2151>();
+
         public static List<YM2612> List_ym2612 = new List<YM2612>();
 
         public static List<GBAPU> List_gbapu = new List<GBAPU>();
@@ -19,6 +21,7 @@ namespace zanac.mamidimemo.instruments
         public static IEnumerable<InstrumentBase> GetAllInstruments()
         {
             List<InstrumentBase> insts = new List<InstrumentBase>();
+            insts.AddRange(List_ym2151);
             insts.AddRange(List_ym2612);
             insts.AddRange(List_gbapu);
             insts.AddRange(List_sn76496);
@@ -39,6 +42,18 @@ namespace zanac.mamidimemo.instruments
         {
             switch (instrumentType)
             {
+                case InstrumentType.YM2151:
+                    {
+                        lock (List_ym2151)
+                        {
+                            if (List_ym2151.Count < 7)
+                            {
+                                List_ym2151.Add(new YM2151((uint)List_ym2151.Count));
+                                InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
+                            }
+                        }
+                        break;
+                    }
                 case InstrumentType.YM2612:
                     {
                         lock (List_ym2612)
@@ -99,6 +114,10 @@ namespace zanac.mamidimemo.instruments
         {
             switch (instrument.InstrumentType)
             {
+                case InstrumentType.YM2151:
+                    List_ym2151.Remove((YM2151)instrument);
+                    InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
+                    break;
                 case InstrumentType.YM2612:
                     List_ym2612.Remove((YM2612)instrument);
                     InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
@@ -133,6 +152,8 @@ namespace zanac.mamidimemo.instruments
         /// <param name="e"></param>
         private static void MidiManager_MidiEventReceived(object sender, Melanchall.DryWetMidi.Devices.MidiEventReceivedEventArgs e)
         {
+            lock (List_ym2151)
+                List_ym2151.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
             lock (List_ym2612)
                 List_ym2612.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
             lock (List_gbapu)

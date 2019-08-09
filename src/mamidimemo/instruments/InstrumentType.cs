@@ -11,6 +11,7 @@ namespace zanac.mamidimemo.instruments
     /// </summary>
     public enum InstrumentType
     {
+        YM2151,
         YM2612,
         GBAPU,
         SN76496,

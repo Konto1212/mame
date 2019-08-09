@@ -14,26 +14,26 @@ using zanac.mamidimemo.ComponentModel;
 using zanac.mamidimemo.mame;
 using zanac.mamidimemo.midi;
 
-//https://www.plutiedev.com/ym2612-registers
-//http://www.smspower.org/maxim/Documents/YM2612#regb4
+//https://www.plutiedev.com/ym2151-registers
+//http://www.smspower.org/maxim/Documents/YM2151#regb4
 
 namespace zanac.mamidimemo.instruments
 {
     /// <summary>
     /// 
     /// </summary>
-    public class YM2612 : InstrumentBase
+    public class YM2151 : InstrumentBase
     {
 
-        public override string Name => "YM2612";
+        public override string Name => "YM2151";
 
-        public override InstrumentType InstrumentType => InstrumentType.YM2612;
+        public override InstrumentType InstrumentType => InstrumentType.YM2151;
 
         [Browsable(false)]
-        public override string ImageKey => "YM2612";
+        public override string ImageKey => "YM2151";
 
 
-        public YM2612Timbre[] Timbres
+        public YM2151Timbre[] Timbres
         {
             get;
             private set;
@@ -46,13 +46,13 @@ namespace zanac.mamidimemo.instruments
         /// <param name="data"></param>
         /// <returns></returns>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void delegate_ym2612_write(uint unitNumber, uint address, byte data);
+        private delegate void delegate_ym2151_write(uint unitNumber, uint address, byte data);
 
 
         /// <summary>
         /// 
         /// </summary>
-        private static delegate_ym2612_write Ym2612_write
+        private static delegate_ym2151_write Ym2151_write
         {
             get;
             set;
@@ -62,14 +62,28 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
-        private static void Ym2612WriteData(uint unitNumber, byte address, int op, int slot, byte data)
+        private static void Ym2151WriteData(uint unitNumber, byte address, int op, int slot, byte data)
         {
-            uint reg = (uint)(slot / 3) * 2;
             try
             {
                 Program.SoundUpdating();
-                Ym2612_write(unitNumber, reg + 0, (byte)(address + (op * 4) + (slot % 3)));
-                Ym2612_write(unitNumber, reg + 1, data);
+                switch (op)
+                {
+                    case 0:
+                        op = 0;
+                        break;
+                    case 1:
+                        op = 2;
+                        break;
+                    case 2:
+                        op = 1;
+                        break;
+                    case 3:
+                        op = 3;
+                        break;
+                }
+                Ym2151_write(unitNumber, 0, (byte)(address + (op * 8) + slot));
+                Ym2151_write(unitNumber, 1, data);
             }
             finally
             {
@@ -80,26 +94,26 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
-        static YM2612()
+        static YM2151()
         {
-            IntPtr funcPtr = MameIF.GetProcAddress("ym2612_write");
+            IntPtr funcPtr = MameIF.GetProcAddress("ym2151_write");
             if (funcPtr != IntPtr.Zero)
             {
-                Ym2612_write = (delegate_ym2612_write)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_ym2612_write));
+                Ym2151_write = (delegate_ym2151_write)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_ym2151_write));
             }
         }
 
-        private YM2612SoundManager soundManager;
+        private YM2151SoundManager soundManager;
 
         /// <summary>
         /// 
         /// </summary>
-        public YM2612(uint unitNumber) : base(unitNumber)
+        public YM2151(uint unitNumber) : base(unitNumber)
         {
-            Timbres = new YM2612Timbre[128];
+            Timbres = new YM2151Timbre[128];
             setPresetInstruments();
 
-            this.soundManager = new YM2612SoundManager(this);
+            this.soundManager = new YM2151SoundManager(this);
         }
 
         /// <summary>
@@ -107,183 +121,67 @@ namespace zanac.mamidimemo.instruments
         /// </summary>
         private void setPresetInstruments()
         {
-            //Brass Section.dmp
-            Timbres[0].FMS = 1;
+            //Dist Gt
+            Timbres[0].PMS = 0;
             Timbres[0].AMS = 0;
-            Timbres[0].FB = 7;
+            Timbres[0].FB = 0;
             Timbres[0].ALG = 3;
 
             Timbres[0].f_Op1.Enable = 1;
             Timbres[0].f_Op1.AR = 31;
-            Timbres[0].f_Op1.D1R = 6;
-            Timbres[0].f_Op1.SL = 15;
+            Timbres[0].f_Op1.D1R = 0;
+            Timbres[0].f_Op1.SL = 0;
             Timbres[0].f_Op1.D2R = 0;
-            Timbres[0].f_Op1.RR = 7;
+            Timbres[0].f_Op1.RR = 6;
 
-            Timbres[0].f_Op1.MUL = 1;
+            Timbres[0].f_Op1.MUL = 8;
             Timbres[0].f_Op1.RS = 0;
             Timbres[0].f_Op1.DT1 = 7;
             Timbres[0].f_Op1.AM = 0;
-            Timbres[0].f_Op1.SSG_EG = 0;
-            Timbres[0].f_Op1.TL = 20;
+            Timbres[0].f_Op1.DT2 = 0;
+            Timbres[0].f_Op1.TL = 56;
 
             Timbres[0].f_Op2.Enable = 1;
             Timbres[0].f_Op2.AR = 31;
-            Timbres[0].f_Op2.D1R = 7;
-            Timbres[0].f_Op2.SL = 4;
+            Timbres[0].f_Op2.D1R = 18;
+            Timbres[0].f_Op2.SL = 0;
             Timbres[0].f_Op2.D2R = 0;
-            Timbres[0].f_Op2.RR = 15;
+            Timbres[0].f_Op2.RR = 6;
 
-            Timbres[0].f_Op2.MUL = 2;
+            Timbres[0].f_Op2.MUL = 3;
             Timbres[0].f_Op2.RS = 0;
-            Timbres[0].f_Op2.DT1 = 6;
+            Timbres[0].f_Op2.DT1 = 7;
             Timbres[0].f_Op2.AM = 0;
-            Timbres[0].f_Op2.SSG_EG = 0;
-            Timbres[0].f_Op2.TL = 21;
+            Timbres[0].f_Op2.DT2 = 0;
+            Timbres[0].f_Op2.TL = 19;
 
             Timbres[0].f_Op3.Enable = 1;
             Timbres[0].f_Op3.AR = 31;
-            Timbres[0].f_Op3.D1R = 7;
-            Timbres[0].f_Op3.SL = 4;
+            Timbres[0].f_Op3.D1R = 0;
+            Timbres[0].f_Op3.SL = 0;
             Timbres[0].f_Op3.D2R = 0;
-            Timbres[0].f_Op3.RR = 15;
+            Timbres[0].f_Op3.RR = 6;
 
-            Timbres[0].f_Op3.MUL = 1;
+            Timbres[0].f_Op3.MUL = 3;
             Timbres[0].f_Op3.RS = 0;
-            Timbres[0].f_Op3.DT1 = 2;
+            Timbres[0].f_Op3.DT1 = 4;
             Timbres[0].f_Op3.AM = 0;
-            Timbres[0].f_Op3.SSG_EG = 0;
-            Timbres[0].f_Op3.TL = 12;
+            Timbres[0].f_Op3.DT2 = 0;
+            Timbres[0].f_Op3.TL = 8;
 
             Timbres[0].f_Op4.Enable = 1;
-            Timbres[0].f_Op4.AR = 31;
-            Timbres[0].f_Op4.D1R = 0;
+            Timbres[0].f_Op4.AR = 20;
+            Timbres[0].f_Op4.D1R = 17;
             Timbres[0].f_Op4.SL = 0;
             Timbres[0].f_Op4.D2R = 0;
-            Timbres[0].f_Op4.RR = 15;
+            Timbres[0].f_Op4.RR = 5;
 
-            Timbres[0].f_Op4.MUL = 1;
+            Timbres[0].f_Op4.MUL = 2;
             Timbres[0].f_Op4.RS = 0;
             Timbres[0].f_Op4.DT1 = 4;
             Timbres[0].f_Op4.AM = 0;
-            Timbres[0].f_Op4.SSG_EG = 0;
-            Timbres[0].f_Op4.TL = 12;
-
-            //Additive Chimes A.dmp
-            Timbres[2].FMS = 0;
-            Timbres[2].AMS = 0;
-            Timbres[2].FB = 0;
-            Timbres[2].ALG = 7;
-
-            Timbres[2].f_Op1.AR = 31;
-            Timbres[2].f_Op1.D1R = 4;
-            Timbres[2].f_Op1.SL = 15;
-            Timbres[2].f_Op1.D2R = 0;
-            Timbres[2].f_Op1.RR = 4;
-
-            Timbres[2].f_Op1.MUL = 1;
-            Timbres[2].f_Op1.RS = 0;
-            Timbres[2].f_Op1.DT1 = 4;
-            Timbres[2].f_Op1.AM = 0;
-            Timbres[2].f_Op1.SSG_EG = 0;
-            Timbres[2].f_Op1.TL = 20;
-
-            Timbres[2].f_Op2.AR = 31;
-            Timbres[2].f_Op2.D1R = 7;
-            Timbres[2].f_Op2.SL = 15;
-            Timbres[2].f_Op2.D2R = 0;
-            Timbres[2].f_Op2.RR = 5;
-
-            Timbres[2].f_Op2.MUL = 4;
-            Timbres[2].f_Op2.RS = 0;
-            Timbres[2].f_Op2.DT1 = 4;
-            Timbres[2].f_Op2.AM = 0;
-            Timbres[2].f_Op2.SSG_EG = 0;
-            Timbres[2].f_Op2.TL = 20;
-
-            Timbres[2].f_Op3.AR = 31;
-            Timbres[2].f_Op3.D1R = 10;
-            Timbres[2].f_Op3.SL = 15;
-            Timbres[2].f_Op3.D2R = 0;
-            Timbres[2].f_Op3.RR = 6;
-
-            Timbres[2].f_Op3.MUL = 7;
-            Timbres[2].f_Op3.RS = 0;
-            Timbres[2].f_Op3.DT1 = 4;
-            Timbres[2].f_Op3.AM = 0;
-            Timbres[2].f_Op3.SSG_EG = 0;
-            Timbres[2].f_Op3.TL = 20;
-
-            Timbres[2].f_Op4.AR = 31;
-            Timbres[2].f_Op4.D1R = 13;
-            Timbres[2].f_Op4.SL = 15;
-            Timbres[2].f_Op4.D2R = 0;
-            Timbres[2].f_Op4.RR = 7;
-
-            Timbres[2].f_Op4.MUL = 10;
-            Timbres[2].f_Op4.RS = 0;
-            Timbres[2].f_Op4.DT1 = 0;
-            Timbres[2].f_Op4.AM = 0;
-            Timbres[2].f_Op4.SSG_EG = 0;
-            Timbres[2].f_Op4.TL = 20;
-
-            //DX Piano1
-            Timbres[1].FMS = 0;
-            Timbres[1].AMS = 0;
-            Timbres[1].FB = 0;
-            Timbres[1].ALG = 1;
-
-            Timbres[1].f_Op1.AR = 31;
-            Timbres[1].f_Op1.D1R = 9;
-            Timbres[1].f_Op1.SL = 15;
-            Timbres[1].f_Op1.D2R = 0;
-            Timbres[1].f_Op1.RR = 5;
-
-            Timbres[1].f_Op1.MUL = 9;
-            Timbres[1].f_Op1.RS = 2;
-            Timbres[1].f_Op1.DT1 = 7;
-            Timbres[1].f_Op1.AM = 0;
-            Timbres[1].f_Op1.SSG_EG = 0;
-            Timbres[1].f_Op1.TL = 60;
-
-            Timbres[1].f_Op2.AR = 31;
-            Timbres[1].f_Op2.D1R = 9;
-            Timbres[1].f_Op2.SL = 15;
-            Timbres[1].f_Op2.D2R = 0;
-            Timbres[1].f_Op2.RR = 5;
-
-            Timbres[1].f_Op2.MUL = 9;
-            Timbres[1].f_Op2.RS = 2;
-            Timbres[1].f_Op2.DT1 = 1;
-            Timbres[1].f_Op2.AM = 0;
-            Timbres[1].f_Op2.SSG_EG = 0;
-            Timbres[1].f_Op2.TL = 60;
-
-            Timbres[1].f_Op3.AR = 31;
-            Timbres[1].f_Op3.D1R = 7;
-            Timbres[1].f_Op3.SL = 15;
-            Timbres[1].f_Op3.D2R = 0;
-            Timbres[1].f_Op3.RR = 5;
-
-            Timbres[1].f_Op3.MUL = 0;
-            Timbres[1].f_Op3.RS = 2;
-            Timbres[1].f_Op3.DT1 = 4;
-            Timbres[1].f_Op3.AM = 0;
-            Timbres[1].f_Op3.SSG_EG = 0;
-            Timbres[1].f_Op3.TL = 28;
-
-            Timbres[1].f_Op4.AR = 31;
-            Timbres[1].f_Op4.D1R = 3;
-            Timbres[1].f_Op4.SL = 15;
-            Timbres[1].f_Op4.D2R = 0;
-            Timbres[1].f_Op4.RR = 5;
-
-            Timbres[1].f_Op4.MUL = 0;
-            Timbres[1].f_Op4.RS = 2;
-            Timbres[1].f_Op4.DT1 = 4;
-            Timbres[1].f_Op4.AM = 0;
-            Timbres[1].f_Op4.SSG_EG = 0;
-            Timbres[1].f_Op4.TL = 10;
+            Timbres[0].f_Op4.DT2 = 0;
+            Timbres[0].f_Op4.TL = 24;
         }
 
         /// <summary>
@@ -329,21 +227,21 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
-        private class YM2612SoundManager : SoundManagerBase
+        private class YM2151SoundManager : SoundManagerBase
         {
-            private List<YM2612Sound> allOnSounds = new List<YM2612Sound>();
+            private List<YM2151Sound> allOnSounds = new List<YM2151Sound>();
 
-            private List<YM2612Sound> fmOnSounds = new List<YM2612Sound>();
+            private List<YM2151Sound> fmOnSounds = new List<YM2151Sound>();
 
-            private List<YM2612Sound> psgOnSounds = new List<YM2612Sound>();
+            private List<YM2151Sound> psgOnSounds = new List<YM2151Sound>();
 
-            private YM2612 parentModule;
+            private YM2151 parentModule;
 
             /// <summary>
             /// 
             /// </summary>
             /// <param name="parent"></param>
-            public YM2612SoundManager(YM2612 parent)
+            public YM2151SoundManager(YM2151 parent)
             {
                 this.parentModule = parent;
             }
@@ -415,7 +313,7 @@ namespace zanac.mamidimemo.instruments
                 if (emptySlot < 0)
                     return;
 
-                YM2612Sound snd = new YM2612Sound(parentModule, note, emptySlot);
+                YM2151Sound snd = new YM2151Sound(parentModule, note, emptySlot);
                 allOnSounds.Add(snd);
                 fmOnSounds.Add(snd);
                 FormMain.OutputLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
@@ -443,7 +341,7 @@ namespace zanac.mamidimemo.instruments
             /// <param name="note"></param>
             public override void NoteOff(NoteOffEvent note)
             {
-                YM2612Sound removed = SearchAndRemoveOnSound(note, allOnSounds);
+                YM2151Sound removed = SearchAndRemoveOnSound(note, allOnSounds);
 
                 if (removed != null)
                 {
@@ -474,14 +372,14 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
-        private class YM2612Sound : SoundBase
+        private class YM2151Sound : SoundBase
         {
 
-            private YM2612 parentModule;
+            private YM2151 parentModule;
 
             private SevenBitNumber programNumber;
 
-            public YM2612Timbre Timbre;
+            public YM2151Timbre Timbre;
 
             /// <summary>
             /// 
@@ -490,7 +388,7 @@ namespace zanac.mamidimemo.instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public YM2612Sound(YM2612 parentModule, NoteOnEvent noteOnEvent, int slot) : base(noteOnEvent, slot)
+            public YM2151Sound(YM2151 parentModule, NoteOnEvent noteOnEvent, int slot) : base(noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -509,9 +407,8 @@ namespace zanac.mamidimemo.instruments
                 //Volume
                 UpdateFmVolume();
                 //On
-                uint reg = (uint)(Slot / 3) * 2;
-                byte op = (byte)(Timbre.Op1.Enable << 4 | Timbre.Op2.Enable << 5 | Timbre.Op3.Enable << 6 | Timbre.Op4.Enable << 7);
-                Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(op | (reg << 1) | (byte)(Slot % 3)));
+                byte op = (byte)(Timbre.Op1.Enable << 3 | Timbre.Op3.Enable << 4 | Timbre.Op2.Enable << 5 | Timbre.Op4.Enable << 6);
+                Ym2151WriteData(parentModule.UnitNumber, 0x08, 0, 0, (byte)(op | (Slot % 3)));
             }
 
 
@@ -564,8 +461,8 @@ namespace zanac.mamidimemo.instruments
                 var vel = NoteOnEvent.Velocity / 127d;
                 foreach (int op in ops)
                 {
-                    //$40+: total level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(127 - Math.Round((127 - timbre.GetOperator(op).TL) * vol * vel * exp)));
+                    //$60+: total level
+                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)(127 - Math.Round((127 - timbre.GetOperator(op).TL) * vol * vel * exp)));
                 }
             }
 
@@ -580,53 +477,123 @@ namespace zanac.mamidimemo.instruments
 
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
-
-                int noteNum = NoteOnEvent.NoteNumber;
                 if (pitch > 0)
                 {
-                    noteNum = NoteOnEvent.NoteNumber + range;
+                    //0x1fff 8192 13bit 0x3f 63 6bit
+                    double range1 = 8192d / range;
+                    int kf = (int)Math.Round(63d * (((double)pitch % range1) / range1));
+
+                    int noted = (int)(pitch / range1);
+                    int noteNum = NoteOnEvent.NoteNumber + noted;
                     if (noteNum > 127)
                         noteNum = 127;
                     var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
 
-                    double cfreq = (double)convertFmFrequency(NoteOnEvent);
-                    double nfreq = (double)convertFmFrequency(nnOn);
-                    var doctave = nnOn.GetNoteOctave() - NoteOnEvent.GetNoteOctave() + 1;
-                    nfreq = nfreq * (double)doctave;
-
-                    var dfreq = (nfreq - cfreq) * ((double)pitch / (double)8192);
-                    var freq = (ushort)Math.Round(cfreq + dfreq);
-                    byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 3);
-
-                    Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | (freq >> 8)));
-                    Ym2612WriteData(parentModule.UnitNumber, 0xa0, 0, Slot, (byte)(0xff & freq));
+                    byte nn = getNoteNum(nnOn.GetNoteName());
+                    byte octave = (byte)nnOn.GetNoteOctave();
+                    if (nn == 0xff)
+                    {
+                        if (octave > 0)
+                        {
+                            octave -= 1;
+                            nn = 14;
+                        }
+                    }
+                    if (octave > 0)
+                        octave -= 1;
+                    Ym2151WriteData(parentModule.UnitNumber, 0x28, 0, Slot, (byte)((octave << 4) | nn));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)(kf << 2));
                 }
                 else if (pitch < 0)
                 {
-                    noteNum = NoteOnEvent.NoteNumber - range;
-                    if (noteNum < 0)
-                        noteNum = 0;
+                    pitch = -pitch;
+                    double range1 = 8192d / range;
+                    int kf = (int)Math.Round(63d - (63d * (((double)pitch % range1) / range1)));
+
+                    int noted = (int)(pitch / range1) + 1;
+                    int noteNum = NoteOnEvent.NoteNumber - noted;
+                    if (noteNum > 127)
+                        noteNum = 127;
                     var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
 
-                    double cfreq = (double)convertFmFrequency(NoteOnEvent);
-                    double nfreq = (double)convertFmFrequency(nnOn);
-                    var doctave = NoteOnEvent.GetNoteOctave() - nnOn.GetNoteOctave() + 1;
-                    nfreq = nfreq / (double)doctave;
-
-                    var dfreq = (nfreq - cfreq) * ((double)-pitch / (double)8192);
-                    var freq = (ushort)Math.Round(cfreq + dfreq);
-                    byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 3);
-
-                    Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | (freq >> 8)));
-                    Ym2612WriteData(parentModule.UnitNumber, 0xa0, 0, Slot, (byte)(0xff & freq));
+                    byte nn = getNoteNum(nnOn.GetNoteName());
+                    byte octave = (byte)nnOn.GetNoteOctave();
+                    if (nn == 0xff)
+                    {
+                        if (octave > 0)
+                        {
+                            octave -= 1;
+                            nn = 14;
+                        }
+                    }
+                    if (octave > 0)
+                        octave -= 1;
+                    Ym2151WriteData(parentModule.UnitNumber, 0x28, 0, Slot, (byte)((octave << 4) | nn));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)(kf << 2));
                 }
                 else
                 {
-                    var freq = convertFmFrequency(NoteOnEvent);
-                    byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 3);
-                    Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | (freq >> 8)));
-                    Ym2612WriteData(parentModule.UnitNumber, 0xa0, 0, Slot, (byte)(0xff & freq));
+                    byte nn = getNoteNum(NoteOnEvent.GetNoteName());
+                    byte octave = (byte)NoteOnEvent.GetNoteOctave();
+                    if (nn == 0xff)
+                    {
+                        if (octave > 0)
+                        {
+                            octave -= 1;
+                            nn = 14;
+                        }
+                    }
+                    if (octave > 0)
+                        octave -= 1;
+                    Ym2151WriteData(parentModule.UnitNumber, 0x28, 0, Slot, (byte)((octave << 4) | nn));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)0);
                 }
+            }
+
+            private byte getNoteNum(NoteName noteName)
+            {
+                byte nn = 0;
+                switch (noteName)
+                {
+                    case NoteName.C:
+                        nn = 0xff;
+                        break;
+                    case NoteName.CSharp:
+                        nn = 0;
+                        break;
+                    case NoteName.D:
+                        nn = 1;
+                        break;
+                    case NoteName.DSharp:
+                        nn = 2;
+                        break;
+                    case NoteName.E:
+                        nn = 4;
+                        break;
+                    case NoteName.F:
+                        nn = 5;
+                        break;
+                    case NoteName.FSharp:
+                        nn = 6;
+                        break;
+                    case NoteName.G:
+                        nn = 8;
+                        break;
+                    case NoteName.GSharp:
+                        nn = 9;
+                        break;
+                    case NoteName.A:
+                        nn = 10;
+                        break;
+                    case NoteName.ASharp:
+                        nn = 12;
+                        break;
+                    case NoteName.B:
+                        nn = 13;
+                        break;
+                }
+
+                return nn;
             }
 
             /// <summary>
@@ -637,7 +604,6 @@ namespace zanac.mamidimemo.instruments
                 var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                 var timbre = parentModule.Timbres[pn];
 
-                //$B4+: panning, FMS, AMS
                 byte pan = parentModule.Panpots[NoteOnEvent.Channel];
                 if (pan < 32)
                     pan = 0x2;
@@ -645,7 +611,7 @@ namespace zanac.mamidimemo.instruments
                     pan = 0x1;
                 else
                     pan = 0x3;
-                Ym2612WriteData(parentModule.UnitNumber, 0xB4, 0, Slot, (byte)(pan << 6 | (timbre.AMS << 4) | timbre.FMS));
+                Ym2151WriteData(parentModule.UnitNumber, 0x20, 0, Slot, (byte)(pan << 6 | (timbre.FB << 3) | timbre.ALG));
             }
 
             /// <summary>
@@ -656,26 +622,16 @@ namespace zanac.mamidimemo.instruments
                 var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                 var timbre = parentModule.Timbres[pn];
 
+                Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)((timbre.PMS << 4 | timbre.AMS)));
                 for (int op = 0; op < 4; op++)
                 {
-                    //$30+: multiply and detune
-                    Ym2612WriteData(parentModule.UnitNumber, 0x30, op, Slot, (byte)((timbre.GetOperator(op).DT1 << 4 | timbre.GetOperator(op).MUL)));
-                    //$40+: total level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)timbre.GetOperator(op).TL);
-                    //$50+: attack rate and rate scaling
-                    Ym2612WriteData(parentModule.UnitNumber, 0x50, op, Slot, (byte)((timbre.GetOperator(op).RS << 6 | timbre.GetOperator(op).AR)));
-                    //$60+: 1st decay rate and AM enable
-                    Ym2612WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)((timbre.GetOperator(op).AM << 7 | timbre.GetOperator(op).D1R)));
-                    //$70+: 2nd decay rate
-                    Ym2612WriteData(parentModule.UnitNumber, 0x70, op, Slot, (byte)timbre.GetOperator(op).D2R);
-                    //$80+: release rate and sustain level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.GetOperator(op).SL << 4 | timbre.GetOperator(op).RR)));
-                    //$90+: SSG-EG
-                    Ym2612WriteData(parentModule.UnitNumber, 0x90, op, Slot, (byte)timbre.GetOperator(op).SSG_EG);
+                    Ym2151WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)((timbre.GetOperator(op).DT1 << 4 | timbre.GetOperator(op).MUL)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)timbre.GetOperator(op).TL);
+                    Ym2151WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.GetOperator(op).RS << 6 | timbre.GetOperator(op).AR)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xa0, op, Slot, (byte)((timbre.GetOperator(op).AM << 7 | timbre.GetOperator(op).D1R)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xc0, op, Slot, (byte)((timbre.GetOperator(op).DT2 << 7 | timbre.GetOperator(op).D2R)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xe0, op, Slot, (byte)((timbre.GetOperator(op).SL << 7 | timbre.GetOperator(op).RR)));
                 }
-
-                //$B0+: algorithm and feedback
-                Ym2612WriteData(parentModule.UnitNumber, 0xB0, 0, Slot, (byte)(timbre.FB << 3 | timbre.ALG));
 
                 UpdatePanpot();
             }
@@ -685,68 +641,16 @@ namespace zanac.mamidimemo.instruments
             /// </summary>
             public override void Off()
             {
-                uint reg = (uint)(Slot / 3) * 2;
-                Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(0x00 | (reg << 1) | (byte)(Slot % 3)));
+                Ym2151WriteData(parentModule.UnitNumber, 0x08, 0, 0, (byte)(0x00 | Slot));
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="note"></param>
-            /// <param name="freq"></param>
-            /// <returns></returns>
-            private ushort convertFmFrequency(NoteOnEvent note)
-            {
-                ushort freq = 0;
-                switch (note.GetNoteName())
-                {
-                    case NoteName.C:
-                        freq = 644;
-                        break;
-                    case NoteName.CSharp:
-                        freq = 681;
-                        break;
-                    case NoteName.D:
-                        freq = 722;
-                        break;
-                    case NoteName.DSharp:
-                        freq = 765;
-                        break;
-                    case NoteName.E:
-                        freq = 810;
-                        break;
-                    case NoteName.F:
-                        freq = 858;
-                        break;
-                    case NoteName.FSharp:
-                        freq = 910;
-                        break;
-                    case NoteName.G:
-                        freq = 964;
-                        break;
-                    case NoteName.GSharp:
-                        freq = 1021;
-                        break;
-                    case NoteName.A:
-                        freq = 1081;
-                        break;
-                    case NoteName.ASharp:
-                        freq = 1146;
-                        break;
-                    case NoteName.B:
-                        freq = 1214;
-                        break;
-                }
-
-                return freq;
-            }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ValueTypeTypeConverter<YM2612Timbre>))]
-        public struct YM2612Timbre
+        [TypeConverter(typeof(ValueTypeTypeConverter<YM2151Timbre>))]
+        public struct YM2151Timbre
         {
             #region FM Symth
 
@@ -792,23 +696,23 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public byte f_FMS;
+            public byte f_PMS;
 
-            public byte FMS
+            public byte PMS
             {
                 get
                 {
-                    return f_FMS;
+                    return f_PMS;
                 }
                 set
                 {
-                    f_FMS = (byte)(value & 7);
+                    f_PMS = (byte)(value & 7);
                 }
             }
 
-            public YM2612Operator f_Op1;
+            public YM2151Operator f_Op1;
 
-            public YM2612Operator Op1
+            public YM2151Operator Op1
             {
                 get
                 {
@@ -820,9 +724,9 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public YM2612Operator f_Op2;
+            public YM2151Operator f_Op2;
 
-            public YM2612Operator Op2
+            public YM2151Operator Op2
             {
                 get
                 {
@@ -834,9 +738,9 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public YM2612Operator f_Op3;
+            public YM2151Operator f_Op3;
 
-            public YM2612Operator Op3
+            public YM2151Operator Op3
             {
                 get
                 {
@@ -848,9 +752,9 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public YM2612Operator f_Op4;
+            public YM2151Operator f_Op4;
 
-            public YM2612Operator Op4
+            public YM2151Operator Op4
             {
                 get
                 {
@@ -868,7 +772,7 @@ namespace zanac.mamidimemo.instruments
             /// 
             /// </summary>
             /// <param name="idx"></param>
-            public YM2612Operator GetOperator(int idx)
+            public YM2151Operator GetOperator(int idx)
             {
                 switch (idx)
                 {
@@ -888,8 +792,8 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ValueTypeTypeConverter<YM2612Operator>))]
-        public struct YM2612Operator
+        [TypeConverter(typeof(ValueTypeTypeConverter<YM2151Operator>))]
+        public struct YM2151Operator
         {
             public byte f_Enable;
 
@@ -904,7 +808,7 @@ namespace zanac.mamidimemo.instruments
                 }
                 set
                 {
-                    f_Enable = value;
+                    f_Enable = (byte)(value & 1);
                 }
             }
 
@@ -1079,19 +983,19 @@ namespace zanac.mamidimemo.instruments
             }
 
             /// <summary>
-            /// SSG-EG(0-15)
+            /// DT2(0-3)
             /// </summary>
-            public byte f_SSG_EG;
+            public byte f_DT2;
 
-            public byte SSG_EG
+            public byte DT2
             {
                 get
                 {
-                    return f_SSG_EG;
+                    return f_DT2;
                 }
                 set
                 {
-                    f_SSG_EG = (byte)(value & 15);
+                    f_DT2 = (byte)(value & 3);
                 }
             }
         }

@@ -4,6 +4,7 @@
 #include "..\frontend\mame\mame.h"
 #include "..\frontend\mame\cheat.h"
 #include "..\devices\sound\fm.h"
+#include "..\devices\sound\ym2151.h"
 #include "..\devices\sound\2612intf.h"
 #include "..\devices\sound\gb.h"
 #include "..\devices\sound\sn76496.h"
@@ -16,6 +17,23 @@ address_space *dummy;
 extern "C"
 {
 	//memodimemo
+
+	DllExport void ym2151_write(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		ym2151_device *ym2151 = dynamic_cast<ym2151_device *>(rm->device((std::string("ym2151_") + num).c_str()));
+		if (ym2151 == nullptr)
+			return;
+
+		ym2151->write(address, data);
+	}
 
 	DllExport void ym2612_write(unsigned int unitNumber, unsigned int address, unsigned char data)
 	{

@@ -85,6 +85,7 @@
     <Compile Include="instruments\SoundBase.cs" />
     <Compile Include="instruments\SoundManagerBase.cs" />
     <Compile Include="instruments\SN76496.cs" />
+    <Compile Include="instruments\YM2151.cs" />
     <Compile Include="instruments\YM2612.cs" />
     <Compile Include="mame\MameIf.cs" />
     <Compile Include="midi\MidiManager.cs" />
