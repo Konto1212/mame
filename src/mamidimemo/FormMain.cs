@@ -64,13 +64,7 @@ namespace zanac.mamidimemo
         private void InstrumentManager_InstrumentAdded(object sender, EventArgs e)
         {
             listViewIntruments.Clear();
-            foreach (var inst in InstrumentManager.List_ym2612)
-            {
-                var lvi = new ListViewItem(inst.Name, inst.ImageKey);
-                var item = listViewIntruments.Items.Add(lvi);
-                item.Tag = inst;
-            }
-            foreach (var inst in InstrumentManager.List_sn76496)
+            foreach (var inst in InstrumentManager.GetAllInstruments())
             {
                 var lvi = new ListViewItem(inst.Name, inst.ImageKey);
                 var item = listViewIntruments.Items.Add(lvi);
@@ -160,6 +154,11 @@ namespace zanac.mamidimemo
             InstrumentManager.AddInstrument(InstrumentType.SN76496);
         }
 
+        private void addNAMCOCUS30ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.NAMCO_CUS30);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -169,5 +168,7 @@ namespace zanac.mamidimemo
         {
             Close();
         }
+
+
     }
 }

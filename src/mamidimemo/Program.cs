@@ -26,9 +26,10 @@ namespace zanac.mamidimemo
         public static void Main(IntPtr parentModule)
         {
             MameIF.Initialize(parentModule);
-
+            var threadStart = new ManualResetEvent(false);
             mainThread = new Thread(new ThreadStart(() =>
             {
+                threadStart.Set();
                 Settings.Default.Reload();
 
                 Application.EnableVisualStyles();
@@ -39,7 +40,7 @@ namespace zanac.mamidimemo
                 Settings.Default.Save();
             }));
             mainThread.Start();
-            while (mainThread.ThreadState != ThreadState.Running) ;
+            threadStart.WaitOne();
         }
 
         /// <summary>
@@ -48,9 +49,8 @@ namespace zanac.mamidimemo
         /// <returns></returns>
         public static int HasExited()
         {
-            if (mainThread == null)
-                return 1;
-            return (mainThread.ThreadState != ThreadState.Running) ? 1 : 0;
+            var ret = mainThread.IsAlive ? 0 : 1;
+            return ret;
         }
 
         static ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);

@@ -9,8 +9,9 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2612intf.h"
-#include "sound/sn76496.h"
 #include "sound/gb.h"
+#include "sound/sn76496.h"
+#include "sound/namco.h"
 #include "video/315_5313.h"
 
 /* Megadrive Console Specific */
@@ -73,14 +74,19 @@ public:
 			strcpy(device_names[didx][i], (std::string("sn76496_") + num).c_str());
 			m_sn76496[i] = new optional_device<sn76496_base_device>(*this, device_names[didx][i]);
 			didx++;
+			//namco cus30
+			strcpy(device_names[didx][i], (std::string("namco_cus30_") + num).c_str());
+			m_namco_cus30[i] = new optional_device<namco_cus30_device>(*this, device_names[didx][i]);
+			didx++;
 		}
 	}
 
-	char device_names[3][8][100];
+	char device_names[4][8][100];
 	optional_device<ym2612_device> *m_ym2612[8];
 	optional_device<gameboy_sound_device> *m_gbsnd[8];
 	optional_device<sn76496_base_device> *m_sn76496[8];
-	
+	optional_device<namco_cus30_device> *m_namco_cus30[8];
+
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;

@@ -280,6 +280,9 @@ void running_machine::start()
 //-------------------------------------------------
 //  run - execute the machine
 //-------------------------------------------------
+
+//mamidimemo
+
 void StartMAmidiMEmoMain();
 
 int HasExited();

@@ -14,6 +14,19 @@ namespace zanac.mamidimemo.instruments
 
         public static List<SN76496> List_sn76496 = new List<SN76496>();
 
+        public static List<NAMCO_CUS30> List_namco_cus30 = new List<NAMCO_CUS30>();
+
+        public static IEnumerable<InstrumentBase> GetAllInstruments()
+        {
+            List<InstrumentBase> insts = new List<InstrumentBase>();
+            insts.AddRange(List_ym2612);
+            insts.AddRange(List_gbapu);
+            insts.AddRange(List_sn76496);
+            insts.AddRange(List_namco_cus30);
+
+            return insts.AsEnumerable();
+        }
+
         public static event EventHandler<EventArgs> InstrumentAdded;
 
         public static event EventHandler<EventArgs> InstrumentRemoved;
@@ -62,6 +75,18 @@ namespace zanac.mamidimemo.instruments
                         }
                         break;
                     }
+                case InstrumentType.NAMCO_CUS30:
+                    {
+                        lock (List_namco_cus30)
+                        {
+                            if (List_namco_cus30.Count < 7)
+                            {
+                                List_namco_cus30.Add(new NAMCO_CUS30((uint)List_namco_cus30.Count));
+                                InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
+                            }
+                        }
+                        break;
+                    }
             }
         }
 
@@ -84,6 +109,10 @@ namespace zanac.mamidimemo.instruments
                     break;
                 case InstrumentType.SN76496:
                     List_sn76496.Remove((SN76496)instrument);
+                    InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
+                    break;
+                case InstrumentType.NAMCO_CUS30:
+                    List_namco_cus30.Remove((NAMCO_CUS30)instrument);
                     InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                     break;
             }
@@ -110,6 +139,8 @@ namespace zanac.mamidimemo.instruments
                 List_gbapu.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
             lock (List_sn76496)
                 List_sn76496.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
+            lock (List_namco_cus30)
+                List_namco_cus30.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
         }
 
     }

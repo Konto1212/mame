@@ -14,5 +14,6 @@ namespace zanac.mamidimemo.instruments
         YM2612,
         GBAPU,
         SN76496,
+        NAMCO_CUS30,
     }
 }

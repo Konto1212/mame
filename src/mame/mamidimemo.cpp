@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "emumem.h"
 #include "machine.h"
 #include "..\frontend\mame\mame.h"
 #include "..\frontend\mame\cheat.h"
@@ -6,8 +7,11 @@
 #include "..\devices\sound\2612intf.h"
 #include "..\devices\sound\gb.h"
 #include "..\devices\sound\sn76496.h"
+#include "..\devices\sound\namco.h"
 
 #define DllExport extern "C" __declspec (dllexport)
+
+address_space *dummy;
 
 extern "C"
 {
@@ -84,6 +88,40 @@ extern "C"
 			return;
 
 		sn76496->write(data);
+	}
+
+	DllExport void namco_cus30_w(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		namco_cus30_device *cus30 = dynamic_cast<namco_cus30_device *>(rm->device((std::string("namco_cus30_") + num).c_str()));
+		if (cus30 == nullptr)
+			return;
+
+		cus30->namcos1_cus30_w(*dummy, address, data);
+	}
+
+	DllExport unsigned char namco_cus30_r(unsigned int unitNumber, unsigned int address)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return 0;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return 0;
+
+		std::string num = std::to_string(unitNumber);
+		namco_cus30_device *cus30 = dynamic_cast<namco_cus30_device *>(rm->device((std::string("namco_cus30_") + num).c_str()));
+		if (cus30 == nullptr)
+			return 0;
+
+		return cus30->namcos1_cus30_r(*dummy, address);
 	}
 }
 

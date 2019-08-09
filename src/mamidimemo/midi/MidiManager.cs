@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,5 +66,32 @@ namespace zanac.mamidimemo.midi
             MidiEventReceived?.Invoke(sender, e);
         }
 
+        public static byte[] ToByteArray<T>(this T structure) where T : struct
+        {
+            byte[] bb = new byte[Marshal.SizeOf(typeof(T))];
+            GCHandle gch = GCHandle.Alloc(bb, GCHandleType.Pinned);
+            Marshal.StructureToPtr(structure, gch.AddrOfPinnedObject(), false);
+            gch.Free();
+            return bb;
+        }
+
+        public static T FromByteArray<T>(byte[] data) where T : struct
+        {
+            GCHandle? gch = null;
+            T str;
+            try
+            {
+                gch = GCHandle.Alloc(data, GCHandleType.Pinned);
+                str = Marshal.PtrToStructure<T>(gch.Value.AddrOfPinnedObject());
+            }
+            finally
+            {
+                gch?.Free();
+            }
+            return str;
+        }
+
     }
+
+
 }
