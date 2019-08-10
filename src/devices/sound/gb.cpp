@@ -363,10 +363,10 @@ void gameboy_sound_device::update_square_channel(struct SOUND &snd, uint64_t cyc
 			}
 		}
 
-		if (cycles & 3)
-		{
-			snd.cycles_left = 4 - (cycles & 3);
-		}
+		//if (cycles & 3)
+		//{
+		//	snd.cycles_left = 4 - (cycles & 3);
+		//}
 		cycles >>= 2;
 		uint16_t    distance = 0x800 - snd.frequency_counter;
 		if (cycles >= distance)
@@ -393,22 +393,22 @@ void dmg_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 	if (snd.on)
 	{
 		// compensate for leftover cycles
-		if (snd.cycles_left > 0)
-		{
-			if (cycles <= snd.cycles_left)
-			{
-				// Emit samples
-				snd.cycles_left -= cycles;
-				cycles = 0;
-			}
-			else
-			{
-				// Emit samples
+		//if (snd.cycles_left > 0)
+		//{
+		//	if (cycles <= snd.cycles_left)
+		//	{
+		//		// Emit samples
+		//		snd.cycles_left -= cycles;
+		//		cycles = 0;
+		//	}
+		//	else
+		//	{
+		//		// Emit samples
 
-				cycles -= snd.cycles_left;
-				snd.cycles_left = 0;
-			}
-		}
+		//		cycles -= snd.cycles_left;
+		//		snd.cycles_left = 0;
+		//	}
+		//}
 
 		while (cycles > 0)
 		{

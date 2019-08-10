@@ -290,7 +290,7 @@ namespace zanac.mamidimemo.instruments
                 {
                     if (t.NoteOnEvent.Channel == midiEvent.Channel)
                     {
-                        t.UpdatePitch();
+                        t.UpdatePitch(0x00);
                     }
                 }
             }
@@ -491,19 +491,13 @@ namespace zanac.mamidimemo.instruments
                             var timbre = parentModule.Timbres[pn];
 
                             GbApuWriteData(parentModule.UnitNumber, reg, (byte)(timbre.SweepTime << 4 | timbre.SweepDir << 3 | timbre.SweepNumber));
-
-                            UpdatePitch();
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, (byte)(timbre.Duty << 6 | timbre.SoundLength));
 
                             UpdateVolume();
 
                             UpdatePanpot();
 
-                            //Freq
-                            ushort freq = convertPsgFrequency(NoteOnEvent);
-
-                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(freq & 0xff));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(0x80 | (timbre.EnableLength << 6) | ((freq >> 8) & 0x07)));
+                            UpdatePitch(0x80);
 
                             break;
                         }
@@ -515,18 +509,13 @@ namespace zanac.mamidimemo.instruments
                             var timbre = parentModule.Timbres[pn];
 
                             GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
-                            UpdatePitch();
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, (byte)(timbre.Duty << 6 | timbre.SoundLength));
 
                             UpdateVolume();
 
                             UpdatePanpot();
 
-                            //Freq
-                            ushort freq = convertPsgFrequency(NoteOnEvent);
-
-                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(freq & 0xff));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(0x80 | (timbre.EnableLength << 6) | ((freq >> 8) & 0x07)));
+                            UpdatePitch(0x80);
 
                             break;
                         }
@@ -538,7 +527,6 @@ namespace zanac.mamidimemo.instruments
                             var timbre = parentModule.Timbres[pn];
 
                             GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
-                            UpdatePitch();
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, timbre.SoundLength);
 
                             UpdateVolume();
@@ -553,8 +541,8 @@ namespace zanac.mamidimemo.instruments
                                 GbApuWaveWriteData(parentModule.UnitNumber, (uint)i, (byte)(((timbre.WaveData[i * 2] & 0xf) << 4) | (timbre.WaveData[(i * 2) + 1] & 0xf)));
 
                             GbApuWriteData(parentModule.UnitNumber, reg, 0x80);
-                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(freq & 0xff));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(0x80 | (timbre.EnableLength << 6) | ((freq >> 8) & 0x07)));
+
+                            UpdatePitch(0x80);
 
                             break;
                         }
@@ -566,22 +554,13 @@ namespace zanac.mamidimemo.instruments
                             var timbre = parentModule.Timbres[pn];
 
                             //GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
-                            UpdatePitch();
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, timbre.SoundLength);
 
                             UpdateVolume();
 
                             UpdatePanpot();
 
-                            var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
-                            var nfreq = (int)timbre.NoiseShiftClockFrequency + ((15 * pitch) / 8192);
-                            if (nfreq > 15)
-                                nfreq = 15;
-                            else if (nfreq < 0)
-                                nfreq = 0;
-
-                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(nfreq << 4 | timbre.NoiseCounter << 3 | timbre.NoiseDivRatio));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(0x80 | (timbre.EnableLength << 6)));
+                            UpdatePitch(0x80);
 
                             break;
                         }
@@ -657,7 +636,7 @@ namespace zanac.mamidimemo.instruments
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public void UpdatePitch()
+            public void UpdatePitch(byte keyOn)
             {
                 var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                 var timbre = parentModule.Timbres[pn];
@@ -691,8 +670,7 @@ namespace zanac.mamidimemo.instruments
                             ushort gfreq = convertPsgFrequency(freq);
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(gfreq & 0xff));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)((timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 1, (byte)0xc0);
+                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
 
                             break;
                         }
@@ -702,8 +680,7 @@ namespace zanac.mamidimemo.instruments
                             ushort gfreq = convertWavFrequency(freq);
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(gfreq & 0xff));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)((timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 1, (byte)0xc0);
+                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
 
                             break;
                         }
@@ -711,15 +688,14 @@ namespace zanac.mamidimemo.instruments
                         {
                             uint reg = (uint)((Slot + 3) * 5);
 
-                            var nfreq = (int)timbre.NoiseShiftClockFrequency + ((15 * pitch) / 8192);
+                            var nfreq = (int)timbre.NoiseShiftClockFrequency + ((15 * -pitch) / 8192);
                             if (nfreq > 15)
                                 nfreq = 15;
                             else if (nfreq < 0)
                                 nfreq = 0;
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(nfreq << 4 | timbre.NoiseCounter << 3 | timbre.NoiseDivRatio));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(0x80 | (timbre.EnableLength << 6)));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 1, (byte)0xc0);
+                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (timbre.EnableLength << 6)));
 
                             break;
                         }
@@ -806,16 +782,6 @@ namespace zanac.mamidimemo.instruments
             private ushort convertPsgFrequency(NoteOnEvent note)
             {
                 var realfreq = 440.0 * Math.Pow(2.0, (note.NoteNumber - 69.0) / 12.0);
-
-                /*
-                 * FF14 - NR14 - Channel 1 Frequency hi (R/W)
-                 * Bit 7   - Initial (1=Restart Sound)     (Write Only)
-                 * Bit 6   - Counter/consecutive selection (Read/Write)
-                 * (1=Stop output when length in NR11 expires)
-                 * Bit 2-0 - Frequency's higher 3 bits (x) (Write Only)
-                 * Frequency = 131072/(2048-x) Hz
-                 */
-
                 return convertPsgFrequency(realfreq);
             }
 
@@ -826,11 +792,15 @@ namespace zanac.mamidimemo.instruments
             /// <returns></returns>
             private ushort convertPsgFrequency(double freq)
             {
-                //f = 4194304 / (4 x 2 x (2048 - X)) Hz 
-                //X = 2048 - 4194304 / (f x 4 x 2) Hz 
+                /*
+                 * FF14 - NR14 - Channel 1 Frequency hi (R/W)
+                 * Bit 7   - Initial (1=Restart Sound)     (Write Only)
+                 * Bit 6   - Counter/consecutive selection (Read/Write)
+                 * (1=Stop output when length in NR11 expires)
+                 * Bit 2-0 - Frequency's higher 3 bits (x) (Write Only)
+                 * Frequency = 131072/(2048-x) Hz
+                 */
 
-                //var gbfreq = 2048d - (131072d / realfreq);
-                //return (ushort)Math.Round(2048d - (524288d / freq));
                 return (ushort)Math.Round(2048d - (131072d / freq));
             }
 
