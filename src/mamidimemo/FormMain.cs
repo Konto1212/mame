@@ -53,7 +53,25 @@ namespace zanac.mamidimemo
                 toolStripComboBoxMidiIf.SelectedIndex = 0;
             outputListView = listView1;
 
+            InstrumentManager_InstrumentAdded(null, null);
             InstrumentManager.InstrumentAdded += InstrumentManager_InstrumentAdded;
+            InstrumentManager.InstrumentRemoved += InstrumentManager_InstrumentRemoved;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void InstrumentManager_InstrumentRemoved(object sender, EventArgs e)
+        {
+            listViewIntruments.Clear();
+            foreach (var inst in InstrumentManager.GetAllInstruments())
+            {
+                var lvi = new ListViewItem(inst.Name, inst.ImageKey);
+                var item = listViewIntruments.Items.Add(lvi);
+                item.Tag = inst;
+            }
         }
 
         /// <summary>
@@ -159,6 +177,29 @@ namespace zanac.mamidimemo
             InstrumentManager.AddInstrument(InstrumentType.NAMCO_CUS30);
         }
 
+        private void extendGBAPUToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.GB_APU);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void decreaseThisKindOfChipToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Dictionary<InstrumentType, object> insts = new Dictionary<InstrumentType, object>();
+            foreach (ListViewItem item in listViewIntruments.SelectedItems)
+            {
+                var tp = ((InstrumentBase)item.Tag).InstrumentType;
+                if (!insts.ContainsKey(tp))
+                    insts.Add(tp, null);
+            }
+            foreach (var tp in insts.Keys)
+                InstrumentManager.RemoveInstrument(tp);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -173,5 +214,7 @@ namespace zanac.mamidimemo
         {
             InstrumentManager.AddInstrument(InstrumentType.YM2151);
         }
+
+
     }
 }

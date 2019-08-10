@@ -5,11 +5,15 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.MusicTheory;
 using Melanchall.DryWetMidi.Smf;
+using Newtonsoft.Json;
+using Omu.ValueInjecter;
+using Omu.ValueInjecter.Injections;
 using zanac.mamidimemo.ComponentModel;
 using zanac.mamidimemo.mame;
 using zanac.mamidimemo.midi;
@@ -22,6 +26,7 @@ namespace zanac.mamidimemo.instruments
     /// <summary>
     /// 
     /// </summary>
+    [DataContract]
     public class SN76496 : InstrumentBase
     {
 
@@ -32,11 +37,26 @@ namespace zanac.mamidimemo.instruments
         [Browsable(false)]
         public override string ImageKey => "SN76496";
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("Timbres (0-127)")]
         public SN76496Timbre[] Timbres
         {
             get;
             private set;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serializeData"></param>
+        public override void RestoreFrom(string serializeData)
+        {
+            var obj = JsonConvert.DeserializeObject<SN76496>(serializeData);
+            this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
         }
 
         /// <summary>
@@ -96,6 +116,8 @@ namespace zanac.mamidimemo.instruments
         public SN76496(uint unitNumber) : base(unitNumber)
         {
             Timbres = new SN76496Timbre[128];
+            for (int i = 0; i < 128; i++)
+                Timbres[i] = new SN76496Timbre();
             setPresetInstruments();
 
             this.soundManager = new SN76496SoundManager(this);
@@ -107,7 +129,6 @@ namespace zanac.mamidimemo.instruments
         private void setPresetInstruments()
         {
             Timbres[0].SoundType = SoundType.PSG;
-            Timbres[1].SoundType = SoundType.PSG;
         }
 
         /// <summary>
@@ -188,7 +209,7 @@ namespace zanac.mamidimemo.instruments
                                 t.UpdatePsgPitch();
                                 break;
                             case SoundType.NOISE:
-                                //TODO:
+                                t.UpdateNoisePitch();
                                 break;
                         }
                     }
@@ -218,7 +239,7 @@ namespace zanac.mamidimemo.instruments
                                         t.UpdatePsgVolume();
                                         break;
                                     case SoundType.NOISE:
-                                        //TODO:
+                                        t.UpdateNoiseVolume();
                                         break;
                                 }
                             }
@@ -237,7 +258,7 @@ namespace zanac.mamidimemo.instruments
                                         t.UpdatePsgVolume();
                                         break;
                                     case SoundType.NOISE:
-                                        //TODO:
+                                        t.UpdateNoiseVolume();
                                         break;
                                 }
                             }
@@ -266,6 +287,7 @@ namespace zanac.mamidimemo.instruments
                         break;
                     case SoundType.NOISE:
                         noiseOnSounds.Add(snd);
+                        FormMain.OutputLog("KeyOn NOISE ch" + emptySlot + " " + note.ToString());
                         break;
                 }
                 snd.On();
@@ -492,26 +514,25 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ValueTypeTypeConverter<SN76496Timbre>))]
-        public struct SN76496Timbre
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<SN76496Timbre>))]
+        [DataContract]
+        public class SN76496Timbre : TimbreBase
         {
-            public SoundType f_SoundType;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Sound Type")]
             public SoundType SoundType
             {
-                get
-                {
-                    return f_SoundType;
-                }
-                set
-                {
-                    f_SoundType = value;
-                }
+                get;
+                set;
             }
 
             public byte f_FB;
 
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Feedback (0-1)")]
             public byte FB
             {
                 get
@@ -522,6 +543,12 @@ namespace zanac.mamidimemo.instruments
                 {
                     f_FB = (byte)(value & 1);
                 }
+            }
+
+            public override void RestoreFrom(string serializeData)
+            {
+                var obj = JsonConvert.DeserializeObject<SN76496Timbre>(serializeData);
+                this.InjectFrom(obj);
             }
         }
 

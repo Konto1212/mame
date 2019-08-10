@@ -34,5 +34,65 @@ namespace zanac.mamidimemo.Properties {
                 this["MidiIF"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string YM2151 {
+            get {
+                return ((string)(this["YM2151"]));
+            }
+            set {
+                this["YM2151"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string YM2612 {
+            get {
+                return ((string)(this["YM2612"]));
+            }
+            set {
+                this["YM2612"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GB_APU {
+            get {
+                return ((string)(this["GB_APU"]));
+            }
+            set {
+                this["GB_APU"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SN76496 {
+            get {
+                return ((string)(this["SN76496"]));
+            }
+            set {
+                this["SN76496"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NAMCO_CUS30 {
+            get {
+                return ((string)(this["NAMCO_CUS30"]));
+            }
+            set {
+                this["NAMCO_CUS30"] = value;
+            }
+        }
     }
 }

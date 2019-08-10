@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using zanac.mamidimemo.Properties;
 
 namespace zanac.mamidimemo.instruments
 {
@@ -12,7 +14,7 @@ namespace zanac.mamidimemo.instruments
 
         public static List<YM2612> List_ym2612 = new List<YM2612>();
 
-        public static List<GBAPU> List_gbapu = new List<GBAPU>();
+        public static List<GB_APU> List_gbapu = new List<GB_APU>();
 
         public static List<SN76496> List_sn76496 = new List<SN76496>();
 
@@ -21,14 +23,49 @@ namespace zanac.mamidimemo.instruments
         public static IEnumerable<InstrumentBase> GetAllInstruments()
         {
             List<InstrumentBase> insts = new List<InstrumentBase>();
+
             insts.AddRange(List_ym2151);
             insts.AddRange(List_ym2612);
             insts.AddRange(List_gbapu);
             insts.AddRange(List_sn76496);
             insts.AddRange(List_namco_cus30);
 
+            string data = Settings.Default.YM2151;
+
             return insts.AsEnumerable();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void RestoreSettings()
+        {
+            var List_ym2151 = JsonConvert.DeserializeObject<List<YM2151>>(Settings.Default.YM2151);
+            if (List_ym2151 != null)
+                InstrumentManager.List_ym2151 = List_ym2151;
+            var List_ym2612 = JsonConvert.DeserializeObject<List<YM2612>>(Settings.Default.YM2612);
+            if (List_ym2612 != null)
+                InstrumentManager.List_ym2612 = List_ym2612;
+            var List_gbapu = JsonConvert.DeserializeObject<List<GB_APU>>(Settings.Default.GB_APU);
+            if (List_gbapu != null)
+                InstrumentManager.List_gbapu = List_gbapu;
+            var List_sn76496 = JsonConvert.DeserializeObject<List<SN76496>>(Settings.Default.SN76496);
+            if (List_sn76496 != null)
+                InstrumentManager.List_sn76496 = List_sn76496;
+            var List_namco_cus30 = JsonConvert.DeserializeObject<List<NAMCO_CUS30>>(Settings.Default.NAMCO_CUS30);
+            if (List_namco_cus30 != null)
+                InstrumentManager.List_namco_cus30 = List_namco_cus30;
+        }
+
+        public static void SaveSettings()
+        {
+            Settings.Default.YM2151 = JsonConvert.SerializeObject(List_ym2151, Formatting.Indented);
+            Settings.Default.YM2612 = JsonConvert.SerializeObject(List_ym2612, Formatting.Indented);
+            Settings.Default.NAMCO_CUS30 = JsonConvert.SerializeObject(List_namco_cus30, Formatting.Indented);
+            Settings.Default.SN76496 = JsonConvert.SerializeObject(List_sn76496, Formatting.Indented);
+            Settings.Default.GB_APU = JsonConvert.SerializeObject(List_gbapu, Formatting.Indented);
+        }
+
 
         public static event EventHandler<EventArgs> InstrumentAdded;
 
@@ -66,13 +103,13 @@ namespace zanac.mamidimemo.instruments
                         }
                         break;
                     }
-                case InstrumentType.GBAPU:
+                case InstrumentType.GB_APU:
                     {
                         lock (List_gbapu)
                         {
                             if (List_gbapu.Count < 7)
                             {
-                                List_gbapu.Add(new GBAPU((uint)List_gbapu.Count));
+                                List_gbapu.Add(new GB_APU((uint)List_gbapu.Count));
                                 InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                             }
                         }
@@ -110,28 +147,28 @@ namespace zanac.mamidimemo.instruments
         /// 
         /// </summary>
         /// <param name="instrumentType"></param>
-        public static void RemoveInstrument(InstrumentBase instrument)
+        public static void RemoveInstrument(InstrumentType type)
         {
-            switch (instrument.InstrumentType)
+            switch (type)
             {
                 case InstrumentType.YM2151:
-                    List_ym2151.Remove((YM2151)instrument);
+                    List_ym2151.RemoveAt(List_ym2151.Count - 1);
                     InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                     break;
                 case InstrumentType.YM2612:
-                    List_ym2612.Remove((YM2612)instrument);
+                    List_ym2612.RemoveAt(List_ym2612.Count - 1);
                     InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                     break;
-                case InstrumentType.GBAPU:
-                    List_gbapu.Remove((GBAPU)instrument);
+                case InstrumentType.GB_APU:
+                    List_gbapu.RemoveAt(List_gbapu.Count - 1);
                     InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                     break;
                 case InstrumentType.SN76496:
-                    List_sn76496.Remove((SN76496)instrument);
+                    List_sn76496.RemoveAt(List_sn76496.Count - 1);
                     InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                     break;
                 case InstrumentType.NAMCO_CUS30:
-                    List_namco_cus30.Remove((NAMCO_CUS30)instrument);
+                    List_namco_cus30.RemoveAt(List_namco_cus30.Count - 1);
                     InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                     break;
             }

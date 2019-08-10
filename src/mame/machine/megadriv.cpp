@@ -931,12 +931,12 @@ void md_base_state::md_ntsc(machine_config &config)
 
 	for (int i = 0; i < 8; i++) {
 		YM2151(config, *m_ym2151[i], XTAL(3'579'545));
-		(*m_ym2151[i])->add_route(0, "lspeaker", 1.00);
-		(*m_ym2151[i])->add_route(1, "rspeaker", 1.00);
+		(*m_ym2151[i])->add_route(0, "lspeaker", 2.00);
+		(*m_ym2151[i])->add_route(1, "rspeaker", 2.00);
 
 		YM2612(config, *m_ym2612[i], MASTER_CLOCK_NTSC / 7); /* 7.67 MHz */
-		(*m_ym2612[i])->add_route(0, "lspeaker", 1.00);
-		(*m_ym2612[i])->add_route(1, "rspeaker", 1.00);
+		(*m_ym2612[i])->add_route(0, "lspeaker", 2.00);
+		(*m_ym2612[i])->add_route(1, "rspeaker", 2.00);
 
 		SN76496(config, *m_sn76496[i], 3579545); //3.579545 MHz
 		(*m_sn76496[i])->add_route(0, "lspeaker", 1.00);
@@ -947,14 +947,15 @@ void md_base_state::md_ntsc(machine_config &config)
 		(*m_namco_cus30[i])->set_stereo(1);
 		(*m_namco_cus30[i])->add_route(0, "lspeaker", 1.00);
 		(*m_namco_cus30[i])->add_route(1, "rspeaker", 1.00);
+
+		DMG_APU(config, *m_gbsnd[i], XTAL(4'194'304));
+		(*m_gbsnd[i])->add_route(0, "lspeaker", 1.00);
+		(*m_gbsnd[i])->add_route(1, "rspeaker", 1.00);
 	}
 
 	//m_ym2612_1->set_output_gain(0,2.00);
 	//m_ym2612_1->set_output_gain(0, 2.00);
 
-	//DMG_APU(config, m_gbsnd_1, XTAL(4'194'304));
-	//m_gbsnd_1->add_route(0, "lspeaker", 1.00);
-	//m_gbsnd_1->add_route(1, "rspeaker", 1.00);
 }
 
 void md_cons_state::dcat16_megadriv_base(machine_config &config)

@@ -5,11 +5,15 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.MusicTheory;
 using Melanchall.DryWetMidi.Smf;
+using Newtonsoft.Json;
+using Omu.ValueInjecter;
+using Omu.ValueInjecter.Injections;
 using zanac.mamidimemo.ComponentModel;
 using zanac.mamidimemo.mame;
 using zanac.mamidimemo.midi;
@@ -22,6 +26,7 @@ namespace zanac.mamidimemo.instruments
     /// <summary>
     /// 
     /// </summary>
+    [DataContract]
     public class YM2612 : InstrumentBase
     {
 
@@ -32,11 +37,24 @@ namespace zanac.mamidimemo.instruments
         [Browsable(false)]
         public override string ImageKey => "YM2612";
 
-
+        [DataMember]
+        [Category("Chip")]
+        [Description("Timbres (0-127)")]
         public YM2612Timbre[] Timbres
         {
             get;
             private set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serializeData"></param>
+        public override void RestoreFrom(string serializeData)
+        {
+            var obj = JsonConvert.DeserializeObject<YM2612>(serializeData);
+            this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
         }
 
         /// <summary>
@@ -97,6 +115,8 @@ namespace zanac.mamidimemo.instruments
         public YM2612(uint unitNumber) : base(unitNumber)
         {
             Timbres = new YM2612Timbre[128];
+            for (int i = 0; i < 128; i++)
+                Timbres[i] = new YM2612Timbre();
             setPresetInstruments();
 
             this.soundManager = new YM2612SoundManager(this);
@@ -113,61 +133,61 @@ namespace zanac.mamidimemo.instruments
             Timbres[0].FB = 7;
             Timbres[0].ALG = 3;
 
-            Timbres[0].f_Op1.Enable = 1;
-            Timbres[0].f_Op1.AR = 31;
-            Timbres[0].f_Op1.D1R = 6;
-            Timbres[0].f_Op1.SL = 15;
-            Timbres[0].f_Op1.D2R = 0;
-            Timbres[0].f_Op1.RR = 7;
+            Timbres[0].Ops[0].Enable = 1;
+            Timbres[0].Ops[0].AR = 31;
+            Timbres[0].Ops[0].D1R = 6;
+            Timbres[0].Ops[0].SL = 15;
+            Timbres[0].Ops[0].D2R = 0;
+            Timbres[0].Ops[0].RR = 7;
 
-            Timbres[0].f_Op1.MUL = 1;
-            Timbres[0].f_Op1.RS = 0;
-            Timbres[0].f_Op1.DT1 = 7;
-            Timbres[0].f_Op1.AM = 0;
-            Timbres[0].f_Op1.SSG_EG = 0;
-            Timbres[0].f_Op1.TL = 20;
+            Timbres[0].Ops[0].MUL = 1;
+            Timbres[0].Ops[0].RS = 0;
+            Timbres[0].Ops[0].DT1 = 7;
+            Timbres[0].Ops[0].AM = 0;
+            Timbres[0].Ops[0].SSG_EG = 0;
+            Timbres[0].Ops[0].TL = 20;
 
-            Timbres[0].f_Op2.Enable = 1;
-            Timbres[0].f_Op2.AR = 31;
-            Timbres[0].f_Op2.D1R = 7;
-            Timbres[0].f_Op2.SL = 4;
-            Timbres[0].f_Op2.D2R = 0;
-            Timbres[0].f_Op2.RR = 15;
+            Timbres[0].Ops[1].Enable = 1;
+            Timbres[0].Ops[1].AR = 31;
+            Timbres[0].Ops[1].D1R = 7;
+            Timbres[0].Ops[1].SL = 4;
+            Timbres[0].Ops[1].D2R = 0;
+            Timbres[0].Ops[1].RR = 15;
 
-            Timbres[0].f_Op2.MUL = 2;
-            Timbres[0].f_Op2.RS = 0;
-            Timbres[0].f_Op2.DT1 = 6;
-            Timbres[0].f_Op2.AM = 0;
-            Timbres[0].f_Op2.SSG_EG = 0;
-            Timbres[0].f_Op2.TL = 21;
+            Timbres[0].Ops[1].MUL = 2;
+            Timbres[0].Ops[1].RS = 0;
+            Timbres[0].Ops[1].DT1 = 6;
+            Timbres[0].Ops[1].AM = 0;
+            Timbres[0].Ops[1].SSG_EG = 0;
+            Timbres[0].Ops[1].TL = 21;
 
-            Timbres[0].f_Op3.Enable = 1;
-            Timbres[0].f_Op3.AR = 31;
-            Timbres[0].f_Op3.D1R = 7;
-            Timbres[0].f_Op3.SL = 4;
-            Timbres[0].f_Op3.D2R = 0;
-            Timbres[0].f_Op3.RR = 15;
+            Timbres[0].Ops[2].Enable = 1;
+            Timbres[0].Ops[2].AR = 31;
+            Timbres[0].Ops[2].D1R = 7;
+            Timbres[0].Ops[2].SL = 4;
+            Timbres[0].Ops[2].D2R = 0;
+            Timbres[0].Ops[2].RR = 15;
 
-            Timbres[0].f_Op3.MUL = 1;
-            Timbres[0].f_Op3.RS = 0;
-            Timbres[0].f_Op3.DT1 = 2;
-            Timbres[0].f_Op3.AM = 0;
-            Timbres[0].f_Op3.SSG_EG = 0;
-            Timbres[0].f_Op3.TL = 12;
+            Timbres[0].Ops[2].MUL = 1;
+            Timbres[0].Ops[2].RS = 0;
+            Timbres[0].Ops[2].DT1 = 2;
+            Timbres[0].Ops[2].AM = 0;
+            Timbres[0].Ops[2].SSG_EG = 0;
+            Timbres[0].Ops[2].TL = 12;
 
-            Timbres[0].f_Op4.Enable = 1;
-            Timbres[0].f_Op4.AR = 31;
-            Timbres[0].f_Op4.D1R = 0;
-            Timbres[0].f_Op4.SL = 0;
-            Timbres[0].f_Op4.D2R = 0;
-            Timbres[0].f_Op4.RR = 15;
+            Timbres[0].Ops[3].Enable = 1;
+            Timbres[0].Ops[3].AR = 31;
+            Timbres[0].Ops[3].D1R = 0;
+            Timbres[0].Ops[3].SL = 0;
+            Timbres[0].Ops[3].D2R = 0;
+            Timbres[0].Ops[3].RR = 15;
 
-            Timbres[0].f_Op4.MUL = 1;
-            Timbres[0].f_Op4.RS = 0;
-            Timbres[0].f_Op4.DT1 = 4;
-            Timbres[0].f_Op4.AM = 0;
-            Timbres[0].f_Op4.SSG_EG = 0;
-            Timbres[0].f_Op4.TL = 12;
+            Timbres[0].Ops[3].MUL = 1;
+            Timbres[0].Ops[3].RS = 0;
+            Timbres[0].Ops[3].DT1 = 4;
+            Timbres[0].Ops[3].AM = 0;
+            Timbres[0].Ops[3].SSG_EG = 0;
+            Timbres[0].Ops[3].TL = 12;
 
             //Additive Chimes A.dmp
             Timbres[2].FMS = 0;
@@ -175,57 +195,57 @@ namespace zanac.mamidimemo.instruments
             Timbres[2].FB = 0;
             Timbres[2].ALG = 7;
 
-            Timbres[2].f_Op1.AR = 31;
-            Timbres[2].f_Op1.D1R = 4;
-            Timbres[2].f_Op1.SL = 15;
-            Timbres[2].f_Op1.D2R = 0;
-            Timbres[2].f_Op1.RR = 4;
+            Timbres[2].Ops[0].AR = 31;
+            Timbres[2].Ops[0].D1R = 4;
+            Timbres[2].Ops[0].SL = 15;
+            Timbres[2].Ops[0].D2R = 0;
+            Timbres[2].Ops[0].RR = 4;
 
-            Timbres[2].f_Op1.MUL = 1;
-            Timbres[2].f_Op1.RS = 0;
-            Timbres[2].f_Op1.DT1 = 4;
-            Timbres[2].f_Op1.AM = 0;
-            Timbres[2].f_Op1.SSG_EG = 0;
-            Timbres[2].f_Op1.TL = 20;
+            Timbres[2].Ops[0].MUL = 1;
+            Timbres[2].Ops[0].RS = 0;
+            Timbres[2].Ops[0].DT1 = 4;
+            Timbres[2].Ops[0].AM = 0;
+            Timbres[2].Ops[0].SSG_EG = 0;
+            Timbres[2].Ops[0].TL = 20;
 
-            Timbres[2].f_Op2.AR = 31;
-            Timbres[2].f_Op2.D1R = 7;
-            Timbres[2].f_Op2.SL = 15;
-            Timbres[2].f_Op2.D2R = 0;
-            Timbres[2].f_Op2.RR = 5;
+            Timbres[2].Ops[1].AR = 31;
+            Timbres[2].Ops[1].D1R = 7;
+            Timbres[2].Ops[1].SL = 15;
+            Timbres[2].Ops[1].D2R = 0;
+            Timbres[2].Ops[1].RR = 5;
 
-            Timbres[2].f_Op2.MUL = 4;
-            Timbres[2].f_Op2.RS = 0;
-            Timbres[2].f_Op2.DT1 = 4;
-            Timbres[2].f_Op2.AM = 0;
-            Timbres[2].f_Op2.SSG_EG = 0;
-            Timbres[2].f_Op2.TL = 20;
+            Timbres[2].Ops[1].MUL = 4;
+            Timbres[2].Ops[1].RS = 0;
+            Timbres[2].Ops[1].DT1 = 4;
+            Timbres[2].Ops[1].AM = 0;
+            Timbres[2].Ops[1].SSG_EG = 0;
+            Timbres[2].Ops[1].TL = 20;
 
-            Timbres[2].f_Op3.AR = 31;
-            Timbres[2].f_Op3.D1R = 10;
-            Timbres[2].f_Op3.SL = 15;
-            Timbres[2].f_Op3.D2R = 0;
-            Timbres[2].f_Op3.RR = 6;
+            Timbres[2].Ops[2].AR = 31;
+            Timbres[2].Ops[2].D1R = 10;
+            Timbres[2].Ops[2].SL = 15;
+            Timbres[2].Ops[2].D2R = 0;
+            Timbres[2].Ops[2].RR = 6;
 
-            Timbres[2].f_Op3.MUL = 7;
-            Timbres[2].f_Op3.RS = 0;
-            Timbres[2].f_Op3.DT1 = 4;
-            Timbres[2].f_Op3.AM = 0;
-            Timbres[2].f_Op3.SSG_EG = 0;
-            Timbres[2].f_Op3.TL = 20;
+            Timbres[2].Ops[2].MUL = 7;
+            Timbres[2].Ops[2].RS = 0;
+            Timbres[2].Ops[2].DT1 = 4;
+            Timbres[2].Ops[2].AM = 0;
+            Timbres[2].Ops[2].SSG_EG = 0;
+            Timbres[2].Ops[2].TL = 20;
 
-            Timbres[2].f_Op4.AR = 31;
-            Timbres[2].f_Op4.D1R = 13;
-            Timbres[2].f_Op4.SL = 15;
-            Timbres[2].f_Op4.D2R = 0;
-            Timbres[2].f_Op4.RR = 7;
+            Timbres[2].Ops[3].AR = 31;
+            Timbres[2].Ops[3].D1R = 13;
+            Timbres[2].Ops[3].SL = 15;
+            Timbres[2].Ops[3].D2R = 0;
+            Timbres[2].Ops[3].RR = 7;
 
-            Timbres[2].f_Op4.MUL = 10;
-            Timbres[2].f_Op4.RS = 0;
-            Timbres[2].f_Op4.DT1 = 0;
-            Timbres[2].f_Op4.AM = 0;
-            Timbres[2].f_Op4.SSG_EG = 0;
-            Timbres[2].f_Op4.TL = 20;
+            Timbres[2].Ops[3].MUL = 10;
+            Timbres[2].Ops[3].RS = 0;
+            Timbres[2].Ops[3].DT1 = 0;
+            Timbres[2].Ops[3].AM = 0;
+            Timbres[2].Ops[3].SSG_EG = 0;
+            Timbres[2].Ops[3].TL = 20;
 
             //DX Piano1
             Timbres[1].FMS = 0;
@@ -233,57 +253,57 @@ namespace zanac.mamidimemo.instruments
             Timbres[1].FB = 0;
             Timbres[1].ALG = 1;
 
-            Timbres[1].f_Op1.AR = 31;
-            Timbres[1].f_Op1.D1R = 9;
-            Timbres[1].f_Op1.SL = 15;
-            Timbres[1].f_Op1.D2R = 0;
-            Timbres[1].f_Op1.RR = 5;
+            Timbres[1].Ops[0].AR = 31;
+            Timbres[1].Ops[0].D1R = 9;
+            Timbres[1].Ops[0].SL = 15;
+            Timbres[1].Ops[0].D2R = 0;
+            Timbres[1].Ops[0].RR = 5;
 
-            Timbres[1].f_Op1.MUL = 9;
-            Timbres[1].f_Op1.RS = 2;
-            Timbres[1].f_Op1.DT1 = 7;
-            Timbres[1].f_Op1.AM = 0;
-            Timbres[1].f_Op1.SSG_EG = 0;
-            Timbres[1].f_Op1.TL = 60;
+            Timbres[1].Ops[0].MUL = 9;
+            Timbres[1].Ops[0].RS = 2;
+            Timbres[1].Ops[0].DT1 = 7;
+            Timbres[1].Ops[0].AM = 0;
+            Timbres[1].Ops[0].SSG_EG = 0;
+            Timbres[1].Ops[0].TL = 60;
 
-            Timbres[1].f_Op2.AR = 31;
-            Timbres[1].f_Op2.D1R = 9;
-            Timbres[1].f_Op2.SL = 15;
-            Timbres[1].f_Op2.D2R = 0;
-            Timbres[1].f_Op2.RR = 5;
+            Timbres[1].Ops[1].AR = 31;
+            Timbres[1].Ops[1].D1R = 9;
+            Timbres[1].Ops[1].SL = 15;
+            Timbres[1].Ops[1].D2R = 0;
+            Timbres[1].Ops[1].RR = 5;
 
-            Timbres[1].f_Op2.MUL = 9;
-            Timbres[1].f_Op2.RS = 2;
-            Timbres[1].f_Op2.DT1 = 1;
-            Timbres[1].f_Op2.AM = 0;
-            Timbres[1].f_Op2.SSG_EG = 0;
-            Timbres[1].f_Op2.TL = 60;
+            Timbres[1].Ops[1].MUL = 9;
+            Timbres[1].Ops[1].RS = 2;
+            Timbres[1].Ops[1].DT1 = 1;
+            Timbres[1].Ops[1].AM = 0;
+            Timbres[1].Ops[1].SSG_EG = 0;
+            Timbres[1].Ops[1].TL = 60;
 
-            Timbres[1].f_Op3.AR = 31;
-            Timbres[1].f_Op3.D1R = 7;
-            Timbres[1].f_Op3.SL = 15;
-            Timbres[1].f_Op3.D2R = 0;
-            Timbres[1].f_Op3.RR = 5;
+            Timbres[1].Ops[2].AR = 31;
+            Timbres[1].Ops[2].D1R = 7;
+            Timbres[1].Ops[2].SL = 15;
+            Timbres[1].Ops[2].D2R = 0;
+            Timbres[1].Ops[2].RR = 5;
 
-            Timbres[1].f_Op3.MUL = 0;
-            Timbres[1].f_Op3.RS = 2;
-            Timbres[1].f_Op3.DT1 = 4;
-            Timbres[1].f_Op3.AM = 0;
-            Timbres[1].f_Op3.SSG_EG = 0;
-            Timbres[1].f_Op3.TL = 28;
+            Timbres[1].Ops[2].MUL = 0;
+            Timbres[1].Ops[2].RS = 2;
+            Timbres[1].Ops[2].DT1 = 4;
+            Timbres[1].Ops[2].AM = 0;
+            Timbres[1].Ops[2].SSG_EG = 0;
+            Timbres[1].Ops[2].TL = 28;
 
-            Timbres[1].f_Op4.AR = 31;
-            Timbres[1].f_Op4.D1R = 3;
-            Timbres[1].f_Op4.SL = 15;
-            Timbres[1].f_Op4.D2R = 0;
-            Timbres[1].f_Op4.RR = 5;
+            Timbres[1].Ops[3].AR = 31;
+            Timbres[1].Ops[3].D1R = 3;
+            Timbres[1].Ops[3].SL = 15;
+            Timbres[1].Ops[3].D2R = 0;
+            Timbres[1].Ops[3].RR = 5;
 
-            Timbres[1].f_Op4.MUL = 0;
-            Timbres[1].f_Op4.RS = 2;
-            Timbres[1].f_Op4.DT1 = 4;
-            Timbres[1].f_Op4.AM = 0;
-            Timbres[1].f_Op4.SSG_EG = 0;
-            Timbres[1].f_Op4.TL = 10;
+            Timbres[1].Ops[3].MUL = 0;
+            Timbres[1].Ops[3].RS = 2;
+            Timbres[1].Ops[3].DT1 = 4;
+            Timbres[1].Ops[3].AM = 0;
+            Timbres[1].Ops[3].SSG_EG = 0;
+            Timbres[1].Ops[3].TL = 10;
         }
 
         /// <summary>
@@ -510,7 +530,7 @@ namespace zanac.mamidimemo.instruments
                 UpdateFmVolume();
                 //On
                 uint reg = (uint)(Slot / 3) * 2;
-                byte op = (byte)(Timbre.Op1.Enable << 4 | Timbre.Op2.Enable << 5 | Timbre.Op3.Enable << 6 | Timbre.Op4.Enable << 7);
+                byte op = (byte)(Timbre.Ops[0].Enable << 4 | Timbre.Ops[1].Enable << 5 | Timbre.Ops[2].Enable << 6 | Timbre.Ops[3].Enable << 7);
                 Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(op | (reg << 1) | (byte)(Slot % 3)));
             }
 
@@ -565,7 +585,7 @@ namespace zanac.mamidimemo.instruments
                 foreach (int op in ops)
                 {
                     //$40+: total level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(127 - Math.Round((127 - timbre.GetOperator(op).TL) * vol * vel * exp)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(127 - Math.Round((127 - timbre.Ops[op].TL) * vol * vel * exp)));
                 }
             }
 
@@ -659,19 +679,19 @@ namespace zanac.mamidimemo.instruments
                 for (int op = 0; op < 4; op++)
                 {
                     //$30+: multiply and detune
-                    Ym2612WriteData(parentModule.UnitNumber, 0x30, op, Slot, (byte)((timbre.GetOperator(op).DT1 << 4 | timbre.GetOperator(op).MUL)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x30, op, Slot, (byte)((timbre.Ops[op].DT1 << 4 | timbre.Ops[op].MUL)));
                     //$40+: total level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)timbre.GetOperator(op).TL);
+                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)timbre.Ops[op].TL);
                     //$50+: attack rate and rate scaling
-                    Ym2612WriteData(parentModule.UnitNumber, 0x50, op, Slot, (byte)((timbre.GetOperator(op).RS << 6 | timbre.GetOperator(op).AR)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x50, op, Slot, (byte)((timbre.Ops[op].RS << 6 | timbre.Ops[op].AR)));
                     //$60+: 1st decay rate and AM enable
-                    Ym2612WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)((timbre.GetOperator(op).AM << 7 | timbre.GetOperator(op).D1R)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)((timbre.Ops[op].AM << 7 | timbre.Ops[op].D1R)));
                     //$70+: 2nd decay rate
-                    Ym2612WriteData(parentModule.UnitNumber, 0x70, op, Slot, (byte)timbre.GetOperator(op).D2R);
+                    Ym2612WriteData(parentModule.UnitNumber, 0x70, op, Slot, (byte)timbre.Ops[op].D2R);
                     //$80+: release rate and sustain level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.GetOperator(op).SL << 4 | timbre.GetOperator(op).RR)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.Ops[op].SL << 4 | timbre.Ops[op].RR)));
                     //$90+: SSG-EG
-                    Ym2612WriteData(parentModule.UnitNumber, 0x90, op, Slot, (byte)timbre.GetOperator(op).SSG_EG);
+                    Ym2612WriteData(parentModule.UnitNumber, 0x90, op, Slot, (byte)timbre.Ops[op].SSG_EG);
                 }
 
                 //$B0+: algorithm and feedback
@@ -745,13 +765,18 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ValueTypeTypeConverter<YM2612Timbre>))]
-        public struct YM2612Timbre
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2612Timbre>))]
+        [DataContract]
+        public class YM2612Timbre : TimbreBase
         {
             #region FM Symth
 
-            public byte f_FB;
+            private byte f_FB;
 
+            [DataMember]
+            [Category("Sound")]
+            [Description("Feedback (0-7)")]
             public byte FB
             {
                 get
@@ -764,8 +789,11 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public byte f_ALG;
+            private byte f_ALG;
 
+            [DataMember]
+            [Category("Sound")]
+            [Description("Algorithm (0-7)")]
             public byte ALG
             {
                 get
@@ -778,8 +806,11 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public byte f_AMS;
+            private byte f_AMS;
 
+            [DataMember]
+            [Category("Sound")]
+            [Description("Amplitude Modulation Sensitivity (0-3)")]
             public byte AMS
             {
                 get
@@ -792,8 +823,11 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public byte f_FMS;
+            private byte f_FMS;
 
+            [DataMember]
+            [Category("Sound")]
+            [Description("Frequency Modulation Sensitivity (0-7)")]
             public byte FMS
             {
                 get
@@ -806,96 +840,52 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public YM2612Operator f_Op1;
-
-            public YM2612Operator Op1
-            {
-                get
-                {
-                    return f_Op1;
-                }
-                set
-                {
-                    f_Op1 = value;
-                }
-            }
-
-            public YM2612Operator f_Op2;
-
-            public YM2612Operator Op2
-            {
-                get
-                {
-                    return f_Op2;
-                }
-                set
-                {
-                    f_Op2 = value;
-                }
-            }
-
-            public YM2612Operator f_Op3;
-
-            public YM2612Operator Op3
-            {
-                get
-                {
-                    return f_Op3;
-                }
-                set
-                {
-                    f_Op3 = value;
-                }
-            }
-
-            public YM2612Operator f_Op4;
-
-            public YM2612Operator Op4
-            {
-                get
-                {
-                    return f_Op4;
-                }
-                set
-                {
-                    f_Op4 = value;
-                }
-            }
-
             #endregion
+
 
             /// <summary>
             /// 
             /// </summary>
-            /// <param name="idx"></param>
-            public YM2612Operator GetOperator(int idx)
+            [DataMember]
+            [Category("Sound")]
+            [Description("Operators")]
+            public YM2612Operator[] Ops
             {
-                switch (idx)
-                {
-                    case 0:
-                        return Op1;
-                    case 1:
-                        return Op2;
-                    case 2:
-                        return Op3;
-                    case 3:
-                        return Op4;
-                }
-                return Op1;
+                get;
+                private set;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public YM2612Timbre()
+            {
+                Ops = new YM2612Operator[] { new YM2612Operator(), new YM2612Operator(), new YM2612Operator(), new YM2612Operator() };
+            }
+
+            public override void RestoreFrom(string serializeData)
+            {
+                var obj = JsonConvert.DeserializeObject<YM2612Timbre>(serializeData);
+                this.InjectFrom(obj);
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ValueTypeTypeConverter<YM2612Operator>))]
-        public struct YM2612Operator
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2612Operator>))]
+        [DataContract]
+        public class YM2612Operator
         {
-            public byte f_Enable;
+            private byte f_Enable;
 
             /// <summary>
             /// Enable(0-1)
             /// </summary>
+            [DataMember]
+            [Category("Sound")]
+            [Description("Whether this operator enable or not")]
             public byte Enable
             {
                 get
@@ -908,11 +898,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_DT1;
+
             /// <summary>
             /// Detune1(0-7)
             /// </summary>
-            public byte f_DT1;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("DeTune 1 (1-4-7)")]
             public byte DT1
             {
                 get
@@ -925,11 +918,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_MUL;
+
             /// <summary>
             /// Multiply(0-15)
             /// </summary>
-            public byte f_MUL;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Multiply (0-15)")]
             public byte MUL
             {
                 get
@@ -942,11 +938,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_TL;
+
             /// <summary>
             /// Total Level(0-127)
             /// </summary>
-            public byte f_TL;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Total Level (0-127)")]
             public byte TL
             {
                 get
@@ -959,11 +958,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_RS;
+
             /// <summary>
             /// Rate Scaling(0-3)
             /// </summary>
-            public byte f_RS;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Rate Scaling (0-3)")]
             public byte RS
             {
                 get
@@ -976,11 +978,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_AR;
+
             /// <summary>
             /// Attack Rate(0-31)
             /// </summary>
-            public byte f_AR;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Attack Rate (0-31)")]
             public byte AR
             {
                 get
@@ -993,11 +998,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_AM;
+
             /// <summary>
             /// amplitude modulation sensivity(0-1)
             /// </summary>
-            public byte f_AM;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Amplitude Modulation Sensivity (0-1)")]
             public byte AM
             {
                 get
@@ -1010,11 +1018,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_D1R;
+
             /// <summary>
             /// 1st decay rate(0-31)
             /// </summary>
-            public byte f_D1R;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("1st Decay Rate (0-31)")]
             public byte D1R
             {
                 get
@@ -1027,11 +1038,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_D2R;
+
             /// <summary>
             /// 2nd decay rate(0-31)
             /// </summary>
-            public byte f_D2R;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("2nd Decay Rate (0-31)")]
             public byte D2R
             {
                 get
@@ -1044,11 +1058,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_SL;
+
             /// <summary>
             /// sustain level(0-15)
             /// </summary>
-            public byte f_SL;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Sustain Level(0-15)")]
             public byte SL
             {
                 get
@@ -1061,11 +1078,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_RR;
+
             /// <summary>
             /// release rate(0-15)
             /// </summary>
-            public byte f_RR;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Release Rate (0-15)")]
             public byte RR
             {
                 get
@@ -1078,11 +1098,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_SSG_EG;
+
             /// <summary>
             /// SSG-EG(0-15)
             /// </summary>
-            public byte f_SSG_EG;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("SSG-EG (0-15)")]
             public byte SSG_EG
             {
                 get

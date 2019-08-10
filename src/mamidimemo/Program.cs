@@ -1,10 +1,14 @@
 ﻿using Melanchall.DryWetMidi.Devices;
 using Melanchall.DryWetMidi.Smf;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -31,17 +35,21 @@ namespace zanac.mamidimemo
             {
                 threadStart.Set();
                 Settings.Default.Reload();
+                instruments.InstrumentManager.RestoreSettings();
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 Application.Run(new FormMain());
 
+                instruments.InstrumentManager.SaveSettings();
                 Settings.Default.Save();
             }));
             mainThread.Start();
             threadStart.WaitOne();
         }
+
+
 
         /// <summary>
         /// 

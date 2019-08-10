@@ -175,7 +175,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;statusStrip1.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>133, 17</value>
@@ -202,7 +202,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;menuStrip1.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>37, 20</value>
@@ -210,8 +210,26 @@
   <data name="fileToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;File</value>
   </data>
+  <data name="loadToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>123, 22</value>
+  </data>
+  <data name="loadToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Load...</value>
+  </data>
+  <data name="saveToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>123, 22</value>
+  </data>
+  <data name="saveToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Save</value>
+  </data>
+  <data name="saveAsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>123, 22</value>
+  </data>
+  <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
+    <value>Save &amp;As...</value>
+  </data>
   <data name="toolStripMenuItemExit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>93, 22</value>
+    <value>123, 22</value>
   </data>
   <data name="toolStripMenuItemExit.Text" xml:space="preserve">
     <value>E&amp;xit</value>
@@ -242,6 +260,18 @@
   </data>
   <data name="splitContainer2.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
+  </data>
+  <metadata name="contextMenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>463, 17</value>
+  </metadata>
+  <data name="contextMenuStrip1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>225, 26</value>
+  </data>
+  <data name="&gt;&gt;contextMenuStrip1.Name" xml:space="preserve">
+    <value>contextMenuStrip1</value>
+  </data>
+  <data name="&gt;&gt;contextMenuStrip1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="listViewIntruments.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -385,11 +415,41 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;splitContainer1.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
+  </data>
+  <data name="decreaseThisKindOfChipToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>224, 22</value>
+  </data>
+  <data name="decreaseThisKindOfChipToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Reduce selected chip type(s)</value>
   </data>
   <metadata name="toolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>248, 17</value>
   </metadata>
+  <data name="toolStrip1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 24</value>
+  </data>
+  <data name="toolStrip1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>650, 25</value>
+  </data>
+  <data name="toolStrip1.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="toolStrip1.Text" xml:space="preserve">
+    <value>toolStrip1</value>
+  </data>
+  <data name="&gt;&gt;toolStrip1.Name" xml:space="preserve">
+    <value>toolStrip1</value>
+  </data>
+  <data name="&gt;&gt;toolStrip1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStrip1.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;toolStrip1.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
   <data name="toolStripLabel1.Size" type="System.Drawing.Size, System.Drawing">
     <value>49, 22</value>
   </data>
@@ -398,30 +458,6 @@
   </data>
   <data name="toolStripComboBoxMidiIf.Size" type="System.Drawing.Size, System.Drawing">
     <value>121, 25</value>
-  </data>
-  <data name="addYM2151ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
-  </data>
-  <data name="addYM2151ToolStripMenuItem.Text" xml:space="preserve">
-    <value>Add YM&amp;2151</value>
-  </data>
-  <data name="addYM2612ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
-  </data>
-  <data name="addYM2612ToolStripMenuItem.Text" xml:space="preserve">
-    <value>Add YM2&amp;612</value>
-  </data>
-  <data name="addSN76496ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
-  </data>
-  <data name="addSN76496ToolStripMenuItem.Text" xml:space="preserve">
-    <value>Add &amp;SN76496</value>
-  </data>
-  <data name="addNAMCOCUS30ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
-  </data>
-  <data name="addNAMCOCUS30ToolStripMenuItem.Text" xml:space="preserve">
-    <value>Add &amp;NAMCO CUS30</value>
   </data>
   <data name="toolStripDropDownButton1.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -447,29 +483,35 @@
   <data name="toolStripDropDownButton1.Text" xml:space="preserve">
     <value>Instruments</value>
   </data>
-  <data name="toolStrip1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 24</value>
+  <data name="addYM2151ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>193, 22</value>
   </data>
-  <data name="toolStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>650, 25</value>
+  <data name="addYM2151ToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend YM&amp;2151</value>
   </data>
-  <data name="toolStrip1.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
+  <data name="addYM2612ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>193, 22</value>
   </data>
-  <data name="toolStrip1.Text" xml:space="preserve">
-    <value>toolStrip1</value>
+  <data name="addYM2612ToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend YM2&amp;612</value>
   </data>
-  <data name="&gt;&gt;toolStrip1.Name" xml:space="preserve">
-    <value>toolStrip1</value>
+  <data name="addSN76496ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>193, 22</value>
   </data>
-  <data name="&gt;&gt;toolStrip1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="addSN76496ToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend &amp;SN76496</value>
   </data>
-  <data name="&gt;&gt;toolStrip1.Parent" xml:space="preserve">
-    <value>$this</value>
+  <data name="addNAMCOCUS30ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>193, 22</value>
   </data>
-  <data name="&gt;&gt;toolStrip1.ZOrder" xml:space="preserve">
-    <value>1</value>
+  <data name="addNAMCOCUS30ToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend &amp;NAMCO CUS30</value>
+  </data>
+  <data name="extendGBAPUToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>193, 22</value>
+  </data>
+  <data name="extendGBAPUToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend &amp;GB APU</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -495,6 +537,24 @@
   <data name="&gt;&gt;fileToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;loadToolStripMenuItem.Name" xml:space="preserve">
+    <value>loadToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;loadToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;saveToolStripMenuItem.Name" xml:space="preserve">
+    <value>saveToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;saveToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;saveAsToolStripMenuItem.Name" xml:space="preserve">
+    <value>saveAsToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;saveAsToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;toolStripMenuItemExit.Name" xml:space="preserve">
     <value>toolStripMenuItemExit</value>
   </data>
@@ -511,6 +571,12 @@
     <value>toolStripMenuItemAbout</value>
   </data>
   <data name="&gt;&gt;toolStripMenuItemAbout.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;decreaseThisKindOfChipToolStripMenuItem.Name" xml:space="preserve">
+    <value>decreaseThisKindOfChipToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;decreaseThisKindOfChipToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;imageList1.Name" xml:space="preserve">
@@ -537,6 +603,12 @@
   <data name="&gt;&gt;toolStripDropDownButton1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripDropDownButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;addYM2151ToolStripMenuItem.Name" xml:space="preserve">
+    <value>addYM2151ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;addYM2151ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;addYM2612ToolStripMenuItem.Name" xml:space="preserve">
     <value>addYM2612ToolStripMenuItem</value>
   </data>
@@ -555,10 +627,10 @@
   <data name="&gt;&gt;addNAMCOCUS30ToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;addYM2151ToolStripMenuItem.Name" xml:space="preserve">
-    <value>addYM2151ToolStripMenuItem</value>
+  <data name="&gt;&gt;extendGBAPUToolStripMenuItem.Name" xml:space="preserve">
+    <value>extendGBAPUToolStripMenuItem</value>
   </data>
-  <data name="&gt;&gt;addYM2151ToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;extendGBAPUToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

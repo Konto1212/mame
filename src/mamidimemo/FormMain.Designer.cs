@@ -40,22 +40,28 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.listViewIntruments = new System.Windows.Forms.ListView();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.decreaseThisKindOfChipToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.propertyGrid = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBoxMidiIf = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.addYM2151ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addYM2612ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addSN76496ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addNAMCOCUS30ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addYM2151ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendGBAPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -65,6 +71,7 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -99,9 +106,27 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadToolStripMenuItem,
+            this.saveToolStripMenuItem,
+            this.saveAsToolStripMenuItem,
             this.toolStripMenuItemExit});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
+            // 
+            // loadToolStripMenuItem
+            // 
+            this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            resources.ApplyResources(this.loadToolStripMenuItem, "loadToolStripMenuItem");
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            resources.ApplyResources(this.saveToolStripMenuItem, "saveToolStripMenuItem");
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            resources.ApplyResources(this.saveAsToolStripMenuItem, "saveAsToolStripMenuItem");
             // 
             // toolStripMenuItemExit
             // 
@@ -149,12 +174,26 @@
             // 
             // listViewIntruments
             // 
+            this.listViewIntruments.ContextMenuStrip = this.contextMenuStrip1;
             resources.ApplyResources(this.listViewIntruments, "listViewIntruments");
             this.listViewIntruments.LargeImageList = this.imageList1;
             this.listViewIntruments.Name = "listViewIntruments";
             this.listViewIntruments.SmallImageList = this.imageList1;
             this.listViewIntruments.UseCompatibleStateImageBehavior = false;
             this.listViewIntruments.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.listViewIntruments_ItemSelectionChanged);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.decreaseThisKindOfChipToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            resources.ApplyResources(this.contextMenuStrip1, "contextMenuStrip1");
+            // 
+            // decreaseThisKindOfChipToolStripMenuItem
+            // 
+            this.decreaseThisKindOfChipToolStripMenuItem.Name = "decreaseThisKindOfChipToolStripMenuItem";
+            resources.ApplyResources(this.decreaseThisKindOfChipToolStripMenuItem, "decreaseThisKindOfChipToolStripMenuItem");
+            this.decreaseThisKindOfChipToolStripMenuItem.Click += new System.EventHandler(this.decreaseThisKindOfChipToolStripMenuItem_Click);
             // 
             // imageList1
             // 
@@ -194,9 +233,16 @@
             this.addYM2151ToolStripMenuItem,
             this.addYM2612ToolStripMenuItem,
             this.addSN76496ToolStripMenuItem,
-            this.addNAMCOCUS30ToolStripMenuItem});
+            this.addNAMCOCUS30ToolStripMenuItem,
+            this.extendGBAPUToolStripMenuItem});
             resources.ApplyResources(this.toolStripDropDownButton1, "toolStripDropDownButton1");
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            // 
+            // addYM2151ToolStripMenuItem
+            // 
+            this.addYM2151ToolStripMenuItem.Name = "addYM2151ToolStripMenuItem";
+            resources.ApplyResources(this.addYM2151ToolStripMenuItem, "addYM2151ToolStripMenuItem");
+            this.addYM2151ToolStripMenuItem.Click += new System.EventHandler(this.addYM2151ToolStripMenuItem_Click);
             // 
             // addYM2612ToolStripMenuItem
             // 
@@ -216,11 +262,11 @@
             resources.ApplyResources(this.addNAMCOCUS30ToolStripMenuItem, "addNAMCOCUS30ToolStripMenuItem");
             this.addNAMCOCUS30ToolStripMenuItem.Click += new System.EventHandler(this.addNAMCOCUS30ToolStripMenuItem_Click);
             // 
-            // addYM2151ToolStripMenuItem
+            // extendGBAPUToolStripMenuItem
             // 
-            this.addYM2151ToolStripMenuItem.Name = "addYM2151ToolStripMenuItem";
-            resources.ApplyResources(this.addYM2151ToolStripMenuItem, "addYM2151ToolStripMenuItem");
-            this.addYM2151ToolStripMenuItem.Click += new System.EventHandler(this.addYM2151ToolStripMenuItem_Click);
+            this.extendGBAPUToolStripMenuItem.Name = "extendGBAPUToolStripMenuItem";
+            resources.ApplyResources(this.extendGBAPUToolStripMenuItem, "extendGBAPUToolStripMenuItem");
+            this.extendGBAPUToolStripMenuItem.Click += new System.EventHandler(this.extendGBAPUToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -242,6 +288,7 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -271,6 +318,12 @@
         private System.Windows.Forms.ToolStripMenuItem addSN76496ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addNAMCOCUS30ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addYM2151ToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem decreaseThisKindOfChipToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendGBAPUToolStripMenuItem;
     }
 }
 

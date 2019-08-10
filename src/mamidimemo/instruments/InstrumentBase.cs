@@ -1,14 +1,18 @@
 ﻿using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Smf;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Design;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace zanac.mamidimemo.instruments
 {
+    [DataContract]
     public abstract class InstrumentBase
     {
         /// <summary>
@@ -18,6 +22,36 @@ namespace zanac.mamidimemo.instruments
         {
             get;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Description("Memo")]
+        public string Memo
+        {
+            get;
+            set;
+        }
+
+        [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+    typeof(UITypeEditor)), Localizable(false)]
+        [IgnoreDataMember]
+        [JsonIgnore]
+        [Description("You can copy and paste this text data to other same type Instrument.")]
+        public string SerializeData
+        {
+            get
+            {
+                return JsonConvert.SerializeObject(this, Formatting.None);
+            }
+            set
+            {
+                RestoreFrom(value);
+            }
+        }
+
+        public abstract void RestoreFrom(string serializeData);
 
         /// <summary>
         /// 
@@ -49,6 +83,9 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Receving MIDI ch")]
         public bool[] Channels
         {
             get;
@@ -57,41 +94,61 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Pitch (0 - 8192 - 16383)")]
         public ushort[] Pitchs
         {
             get;
         }
 
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Pitch bend censitivity [halt note]")]
         public byte[] PitchBendRanges
         {
             get;
         }
 
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Program number (0-127)")]
         public byte[] ProgramNumbers
         {
             get;
         }
 
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Volume (0-127)")]
         public byte[] Volumes
         {
             get;
         }
 
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Volume (0-127)")]
         public byte[] Expressions
         {
             get;
         }
 
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Volume ((L)0-63(C)64-127(R))")]
         public byte[] Panpots
         {
             get;
         }
 
+        [Browsable(false)]
         public byte[] RpnLsb
         {
             get;
         }
 
+        [Browsable(false)]
         public byte[] RpnMsb
         {
             get;

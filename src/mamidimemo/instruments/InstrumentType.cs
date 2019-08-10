@@ -13,7 +13,7 @@ namespace zanac.mamidimemo.instruments
     {
         YM2151,
         YM2612,
-        GBAPU,
+        GB_APU,
         SN76496,
         NAMCO_CUS30,
     }

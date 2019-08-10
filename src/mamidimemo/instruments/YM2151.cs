@@ -5,23 +5,27 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.MusicTheory;
 using Melanchall.DryWetMidi.Smf;
+using Newtonsoft.Json;
+using Omu.ValueInjecter;
+using Omu.ValueInjecter.Injections;
 using zanac.mamidimemo.ComponentModel;
 using zanac.mamidimemo.mame;
 using zanac.mamidimemo.midi;
 
-//https://www.plutiedev.com/ym2151-registers
-//http://www.smspower.org/maxim/Documents/YM2151#regb4
+//https://www16.atwiki.jp/mxdrv/pages/24.html
 
 namespace zanac.mamidimemo.instruments
 {
     /// <summary>
     /// 
     /// </summary>
+    [DataContract]
     public class YM2151 : InstrumentBase
     {
 
@@ -32,11 +36,23 @@ namespace zanac.mamidimemo.instruments
         [Browsable(false)]
         public override string ImageKey => "YM2151";
 
-
+        [DataMember]
+        [Category("Chip")]
+        [Description("Timbres (0-127)")]
         public YM2151Timbre[] Timbres
         {
             get;
-            private set;
+            set;
+        }
+
+                /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serializeData"></param>
+        public override void RestoreFrom(string serializeData)
+        {
+            var obj = JsonConvert.DeserializeObject<YM2151>(serializeData);
+            this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
         }
 
         /// <summary>
@@ -111,6 +127,8 @@ namespace zanac.mamidimemo.instruments
         public YM2151(uint unitNumber) : base(unitNumber)
         {
             Timbres = new YM2151Timbre[128];
+            for (int i = 0; i < 128; i++)
+                Timbres[i] = new YM2151Timbre();
             setPresetInstruments();
 
             this.soundManager = new YM2151SoundManager(this);
@@ -127,61 +145,61 @@ namespace zanac.mamidimemo.instruments
             Timbres[0].FB = 0;
             Timbres[0].ALG = 3;
 
-            Timbres[0].f_Op1.Enable = 1;
-            Timbres[0].f_Op1.AR = 31;
-            Timbres[0].f_Op1.D1R = 0;
-            Timbres[0].f_Op1.SL = 0;
-            Timbres[0].f_Op1.D2R = 0;
-            Timbres[0].f_Op1.RR = 6;
+            Timbres[0].Ops[0].Enable = 1;
+            Timbres[0].Ops[0].AR = 31;
+            Timbres[0].Ops[0].D1R = 0;
+            Timbres[0].Ops[0].SL = 0;
+            Timbres[0].Ops[0].D2R = 0;
+            Timbres[0].Ops[0].RR = 6;
 
-            Timbres[0].f_Op1.MUL = 8;
-            Timbres[0].f_Op1.RS = 0;
-            Timbres[0].f_Op1.DT1 = 7;
-            Timbres[0].f_Op1.AM = 0;
-            Timbres[0].f_Op1.DT2 = 0;
-            Timbres[0].f_Op1.TL = 56;
+            Timbres[0].Ops[0].MUL = 8;
+            Timbres[0].Ops[0].RS = 0;
+            Timbres[0].Ops[0].DT1 = 7;
+            Timbres[0].Ops[0].AM = 0;
+            Timbres[0].Ops[0].DT2 = 0;
+            Timbres[0].Ops[0].TL = 56;
 
-            Timbres[0].f_Op2.Enable = 1;
-            Timbres[0].f_Op2.AR = 31;
-            Timbres[0].f_Op2.D1R = 18;
-            Timbres[0].f_Op2.SL = 0;
-            Timbres[0].f_Op2.D2R = 0;
-            Timbres[0].f_Op2.RR = 6;
+            Timbres[0].Ops[1].Enable = 1;
+            Timbres[0].Ops[1].AR = 31;
+            Timbres[0].Ops[1].D1R = 18;
+            Timbres[0].Ops[1].SL = 0;
+            Timbres[0].Ops[1].D2R = 0;
+            Timbres[0].Ops[1].RR = 6;
 
-            Timbres[0].f_Op2.MUL = 3;
-            Timbres[0].f_Op2.RS = 0;
-            Timbres[0].f_Op2.DT1 = 7;
-            Timbres[0].f_Op2.AM = 0;
-            Timbres[0].f_Op2.DT2 = 0;
-            Timbres[0].f_Op2.TL = 19;
+            Timbres[0].Ops[1].MUL = 3;
+            Timbres[0].Ops[1].RS = 0;
+            Timbres[0].Ops[1].DT1 = 7;
+            Timbres[0].Ops[1].AM = 0;
+            Timbres[0].Ops[1].DT2 = 0;
+            Timbres[0].Ops[1].TL = 19;
 
-            Timbres[0].f_Op3.Enable = 1;
-            Timbres[0].f_Op3.AR = 31;
-            Timbres[0].f_Op3.D1R = 0;
-            Timbres[0].f_Op3.SL = 0;
-            Timbres[0].f_Op3.D2R = 0;
-            Timbres[0].f_Op3.RR = 6;
+            Timbres[0].Ops[2].Enable = 1;
+            Timbres[0].Ops[2].AR = 31;
+            Timbres[0].Ops[2].D1R = 0;
+            Timbres[0].Ops[2].SL = 0;
+            Timbres[0].Ops[2].D2R = 0;
+            Timbres[0].Ops[2].RR = 6;
 
-            Timbres[0].f_Op3.MUL = 3;
-            Timbres[0].f_Op3.RS = 0;
-            Timbres[0].f_Op3.DT1 = 4;
-            Timbres[0].f_Op3.AM = 0;
-            Timbres[0].f_Op3.DT2 = 0;
-            Timbres[0].f_Op3.TL = 8;
+            Timbres[0].Ops[2].MUL = 3;
+            Timbres[0].Ops[2].RS = 0;
+            Timbres[0].Ops[2].DT1 = 4;
+            Timbres[0].Ops[2].AM = 0;
+            Timbres[0].Ops[2].DT2 = 0;
+            Timbres[0].Ops[2].TL = 8;
 
-            Timbres[0].f_Op4.Enable = 1;
-            Timbres[0].f_Op4.AR = 20;
-            Timbres[0].f_Op4.D1R = 17;
-            Timbres[0].f_Op4.SL = 0;
-            Timbres[0].f_Op4.D2R = 0;
-            Timbres[0].f_Op4.RR = 5;
+            Timbres[0].Ops[3].Enable = 1;
+            Timbres[0].Ops[3].AR = 20;
+            Timbres[0].Ops[3].D1R = 17;
+            Timbres[0].Ops[3].SL = 0;
+            Timbres[0].Ops[3].D2R = 0;
+            Timbres[0].Ops[3].RR = 5;
 
-            Timbres[0].f_Op4.MUL = 2;
-            Timbres[0].f_Op4.RS = 0;
-            Timbres[0].f_Op4.DT1 = 4;
-            Timbres[0].f_Op4.AM = 0;
-            Timbres[0].f_Op4.DT2 = 0;
-            Timbres[0].f_Op4.TL = 24;
+            Timbres[0].Ops[3].MUL = 2;
+            Timbres[0].Ops[3].RS = 0;
+            Timbres[0].Ops[3].DT1 = 4;
+            Timbres[0].Ops[3].AM = 0;
+            Timbres[0].Ops[3].DT2 = 0;
+            Timbres[0].Ops[3].TL = 24;
         }
 
         /// <summary>
@@ -407,7 +425,7 @@ namespace zanac.mamidimemo.instruments
                 //Volume
                 UpdateFmVolume();
                 //On
-                byte op = (byte)(Timbre.Op1.Enable << 3 | Timbre.Op3.Enable << 4 | Timbre.Op2.Enable << 5 | Timbre.Op4.Enable << 6);
+                byte op = (byte)(Timbre.Ops[0].Enable << 3 | Timbre.Ops[2].Enable << 4 | Timbre.Ops[1].Enable << 5 | Timbre.Ops[3].Enable << 6);
                 Ym2151WriteData(parentModule.UnitNumber, 0x08, 0, 0, (byte)(op | (Slot % 3)));
             }
 
@@ -462,7 +480,7 @@ namespace zanac.mamidimemo.instruments
                 foreach (int op in ops)
                 {
                     //$60+: total level
-                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)(127 - Math.Round((127 - timbre.GetOperator(op).TL) * vol * vel * exp)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)(127 - Math.Round((127 - timbre.Ops[op].TL) * vol * vel * exp)));
                 }
             }
 
@@ -625,12 +643,12 @@ namespace zanac.mamidimemo.instruments
                 Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)((timbre.PMS << 4 | timbre.AMS)));
                 for (int op = 0; op < 4; op++)
                 {
-                    Ym2151WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)((timbre.GetOperator(op).DT1 << 4 | timbre.GetOperator(op).MUL)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)timbre.GetOperator(op).TL);
-                    Ym2151WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.GetOperator(op).RS << 6 | timbre.GetOperator(op).AR)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0xa0, op, Slot, (byte)((timbre.GetOperator(op).AM << 7 | timbre.GetOperator(op).D1R)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0xc0, op, Slot, (byte)((timbre.GetOperator(op).DT2 << 7 | timbre.GetOperator(op).D2R)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0xe0, op, Slot, (byte)((timbre.GetOperator(op).SL << 7 | timbre.GetOperator(op).RR)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)((timbre.Ops[op].DT1 << 4 | timbre.Ops[op].MUL)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)timbre.Ops[op].TL);
+                    Ym2151WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.Ops[op].RS << 6 | timbre.Ops[op].AR)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xa0, op, Slot, (byte)((timbre.Ops[op].AM << 7 | timbre.Ops[op].D1R)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xc0, op, Slot, (byte)((timbre.Ops[op].DT2 << 7 | timbre.Ops[op].D2R)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xe0, op, Slot, (byte)((timbre.Ops[op].SL << 7 | timbre.Ops[op].RR)));
                 }
 
                 UpdatePanpot();
@@ -646,16 +664,22 @@ namespace zanac.mamidimemo.instruments
 
         }
 
+
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ValueTypeTypeConverter<YM2151Timbre>))]
-        public struct YM2151Timbre
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2151Timbre>))]
+        [DataContract]
+        public class YM2151Timbre : TimbreBase
         {
             #region FM Symth
 
-            public byte f_FB;
+            private byte f_FB;
 
+            [DataMember]
+            [Category("Sound")]
+            [Description("Feedback (0-7)")]
             public byte FB
             {
                 get
@@ -668,8 +692,11 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public byte f_ALG;
+            private byte f_ALG;
 
+            [DataMember]
+            [Category("Sound")]
+            [Description("Algorithm (0-7)")]
             public byte ALG
             {
                 get
@@ -682,8 +709,11 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public byte f_AMS;
+            private byte f_AMS;
 
+            [DataMember]
+            [Category("Sound")]
+            [Description("Amplitude Modulation Sensitivity (0-3)")]
             public byte AMS
             {
                 get
@@ -696,8 +726,11 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public byte f_PMS;
+            private byte f_PMS;
 
+            [DataMember]
+            [Category("Sound")]
+            [Description("Phase Modulation Sensitivity (0-7)")]
             public byte PMS
             {
                 get
@@ -710,96 +743,52 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public YM2151Operator f_Op1;
-
-            public YM2151Operator Op1
+            /// <summary>
+            /// 
+            /// </summary>
+            [DataMember]
+            [Category("Sound")]
+            [Description("Operators")]
+            public YM2151Operator[] Ops
             {
-                get
-                {
-                    return f_Op1;
-                }
-                set
-                {
-                    f_Op1 = value;
-                }
+                get;
+                private set;
             }
-
-            public YM2151Operator f_Op2;
-
-            public YM2151Operator Op2
-            {
-                get
-                {
-                    return f_Op2;
-                }
-                set
-                {
-                    f_Op2 = value;
-                }
-            }
-
-            public YM2151Operator f_Op3;
-
-            public YM2151Operator Op3
-            {
-                get
-                {
-                    return f_Op3;
-                }
-                set
-                {
-                    f_Op3 = value;
-                }
-            }
-
-            public YM2151Operator f_Op4;
-
-            public YM2151Operator Op4
-            {
-                get
-                {
-                    return f_Op4;
-                }
-                set
-                {
-                    f_Op4 = value;
-                }
-            }
-
-            #endregion
 
             /// <summary>
             /// 
             /// </summary>
-            /// <param name="idx"></param>
-            public YM2151Operator GetOperator(int idx)
+            public YM2151Timbre()
             {
-                switch (idx)
-                {
-                    case 0:
-                        return Op1;
-                    case 1:
-                        return Op2;
-                    case 2:
-                        return Op3;
-                    case 3:
-                        return Op4;
-                }
-                return Op1;
+                Ops = new YM2151Operator[] { new YM2151Operator(), new YM2151Operator(), new YM2151Operator(), new YM2151Operator() };
             }
+
+            #endregion
+
+            public override void RestoreFrom(string serializeData)
+            {
+                var obj = JsonConvert.DeserializeObject<YM2151Timbre>(serializeData);
+                this.InjectFrom(obj);
+            }
+
         }
 
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ValueTypeTypeConverter<YM2151Operator>))]
-        public struct YM2151Operator
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2151Operator>))]
+        [DataContract]
+        public class YM2151Operator
         {
-            public byte f_Enable;
+            private byte f_Enable;
 
             /// <summary>
             /// Enable(0-1)
             /// </summary>
+            [DataMember]
+            [Category("Sound")]
+            [Description("Whether this operator enable or not")]
             public byte Enable
             {
                 get
@@ -812,11 +801,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_DT1;
+
             /// <summary>
             /// Detune1(0-7)
             /// </summary>
-            public byte f_DT1;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("DeTune 1 (1-4-7)")]
             public byte DT1
             {
                 get
@@ -829,11 +821,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_MUL;
+
             /// <summary>
             /// Multiply(0-15)
             /// </summary>
-            public byte f_MUL;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Multiply (0-15)")]
             public byte MUL
             {
                 get
@@ -846,11 +841,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_TL;
+
             /// <summary>
             /// Total Level(0-127)
             /// </summary>
-            public byte f_TL;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Total Level (0-127)")]
             public byte TL
             {
                 get
@@ -863,11 +861,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_RS;
+
             /// <summary>
             /// Rate Scaling(0-3)
             /// </summary>
-            public byte f_RS;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Rate Scaling (0-3)")]
             public byte RS
             {
                 get
@@ -880,11 +881,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_AR;
+
             /// <summary>
             /// Attack Rate(0-31)
             /// </summary>
-            public byte f_AR;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Attack Rate (0-31)")]
             public byte AR
             {
                 get
@@ -897,11 +901,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_AM;
+
             /// <summary>
             /// amplitude modulation sensivity(0-1)
             /// </summary>
-            public byte f_AM;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Amplitude Modulation Sensivity (0-1)")]
             public byte AM
             {
                 get
@@ -914,11 +921,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_D1R;
+
             /// <summary>
             /// 1st decay rate(0-31)
             /// </summary>
-            public byte f_D1R;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("1st Decay Rate (0-31)")]
             public byte D1R
             {
                 get
@@ -931,11 +941,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_D2R;
+
             /// <summary>
             /// 2nd decay rate(0-31)
             /// </summary>
-            public byte f_D2R;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("2nd Decay Rate (0-31)")]
             public byte D2R
             {
                 get
@@ -948,11 +961,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_SL;
+
             /// <summary>
             /// sustain level(0-15)
             /// </summary>
-            public byte f_SL;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Sustain Level(0-15)")]
             public byte SL
             {
                 get
@@ -965,11 +981,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_RR;
+
             /// <summary>
             /// release rate(0-15)
             /// </summary>
-            public byte f_RR;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Release Rate (0-15)")]
             public byte RR
             {
                 get
@@ -982,11 +1001,14 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
+            private byte f_DT2;
+
             /// <summary>
             /// DT2(0-3)
             /// </summary>
-            public byte f_DT2;
-
+            [DataMember]
+            [Category("Sound")]
+            [Description("Detune 2 (0-3)")]
             public byte DT2
             {
                 get
@@ -1001,4 +1023,6 @@ namespace zanac.mamidimemo.instruments
         }
 
     }
+
+
 }

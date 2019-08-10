@@ -90,6 +90,22 @@ extern "C"
 		return gb_apu->sound_r(address);
 	}
 
+	DllExport void gb_apu_wave_write(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->device((std::string("gbsnd_") + num).c_str()));
+		if (gb_apu == nullptr)
+			return;
+
+		gb_apu->wave_w(address, data);
+	}
 
 	DllExport void sn76496_write(unsigned int unitNumber, unsigned char data)
 	{

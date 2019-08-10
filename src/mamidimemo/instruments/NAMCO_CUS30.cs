@@ -6,11 +6,15 @@ using System.ComponentModel.Design;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.MusicTheory;
 using Melanchall.DryWetMidi.Smf;
+using Newtonsoft.Json;
+using Omu.ValueInjecter;
+using Omu.ValueInjecter.Injections;
 using zanac.mamidimemo.ComponentModel;
 using zanac.mamidimemo.mame;
 using zanac.mamidimemo.midi;
@@ -23,6 +27,7 @@ namespace zanac.mamidimemo.instruments
     /// <summary>
     /// 
     /// </summary>
+    [DataContract]
     public class NAMCO_CUS30 : InstrumentBase
     {
 
@@ -33,11 +38,27 @@ namespace zanac.mamidimemo.instruments
         [Browsable(false)]
         public override string ImageKey => "NAMCO_CUS30";
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("Timbres (0-127)")]
         public NAMCO_CUS30Timbre[] Timbres
         {
             get;
             private set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serializeData"></param>
+        public override void RestoreFrom(string serializeData)
+        {
+            var obj = JsonConvert.DeserializeObject<NAMCO_CUS30>(serializeData);
+            this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
         }
 
         /// <summary>
@@ -497,10 +518,17 @@ namespace zanac.mamidimemo.instruments
         /// 
         /// </summary>
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public class NAMCO_CUS30Timbre
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<NAMCO_CUS30Timbre>))]
+        [DataContract]
+        public class NAMCO_CUS30Timbre : TimbreBase
         {
-            public SoundType f_SoundType;
+            private SoundType f_SoundType;
 
+            /// <summary>
+            /// 
+            /// </summary>
+            [Category("Sound")]
+            [Description("Sound Type")]
             public SoundType SoundType
             {
                 get
@@ -516,6 +544,9 @@ namespace zanac.mamidimemo.instruments
             public byte[] f_wavedata = new byte[32];
 
             [TypeConverter(typeof(ArrayConverter))]
+            [DataMember]
+            [Category("Sound")]
+            [Description("Wave Table (32 samples, 0-15 levels)")]
             public byte[] WaveData
             {
                 get
@@ -526,6 +557,12 @@ namespace zanac.mamidimemo.instruments
                 {
                     f_wavedata = value;
                 }
+            }
+
+            public override void RestoreFrom(string serializeData)
+            {
+                var obj = JsonConvert.DeserializeObject<NAMCO_CUS30Timbre>(serializeData);
+                this.InjectFrom(obj);
             }
         }
 
