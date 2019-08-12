@@ -977,7 +977,7 @@ void md_base_state::md_ntsc(machine_config &config)
 		(*m_gbsnd[i])->add_route(0, "lspeaker", 1.00);
 		(*m_gbsnd[i])->add_route(1, "rspeaker", 1.00);
 
-		NES_APU(config, *m_nesapu[i], XTAL(21'477'272)/2);
+		NES_APU(config, *m_nesapu[i], XTAL(21'477'272)/12);
 		(*m_nesapu[i])->add_route(0, "lspeaker", 1.00);
 		(*m_nesapu[i])->add_route(1, "rspeaker", 1.00);
 	}

@@ -292,7 +292,7 @@ s8 nesapu_device::apu_square(apu_t::square_t *chan)
 
 	while (chan->phaseacc < 0)
 	{
-		chan->phaseacc += (chan->freq >> 11);
+		chan->phaseacc += (chan->freq >> 16);
 		chan->adder = (chan->adder + 1) & 0x0F;
 	}
 
@@ -310,7 +310,7 @@ s8 nesapu_device::apu_square(apu_t::square_t *chan)
 /* OUTPUT TRIANGLE WAVE SAMPLE (VALUES FROM -16 to +15) */
 s8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 {
-	u32 freq;
+	int freq;
 	s8 output;
 	/* reg0: 7=holdnote, 6-0=linear length counter
 	** reg2: low 8 bits of frequency
@@ -342,7 +342,7 @@ s8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 	if (0 == chan->linear_length)
 		return 0;
 
-	freq = ((((chan->regs[3] & 7) << 8) + chan->regs[2]) + 1) << 3;
+	freq = (((chan->regs[3] & 7) << 8) + chan->regs[2]) + 1;
 
 	if (freq < 4) /* inaudible */
 		return 0;
@@ -404,7 +404,7 @@ s8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 	if (0 == chan->vbl_length)
 		return 0;
 
-	freq = noise_freq[chan->regs[2] & 0x0F] << 3;
+	freq = noise_freq[chan->regs[2] & 0x0F];
 	chan->phaseacc -= 4;
 	while (chan->phaseacc < 0)
 	{
@@ -435,7 +435,8 @@ s8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 /* RESET DPCM PARAMETERS */
 static inline void apu_dpcmreset(apu_t::dpcm_t *chan)
 {
-	chan->address = 0xC000 + u16(chan->regs[2] << 6);
+	//chan->address = 0xC000 + u16(chan->regs[2] << 6);
+	chan->address = 0x0000;
 	chan->length = u16(chan->regs[3] << 4) + 1;
 	chan->bits_left = chan->length << 3;
 	chan->irq_occurred = false;
@@ -454,7 +455,6 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 	** reg2: 8 bits of 64-byte aligned address offset : $C000 + (value * 64)
 	** reg3: length, (value * 16) + 1
 	*/
-
 	if (chan->enabled)
 	{
 		freq = dpcm_clocks[chan->regs[0] & 0x0F];

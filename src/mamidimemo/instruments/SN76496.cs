@@ -407,6 +407,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
             public SN76496Timbre Timbre;
 
+            private SoundType lastSoundType;
+
             /// <summary>
             /// 
             /// </summary>
@@ -419,6 +421,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
                 this.Timbre = parentModule.Timbres[programNumber];
+
+                lastSoundType = Timbre.SoundType;
             }
 
             /// <summary>
@@ -535,7 +539,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void Off()
             {
-                switch (Timbre.SoundType)
+                switch (lastSoundType)
                 {
                     case SoundType.PSG:
                         {

@@ -505,6 +505,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
             public GBAPUTimbre Timbre;
 
+            private SoundType lastSoundType;
+
             /// <summary>
             /// 
             /// </summary>
@@ -517,6 +519,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
                 this.Timbre = parentModule.Timbres[programNumber];
+
+                lastSoundType = Timbre.SoundType;
             }
 
             /// <summary>
@@ -787,7 +791,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void Off()
             {
-                switch (Timbre.SoundType)
+                switch (lastSoundType)
                 {
                     case SoundType.SPSG:
                     case SoundType.PSG:

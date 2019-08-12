@@ -1,19 +1,31 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Drawing.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using zanac.MAmidiMEmo.Instruments;
 
 namespace zanac.MAmidiMEmo.Gui
 {
     /// <summary>
     /// 
     /// </summary>
-    public class PcmUITypeEditor : UITypeEditor
+    public class PcmUITypeEditor : ArrayEditor
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        public PcmUITypeEditor(Type type) : base(type)
+        {
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -46,19 +58,25 @@ namespace zanac.MAmidiMEmo.Gui
             // CurrencyValueEditorForm を使用したプロパティエディタの表示
             using (FormPcmEditor frm = new FormPcmEditor())
             {
-                /*
-                frm.CurrencyValue = (long)value;    // 現在のプロパティ値をエディタ側に設定
+                frm.PcmData =
+                    JsonConvert.DeserializeObject<PcmSoundBase[]>(JsonConvert.SerializeObject(((PcmSoundTableBase)value).PcmSounds));
+                if (att != null)
+                    frm.FileDialogFilter = att.Exts;
+                else
+                    frm.FileDialogFilter = "All Files(*.*)|*.*";
+                //"HTMLファイル(*.html;*.htm)|*.html;*.htm|すべてのファイル(*.*)|*.*"
                 DialogResult dr = editorService.ShowDialog(frm);
                 if (dr == DialogResult.OK)
                 {
-                    return frm.CurrencyValue;       // 新しい設定値をプロパティ値として返す
+                    for (int i = 0; i < frm.PcmData.Length; i++)
+                        ((PcmSoundTableBase)value).PcmSounds[i] = frm.PcmData[i];
+                    return value;
                 }
                 else
                 {
                     return value;                   // エディタ呼び出し直前の設定値をそのまま返す
-                }*/
+                }
             }
-            return null;
         }
     }
 }

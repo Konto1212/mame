@@ -29,6 +29,28 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         [DataMember]
+        [Description("Gain Left ch.")]
+        public double GainLeft
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Description("Gain Right ch.")]
+        public double GainRight
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
         [Description("Memo")]
         public string Memo
         {

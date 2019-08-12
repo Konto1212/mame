@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.Design;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.MusicTheory;
 using Melanchall.DryWetMidi.Smf;
@@ -28,7 +29,7 @@ namespace zanac.MAmidiMEmo.Instruments
     /// 
     /// </summary>
     [DataContract]
-    public class RP2A03 : InstrumentBase
+    public partial class RP2A03 : InstrumentBase
     {
 
         public override string Name => "RP2A03";
@@ -75,12 +76,13 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+
         [DataMember]
-        [Category("DPCM")]
+        [Category("Chip")]
         [Description("Delta PCM Data (Max 4081 bytes)")]
-        [Editor(typeof(FormPcmEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        [PcmEditorAttribute(".dmc")]
-        public DPCMSound[] DeltaPcmData
+        [Editor(typeof(PcmUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [PcmEditor("DMC File|*.dmc")]
+        public DPcmSoundTable DeltaPcmSoundTable
         {
             get;
             private set;
@@ -228,9 +230,8 @@ namespace zanac.MAmidiMEmo.Instruments
             Timbres = new RP2A03Timbre[128];
             for (int i = 0; i < 128; i++)
                 Timbres[i] = new RP2A03Timbre();
-            DeltaPcmData = new DPCMSound[128];
-            for (int i = 0; i < 128; i++)
-                DeltaPcmData[i] = new DPCMSound(i);
+            DeltaPcmSoundTable = new DPcmSoundTable();
+
             setPresetInstruments();
 
             this.soundManager = new RP2A03SoundManager(this);
@@ -532,6 +533,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
             public RP2A03Timbre Timbre;
 
+            private SoundType lastSoundType;
+
             /// <summary>
             /// 
             /// </summary>
@@ -544,6 +547,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
                 this.Timbre = parentModule.Timbres[programNumber];
+
+                lastSoundType = Timbre.SoundType;
             }
 
             /// <summary>
@@ -591,7 +596,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         }
                     case SoundType.NOISE:
                         {
-                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << Slot));
+                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 3));
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 8));
 
                             //Volume
@@ -610,22 +615,29 @@ namespace zanac.MAmidiMEmo.Instruments
                             var timbre = parentModule.Timbres[pn];
                             int noteNum = NoteOnEvent.NoteNumber;
 
+                            //keyoff
+                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 4));
+                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)data);
+
                             // Loop / Smple Rate
                             RP2A03WriteData(parentModule.UnitNumber, (uint)0x10,
-                                (byte)(timbre.DeltaPcmBitRate << 6 | timbre.DeltaPcmBitRate));
+                                (byte)(timbre.DeltaPcmLoopEnable << 6 | timbre.DeltaPcmBitRate));
 
                             //Size
-                            if(parentModule.DeltaPcmData[noteNum].DeltaPcmData != null)
+                            if (parentModule.DeltaPcmSoundTable.PcmSounds[noteNum].PcmData != null)
                             {
-                                RP2A03SetDpcm(parentModule.UnitNumber, parentModule.DeltaPcmData[noteNum].DeltaPcmData);
-                                int sz = parentModule.DeltaPcmData[noteNum].DeltaPcmData.Length - 1;
+                                RP2A03SetDpcm(parentModule.UnitNumber, parentModule.DeltaPcmSoundTable.PcmSounds[noteNum].PcmData);
+                                int sz = parentModule.DeltaPcmSoundTable.PcmSounds[noteNum].PcmData.Length - 1;
                                 if (sz > 4081)
                                     sz = 4081;
                                 if (sz >= 16)
                                 {
                                     RP2A03WriteData(parentModule.UnitNumber, (uint)0x13, (byte)((sz / 16) & 0xff));
+                                    //keyon
+                                    RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 16));
                                 }
                             }
+
                             break;
                         }
                 }
@@ -779,7 +791,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void Off()
             {
-                switch (Timbre.SoundType)
+                switch (lastSoundType)
                 {
                     case SoundType.SQUARE:
                         {
@@ -815,6 +827,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataContract]
         public class RP2A03Timbre : TimbreBase
         {
+
             [DataMember]
             [Category("Sound")]
             [Description("Sound Type")]
@@ -1034,7 +1047,7 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
 
-            private byte f_DeltaPcmBitRate = 127;
+            private byte f_DeltaPcmBitRate = 15;
 
             [DataMember]
             [Category("Sound(DPCM)")]
@@ -1047,7 +1060,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
                 set
                 {
-                    f_DeltaPcmBitRate = (byte)(value & 127);
+                    f_DeltaPcmBitRate = (byte)(value & 15);
                 }
             }
 
@@ -1095,41 +1108,33 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         [DataContract]
-        public class DPCMSound
+        public class DPcmSoundTable : PcmSoundTableBase
         {
             /// <summary>
             /// 
             /// </summary>
-            public String KeyName
+            public DPcmSoundTable()
             {
-                get;
-                private set;
+                for (int i = 0; i < 128; i++)
+                    PcmSounds[i] = new DeltaPcmSound(i);
             }
+        }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            public int NoteNumber
-            {
-                get;
-                private set;
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public String SoundName
-            {
-                get;
-                set;
-            }
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataContract]
+        public class DeltaPcmSound : PcmSoundBase
+        {
 
             private byte[] f_DeltaPcmData;
 
             /// <summary>
             /// 
             /// </summary>
-            public byte[] DeltaPcmData
+            [DataMember]
+            [Browsable(false)]
+            public override byte[] PcmData
             {
                 get
                 {
@@ -1162,13 +1167,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="noteNumber"></param>
-            public DPCMSound(int noteNumber)
+            public DeltaPcmSound(int noteNumber) : base(noteNumber)
             {
-                NoteNumber = noteNumber;
-                var no = new NoteOnEvent((SevenBitNumber)NoteNumber, (SevenBitNumber)0);
-                KeyName = no.GetNoteName() + no.GetNoteOctave().ToString();
             }
-
         }
 
     }

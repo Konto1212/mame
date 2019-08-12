@@ -23,11 +23,11 @@ namespace zanac.MAmidiMEmo.Gui
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="exts"></param>
+        /// <param name="fileDialogFilter"></param>
         /// <param name="maxSize"></param>
-        public PcmEditorAttribute(string exts)
+        public PcmEditorAttribute(string fileDialogFilter)
         {
-            Exts = exts;
+            Exts = fileDialogFilter;
         }
     }
 }

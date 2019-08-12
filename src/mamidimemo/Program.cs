@@ -45,6 +45,7 @@ namespace zanac.MAmidiMEmo
                 Instruments.InstrumentManager.SaveSettings();
                 Settings.Default.Save();
             }));
+            mainThread.SetApartmentState(ApartmentState.STA);
             mainThread.Start();
             threadStart.WaitOne();
         }

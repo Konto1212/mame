@@ -9,12 +9,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using zanac.mamidimemo.instruments;
-using zanac.mamidimemo.mame;
-using zanac.mamidimemo.midi;
-using zanac.mamidimemo.Properties;
+using zanac.MAmidiMEmo.Mame;
+using zanac.MAmidiMEmo.Midi;
+using zanac.MAmidiMEmo.Properties;
+using zanac.MAmidiMEmo.Instruments;
+using zanac.MAmidiMEmo.Resources;
 
-namespace zanac.mamidimemo
+namespace zanac.MAmidiMEmo
 {
     public partial class FormMain : Form
     {
@@ -41,7 +42,16 @@ namespace zanac.mamidimemo
         public FormMain()
         {
             InitializeComponent();
+
+            //Images
             imageList1.Images.Add("YM2612", ImageResource.YM2612);
+            imageList1.Images.Add("YM2151", ImageResource.YM2151);
+            imageList1.Images.Add("SN76496", ImageResource.SN76496);
+            imageList1.Images.Add("NAMCO_CUS30", ImageResource.NAMCO_CUS30);
+            imageList1.Images.Add("GB_APU", ImageResource.GB_APU);
+            imageList1.Images.Add("RP2A03", ImageResource.RP2A03);
+
+            //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
             {
                 int idx = toolStripComboBoxMidiIf.Items.Add(dev.Name);
@@ -53,6 +63,7 @@ namespace zanac.mamidimemo
                 toolStripComboBoxMidiIf.SelectedIndex = 0;
             outputListView = listView1;
 
+            //MIDI Event
             InstrumentManager_InstrumentAdded(null, null);
             InstrumentManager.InstrumentAdded += InstrumentManager_InstrumentAdded;
             InstrumentManager.InstrumentRemoved += InstrumentManager_InstrumentRemoved;
@@ -72,6 +83,7 @@ namespace zanac.mamidimemo
                 var item = listViewIntruments.Items.Add(lvi);
                 item.Tag = inst;
             }
+            propertyGrid.SelectedObjects = null;
         }
 
         /// <summary>
@@ -182,6 +194,16 @@ namespace zanac.mamidimemo
             InstrumentManager.AddInstrument(InstrumentType.GB_APU);
         }
 
+        private void addYM2151ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.YM2151);
+        }
+
+        private void extendNESAPUToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.RP2A03);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -210,11 +232,16 @@ namespace zanac.mamidimemo
             Close();
         }
 
-        private void addYM2151ToolStripMenuItem_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InstrumentManager.AddInstrument(InstrumentType.YM2151);
+            Instruments.InstrumentManager.SaveSettings();
+            Settings.Default.Save();
         }
-
 
     }
 }

@@ -92,6 +92,8 @@
     <Compile Include="Instruments\InstrumentManager.cs" />
     <Compile Include="Instruments\InstrumentType.cs" />
     <Compile Include="Instruments\NAMCO_CUS30.cs" />
+    <Compile Include="Instruments\PcmSoundBase.cs" />
+    <Compile Include="Instruments\PcmSoundTableBase.cs" />
     <Compile Include="Instruments\RP2A03.cs" />
     <Compile Include="Instruments\SoundBase.cs" />
     <Compile Include="Instruments\SoundManagerBase.cs" />
@@ -154,9 +156,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\RP2A03.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RP2A03 - コピー.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

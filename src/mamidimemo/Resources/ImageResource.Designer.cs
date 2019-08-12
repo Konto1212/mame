@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace zanac.MAmidiMEmo {
+namespace zanac.MAmidiMEmo.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace zanac.MAmidiMEmo {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("zanac.mamidimemo.ImageResource", typeof(ImageResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("zanac.MAmidiMEmo.Resources.ImageResource", typeof(ImageResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
