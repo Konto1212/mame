@@ -14,14 +14,14 @@ using Melanchall.DryWetMidi.Smf;
 using Newtonsoft.Json;
 using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
-using zanac.mamidimemo.ComponentModel;
-using zanac.mamidimemo.mame;
-using zanac.mamidimemo.midi;
+using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Mame;
+using zanac.MAmidiMEmo.Midi;
 
 //http://www.smspower.org/Development/SN76489
 //http://www.st.rim.or.jp/~nkomatsu/peripheral/SN76489.html
 
-namespace zanac.mamidimemo.instruments
+namespace zanac.MAmidiMEmo.Instruments
 {
     /// <summary>
     /// 
@@ -36,6 +36,25 @@ namespace zanac.mamidimemo.instruments
 
         [Browsable(false)]
         public override string ImageKey => "SN76496";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        protected override string SoundInterfaceTagNamePrefix => "sn76496_";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Category("MIDI")]
+        [Description("MIDI Device ID")]
+        public override uint DeviceID
+        {
+            get
+            {
+                return 3;
+            }
+        }
 
         /// <summary>
         /// 
@@ -88,7 +107,6 @@ namespace zanac.mamidimemo.instruments
             {
                 Program.SoundUpdating();
                 Sn76496_write(unitNumber, data);
-                Sn76496_write(unitNumber, data);
             }
             finally
             {
@@ -106,6 +124,15 @@ namespace zanac.mamidimemo.instruments
             {
                 Sn76496_write = (delegate_sn76496_write)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_sn76496_write));
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            soundManager?.Dispose();
         }
 
         private SN76496SoundManager soundManager;
@@ -191,6 +218,20 @@ namespace zanac.mamidimemo.instruments
             public SN76496SoundManager(SN76496 parent)
             {
                 this.parentModule = parent;
+            }
+
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public override void Dispose()
+            {
+                for (int i = allOnSounds.Count - 1; i > 0; i--)
+                {
+                    var removed = allOnSounds[i];
+                    allOnSounds.RemoveAt(i);
+                    removed.Dispose();
+                }
             }
 
             /// <summary>
@@ -339,7 +380,7 @@ namespace zanac.mamidimemo.instruments
                             return;
                         }
                     }
-                    for (int i = 0; i < psgOnSounds.Count; i++)
+                    for (int i = 0; i < noiseOnSounds.Count; i++)
                     {
                         if (noiseOnSounds[i] == removed)
                         {
@@ -465,7 +506,7 @@ namespace zanac.mamidimemo.instruments
                 else if (pitch < 0)
                 {
                     var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)pitch / (double)8192);
+                    var dfreq = (nfreq - freq) * ((double)-pitch / (double)8192);
                     freq = (ushort)Math.Round(freq + dfreq);
                 }
                 n = (ushort)((ushort)Math.Round(3579545 / (freq * 32)) & 0x3ff);
@@ -528,7 +569,7 @@ namespace zanac.mamidimemo.instruments
                 set;
             }
 
-            public byte f_FB;
+            private byte f_FB;
 
             [DataMember]
             [Category("Sound")]

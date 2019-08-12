@@ -8,14 +8,14 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using zanac.mamidimemo.instruments;
-using zanac.mamidimemo.Properties;
+using zanac.MAmidiMEmo.Instruments;
+using zanac.MAmidiMEmo.Properties;
 
 //https://www.g200kg.com/jp/docs/tech/index.html
 //http://lib.roland.co.jp/support/jp/manuals/res/1809744/MT-32_j2.pdf
 //https://nickfever.com/Music/midi-cc-list
 
-namespace zanac.mamidimemo.midi
+namespace zanac.MAmidiMEmo.Midi
 {
     public static class MidiManager
     {

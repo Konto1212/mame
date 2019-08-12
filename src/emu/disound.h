@@ -88,6 +88,7 @@ public:
 	void set_input_gain(int inputnum, float gain);
 	void set_output_gain(int outputnum, float gain);
 	int inputnum_from_device(device_t &device, int outputnum = 0) const;
+	int m_enable;
 
 protected:
 	// configuration access

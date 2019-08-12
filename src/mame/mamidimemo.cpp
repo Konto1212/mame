@@ -9,6 +9,7 @@
 #include "..\devices\sound\gb.h"
 #include "..\devices\sound\sn76496.h"
 #include "..\devices\sound\namco.h"
+#include "..\devices\sound\nes_apu.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -17,6 +18,24 @@ address_space *dummy;
 extern "C"
 {
 	//memodimemo
+
+	DllExport void set_device_enable(unsigned int unitNumber, char* name, int enable)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+		if (sd == nullptr)
+			return;
+
+		sd->m_enable = enable;
+	}
+
 
 	DllExport void ym2151_write(unsigned int unitNumber, unsigned int address, unsigned char data)
 	{
@@ -157,6 +176,58 @@ extern "C"
 
 		return cus30->namcos1_cus30_r(*dummy, address);
 	}
+
+	DllExport void nes_apu_regwrite(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->device((std::string("nes_apu_") + num).c_str()));
+		if (nesapu == nullptr)
+			return;
+
+		nesapu->write(address, data);
+	}
+
+	DllExport unsigned char nes_apu_regread(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return 0;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return 0;
+
+		std::string num = std::to_string(unitNumber);
+		nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->device((std::string("nes_apu_") + num).c_str()));
+		if (nesapu == nullptr)
+			return 0;
+
+		return nesapu->read(address);
+	}
+
+	DllExport void nes_apu_set_dpcm(unsigned int unitNumber, unsigned char* address, unsigned int length)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->device((std::string("nes_apu_") + num).c_str()));
+		if (nesapu == nullptr)
+			return;
+
+		nesapu->set_dpcm(address, length);
+	}
+
 }
 
 

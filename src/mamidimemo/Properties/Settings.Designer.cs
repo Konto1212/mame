@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace zanac.mamidimemo.Properties {
+namespace zanac.MAmidiMEmo.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -92,6 +92,18 @@ namespace zanac.mamidimemo.Properties {
             }
             set {
                 this["NAMCO_CUS30"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RP2A03 {
+            get {
+                return ((string)(this["RP2A03"]));
+            }
+            set {
+                this["RP2A03"] = value;
             }
         }
     }

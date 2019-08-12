@@ -13,6 +13,7 @@
 #include "sound/gb.h"
 #include "sound/sn76496.h"
 #include "sound/namco.h"
+#include "sound/nes_apu.h"
 #include "video/315_5313.h"
 
 /* Megadrive Console Specific */
@@ -49,13 +50,15 @@ class md_base_state : public driver_device
 public:
 	md_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+		m_maincpu(*this, "maincpu")
+		/*
 		m_z80snd(*this, "genesis_snd_z80"),
 		m_ymsnd(*this, "ymsnd"),
 		m_scan_timer(*this, "md_scan_timer"),
 		m_vdp(*this, "gen_vdp"),
 		m_megadrive_ram(*this, "megadrive_ram"),
 		m_io_reset(*this, "RESET")
+		*/
 	{
 		//mamidimemo
 		for (int i = 0; i < 8; i++)
@@ -71,10 +74,6 @@ public:
 			strcpy(device_names[didx][i], (std::string("ym2612_") + num).c_str());
 			m_ym2612[i] = new optional_device<ym2612_device>(*this, device_names[didx][i]);
 			didx++;
-			//GB APU
-			strcpy(device_names[didx][i], (std::string("gbsnd_") + num).c_str());
-			m_gbsnd[i] = new optional_device<gameboy_sound_device>(*this, device_names[didx][i]);
-			didx++;
 			//sn76496(PSG)
 			strcpy(device_names[didx][i], (std::string("sn76496_") + num).c_str());
 			m_sn76496[i] = new optional_device<sn76496_base_device>(*this, device_names[didx][i]);
@@ -83,18 +82,28 @@ public:
 			strcpy(device_names[didx][i], (std::string("namco_cus30_") + num).c_str());
 			m_namco_cus30[i] = new optional_device<namco_cus30_device>(*this, device_names[didx][i]);
 			didx++;
+			//GB APU
+			strcpy(device_names[didx][i], (std::string("gbsnd_") + num).c_str());
+			m_gbsnd[i] = new optional_device<gameboy_sound_device>(*this, device_names[didx][i]);
+			didx++;
+			//nes apu
+			strcpy(device_names[didx][i], (std::string("nes_apu_") + num).c_str());
+			m_nesapu[i] = new optional_device<nesapu_device>(*this, device_names[didx][i]);
+			didx++;
 		}
 	}
 
-	char device_names[5][8][100];
-	optional_device<ym2151_device> *m_ym2151[8];
-	optional_device<ym2612_device> *m_ym2612[8];
-	optional_device<gameboy_sound_device> *m_gbsnd[8];
-	optional_device<sn76496_base_device> *m_sn76496[8];
-	optional_device<namco_cus30_device> *m_namco_cus30[8];
+	char device_names[ 6 ][8][100];
+	optional_device<ym2151_device> *m_ym2151[8];	//1
+	optional_device<ym2612_device> *m_ym2612[8];	//2
+	optional_device<sn76496_base_device> *m_sn76496[8];	//3
+	optional_device<namco_cus30_device> *m_namco_cus30[8];	//4
+	optional_device<gameboy_sound_device> *m_gbsnd[8];	//5
+	optional_device<nesapu_device> *m_nesapu[8];	//6
 
 
 	required_device<m68000_base_device> m_maincpu;
+	/*
 	optional_device<cpu_device> m_z80snd;
 	optional_device<ym2612_device> m_ymsnd;
 	optional_device<timer_device> m_scan_timer;
@@ -102,6 +111,7 @@ public:
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
 
 	optional_ioport m_io_reset;
+	*/
 	ioport_port *m_io_pad_3b[4];
 	ioport_port *m_io_pad_6b[4];
 

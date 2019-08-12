@@ -14,13 +14,13 @@ using Melanchall.DryWetMidi.Smf;
 using Newtonsoft.Json;
 using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
-using zanac.mamidimemo.ComponentModel;
-using zanac.mamidimemo.mame;
-using zanac.mamidimemo.midi;
+using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Mame;
+using zanac.MAmidiMEmo.Midi;
 
 //https://www16.atwiki.jp/mxdrv/pages/24.html
 
-namespace zanac.mamidimemo.instruments
+namespace zanac.MAmidiMEmo.Instruments
 {
     /// <summary>
     /// 
@@ -35,6 +35,25 @@ namespace zanac.mamidimemo.instruments
 
         [Browsable(false)]
         public override string ImageKey => "YM2151";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        protected override string SoundInterfaceTagNamePrefix => "ym2151_";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Category("MIDI")]
+        [Description("MIDI Device ID")]
+        public override uint DeviceID
+        {
+            get
+            {
+                return 1;
+            }
+        }
 
         [DataMember]
         [Category("Chip")]
@@ -132,6 +151,15 @@ namespace zanac.mamidimemo.instruments
             setPresetInstruments();
 
             this.soundManager = new YM2151SoundManager(this);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            soundManager?.Dispose();
         }
 
         /// <summary>
@@ -247,7 +275,6 @@ namespace zanac.mamidimemo.instruments
         /// </summary>
         private class YM2151SoundManager : SoundManagerBase
         {
-            private List<YM2151Sound> allOnSounds = new List<YM2151Sound>();
 
             private List<YM2151Sound> fmOnSounds = new List<YM2151Sound>();
 
@@ -267,21 +294,6 @@ namespace zanac.mamidimemo.instruments
             /// <summary>
             /// 
             /// </summary>
-            /// <param name="midiEvent"></param>
-            public override void PitchBend(PitchBendEvent midiEvent)
-            {
-                foreach (var t in allOnSounds)
-                {
-                    if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                    {
-                        t.UpdateFmPitch();
-                    }
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
             /// <param name="channel"></param>
             /// <param name="value"></param>
             public override void ControlChange(ControlChangeEvent midiEvent)
@@ -292,7 +304,7 @@ namespace zanac.mamidimemo.instruments
                         //nothing
                         break;
                     case 7:    //Volume
-                        foreach (var t in allOnSounds)
+                        foreach (YM2151Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -301,7 +313,7 @@ namespace zanac.mamidimemo.instruments
                         }
                         break;
                     case 10:    //Panpot
-                        foreach (var t in allOnSounds)
+                        foreach (YM2151Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -310,7 +322,7 @@ namespace zanac.mamidimemo.instruments
                         }
                         break;
                     case 11:    //Expression
-                        foreach (var t in allOnSounds)
+                        foreach (YM2151Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -332,7 +344,7 @@ namespace zanac.mamidimemo.instruments
                     return;
 
                 YM2151Sound snd = new YM2151Sound(parentModule, note, emptySlot);
-                allOnSounds.Add(snd);
+                AllOnSounds.Add(snd);
                 fmOnSounds.Add(snd);
                 FormMain.OutputLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
                 snd.On();
@@ -359,7 +371,7 @@ namespace zanac.mamidimemo.instruments
             /// <param name="note"></param>
             public override void NoteOff(NoteOffEvent note)
             {
-                YM2151Sound removed = SearchAndRemoveOnSound(note, allOnSounds);
+                YM2151Sound removed = SearchAndRemoveOnSound(note, AllOnSounds) as YM2151Sound;
 
                 if (removed != null)
                 {
@@ -426,7 +438,7 @@ namespace zanac.mamidimemo.instruments
                 UpdateFmVolume();
                 //On
                 byte op = (byte)(Timbre.Ops[0].Enable << 3 | Timbre.Ops[2].Enable << 4 | Timbre.Ops[1].Enable << 5 | Timbre.Ops[3].Enable << 6);
-                Ym2151WriteData(parentModule.UnitNumber, 0x08, 0, 0, (byte)(op | (Slot % 3)));
+                Ym2151WriteData(parentModule.UnitNumber, 0x08, 0, 0, (byte)(op | Slot));
             }
 
 

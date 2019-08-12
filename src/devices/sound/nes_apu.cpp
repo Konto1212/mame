@@ -284,7 +284,7 @@ s8 nesapu_device::apu_square(apu_t::square_t *chan)
 		}
 	}
 
-	if ((0 == (chan->regs[1] & 8) && (chan->freq >> 16) > freq_limit[chan->regs[1] & 7])
+	if ((1 == (chan->regs[1] & 8) && (chan->freq >> 16) > freq_limit[chan->regs[1] & 7])
 			|| (chan->freq >> 16) < 4)
 		return 0;
 
@@ -292,7 +292,7 @@ s8 nesapu_device::apu_square(apu_t::square_t *chan)
 
 	while (chan->phaseacc < 0)
 	{
-		chan->phaseacc += (chan->freq >> 16);
+		chan->phaseacc += (chan->freq >> 11);
 		chan->adder = (chan->adder + 1) & 0x0F;
 	}
 
@@ -310,7 +310,7 @@ s8 nesapu_device::apu_square(apu_t::square_t *chan)
 /* OUTPUT TRIANGLE WAVE SAMPLE (VALUES FROM -16 to +15) */
 s8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 {
-	int freq;
+	u32 freq;
 	s8 output;
 	/* reg0: 7=holdnote, 6-0=linear length counter
 	** reg2: low 8 bits of frequency
@@ -342,7 +342,7 @@ s8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 	if (0 == chan->linear_length)
 		return 0;
 
-	freq = (((chan->regs[3] & 7) << 8) + chan->regs[2]) + 1;
+	freq = ((((chan->regs[3] & 7) << 8) + chan->regs[2]) + 1) << 3;
 
 	if (freq < 4) /* inaudible */
 		return 0;
@@ -404,7 +404,7 @@ s8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 	if (0 == chan->vbl_length)
 		return 0;
 
-	freq = noise_freq[chan->regs[2] & 0x0F];
+	freq = noise_freq[chan->regs[2] & 0x0F] << 3;
 	chan->phaseacc -= 4;
 	while (chan->phaseacc < 0)
 	{
@@ -486,7 +486,8 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 			bit_pos = 7 - (chan->bits_left & 7);
 			if (7 == bit_pos)
 			{
-				chan->cur_byte = m_mem_read_cb(chan->address);
+//				chan->cur_byte = m_mem_read_cb(chan->address);
+				chan->cur_byte = m_dpcm_buffer[chan->address];
 				chan->address++;
 				chan->length--;
 			}
@@ -752,6 +753,13 @@ void nesapu_device::write(offs_t address, u8 value)
 	apu_regwrite(address,value);
 }
 
+void nesapu_device::set_dpcm(u8 *dpcm_data, u32 length)
+{
+	if (length > 4081)
+		length = 4081;
+	memcpy(m_dpcm_buffer, dpcm_data, length);
+}
+
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -759,6 +767,12 @@ void nesapu_device::write(offs_t address, u8 value)
 
 void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	if (m_enable == 0)
+	{
+		std::fill(&outputs[0][0], &outputs[0][samples], 0);
+		return;
+	}
+
 	int accum;
 	memset( outputs[0], 0, samples*sizeof(*outputs[0]) );
 

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{60192987-27BB-4ADC-AC5A-03EA2846A569}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>zanac.mamidimemo</RootNamespace>
-    <AssemblyName>mamidimemo</AssemblyName>
+    <RootNamespace>zanac.MAmidiMEmo</RootNamespace>
+    <AssemblyName>MAmidiMEmo</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -47,12 +47,6 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="avenue.core">
-      <HintPath>nextmidi\avenue.core.dll</HintPath>
-    </Reference>
-    <Reference Include="avenue.filing">
-      <HintPath>nextmidi\avenue.filing.dll</HintPath>
-    </Reference>
     <Reference Include="Melanchall.DryWetMidi, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\build\projects\windows\mame\vs2017\packages\Melanchall.DryWetMidi.4.1.1\lib\net45\Melanchall.DryWetMidi.dll</HintPath>
     </Reference>
@@ -79,34 +73,42 @@
   <ItemGroup>
     <Compile Include="ComponentModel\NoTypeConverter.cs" />
     <Compile Include="ComponentModel\ValueTypeTypeConverter.cs" />
-    <Compile Include="FormMain.cs">
+    <Compile Include="Gui\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormMain.Designer.cs">
+    <Compile Include="Gui\FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="instruments\InstrumentBase.cs" />
-    <Compile Include="instruments\GBAPU.cs" />
-    <Compile Include="instruments\InstrumentManager.cs" />
-    <Compile Include="instruments\InstrumentType.cs" />
-    <Compile Include="instruments\NAMCO_CUS30.cs" />
-    <Compile Include="instruments\SoundBase.cs" />
-    <Compile Include="instruments\SoundManagerBase.cs" />
-    <Compile Include="instruments\SN76496.cs" />
-    <Compile Include="instruments\TimbreBase.cs" />
-    <Compile Include="instruments\YM2151.cs" />
-    <Compile Include="instruments\YM2612.cs" />
-    <Compile Include="mame\MameIf.cs" />
-    <Compile Include="midi\MidiManager.cs" />
+    <Compile Include="Gui\FormPcmEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gui\FormPcmEditor.Designer.cs">
+      <DependentUpon>FormPcmEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Gui\PcmEditorAttribute.cs" />
+    <Compile Include="Gui\PcmUITypeEditor.cs" />
+    <Compile Include="Instruments\InstrumentBase.cs" />
+    <Compile Include="Instruments\GBAPU.cs" />
+    <Compile Include="Instruments\InstrumentManager.cs" />
+    <Compile Include="Instruments\InstrumentType.cs" />
+    <Compile Include="Instruments\NAMCO_CUS30.cs" />
+    <Compile Include="Instruments\RP2A03.cs" />
+    <Compile Include="Instruments\SoundBase.cs" />
+    <Compile Include="Instruments\SoundManagerBase.cs" />
+    <Compile Include="Instruments\SN76496.cs" />
+    <Compile Include="Instruments\TimbreBase.cs" />
+    <Compile Include="Instruments\YM2151.cs" />
+    <Compile Include="Instruments\YM2612.cs" />
+    <Compile Include="Mame\MameIf.cs" />
+    <Compile Include="Midi\MidiManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ImageResource.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ImageResource.resx</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="FormMain.resx">
+    <Compile Include="Resources\ImageResource.Designer.cs" />
+    <EmbeddedResource Include="Gui\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Gui\FormPcmEditor.resx">
+      <DependentUpon>FormPcmEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -118,9 +120,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="ImageResource.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ImageResource.Designer.cs</LastGenOutput>
+    <EmbeddedResource Include="Resources\ImageResource.resx">
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -135,6 +136,27 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\YM2612.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\YM2151.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SN76496.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NAMCO_CUS30.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\GB_APU.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RP2A03.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RP2A03 - コピー.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

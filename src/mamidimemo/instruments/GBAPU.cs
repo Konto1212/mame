@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing.Design;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
@@ -13,9 +14,9 @@ using Melanchall.DryWetMidi.Smf;
 using Newtonsoft.Json;
 using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
-using zanac.mamidimemo.ComponentModel;
-using zanac.mamidimemo.mame;
-using zanac.mamidimemo.midi;
+using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Mame;
+using zanac.MAmidiMEmo.Midi;
 
 //http://bgb.bircd.org/pandocs.htm#soundcontrolregisters
 //https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
@@ -23,7 +24,7 @@ using zanac.mamidimemo.midi;
 //http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
 //http://www.devrs.com/gb/files/hosted/GBSOUND.txt
 
-namespace zanac.mamidimemo.instruments
+namespace zanac.MAmidiMEmo.Instruments
 {
     /// <summary>
     /// 
@@ -37,6 +38,25 @@ namespace zanac.mamidimemo.instruments
 
         [Browsable(false)]
         public override string ImageKey => "GB_APU";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        protected override string SoundInterfaceTagNamePrefix => "gbsnd_";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Category("MIDI")]
+        [Description("MIDI Device ID")]
+        public override uint DeviceID
+        {
+            get
+            {
+                return 5;
+            }
+        }
 
         /// <summary>
         /// 
@@ -196,6 +216,15 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            soundManager?.Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void setPresetInstruments()
         {
             Timbres[0].SoundType = SoundType.PSG;
@@ -278,6 +307,20 @@ namespace zanac.mamidimemo.instruments
                 //Sound On
                 GbApuWriteData(parentModule.UnitNumber, 0x16, 0x80);
                 GbApuWriteData(parentModule.UnitNumber, 0x14, 0x77);
+            }
+
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public override void Dispose()
+            {
+                for (int i = allOnSounds.Count - 1; i > 0; i--)
+                {
+                    var removed = allOnSounds[i];
+                    allOnSounds.RemoveAt(i);
+                    removed.Dispose();
+                }
             }
 
             /// <summary>
@@ -656,7 +699,7 @@ namespace zanac.mamidimemo.instruments
                 else if (pitch < 0)
                 {
                     var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - range - 69.0) / 12.0);
-                    var dfreq = (freq - nfreq) * ((double)-pitch / (double)8192);
+                    var dfreq = (nfreq - freq) * ((double)-pitch / (double)8192);
                     freq = (ushort)Math.Round(freq - dfreq);
                 }
 
@@ -1057,7 +1100,7 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public byte[] f_wavedata = new byte[32];
+            private byte[] f_wavedata = new byte[32];
 
             [TypeConverter(typeof(ArrayConverter))]
             [DataMember]
@@ -1072,6 +1115,41 @@ namespace zanac.mamidimemo.instruments
                 set
                 {
                     f_wavedata = value;
+                }
+            }
+
+
+            [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+            typeof(UITypeEditor)), Localizable(false)]
+            [Category("Sound")]
+            [Description("Wave Table (32 samples, 0-15 levels)")]
+            [IgnoreDataMember]
+            [JsonIgnore]
+            public string WaveDataSerializeData
+            {
+                get
+                {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < WaveData.Length; i++)
+                    {
+                        if (sb.Length != 0)
+                            sb.Append(' ');
+                        sb.Append(WaveData[i].ToString((IFormatProvider)null));
+                    }
+                    return sb.ToString();
+                }
+                set
+                {
+                    string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    List<byte> vs = new List<byte>();
+                    foreach (var val in vals)
+                    {
+                        byte v = 0;
+                        if (byte.TryParse(val, out v))
+                            vs.Add(v);
+                    }
+                    for (int i = 0; i < Math.Min(WaveData.Length, vs.Count); i++)
+                        WaveData[i] = vs[i] > 15 ? (byte)15 : vs[i];
                 }
             }
 

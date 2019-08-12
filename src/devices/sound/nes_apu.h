@@ -54,6 +54,7 @@ public:
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
+	void set_dpcm(u8 *dpcm_data, u32 length);
 
 protected:
 	// device-level overrides
@@ -75,6 +76,7 @@ private:
 	u32     m_vbl_times[0x20];       /* VBL durations in samples */
 	u32     m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
 	u32     m_sync_times2[SYNCS_MAX2]; /* Samples per sync table */
+	u8      m_dpcm_buffer[4081];
 	sound_stream *m_stream;
 	devcb_write_line m_irq_handler;
 	devcb_read8 m_mem_read_cb;

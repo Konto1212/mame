@@ -6,21 +6,43 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace zanac.mamidimemo.instruments
+namespace zanac.MAmidiMEmo.Instruments
 {
 
     /// <summary>
     /// 
     /// </summary>
-    public class SoundManagerBase
+    public class SoundManagerBase : IDisposable
     {
-      
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected List<SoundBase> AllOnSounds
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         public SoundManagerBase()
         {
-           
+            AllOnSounds = new List<SoundBase>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void Dispose()
+        {
+            for (int i = AllOnSounds.Count - 1; i > 0; i--)
+            {
+                var removed = AllOnSounds[i];
+                AllOnSounds.RemoveAt(i);
+                removed.Dispose();
+            }
         }
 
         /// <summary>
@@ -106,7 +128,7 @@ namespace zanac.mamidimemo.instruments
         /// <param name="note"></param>
         /// <param name="onOnSounds"></param>
         /// <returns></returns>
-        protected static T SearchAndRemoveOnSound<T >(NoteOffEvent note, List<T> onOnSounds) where T : SoundBase
+        protected static T SearchAndRemoveOnSound<T>(NoteOffEvent note, List<T> onOnSounds) where T : SoundBase
         {
             T removed = null;
             for (int i = 0; i < onOnSounds.Count; i++)

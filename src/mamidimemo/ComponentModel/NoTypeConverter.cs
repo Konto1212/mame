@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace zanac.mamidimemo.ComponentModel
+namespace zanac.MAmidiMEmo.ComponentModel
 {
     /// <summary>
     /// 

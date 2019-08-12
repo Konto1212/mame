@@ -14,14 +14,14 @@ using Melanchall.DryWetMidi.Smf;
 using Newtonsoft.Json;
 using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
-using zanac.mamidimemo.ComponentModel;
-using zanac.mamidimemo.mame;
-using zanac.mamidimemo.midi;
+using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Mame;
+using zanac.MAmidiMEmo.Midi;
 
 //https://www.plutiedev.com/ym2612-registers
 //http://www.smspower.org/maxim/Documents/YM2612#regb4
 
-namespace zanac.mamidimemo.instruments
+namespace zanac.MAmidiMEmo.Instruments
 {
     /// <summary>
     /// 
@@ -36,6 +36,25 @@ namespace zanac.mamidimemo.instruments
 
         [Browsable(false)]
         public override string ImageKey => "YM2612";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        protected override string SoundInterfaceTagNamePrefix => "ym2612_";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Category("MIDI")]
+        [Description("MIDI Device ID")]
+        public override uint DeviceID
+        {
+            get
+            {
+                return 2;
+            }
+        }
 
         [DataMember]
         [Category("Chip")]
@@ -120,6 +139,15 @@ namespace zanac.mamidimemo.instruments
             setPresetInstruments();
 
             this.soundManager = new YM2612SoundManager(this);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            soundManager?.Dispose();
         }
 
         /// <summary>
@@ -351,8 +379,6 @@ namespace zanac.mamidimemo.instruments
         /// </summary>
         private class YM2612SoundManager : SoundManagerBase
         {
-            private List<YM2612Sound> allOnSounds = new List<YM2612Sound>();
-
             private List<YM2612Sound> fmOnSounds = new List<YM2612Sound>();
 
             private List<YM2612Sound> psgOnSounds = new List<YM2612Sound>();
@@ -374,7 +400,7 @@ namespace zanac.mamidimemo.instruments
             /// <param name="midiEvent"></param>
             public override void PitchBend(PitchBendEvent midiEvent)
             {
-                foreach (var t in allOnSounds)
+                foreach (YM2612Sound t in AllOnSounds)
                 {
                     if (t.NoteOnEvent.Channel == midiEvent.Channel)
                     {
@@ -396,7 +422,7 @@ namespace zanac.mamidimemo.instruments
                         //nothing
                         break;
                     case 7:    //Volume
-                        foreach (var t in allOnSounds)
+                        foreach (YM2612Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -405,7 +431,7 @@ namespace zanac.mamidimemo.instruments
                         }
                         break;
                     case 10:    //Panpot
-                        foreach (var t in allOnSounds)
+                        foreach (YM2612Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -414,7 +440,7 @@ namespace zanac.mamidimemo.instruments
                         }
                         break;
                     case 11:    //Expression
-                        foreach (var t in allOnSounds)
+                        foreach (YM2612Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -436,7 +462,7 @@ namespace zanac.mamidimemo.instruments
                     return;
 
                 YM2612Sound snd = new YM2612Sound(parentModule, note, emptySlot);
-                allOnSounds.Add(snd);
+                AllOnSounds.Add(snd);
                 fmOnSounds.Add(snd);
                 FormMain.OutputLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
                 snd.On();
@@ -463,7 +489,7 @@ namespace zanac.mamidimemo.instruments
             /// <param name="note"></param>
             public override void NoteOff(NoteOffEvent note)
             {
-                YM2612Sound removed = SearchAndRemoveOnSound(note, allOnSounds);
+                YM2612Sound removed = SearchAndRemoveOnSound(note, AllOnSounds) as YM2612Sound;
 
                 if (removed != null)
                 {

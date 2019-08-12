@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace zanac.mamidimemo.instruments
+namespace zanac.MAmidiMEmo.Instruments
 {
     /// <summary>
     /// 
@@ -13,8 +13,9 @@ namespace zanac.mamidimemo.instruments
     {
         YM2151,
         YM2612,
-        GB_APU,
         SN76496,
         NAMCO_CUS30,
+        GB_APU,
+        RP2A03,
     }
 }

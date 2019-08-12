@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace zanac.mamidimemo.mame
+namespace zanac.MAmidiMEmo.Mame
 {
     public static class MameIF
     {

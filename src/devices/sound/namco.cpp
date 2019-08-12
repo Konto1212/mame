@@ -657,6 +657,12 @@ WRITE8_MEMBER( namco_15xx_device::sharedram_w )
 
 void namco_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	if (m_enable == 0)
+	{
+		std::fill(&outputs[0][0], &outputs[0][samples], 0);
+		return;
+	}
+
 	if (m_stereo)
 	{
 		sound_channel *voice;

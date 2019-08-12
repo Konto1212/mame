@@ -267,9 +267,9 @@ MACHINE_START_MEMBER(md_cons_state, md_common)
 	// setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
 		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
-
+	/*
 	m_vdp->stop_timers();
-
+	*/
 	if (m_cart)
 		m_cart->save_nvram();
 }
@@ -317,11 +317,11 @@ void md_cons_state::install_tmss()
 MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 {
 	MACHINE_START_CALL_MEMBER( md_common );
-
+	/*
 	// the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
 	if (m_cart->get_type() == SEGA_SVP)
 		m_vdp->set_dma_delay(2);
-
+	*/
 	if (m_tmss)
 	{
 		install_tmss();
@@ -340,7 +340,9 @@ MACHINE_START_MEMBER(md_cons_state, ms_megacd)
 
 	// the segaCD introduces some kind of DMA 'lag', which we have to compensate for,
 	// at least when reading wordram? we might need to check what mode we're in the DMA...
+	/*
 	m_vdp->set_dma_delay(2);
+	*/
 }
 
 MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
@@ -355,6 +357,7 @@ MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 // same as screen_eof_megadriv but with addition of 32x and SegaCD/MegaCD pieces
 WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
 {
+	/*
 	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
@@ -374,6 +377,7 @@ WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
 				m_segacd->update_total_scanlines(mode3);
 		}
 	}
+	*/
 }
 
 void md_cons_state::ms_megadriv(machine_config &config)
@@ -383,8 +387,9 @@ void md_cons_state::ms_megadriv(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
+	/*
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
-
+	*/
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
@@ -395,9 +400,9 @@ void md_cons_state::ms_megadpal(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
-
+	/*
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
-
+	*/
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
@@ -414,9 +419,9 @@ void md_cons_state::dcat16_megadriv(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
-
+	/*
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
-
+	*/
 //  has SD card slot instead?
 //  MD_CART_SLOT(config, m_cart, md_cart, nullptr);
 //  SOFTWARE_LIST(config, "cart_list").set_original("megadriv");

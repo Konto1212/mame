@@ -8,9 +8,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-using zanac.mamidimemo.ComponentModel;
+using zanac.MAmidiMEmo.ComponentModel;
 
-namespace zanac.mamidimemo.instruments
+namespace zanac.MAmidiMEmo.Instruments
 {
     /// <summary>
     /// 

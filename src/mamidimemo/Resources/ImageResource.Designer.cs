@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace zanac.mamidimemo {
+namespace zanac.MAmidiMEmo {
     using System;
     
     
@@ -57,6 +57,56 @@ namespace zanac.mamidimemo {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap GB_APU {
+            get {
+                object obj = ResourceManager.GetObject("GB_APU", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap NAMCO_CUS30 {
+            get {
+                object obj = ResourceManager.GetObject("NAMCO_CUS30", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap RP2A03 {
+            get {
+                object obj = ResourceManager.GetObject("RP2A03", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap SN76496 {
+            get {
+                object obj = ResourceManager.GetObject("SN76496", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap YM2151 {
+            get {
+                object obj = ResourceManager.GetObject("YM2151", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

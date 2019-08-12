@@ -12,10 +12,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using zanac.mamidimemo.mame;
-using zanac.mamidimemo.Properties;
+using zanac.MAmidiMEmo.Mame;
+using zanac.MAmidiMEmo.Properties;
 
-namespace zanac.mamidimemo
+namespace zanac.MAmidiMEmo
 {
     public static class Program
     {
@@ -35,14 +35,14 @@ namespace zanac.mamidimemo
             {
                 threadStart.Set();
                 Settings.Default.Reload();
-                instruments.InstrumentManager.RestoreSettings();
+                Instruments.InstrumentManager.RestoreSettings();
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 Application.Run(new FormMain());
 
-                instruments.InstrumentManager.SaveSettings();
+                Instruments.InstrumentManager.SaveSettings();
                 Settings.Default.Save();
             }));
             mainThread.Start();

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Smf;
 
-namespace zanac.mamidimemo.instruments
+namespace zanac.MAmidiMEmo.Instruments
 {
 
     /// <summary>

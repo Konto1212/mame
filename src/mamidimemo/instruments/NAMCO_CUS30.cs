@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Drawing.Design;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -15,14 +16,14 @@ using Melanchall.DryWetMidi.Smf;
 using Newtonsoft.Json;
 using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
-using zanac.mamidimemo.ComponentModel;
-using zanac.mamidimemo.mame;
-using zanac.mamidimemo.midi;
+using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Mame;
+using zanac.MAmidiMEmo.Midi;
 
 //http://fpga.blog.shinobi.jp/fpga/おんげん！
 //https://www.walkofmind.com/programming/pie/wsg3.htm
 
-namespace zanac.mamidimemo.instruments
+namespace zanac.MAmidiMEmo.Instruments
 {
     /// <summary>
     /// 
@@ -37,6 +38,25 @@ namespace zanac.mamidimemo.instruments
 
         [Browsable(false)]
         public override string ImageKey => "NAMCO_CUS30";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        protected override string SoundInterfaceTagNamePrefix => "namco_cus30_";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Category("MIDI")]
+        [Description("MIDI Device ID")]
+        public override uint DeviceID
+        {
+            get
+            {
+                return 4;
+            }
+        }
 
         /// <summary>
         /// 
@@ -164,6 +184,15 @@ namespace zanac.mamidimemo.instruments
         /// <summary>
         /// 
         /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            soundManager?.Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void setPresetInstruments()
         {
             Timbres[0].SoundType = SoundType.WSG;
@@ -223,8 +252,6 @@ namespace zanac.mamidimemo.instruments
         /// </summary>
         private class NAMCO_CUS30SoundManager : SoundManagerBase
         {
-            private List<NAMCO_CUS30Sound> allOnSounds = new List<NAMCO_CUS30Sound>();
-
             private List<NAMCO_CUS30Sound> wsgOnSounds = new List<NAMCO_CUS30Sound>();
 
             private NAMCO_CUS30 parentModule;
@@ -244,7 +271,7 @@ namespace zanac.mamidimemo.instruments
             /// <param name="midiEvent"></param>
             public override void PitchBend(PitchBendEvent midiEvent)
             {
-                foreach (var t in allOnSounds)
+                foreach (NAMCO_CUS30Sound t in AllOnSounds)
                 {
                     if (t.NoteOnEvent.Channel == midiEvent.Channel)
                     {
@@ -266,7 +293,7 @@ namespace zanac.mamidimemo.instruments
                         //nothing
                         break;
                     case 7:    //Volume
-                        foreach (var t in allOnSounds)
+                        foreach (NAMCO_CUS30Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -275,7 +302,7 @@ namespace zanac.mamidimemo.instruments
                         }
                         break;
                     case 10:    //Panpot
-                        foreach (var t in allOnSounds)
+                        foreach (NAMCO_CUS30Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -284,7 +311,7 @@ namespace zanac.mamidimemo.instruments
                         }
                         break;
                     case 11:    //Expression
-                        foreach (var t in allOnSounds)
+                        foreach (NAMCO_CUS30Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -306,7 +333,7 @@ namespace zanac.mamidimemo.instruments
                     return;
 
                 NAMCO_CUS30Sound snd = new NAMCO_CUS30Sound(parentModule, note, emptySlot);
-                allOnSounds.Add(snd);
+                AllOnSounds.Add(snd);
                 wsgOnSounds.Add(snd);
                 FormMain.OutputLog("KeyOn WSG ch" + emptySlot + " " + note.ToString());
                 snd.On();
@@ -333,7 +360,7 @@ namespace zanac.mamidimemo.instruments
             /// <param name="note"></param>
             public override void NoteOff(NoteOffEvent note)
             {
-                NAMCO_CUS30Sound removed = SearchAndRemoveOnSound(note, allOnSounds);
+                NAMCO_CUS30Sound removed = SearchAndRemoveOnSound(note, AllOnSounds) as NAMCO_CUS30Sound;
 
                 if (removed != null)
                 {
@@ -541,7 +568,7 @@ namespace zanac.mamidimemo.instruments
                 }
             }
 
-            public byte[] f_wavedata = new byte[32];
+            private byte[] f_wavedata = new byte[32];
 
             [TypeConverter(typeof(ArrayConverter))]
             [DataMember]
@@ -556,6 +583,41 @@ namespace zanac.mamidimemo.instruments
                 set
                 {
                     f_wavedata = value;
+                }
+            }
+
+
+            [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+            typeof(UITypeEditor)), Localizable(false)]
+            [Category("Sound")]
+            [Description("Wave Table (32 samples, 0-15 levels)")]
+            [IgnoreDataMember]
+            [JsonIgnore]
+            public string WaveDataSerializeData
+            {
+                get
+                {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < WaveData.Length; i++)
+                    {
+                        if (sb.Length != 0)
+                            sb.Append(' ');
+                        sb.Append(WaveData[i].ToString((IFormatProvider)null));
+                    }
+                    return sb.ToString();
+                }
+                set
+                {
+                    string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    List<byte> vs = new List<byte>();
+                    foreach (var val in vals)
+                    {
+                        byte v = 0;
+                        if (byte.TryParse(val, out v))
+                            vs.Add(v);
+                    }
+                    for (int i = 0; i < Math.Min(WaveData.Length, vs.Count); i++)
+                        WaveData[i] = vs[i] > 15 ? (byte)15 : vs[i];
                 }
             }
 

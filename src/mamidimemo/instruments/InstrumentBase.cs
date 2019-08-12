@@ -6,14 +6,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using zanac.MAmidiMEmo.Mame;
 
-namespace zanac.mamidimemo.instruments
+namespace zanac.MAmidiMEmo.Instruments
 {
     [DataContract]
-    public abstract class InstrumentBase
+    public abstract class InstrumentBase : IDisposable
     {
         /// <summary>
         /// 
@@ -67,6 +69,23 @@ namespace zanac.mamidimemo.instruments
         /// </summary>
         [Browsable(false)]
         public abstract InstrumentType InstrumentType
+        {
+            get;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        protected abstract string SoundInterfaceTagNamePrefix
+        {
+            get;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public abstract uint DeviceID
         {
             get;
         }
@@ -154,6 +173,7 @@ namespace zanac.mamidimemo.instruments
             get;
         }
 
+
         /// <summary>
         /// 
         /// </summary>
@@ -222,6 +242,47 @@ namespace zanac.mamidimemo.instruments
                     0, 0, 0,
                     0, 0, 0,
                     0, 0, 0, 0};
+
+            set_device_enable(UnitNumber, SoundInterfaceTagNamePrefix, 1);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        static InstrumentBase()
+        {
+            IntPtr funcPtr = MameIF.GetProcAddress("set_device_enable");
+            if (funcPtr != IntPtr.Zero)
+            {
+                set_device_enable = Marshal.GetDelegateForFunctionPointer<delegate_set_device_enable>(funcPtr);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_set_device_enable(uint unitNumber, string tagName, byte enable);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_set_device_enable set_device_enable
+        {
+            get;
+            set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void Dispose()
+        {
+            set_device_enable(UnitNumber, SoundInterfaceTagNamePrefix, 0);
         }
 
         /// <summary>
