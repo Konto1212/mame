@@ -13,12 +13,11 @@ using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 using zanac.MAmidiMEmo.Properties;
 using zanac.MAmidiMEmo.Instruments;
-using zanac.MAmidiMEmo.Resources;
 using zanac.MAmidiMEmo.ComponentModel;
 using Newtonsoft.Json;
 using System.IO;
 
-namespace zanac.MAmidiMEmo
+namespace zanac.MAmidiMEmo.Gui
 {
     public partial class FormMain : Form
     {
@@ -60,12 +59,12 @@ namespace zanac.MAmidiMEmo
             InitializeComponent();
 
             //Images
-            imageList1.Images.Add("YM2612", ImageResource.YM2612);
-            imageList1.Images.Add("YM2151", ImageResource.YM2151);
-            imageList1.Images.Add("SN76496", ImageResource.SN76496);
-            imageList1.Images.Add("NAMCO_CUS30", ImageResource.NAMCO_CUS30);
-            imageList1.Images.Add("GB_APU", ImageResource.GB_APU);
-            imageList1.Images.Add("RP2A03", ImageResource.RP2A03);
+            imageList1.Images.Add("YM2612", Resources.YM2612);
+            imageList1.Images.Add("YM2151", Resources.YM2151);
+            imageList1.Images.Add("SN76496", Resources.SN76496);
+            imageList1.Images.Add("NAMCO_CUS30", Resources.NAMCO_CUS30);
+            imageList1.Images.Add("GB_APU", Resources.GB_APU);
+            imageList1.Images.Add("RP2A03", Resources.RP2A03);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -330,6 +329,12 @@ namespace zanac.MAmidiMEmo
                     MessageBox.Show(ex.ToString());
                 }
             }
+        }
+
+        private void toolStripMenuItemAbout_Click(object sender, EventArgs e)
+        {
+            FormAbout fa = new FormAbout();
+            fa.ShowDialog(this);
         }
     }
 }

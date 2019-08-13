@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Gui;
 using zanac.MAmidiMEmo.Instruments;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Properties;
@@ -21,9 +22,12 @@ namespace zanac.MAmidiMEmo
 {
     public static class Program
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string FILE_VERSION = "0.1.0.0";
 
         private static Thread mainThread;
-
 
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
