@@ -14,6 +14,9 @@ using zanac.MAmidiMEmo.Midi;
 using zanac.MAmidiMEmo.Properties;
 using zanac.MAmidiMEmo.Instruments;
 using zanac.MAmidiMEmo.Resources;
+using zanac.MAmidiMEmo.ComponentModel;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace zanac.MAmidiMEmo
 {
@@ -26,7 +29,20 @@ namespace zanac.MAmidiMEmo
         /// 
         /// </summary>
         /// <param name="log"></param>
-        //[Conditional("DEBUG")]
+        [Conditional("DEBUG")]
+        public static void OutputDebugLog(String log)
+        {
+            outputListView?.BeginInvoke(new MethodInvoker(() =>
+            {
+                var item = outputListView.Items.Add(log);
+                outputListView.EnsureVisible(item.Index);
+            }), null);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="log"></param>
         public static void OutputLog(String log)
         {
             outputListView?.BeginInvoke(new MethodInvoker(() =>
@@ -64,7 +80,8 @@ namespace zanac.MAmidiMEmo
             outputListView = listView1;
 
             //MIDI Event
-            InstrumentManager_InstrumentAdded(null, null);
+            InstrumentManager_InstrumentChanged(null, null);
+            InstrumentManager.InstrumentChanged += InstrumentManager_InstrumentChanged;
             InstrumentManager.InstrumentAdded += InstrumentManager_InstrumentAdded;
             InstrumentManager.InstrumentRemoved += InstrumentManager_InstrumentRemoved;
         }
@@ -107,6 +124,22 @@ namespace zanac.MAmidiMEmo
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void InstrumentManager_InstrumentChanged(object sender, EventArgs e)
+        {
+            listViewIntruments.Clear();
+            foreach (var inst in InstrumentManager.GetAllInstruments())
+            {
+                var lvi = new ListViewItem(inst.Name, inst.ImageKey);
+                var item = listViewIntruments.Items.Add(lvi);
+                item.Tag = inst;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripComboBox1_DropDown(object sender, EventArgs e)
         {
             toolStripComboBoxMidiIf.Items.Clear();
@@ -121,9 +154,9 @@ namespace zanac.MAmidiMEmo
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 MessageBox.Show(ex.ToString());
             }
@@ -143,9 +176,9 @@ namespace zanac.MAmidiMEmo
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 MessageBox.Show(ex.ToString());
             }
@@ -239,9 +272,64 @@ namespace zanac.MAmidiMEmo
         /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Instruments.InstrumentManager.SaveSettings();
-            Settings.Default.Save();
+            try
+            {
+                var es = Program.SaveEnvironmentSettings();
+                Settings.Default.EnvironmentSettings = JsonConvert.SerializeObject(es, Formatting.Indented);
+                Settings.Default.Save();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult dr = saveFileDialog1.ShowDialog(this);
+            if (dr == DialogResult.OK)
+            {
+                try
+                {
+                    var es = Program.SaveEnvironmentSettings();
+                    string data = JsonConvert.SerializeObject(es, Formatting.Indented);
+                    File.WriteAllText(saveFileDialog1.FileName, StringCompressionUtility.Compress(data));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult dr = openFileDialog1.ShowDialog(this);
+            if (dr == DialogResult.OK)
+            {
+                try
+                {
+                    string text = StringCompressionUtility.Decompress(File.ReadAllText(openFileDialog1.FileName));
+                    var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(text);
+                    InstrumentManager.RestoreSettings(settings);
+
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+        }
     }
 }

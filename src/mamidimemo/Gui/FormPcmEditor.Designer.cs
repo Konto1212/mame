@@ -106,7 +106,6 @@ namespace zanac.MAmidiMEmo.Gui
             // 
             // openFileDialog1
             // 
-            this.openFileDialog1.ShowReadOnly = true;
             this.openFileDialog1.SupportMultiDottedExtensions = true;
             resources.ApplyResources(this.openFileDialog1, "openFileDialog1");
             // 

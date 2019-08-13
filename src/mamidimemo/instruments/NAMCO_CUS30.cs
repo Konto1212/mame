@@ -335,7 +335,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 NAMCO_CUS30Sound snd = new NAMCO_CUS30Sound(parentModule, note, emptySlot);
                 AllOnSounds.Add(snd);
                 wsgOnSounds.Add(snd);
-                FormMain.OutputLog("KeyOn WSG ch" + emptySlot + " " + note.ToString());
+                FormMain.OutputDebugLog("KeyOn WSG ch" + emptySlot + " " + note.ToString());
                 snd.On();
             }
 
@@ -368,7 +368,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     {
                         if (wsgOnSounds[i] == removed)
                         {
-                            FormMain.OutputLog("KeyOff WSG ch" + removed.Slot + " " + note.ToString());
+                            FormMain.OutputDebugLog("KeyOff WSG ch" + removed.Slot + " " + note.ToString());
                             wsgOnSounds.RemoveAt(i);
                             return;
                         }
@@ -631,9 +631,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 catch (Exception ex)
                 {
                     if (ex is Exception)
-                        return;
+                        throw;
                     if (ex is SystemException)
-                        return;
+                        throw;
 
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }

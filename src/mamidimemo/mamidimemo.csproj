@@ -74,6 +74,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\StringCompressionUtility.cs" />
+    <Compile Include="ComponentModel\DummyEditor.cs" />
+    <Compile Include="ComponentModel\EnvironmentSettings.cs" />
     <Compile Include="ComponentModel\MidiHookAttribute.cs" />
     <Compile Include="ComponentModel\MidiHookProxy.cs" />
     <Compile Include="ComponentModel\NoTypeConverter.cs" />
@@ -171,6 +174,9 @@
     <None Include="Resources\RP2A03.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ReadMe.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\..\build\generated\version.cpp">
       <Link>version.cpp</Link>
     </None>

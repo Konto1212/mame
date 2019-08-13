@@ -84,9 +84,9 @@ namespace zanac.MAmidiMEmo.Instruments
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
@@ -402,19 +402,19 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     case SoundType.SPSG:
                         spsgOnSounds.Add(snd);
-                        FormMain.OutputLog("KeyOn SPSG ch" + emptySlot + " " + note.ToString());
+                        FormMain.OutputDebugLog("KeyOn SPSG ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.PSG:
                         psgOnSounds.Add(snd);
-                        FormMain.OutputLog("KeyOn PSG ch" + emptySlot + " " + note.ToString());
+                        FormMain.OutputDebugLog("KeyOn PSG ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.WAV:
                         wavOnSounds.Add(snd);
-                        FormMain.OutputLog("KeyOn WAV ch" + emptySlot + " " + note.ToString());
+                        FormMain.OutputDebugLog("KeyOn WAV ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.NOISE:
                         noiseOnSounds.Add(snd);
-                        FormMain.OutputLog("KeyOn NOISE ch" + emptySlot + " " + note.ToString());
+                        FormMain.OutputDebugLog("KeyOn NOISE ch" + emptySlot + " " + note.ToString());
                         break;
                 }
                 snd.On();
@@ -1194,9 +1194,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 catch (Exception ex)
                 {
                     if (ex is Exception)
-                        return;
+                        throw;
                     if (ex is SystemException)
-                        return;
+                        throw;
 
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }

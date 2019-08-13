@@ -80,9 +80,9 @@ namespace zanac.MAmidiMEmo.Instruments
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
@@ -479,7 +479,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 YM2612Sound snd = new YM2612Sound(parentModule, note, emptySlot);
                 AllOnSounds.Add(snd);
                 fmOnSounds.Add(snd);
-                FormMain.OutputLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
+                FormMain.OutputDebugLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
                 snd.On();
             }
 
@@ -512,7 +512,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     {
                         if (fmOnSounds[i] == removed)
                         {
-                            FormMain.OutputLog("KeyOff FM ch" + removed.Slot + " " + note.ToString());
+                            FormMain.OutputDebugLog("KeyOff FM ch" + removed.Slot + " " + note.ToString());
                             fmOnSounds.RemoveAt(i);
                             return;
                         }
@@ -914,9 +914,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 catch (Exception ex)
                 {
                     if (ex is Exception)
-                        return;
+                        throw;
                     if (ex is SystemException)
-                        return;
+                        throw;
 
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }

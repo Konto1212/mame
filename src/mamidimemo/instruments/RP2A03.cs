@@ -20,8 +20,8 @@ using zanac.MAmidiMEmo.Gui;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
-//http://www.smspower.org/Development/SN76489
-//http://www.st.rim.or.jp/~nkomatsu/peripheral/SN76489.html
+//http://hp.vector.co.jp/authors/VA042397/nes/apu.html
+//https://wiki.nesdev.com/w/index.php/APU
 
 namespace zanac.MAmidiMEmo.Instruments
 {
@@ -102,9 +102,9 @@ namespace zanac.MAmidiMEmo.Instruments
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
@@ -425,19 +425,19 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     case SoundType.SQUARE:
                         sqOnSounds.Add(snd);
-                        FormMain.OutputLog("KeyOn SQ ch" + emptySlot + " " + note.ToString());
+                        FormMain.OutputDebugLog("KeyOn SQ ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.SAW:
                         sawOnSounds.Add(snd);
-                        FormMain.OutputLog("KeyOn Saw ch" + emptySlot + " " + note.ToString());
+                        FormMain.OutputDebugLog("KeyOn Saw ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.NOISE:
                         noiseOnSounds.Add(snd);
-                        FormMain.OutputLog("KeyOn Noise ch" + emptySlot + " " + note.ToString());
+                        FormMain.OutputDebugLog("KeyOn Noise ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.DPCM:
                         dpcmOnSounds.Add(snd);
-                        FormMain.OutputLog("KeyOn DPCM ch" + emptySlot + " " + note.ToString());
+                        FormMain.OutputDebugLog("KeyOn DPCM ch" + emptySlot + " " + note.ToString());
                         break;
                 }
                 snd.On();
@@ -494,7 +494,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     {
                         if (sqOnSounds[i] == removed)
                         {
-                            FormMain.OutputLog("KeyOff SQ ch" + removed.Slot + " " + note.ToString());
+                            FormMain.OutputDebugLog("KeyOff SQ ch" + removed.Slot + " " + note.ToString());
                             sqOnSounds.RemoveAt(i);
                             return;
                         }
@@ -503,7 +503,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     {
                         if (sawOnSounds[i] == removed)
                         {
-                            FormMain.OutputLog("KeyOff Saw ch" + removed.Slot + " " + note.ToString());
+                            FormMain.OutputDebugLog("KeyOff Saw ch" + removed.Slot + " " + note.ToString());
                             sawOnSounds.RemoveAt(i);
                             return;
                         }
@@ -512,7 +512,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     {
                         if (dpcmOnSounds[i] == removed)
                         {
-                            FormMain.OutputLog("KeyOff Saw ch" + removed.Slot + " " + note.ToString());
+                            FormMain.OutputDebugLog("KeyOff Saw ch" + removed.Slot + " " + note.ToString());
                             dpcmOnSounds.RemoveAt(i);
                             return;
                         }
@@ -521,7 +521,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     {
                         if (noiseOnSounds[i] == removed)
                         {
-                            FormMain.OutputLog("KeyOff Noisse ch" + removed.Slot + " " + note.ToString());
+                            FormMain.OutputDebugLog("KeyOff Noisse ch" + removed.Slot + " " + note.ToString());
                             noiseOnSounds.RemoveAt(i);
                             return;
                         }
@@ -1108,9 +1108,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 catch (Exception ex)
                 {
                     if (ex is Exception)
-                        return;
+                        throw;
                     if (ex is SystemException)
-                        return;
+                        throw;
 
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }

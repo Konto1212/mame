@@ -117,9 +117,9 @@ namespace zanac.MAmidiMEmo.Gui
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 MessageBox.Show(ex.ToString());
             }

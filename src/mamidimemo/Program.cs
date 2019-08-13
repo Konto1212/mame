@@ -12,6 +12,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Instruments;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Properties;
 
@@ -35,14 +37,26 @@ namespace zanac.MAmidiMEmo
             {
                 threadStart.Set();
                 Settings.Default.Reload();
-                Instruments.InstrumentManager.RestoreSettings();
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
+                if (!string.IsNullOrEmpty(Settings.Default.EnvironmentSettings))
+                {
+                    try
+                    {
+                        var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(StringCompressionUtility.Decompress(Settings.Default.EnvironmentSettings));
+                        InstrumentManager.RestoreSettings(settings);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString());
+                    }
+                }
+
                 Application.Run(new FormMain());
 
-                Instruments.InstrumentManager.SaveSettings();
+                Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(JsonConvert.SerializeObject(SaveEnvironmentSettings(), Formatting.Indented));
                 Settings.Default.Save();
             }));
             mainThread.SetApartmentState(ApartmentState.STA);
@@ -50,7 +64,23 @@ namespace zanac.MAmidiMEmo
             threadStart.WaitOne();
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static EnvironmentSettings SaveEnvironmentSettings()
+        {
+            var es = new EnvironmentSettings();
+            try
+            {
+                InstrumentManager.SaveSettings(es);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            return es;
+        }
 
         /// <summary>
         /// 

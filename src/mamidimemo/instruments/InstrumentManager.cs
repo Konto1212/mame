@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Properties;
 
 namespace zanac.MAmidiMEmo.Instruments
@@ -41,110 +42,108 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public static void RestoreSettings()
+        public static void RestoreSettings(EnvironmentSettings settings)
         {
             try
             {
-                var List_ym2151 = JsonConvert.DeserializeObject<List<YM2151>>(Settings.Default.YM2151);
-                if (List_ym2151 != null)
-                    InstrumentManager.List_ym2151 = List_ym2151;
+                if (settings.YM2151 != null)
+                    InstrumentManager.List_ym2151 = settings.YM2151;
             }
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
             try
             {
-                var List_ym2612 = JsonConvert.DeserializeObject<List<YM2612>>(Settings.Default.YM2612);
-                if (List_ym2612 != null)
-                    InstrumentManager.List_ym2612 = List_ym2612;
+                if (settings.YM2612 != null)
+                    InstrumentManager.List_ym2612 = settings.YM2612;
             }
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
             try
             {
-                var List_gbapu = JsonConvert.DeserializeObject<List<GB_APU>>(Settings.Default.GB_APU);
-                if (List_gbapu != null)
-                    InstrumentManager.List_gbapu = List_gbapu;
+                if (settings.GB_APU != null)
+                    InstrumentManager.List_gbapu = settings.GB_APU;
             }
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
             try
             {
-                var List_sn76496 = JsonConvert.DeserializeObject<List<SN76496>>(Settings.Default.SN76496);
-                if (List_sn76496 != null)
-                    InstrumentManager.List_sn76496 = List_sn76496;
+                if (settings.SN76496 != null)
+                    InstrumentManager.List_sn76496 = settings.SN76496;
             }
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
             try
             {
-                var List_namco_cus30 = JsonConvert.DeserializeObject<List<NAMCO_CUS30>>(Settings.Default.NAMCO_CUS30);
-                if (List_namco_cus30 != null)
-                    InstrumentManager.List_namco_cus30 = List_namco_cus30;
+                if (settings.NAMCO_CUS30 != null)
+                    InstrumentManager.List_namco_cus30 = settings.NAMCO_CUS30;
             }
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
             try
             {
-                var List_RP2A03 = JsonConvert.DeserializeObject<List<RP2A03>>(Settings.Default.RP2A03);
-                if (List_RP2A03 != null)
-                    InstrumentManager.List_RP2A03 = List_RP2A03;
+                if (settings.RP2A03 != null)
+                    InstrumentManager.List_RP2A03 = settings.RP2A03;
             }
             catch (Exception ex)
             {
                 if (ex is Exception)
-                    return;
+                    throw;
                 if (ex is SystemException)
-                    return;
+                    throw;
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
+
+            InstrumentChanged?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
         }
 
-        public static void SaveSettings()
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void SaveSettings(EnvironmentSettings settings)
         {
-            Settings.Default.YM2151 = JsonConvert.SerializeObject(List_ym2151, Formatting.Indented);
-            Settings.Default.YM2612 = JsonConvert.SerializeObject(List_ym2612, Formatting.Indented);
-            Settings.Default.NAMCO_CUS30 = JsonConvert.SerializeObject(List_namco_cus30, Formatting.Indented);
-            Settings.Default.SN76496 = JsonConvert.SerializeObject(List_sn76496, Formatting.Indented);
-            Settings.Default.GB_APU = JsonConvert.SerializeObject(List_gbapu, Formatting.Indented);
-            Settings.Default.RP2A03 = JsonConvert.SerializeObject(List_RP2A03, Formatting.Indented);
+            settings.YM2151 = List_ym2151;
+            settings.YM2612 = List_ym2612;
+            settings.NAMCO_CUS30 = List_namco_cus30;
+            settings.SN76496 = List_sn76496;
+            settings.GB_APU = List_gbapu;
+            settings.RP2A03 = List_RP2A03;
         }
-
 
         /// <summary>
         /// 
@@ -155,6 +154,11 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         public static event EventHandler<EventArgs> InstrumentRemoved;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static event EventHandler<EventArgs> InstrumentChanged;
 
         /// <summary>
         /// 
@@ -249,22 +253,27 @@ namespace zanac.MAmidiMEmo.Instruments
                         InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                         break;
                     case InstrumentType.YM2612:
+                        List_ym2612[List_ym2612.Count - 1].Dispose();
                         List_ym2612.RemoveAt(List_ym2612.Count - 1);
                         InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                         break;
                     case InstrumentType.GB_APU:
+                        List_gbapu[List_gbapu.Count - 1].Dispose();
                         List_gbapu.RemoveAt(List_gbapu.Count - 1);
                         InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                         break;
                     case InstrumentType.SN76496:
+                        List_sn76496[List_sn76496.Count - 1].Dispose();
                         List_sn76496.RemoveAt(List_sn76496.Count - 1);
                         InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                         break;
                     case InstrumentType.NAMCO_CUS30:
+                        List_namco_cus30[List_namco_cus30.Count - 1].Dispose();
                         List_namco_cus30.RemoveAt(List_namco_cus30.Count - 1);
                         InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                         break;
                     case InstrumentType.RP2A03:
+                        List_RP2A03[List_RP2A03.Count - 1].Dispose();
                         List_RP2A03.RemoveAt(List_RP2A03.Count - 1);
                         InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                         break;
