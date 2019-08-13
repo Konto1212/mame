@@ -1,112 +1,87 @@
+MAmidiMEmo V0.1.0.0 / Itoken (c)2019
 
-# **MAME** #
+*** What is MAmidiMEmo? ***
 
-[![Join the chat at https://gitter.im/mamedev/mame](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mamedev/mame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+MAmidiMEmo is a virtual chiptune sound MIDI module using a MAME sound engine.
+You can control various chips and make sound via MIDI I/F.
+So, you don't need to use dedicated tracker and so on anymore. You can use your favorite MIDI sequencer to make a chip sound.
 
-Build status for tiny build only, containing just core parts of project:
+ Note:MAmidiMEmo is not a sound driver. So, if you want to play fast arpeggio, use the arpeggiator.
 
-| OS/Compiler        | Status           | 
-| ------------- |:-------------:| 
-|Linux GCC / OSX Clang| [![Build Status](https://travis-ci.org/mamedev/mame.svg?branch=master)](https://travis-ci.org/mamedev/mame) |
-|Windows MinGW | [![Build Status](https://tea-ci.org/api/badges/mamedev/mame/status.svg)](https://tea-ci.org/mamedev/mame) |
-|Windows MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/te0qy56b72tp5kmo?svg=true)](https://ci.appveyor.com/project/startaq/mame) |
+MAmidiMEmo adopts multi timbre method. That mean you can play multi chords on MIDI 1ch if the chip supports.
 
-Static analysis status for entire build (except for third-party parts of project):
+e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 8ch with MIDI 16ch like a SC-55 and so on.
+      As well, NES APU has 2ch for square wave, so you can play 2 chords on MIDI 1ch when select a square wave timbre.
+	  However, when you select a triangle wave timbre, you can play 1 chord on MIDI 1ch. Because NES APU has only 1ch for triangle wave.
 
-[![Coverity Scan Status](https://scan.coverity.com/projects/5727/badge.svg?flat=1)](https://scan.coverity.com/projects/mame-emulator)
+*** How to use MAmidiMEmo ***
 
-What is MAME?
-=============
+1. Launch MAmidiMEmo.exe
 
-MAME is a multi-purpose emulation framework.
+   Note: You can change the value of audio latency, sampling rate and audio output interface by modifying the "mame.ini"
+         PortAudio is a low latency sound engine. See http://www.portaudio.com/
 
-MAME's purpose is to preserve decades of software history. As electronic technology continues to rush forward, MAME prevents this important "vintage" software from being lost and forgotten. This is achieved by documenting the hardware and how it functions. The source code to MAME serves as this documentation. The fact that the software is usable serves primarily to validate the accuracy of the documentation (how else can you prove that you have recreated the hardware faithfully?). Over time, MAME (originally stood for Multiple Arcade Machine Emulator) absorbed the sister-project MESS (Multi Emulator Super System), so MAME now documents a wide variety of (mostly vintage) computers, video game consoles and calculators, in addition to the arcade video games that were its initial focus.
+2. Select MIDI I/F from toolbar. MAmidiMEmo will recevie MIDI message from the selected MIDI I/F.
 
-How to compile?
-===============
+   Note: You can use the loopMIDI (See http://www.tobias-erichsen.de/software/loopmidi.html) to send MIDI message from this PC to MAmidiMEmo.
 
-If you're on a *NIX or OSX system, it could be as easy as typing
+3. Add your favorite chips from the [Instruments] menu on the toolbar.
 
-```
-make
-```
+   Note: Currently supported chip is the following.
+         YM2151, YM2612, SN76496, NAMCO CUS30, GB APU, NES APU
+   Note: You can add the chip up to 8 per same chip type and MAmidiMEmo eats more CPU power.
 
-for a MAME build,
+4. Select the chip from the left pane and configure the chip on the right pane.
 
-```
-make SUBTARGET=arcade
-```
+   *[Timbres]
+    You can edit sound character from this property. It's selected by "Program Change" MIDI message.
+	Please refer the following articles or MAME sources to understand these timbre parameters.
 
-for an arcade-only build, or
+	YM2151:
+	 https://www16.atwiki.jp/mxdrv/pages/24.html
+	YM2612:
+	 https://www.plutiedev.com/ym2612-registers
+	 http://www.smspower.org/maxim/Documents/YM2612
+	NES APU:
+	 http://hp.vector.co.jp/authors/VA042397/nes/apu.html
+	 https://wiki.nesdev.com/w/index.php/APU
+	 https://wiki.nesdev.com/w/index.php/APU_DMC
+	GB APU:
+	 http://bgb.bircd.org/pandocs.htm#soundcontrolregisters
+	 https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+	 http://mydocuments.g2.xrea.com/
+	 http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
+	 http://www.devrs.com/gb/files/hosted/GBSOUND.txt
+	NAMCO CUS30:
+     https://www.walkofmind.com/programming/pie/wsg3.htm
+	 http://fpga.blog.shinobi.jp/fpga/おんげん！
+	SN76489:
+	 http://www.smspower.org/Development/SN76489
+	 http://www.st.rim.or.jp/~nkomatsu/peripheral/SN76489.html
 
-```
-make SUBTARGET=mess
-```
+   *[Channels]
+    Select which MIDI ch messages the chip receive.
 
-for MESS build.
+5. Play MIDI file by youe favorite sequencer or player.
+   Of course, you can connect your favrite keyboard to MAmidiMEmo for live performance.
 
-See the [Compiling MAME](http://docs.mamedev.org/initialsetup/compilingmame.html) page on our documentation site for more information, including prerequisites for Mac OS X and popular Linux distributions.
+   MAmidiMEmo currently supports the following MIDI messages.
 
-For recent versions of OSX you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://www.libsdl.org/download-2.0.php).
+    Note on/off and Velocity
+    Program Number
+    Pitch and PitchRange
+    Volume and Expression
+    Panpot
 
-For Windows users, we provide a ready-made [build environment](http://mamedev.org/tools/) based on MinGW-w64.
+6. (TBD)
+   You can modify current environment and all timbre parameters via System Exclusive MIDI Message.
 
-Visual Studio builds are also possible, but you still need [build environment](http://mamedev.org/tools/) based on MinGW-w64.
-In order to generate solution and project files just run:
+   SysEx format:
 
-```
-make vs2017
-```
-or use this command to build it directly using msbuild
-
-```
-make vs2017 MSBUILD=1
-```
-
-
-Where can I find out more?
-=============
-
-* [Official MAME Development Team Site](http://mamedev.org/) (includes binary downloads for MAME and MESS, wiki, forums, and more)
-* [Official MESS Wiki](http://mess.redump.net/)
-* [MAME Testers](http://mametesters.org/) (official bug tracker for MAME and MESS)
-
-
-Contributing
-=============
-
-## Coding standard
-
-MAME source code should be viewed and edited with your editor set to use four spaces per tab. Tabs are used for initial indentation of lines, with one tab used per indentation level. Spaces are used for other alignment within a line.
-
-Some parts of the code follow [Allman style](https://en.wikipedia.org/wiki/Indent_style#Allman_style); some parts of the code follow [K&R style](https://en.wikipedia.org/wiki/Indent_style#K.26R_style) -- mostly depending on who wrote the original version. **Above all else, be consistent with what you modify, and keep whitespace changes to a minimum when modifying existing source.** For new code, the majority tends to prefer Allman style, so if you don't care much, use that.
-
-All contributors need to either add a standard header for license info (on new files) or inform us of their wishes regarding which of the following licenses they would like their code to be made available under: the [BSD-3-Clause](http://opensource.org/licenses/BSD-3-Clause) license, the [LGPL-2.1](http://opensource.org/licenses/LGPL-2.1), or the [GPL-2.0](http://opensource.org/licenses/GPL-2.0).
-
-License
-=======
-The MAME project as a whole is distributed under the terms of the [GNU General Public License, version 2](http://opensource.org/licenses/GPL-2.0) or later (GPL-2.0+), since it contains code made available under multiple GPL-compatible licenses. A great majority of files (over 90% including core files) are under the [BSD-3-Clause License](http://opensource.org/licenses/BSD-3-Clause) and we would encourage new contributors to distribute files under this license.
-
-Please note that MAME is a registered trademark of Gregory Ember, and permission is required to use the "MAME" name, logo, or wordmark.
-
-<a href="http://opensource.org/licenses/GPL-2.0" target="_blank">
-<img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
-</a>
-
-    Copyright (C) 1997-2019  MAMEDev and contributors
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-Please see [LICENSE.md](LICENSE.md) for further details.
+	YM2151:(TBD)
+	YM2612:(TBD)
+	NES APU:(TBD)
+	GB APU:(TBD)
+	NAMCO CUS30:(TBD)
+	SN76489:(TBD)
+   
