@@ -254,8 +254,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public override void Dispose()
         {
-            base.Dispose();
             soundManager?.Dispose();
+            base.Dispose();
         }
 
         /// <summary>

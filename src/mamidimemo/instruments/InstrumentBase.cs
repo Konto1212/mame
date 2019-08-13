@@ -336,8 +336,6 @@ namespace zanac.MAmidiMEmo.Instruments
                     0, 0, 0,
                     0, 0, 0,
                     0, 0, 0, 0};
-
-            set_device_enable(UnitNumber, SoundInterfaceTagNamePrefix, 1);
         }
 
         /// <summary>
@@ -346,6 +344,14 @@ namespace zanac.MAmidiMEmo.Instruments
         public virtual void Dispose()
         {
             set_device_enable(UnitNumber, SoundInterfaceTagNamePrefix, 0);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal void PrepareSound()
+        {
+            set_device_enable(UnitNumber, SoundInterfaceTagNamePrefix, 1);
         }
 
         /// <summary>

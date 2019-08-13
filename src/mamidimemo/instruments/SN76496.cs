@@ -144,8 +144,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public override void Dispose()
         {
-            base.Dispose();
             soundManager?.Dispose();
+            base.Dispose();
         }
 
         private SN76496SoundManager soundManager;
@@ -231,20 +231,6 @@ namespace zanac.MAmidiMEmo.Instruments
             public SN76496SoundManager(SN76496 parent)
             {
                 this.parentModule = parent;
-            }
-
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public override void Dispose()
-            {
-                for (int i = allOnSounds.Count - 1; i > 0; i--)
-                {
-                    var removed = allOnSounds[i];
-                    allOnSounds.RemoveAt(i);
-                    removed.Dispose();
-                }
             }
 
             /// <summary>

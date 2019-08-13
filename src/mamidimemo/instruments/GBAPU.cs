@@ -231,8 +231,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public override void Dispose()
         {
-            base.Dispose();
             soundManager?.Dispose();
+            base.Dispose();
         }
 
         /// <summary>
@@ -320,20 +320,6 @@ namespace zanac.MAmidiMEmo.Instruments
                 //Sound On
                 GbApuWriteData(parentModule.UnitNumber, 0x16, 0x80);
                 GbApuWriteData(parentModule.UnitNumber, 0x14, 0x77);
-            }
-
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public override void Dispose()
-            {
-                for (int i = allOnSounds.Count - 1; i > 0; i--)
-                {
-                    var removed = allOnSounds[i];
-                    allOnSounds.RemoveAt(i);
-                    removed.Dispose();
-                }
             }
 
             /// <summary>

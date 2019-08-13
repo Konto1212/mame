@@ -47,7 +47,16 @@ namespace zanac.MAmidiMEmo.Instruments
             try
             {
                 if (settings.YM2151 != null)
+                {
+                    for (int i = List_ym2151.Count - 1; i >= 0; i--)
+                    {
+                        List_ym2151[i].Dispose();
+                        List_ym2151.RemoveAt(i);
+                    }
+                    foreach (InstrumentBase inst in settings.YM2151)
+                        inst.PrepareSound();
                     InstrumentManager.List_ym2151 = settings.YM2151;
+                }
             }
             catch (Exception ex)
             {
@@ -61,7 +70,16 @@ namespace zanac.MAmidiMEmo.Instruments
             try
             {
                 if (settings.YM2612 != null)
+                {
+                    for (int i = List_ym2612.Count - 1; i >= 0; i--)
+                    {
+                        List_ym2612[i].Dispose();
+                        List_ym2612.RemoveAt(i);
+                    }
+                    foreach (InstrumentBase inst in settings.YM2612)
+                        inst.PrepareSound();
                     InstrumentManager.List_ym2612 = settings.YM2612;
+                }
             }
             catch (Exception ex)
             {
@@ -75,7 +93,16 @@ namespace zanac.MAmidiMEmo.Instruments
             try
             {
                 if (settings.GB_APU != null)
+                {
+                    for (int i = List_gbapu.Count - 1; i >= 0; i--)
+                    {
+                        List_gbapu[i].Dispose();
+                        List_gbapu.RemoveAt(i);
+                    }
+                    foreach (InstrumentBase inst in settings.GB_APU)
+                        inst.PrepareSound();
                     InstrumentManager.List_gbapu = settings.GB_APU;
+                }
             }
             catch (Exception ex)
             {
@@ -89,7 +116,16 @@ namespace zanac.MAmidiMEmo.Instruments
             try
             {
                 if (settings.SN76496 != null)
+                {
+                    for (int i = List_sn76496.Count - 1; i >= 0; i--)
+                    {
+                        List_sn76496[i].Dispose();
+                        List_sn76496.RemoveAt(i);
+                    }
+                    foreach (InstrumentBase inst in settings.SN76496)
+                        inst.PrepareSound();
                     InstrumentManager.List_sn76496 = settings.SN76496;
+                }
             }
             catch (Exception ex)
             {
@@ -103,7 +139,16 @@ namespace zanac.MAmidiMEmo.Instruments
             try
             {
                 if (settings.NAMCO_CUS30 != null)
+                {
+                    for (int i = List_namco_cus30.Count - 1; i >= 0; i--)
+                    {
+                        List_namco_cus30[i].Dispose();
+                        List_namco_cus30.RemoveAt(i);
+                    }
+                    foreach (InstrumentBase inst in settings.NAMCO_CUS30)
+                        inst.PrepareSound();
                     InstrumentManager.List_namco_cus30 = settings.NAMCO_CUS30;
+                }
             }
             catch (Exception ex)
             {
@@ -117,7 +162,16 @@ namespace zanac.MAmidiMEmo.Instruments
             try
             {
                 if (settings.RP2A03 != null)
+                {
+                    for (int i = List_RP2A03.Count - 1; i >= 0; i--)
+                    {
+                        List_RP2A03[i].Dispose();
+                        List_RP2A03.RemoveAt(i);
+                    }
+                    foreach (InstrumentBase inst in settings.RP2A03)
+                        inst.PrepareSound();
                     InstrumentManager.List_RP2A03 = settings.RP2A03;
+                }
             }
             catch (Exception ex)
             {
@@ -182,7 +236,9 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (List_ym2151.Count < 7)
                             {
-                                List_ym2151.Add(new YM2151((uint)List_ym2151.Count));
+                                var inst = new YM2151((uint)List_ym2151.Count);
+                                inst.PrepareSound();
+                                List_ym2151.Add(inst);
                                 InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                             }
                             break;
@@ -191,7 +247,9 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (List_ym2612.Count < 7)
                             {
-                                List_ym2612.Add(new YM2612((uint)List_ym2612.Count));
+                                var inst = new YM2612((uint)List_ym2612.Count);
+                                inst.PrepareSound();
+                                List_ym2612.Add(inst);
                                 InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                             }
                             break;
@@ -200,7 +258,9 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (List_gbapu.Count < 7)
                             {
-                                List_gbapu.Add(new GB_APU((uint)List_gbapu.Count));
+                                var inst = new GB_APU((uint)List_gbapu.Count);
+                                inst.PrepareSound();
+                                List_gbapu.Add(inst);
                                 InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                             }
                             break;
@@ -209,7 +269,9 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (List_sn76496.Count < 7)
                             {
-                                List_sn76496.Add(new SN76496((uint)List_sn76496.Count));
+                                var inst = new SN76496((uint)List_sn76496.Count);
+                                inst.PrepareSound();
+                                List_sn76496.Add(inst);
                                 InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                             }
                             break;
@@ -218,7 +280,9 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (List_namco_cus30.Count < 7)
                             {
-                                List_namco_cus30.Add(new NAMCO_CUS30((uint)List_namco_cus30.Count));
+                                var inst = new NAMCO_CUS30((uint)List_namco_cus30.Count);
+                                inst.PrepareSound();
+                                List_namco_cus30.Add(inst);
                                 InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                             }
                             break;
@@ -227,7 +291,9 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (List_RP2A03.Count < 7)
                             {
-                                List_RP2A03.Add(new RP2A03((uint)List_RP2A03.Count));
+                                var inst = new RP2A03((uint)List_RP2A03.Count);
+                                inst.PrepareSound();
+                                List_RP2A03.Add(inst);
                                 InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                             }
                             break;

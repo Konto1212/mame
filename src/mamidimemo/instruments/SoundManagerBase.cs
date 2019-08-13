@@ -37,7 +37,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public virtual void Dispose()
         {
-            for (int i = AllOnSounds.Count - 1; i > 0; i--)
+            for (int i = AllOnSounds.Count - 1; i >= 0; i--)
             {
                 var removed = AllOnSounds[i];
                 AllOnSounds.RemoveAt(i);
