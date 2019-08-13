@@ -171,6 +171,9 @@
     <None Include="Resources\RP2A03.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\build\generated\version.cpp">
+      <Link>version.cpp</Link>
+    </None>
     <Content Include="Data\main.c" />
     <Content Include="Data\main.s" />
   </ItemGroup>
