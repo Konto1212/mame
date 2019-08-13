@@ -85,3 +85,5 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 	NAMCO CUS30:(TBD)
 	SN76489:(TBD)
    
+   [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](YOUR_EMAIL_CODE)
+
