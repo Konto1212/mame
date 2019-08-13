@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.Serialization;
+using zanac.MAmidiMEmo.ComponentModel;
 
 //http://www.smspower.org/Development/SN76489
 //http://www.st.rim.or.jp/~nkomatsu/peripheral/SN76489.html
@@ -10,14 +12,15 @@ namespace zanac.MAmidiMEmo.Instruments
     /// 
     /// </summary>
     [DataContract]
-    public class PcmSoundTableBase
+    [MidiHook]
+    public class PcmTimbreTableBase : ContextBoundObject
     {
         /// <summary>
         /// 
         /// </summary>
         [DataMember]
         [Browsable(false)]
-        public PcmSoundBase[] PcmSounds
+        public PcmTimbreBase[] PcmTimbres
         {
             get;
             private set;
@@ -26,9 +29,9 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public PcmSoundTableBase()
+        public PcmTimbreTableBase()
         {
-            PcmSounds = new PcmSoundBase[128];
+            PcmTimbres = new PcmTimbreBase[128];
         }
     }
 }

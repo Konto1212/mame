@@ -446,7 +446,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 var pan = parentModule.Panpots[NoteOnEvent.Channel] / 127d;
 
-                if (pan < 63)   //left
+                if (pan < 0.5)   //left
                     fv_r = (byte)((byte)(fv_r * pan / 63) & 0xf);
                 else if (pan > 64)  //right
                     fv_l = (byte)((byte)(fv_l * (127 - pan) / 63) & 0xf);
@@ -623,8 +623,20 @@ namespace zanac.MAmidiMEmo.Instruments
 
             public override void RestoreFrom(string serializeData)
             {
-                var obj = JsonConvert.DeserializeObject<NAMCO_CUS30Timbre>(serializeData);
-                this.InjectFrom(obj);
+                try
+                {
+                    var obj = JsonConvert.DeserializeObject<NAMCO_CUS30Timbre>(serializeData);
+                    this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is Exception)
+                        return;
+                    if (ex is SystemException)
+                        return;
+
+                    System.Windows.Forms.MessageBox.Show(ex.ToString());
+                }
             }
         }
 

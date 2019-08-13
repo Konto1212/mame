@@ -10,41 +10,64 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Mame;
 
 namespace zanac.MAmidiMEmo.Instruments
 {
+    [MidiHook]
     [DataContract]
-    public abstract class InstrumentBase : IDisposable
+    public abstract class InstrumentBase : ContextBoundObject
     {
         /// <summary>
         /// 
         /// </summary>
+        [Category("General")]
         public abstract string Name
         {
             get;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [DataMember]
-        [Description("Gain Left ch.")]
-        public double GainLeft
-        {
-            get;
-            set;
-        }
+        private float f_GainLeft = 1.0f;
 
         /// <summary>
         /// 
         /// </summary>
         [DataMember]
-        [Description("Gain Right ch.")]
-        public double GainRight
+        [Category("General")]
+        [Description("Gain Left ch. (0.0-*)")]
+        public float GainLeft
         {
-            get;
-            set;
+            get
+            {
+                return f_GainLeft;
+            }
+            set
+            {
+                f_GainLeft = value;
+                set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 0, value);
+            }
+        }
+
+        private float f_GainRight = 1.0f;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Category("General")]
+        [Description("Gain Right ch. (0.0-*)")]
+        public float GainRight
+        {
+            get
+            {
+                return f_GainRight;
+            }
+            set
+            {
+                f_GainRight = value;
+                set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 1, value);
+            }
         }
 
         /// <summary>
@@ -67,7 +90,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get
             {
-                return JsonConvert.SerializeObject(this, Formatting.None);
+                return JsonConvert.SerializeObject(this, Formatting.Indented);
             }
             set
             {
@@ -90,6 +113,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         [Browsable(false)]
+        [Category("General")]
         public abstract InstrumentType InstrumentType
         {
             get;
@@ -107,6 +131,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
+        [Category("General")]
         public abstract uint DeviceID
         {
             get;
@@ -115,6 +140,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
+        [Category("General")]
         public uint UnitNumber
         {
             get;
@@ -199,6 +225,52 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_set_device_enable(uint unitNumber, string tagName, byte enable);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_set_device_enable set_device_enable
+        {
+            get;
+            set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_set_output_gain(uint unitNumber, string tagName, int channel, float gain);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_set_output_gain set_output_gain
+        {
+            get;
+            set;
+        }
+
+        static InstrumentBase()
+        {
+            IntPtr funcPtr = MameIF.GetProcAddress("set_device_enable");
+            if (funcPtr != IntPtr.Zero)
+                set_device_enable = Marshal.GetDelegateForFunctionPointer<delegate_set_device_enable>(funcPtr);
+
+            funcPtr = MameIF.GetProcAddress("set_output_gain");
+            if (funcPtr != IntPtr.Zero)
+                set_output_gain = Marshal.GetDelegateForFunctionPointer<delegate_set_output_gain>(funcPtr);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public InstrumentBase(uint unitNumber)
         {
             UnitNumber = unitNumber;
@@ -267,37 +339,6 @@ namespace zanac.MAmidiMEmo.Instruments
 
             set_device_enable(UnitNumber, SoundInterfaceTagNamePrefix, 1);
         }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        static InstrumentBase()
-        {
-            IntPtr funcPtr = MameIF.GetProcAddress("set_device_enable");
-            if (funcPtr != IntPtr.Zero)
-            {
-                set_device_enable = Marshal.GetDelegateForFunctionPointer<delegate_set_device_enable>(funcPtr);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="address"></param>
-        /// <param name="data"></param>
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void delegate_set_device_enable(uint unitNumber, string tagName, byte enable);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private static delegate_set_device_enable set_device_enable
-        {
-            get;
-            set;
-        }
-
 
         /// <summary>
         /// 

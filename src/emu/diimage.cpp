@@ -673,7 +673,7 @@ void device_image_interface::battery_save(const void *buffer, int length)
 
 	if (!device().machine().options().nvram_save())
 		return;
-
+	/*
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
 	// try to open the battery file and write it out, if possible
@@ -681,6 +681,7 @@ void device_image_interface::battery_save(const void *buffer, int length)
 	osd_file::error filerr = file.open(fname);
 	if (filerr == osd_file::error::NONE)
 		file.write(buffer, length);
+	*/
 }
 
 

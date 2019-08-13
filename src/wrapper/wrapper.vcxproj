@@ -133,6 +133,10 @@
       <AdditionalDependencies />
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -155,6 +159,15 @@
       <AdditionalDependencies />
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
+    <PostBuildEvent>
+      <Command>cd /D $(OutDir)
+del /Q *.exp
+del /Q *.lib
+del /Q *.pdb
+del /Q *.xml
+del /Q *.metagen
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release(but Debug .NET)|Win32'">
     <ClCompile>

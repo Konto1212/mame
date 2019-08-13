@@ -94,8 +94,20 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="serializeData"></param>
         public override void RestoreFrom(string serializeData)
         {
-            var obj = JsonConvert.DeserializeObject<RP2A03>(serializeData);
-            this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+            try
+            {
+                var obj = JsonConvert.DeserializeObject<RP2A03>(serializeData);
+                this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+            }
+            catch (Exception ex)
+            {
+                if (ex is Exception)
+                    return;
+                if (ex is SystemException)
+                    return;
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
         }
 
         /// <summary>
@@ -624,10 +636,10 @@ namespace zanac.MAmidiMEmo.Instruments
                                 (byte)(timbre.DeltaPcmLoopEnable << 6 | timbre.DeltaPcmBitRate));
 
                             //Size
-                            if (parentModule.DeltaPcmSoundTable.PcmSounds[noteNum].PcmData != null)
+                            if (parentModule.DeltaPcmSoundTable.PcmTimbres[noteNum].PcmData != null)
                             {
-                                RP2A03SetDpcm(parentModule.UnitNumber, parentModule.DeltaPcmSoundTable.PcmSounds[noteNum].PcmData);
-                                int sz = parentModule.DeltaPcmSoundTable.PcmSounds[noteNum].PcmData.Length - 1;
+                                RP2A03SetDpcm(parentModule.UnitNumber, parentModule.DeltaPcmSoundTable.PcmTimbres[noteNum].PcmData);
+                                int sz = parentModule.DeltaPcmSoundTable.PcmTimbres[noteNum].PcmData.Length - 1;
                                 if (sz > 4081)
                                     sz = 4081;
                                 if (sz >= 16)
@@ -1088,8 +1100,20 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="serializeData"></param>
             public override void RestoreFrom(string serializeData)
             {
-                var obj = JsonConvert.DeserializeObject<RP2A03Timbre>(serializeData);
-                this.InjectFrom(obj);
+                try
+                {
+                    var obj = JsonConvert.DeserializeObject<RP2A03Timbre>(serializeData);
+                    this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is Exception)
+                        return;
+                    if (ex is SystemException)
+                        return;
+
+                    System.Windows.Forms.MessageBox.Show(ex.ToString());
+                }
             }
         }
 
@@ -1108,7 +1132,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         [DataContract]
-        public class DPcmSoundTable : PcmSoundTableBase
+        public class DPcmSoundTable : PcmTimbreTableBase
         {
             /// <summary>
             /// 
@@ -1116,7 +1140,7 @@ namespace zanac.MAmidiMEmo.Instruments
             public DPcmSoundTable()
             {
                 for (int i = 0; i < 128; i++)
-                    PcmSounds[i] = new DeltaPcmSound(i);
+                    PcmTimbres[i] = new DeltaPcmSound(i);
             }
         }
 
@@ -1124,7 +1148,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         [DataContract]
-        public class DeltaPcmSound : PcmSoundBase
+        public class DeltaPcmSound : PcmTimbreBase
         {
 
             private byte[] f_DeltaPcmData;

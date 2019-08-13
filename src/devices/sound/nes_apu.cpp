@@ -156,7 +156,7 @@ void nesapu_device::calculate_rates()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
 	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
+		m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
 }
 
 //-------------------------------------------------
@@ -775,6 +775,7 @@ void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 	int accum;
 	memset( outputs[0], 0, samples*sizeof(*outputs[0]) );
+	memset( outputs[1], 0, samples*sizeof(*outputs[1]) );
 
 	while (samples--)
 	{
@@ -791,5 +792,6 @@ void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			accum = -128;
 
 		*(outputs[0]++)=accum<<8;
+		*(outputs[1]++)=accum<<8;
 	}
 }

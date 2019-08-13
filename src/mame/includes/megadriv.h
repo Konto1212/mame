@@ -76,7 +76,7 @@ public:
 			didx++;
 			//sn76496(PSG)
 			strcpy(device_names[didx][i], (std::string("sn76496_") + num).c_str());
-			m_sn76496[i] = new optional_device<sn76496_base_device>(*this, device_names[didx][i]);
+			m_sn76496[i] = new optional_device<sn76496_device>(*this, device_names[didx][i]);
 			didx++;
 			//namco cus30
 			strcpy(device_names[didx][i], (std::string("namco_cus30_") + num).c_str());
@@ -96,7 +96,7 @@ public:
 	char device_names[ 6 ][8][100];
 	optional_device<ym2151_device> *m_ym2151[8];	//1
 	optional_device<ym2612_device> *m_ym2612[8];	//2
-	optional_device<sn76496_base_device> *m_sn76496[8];	//3
+	optional_device<sn76496_device> *m_sn76496[8];	//3
 	optional_device<namco_cus30_device> *m_namco_cus30[8];	//4
 	optional_device<gameboy_sound_device> *m_gbsnd[8];	//5
 	optional_device<nesapu_device> *m_nesapu[8];	//6

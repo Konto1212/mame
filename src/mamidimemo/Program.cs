@@ -62,7 +62,7 @@ namespace zanac.MAmidiMEmo
             return ret;
         }
 
-        static ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+        private static ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
         /// <summary>
         /// 

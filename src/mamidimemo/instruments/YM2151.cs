@@ -64,14 +64,26 @@ namespace zanac.MAmidiMEmo.Instruments
             set;
         }
 
-                /// <summary>
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="serializeData"></param>
         public override void RestoreFrom(string serializeData)
         {
-            var obj = JsonConvert.DeserializeObject<YM2151>(serializeData);
-            this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+            try
+            {
+                var obj = JsonConvert.DeserializeObject<YM2151>(serializeData);
+                this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+            }
+            catch (Exception ex)
+            {
+                if (ex is Exception)
+                    return;
+                if (ex is SystemException)
+                    return;
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
         }
 
         /// <summary>
@@ -145,9 +157,13 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public YM2151(uint unitNumber) : base(unitNumber)
         {
+            GainLeft = 2.0f;
+            GainRight = 2.0f;
+
             Timbres = new YM2151Timbre[128];
             for (int i = 0; i < 128; i++)
                 Timbres[i] = new YM2151Timbre();
+
             setPresetInstruments();
 
             this.soundManager = new YM2151SoundManager(this);
@@ -779,8 +795,20 @@ namespace zanac.MAmidiMEmo.Instruments
 
             public override void RestoreFrom(string serializeData)
             {
-                var obj = JsonConvert.DeserializeObject<YM2151Timbre>(serializeData);
-                this.InjectFrom(obj);
+                try
+                {
+                    var obj = JsonConvert.DeserializeObject<YM2151Timbre>(serializeData);
+                    this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is Exception)
+                        return;
+                    if (ex is SystemException)
+                        return;
+
+                    System.Windows.Forms.MessageBox.Show(ex.ToString());
+                }
             }
 
         }

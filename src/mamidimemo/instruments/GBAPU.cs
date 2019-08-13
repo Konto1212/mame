@@ -76,8 +76,20 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="serializeData"></param>
         public override void RestoreFrom(string serializeData)
         {
-            var obj = JsonConvert.DeserializeObject<GB_APU>(serializeData);
-            this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+            try
+            {
+                var obj = JsonConvert.DeserializeObject<GB_APU>(serializeData);
+                this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+            }
+            catch (Exception ex)
+            {
+                if (ex is Exception)
+                    return;
+                if (ex is SystemException)
+                    return;
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
         }
 
         /// <summary>
@@ -1174,8 +1186,20 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="serializeData"></param>
             public override void RestoreFrom(string serializeData)
             {
-                var obj = JsonConvert.DeserializeObject<GBAPUTimbre>(serializeData);
-                this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+                try
+                {
+                    var obj = JsonConvert.DeserializeObject<GBAPUTimbre>(serializeData);
+                    this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is Exception)
+                        return;
+                    if (ex is SystemException)
+                        return;
+
+                    System.Windows.Forms.MessageBox.Show(ex.ToString());
+                }
             }
         }
 

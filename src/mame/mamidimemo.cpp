@@ -37,6 +37,24 @@ extern "C"
 	}
 
 
+	DllExport void set_output_gain(unsigned int unitNumber, char* name, int channel, float gain)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+		if (sd == nullptr)
+			return;
+
+		sd->set_output_gain(channel, gain);
+	}
+
+
 	DllExport void ym2151_write(unsigned int unitNumber, unsigned int address, unsigned char data)
 	{
 		mame_machine_manager *mmm = mame_machine_manager::instance();

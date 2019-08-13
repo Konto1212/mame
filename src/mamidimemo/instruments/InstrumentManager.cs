@@ -43,24 +43,96 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public static void RestoreSettings()
         {
-            var List_ym2151 = JsonConvert.DeserializeObject<List<YM2151>>(Settings.Default.YM2151);
-            if (List_ym2151 != null)
-                InstrumentManager.List_ym2151 = List_ym2151;
-            var List_ym2612 = JsonConvert.DeserializeObject<List<YM2612>>(Settings.Default.YM2612);
-            if (List_ym2612 != null)
-                InstrumentManager.List_ym2612 = List_ym2612;
-            var List_gbapu = JsonConvert.DeserializeObject<List<GB_APU>>(Settings.Default.GB_APU);
-            if (List_gbapu != null)
-                InstrumentManager.List_gbapu = List_gbapu;
-            var List_sn76496 = JsonConvert.DeserializeObject<List<SN76496>>(Settings.Default.SN76496);
-            if (List_sn76496 != null)
-                InstrumentManager.List_sn76496 = List_sn76496;
-            var List_namco_cus30 = JsonConvert.DeserializeObject<List<NAMCO_CUS30>>(Settings.Default.NAMCO_CUS30);
-            if (List_namco_cus30 != null)
-                InstrumentManager.List_namco_cus30 = List_namco_cus30;
-            var List_RP2A03 = JsonConvert.DeserializeObject<List<RP2A03>>(Settings.Default.RP2A03);
-            if (List_RP2A03 != null)
-                InstrumentManager.List_RP2A03 = List_RP2A03;
+            try
+            {
+                var List_ym2151 = JsonConvert.DeserializeObject<List<YM2151>>(Settings.Default.YM2151);
+                if (List_ym2151 != null)
+                    InstrumentManager.List_ym2151 = List_ym2151;
+            }
+            catch (Exception ex)
+            {
+                if (ex is Exception)
+                    return;
+                if (ex is SystemException)
+                    return;
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
+            try
+            {
+                var List_ym2612 = JsonConvert.DeserializeObject<List<YM2612>>(Settings.Default.YM2612);
+                if (List_ym2612 != null)
+                    InstrumentManager.List_ym2612 = List_ym2612;
+            }
+            catch (Exception ex)
+            {
+                if (ex is Exception)
+                    return;
+                if (ex is SystemException)
+                    return;
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
+            try
+            {
+                var List_gbapu = JsonConvert.DeserializeObject<List<GB_APU>>(Settings.Default.GB_APU);
+                if (List_gbapu != null)
+                    InstrumentManager.List_gbapu = List_gbapu;
+            }
+            catch (Exception ex)
+            {
+                if (ex is Exception)
+                    return;
+                if (ex is SystemException)
+                    return;
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
+            try
+            {
+                var List_sn76496 = JsonConvert.DeserializeObject<List<SN76496>>(Settings.Default.SN76496);
+                if (List_sn76496 != null)
+                    InstrumentManager.List_sn76496 = List_sn76496;
+            }
+            catch (Exception ex)
+            {
+                if (ex is Exception)
+                    return;
+                if (ex is SystemException)
+                    return;
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
+            try
+            {
+                var List_namco_cus30 = JsonConvert.DeserializeObject<List<NAMCO_CUS30>>(Settings.Default.NAMCO_CUS30);
+                if (List_namco_cus30 != null)
+                    InstrumentManager.List_namco_cus30 = List_namco_cus30;
+            }
+            catch (Exception ex)
+            {
+                if (ex is Exception)
+                    return;
+                if (ex is SystemException)
+                    return;
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
+            try
+            {
+                var List_RP2A03 = JsonConvert.DeserializeObject<List<RP2A03>>(Settings.Default.RP2A03);
+                if (List_RP2A03 != null)
+                    InstrumentManager.List_RP2A03 = List_RP2A03;
+            }
+            catch (Exception ex)
+            {
+                if (ex is Exception)
+                    return;
+                if (ex is SystemException)
+                    return;
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
         }
 
         public static void SaveSettings()

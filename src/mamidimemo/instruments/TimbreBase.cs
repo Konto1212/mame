@@ -18,7 +18,8 @@ namespace zanac.MAmidiMEmo.Instruments
     [TypeConverter(typeof(ExpandableObjectConverter))]
     [JsonConverter(typeof(NoTypeConverterJsonConverter<TimbreBase>))]
     [DataContract]
-    public abstract class TimbreBase
+    [MidiHook]
+    public abstract class TimbreBase : ContextBoundObject
     {
         [DataMember]
         [Description("Memo")]
@@ -37,7 +38,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get
             {
-                return JsonConvert.SerializeObject(this, Formatting.None);
+                return JsonConvert.SerializeObject(this, Formatting.Indented);
             }
             set
             {

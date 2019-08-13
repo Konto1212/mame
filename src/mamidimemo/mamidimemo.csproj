@@ -27,7 +27,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\Output\Release\</OutputPath>
+    <OutputPath>..\..\Output\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -45,6 +45,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Melanchall.DryWetMidi, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -71,6 +74,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\MidiHookAttribute.cs" />
+    <Compile Include="ComponentModel\MidiHookProxy.cs" />
     <Compile Include="ComponentModel\NoTypeConverter.cs" />
     <Compile Include="ComponentModel\ValueTypeTypeConverter.cs" />
     <Compile Include="Gui\FormMain.cs">
@@ -92,8 +97,8 @@
     <Compile Include="Instruments\InstrumentManager.cs" />
     <Compile Include="Instruments\InstrumentType.cs" />
     <Compile Include="Instruments\NAMCO_CUS30.cs" />
-    <Compile Include="Instruments\PcmSoundBase.cs" />
-    <Compile Include="Instruments\PcmSoundTableBase.cs" />
+    <Compile Include="Instruments\PcmTimbreBase.cs" />
+    <Compile Include="Instruments\PcmTimbreTableBase.cs" />
     <Compile Include="Instruments\RP2A03.cs" />
     <Compile Include="Instruments\SoundBase.cs" />
     <Compile Include="Instruments\SoundManagerBase.cs" />
@@ -125,6 +130,14 @@
     <EmbeddedResource Include="Resources\ImageResource.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="dummy.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Images.pdn" />
+    <None Include="Data\Images.pptx" />
+    <None Include="mame.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -157,5 +170,13 @@
   <ItemGroup>
     <None Include="Resources\RP2A03.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\main.c" />
+    <Content Include="Data\main.s" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

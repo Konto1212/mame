@@ -12,7 +12,8 @@ namespace zanac.MAmidiMEmo.Instruments
     /// 
     /// </summary>
     [DataContract]
-    public class PcmSoundBase
+    [MidiHook]
+    public class PcmTimbreBase : ContextBoundObject
     {
         /// <summary>
         /// 
@@ -38,7 +39,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         [DataMember]
-        public String SoundName
+        public String TimbreName
         {
             get;
             set;
@@ -59,7 +60,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         /// <param name="noteNumber"></param>
-        public PcmSoundBase(int noteNumber)
+        public PcmTimbreBase(int noteNumber)
         {
             NoteNumber = noteNumber;
             var no = new NoteOnEvent((SevenBitNumber)NoteNumber, (SevenBitNumber)0);

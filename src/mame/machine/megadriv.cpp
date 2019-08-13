@@ -969,7 +969,7 @@ void md_base_state::md_ntsc(machine_config &config)
 
 		NAMCO_CUS30(config, *m_namco_cus30[i], XTAL(49'152'000) / 2048 / 2);
 		(*m_namco_cus30[i])->set_voices(8);
-		(*m_namco_cus30[i])->set_stereo(1);
+		(*m_namco_cus30[i])->set_stereo(true);
 		(*m_namco_cus30[i])->add_route(0, "lspeaker", 1.00);
 		(*m_namco_cus30[i])->add_route(1, "rspeaker", 1.00);
 
@@ -981,10 +981,6 @@ void md_base_state::md_ntsc(machine_config &config)
 		(*m_nesapu[i])->add_route(0, "lspeaker", 1.00);
 		(*m_nesapu[i])->add_route(1, "rspeaker", 1.00);
 	}
-
-	//m_ym2612_1->set_output_gain(0,2.00);
-	//m_ym2612_1->set_output_gain(0, 2.00);
-
 }
 
 void md_cons_state::dcat16_megadriv_base(machine_config &config)

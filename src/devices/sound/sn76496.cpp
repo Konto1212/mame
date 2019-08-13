@@ -170,7 +170,7 @@ sn76496_base_device::sn76496_base_device(
 }
 
 sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76496, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76496, tag, 0x10000, 0x04, 0x08, false, true, 8, false, true, owner, clock)
 {
 }
 

@@ -15,12 +15,12 @@ namespace zanac.MAmidiMEmo.Gui
 {
     public partial class FormPcmEditor : Form
     {
-        public PcmSoundBase[] f_PcmData;
+        public PcmTimbreBase[] f_PcmData;
 
         /// <summary>
         /// 
         /// </summary>
-        public PcmSoundBase[] PcmData
+        public PcmTimbreBase[] PcmData
         {
             get
             {
@@ -37,11 +37,11 @@ namespace zanac.MAmidiMEmo.Gui
                     listViewPcmSounds.Items.Clear();
                     for (int i = 0; i < value.Length; i++)
                     {
-                        PcmSoundBase pcm = value[i];
+                        PcmTimbreBase pcm = value[i];
 
                         var item = listViewPcmSounds.Items.Add(i.ToString() + "(" + pcm.KeyName + ")");
                         item.Tag = pcm;
-                        item.SubItems.Add(pcm.SoundName);
+                        item.SubItems.Add(pcm.TimbreName);
                     }
                     foreach (ColumnHeader c in listViewPcmSounds.Columns)
                         c.Width = -2;
@@ -125,11 +125,11 @@ namespace zanac.MAmidiMEmo.Gui
             }
             if (data != null)
             {
-                PcmSoundBase pcm = (PcmSoundBase)fi.Tag;
+                PcmTimbreBase pcm = (PcmTimbreBase)fi.Tag;
                 pcm.PcmData = data;
-                pcm.SoundName = Path.GetFileNameWithoutExtension(fn);
+                pcm.TimbreName = Path.GetFileNameWithoutExtension(fn);
 
-                fi.SubItems[1].Text = pcm.SoundName;
+                fi.SubItems[1].Text = pcm.TimbreName;
             }
             propertyGrid1.Refresh();
         }
@@ -138,9 +138,9 @@ namespace zanac.MAmidiMEmo.Gui
         {
             for (int i = 0; i < listViewPcmSounds.SelectedItems.Count; i++)
             {
-                PcmSoundBase snd = (PcmSoundBase)listViewPcmSounds.SelectedItems[i].Tag;
+                PcmTimbreBase snd = (PcmTimbreBase)listViewPcmSounds.SelectedItems[i].Tag;
                 snd.PcmData = null;
-                snd.SoundName = null;
+                snd.TimbreName = null;
 
                 listViewPcmSounds.SelectedItems[i].SubItems[1].Text = null;
             }
@@ -152,9 +152,9 @@ namespace zanac.MAmidiMEmo.Gui
             buttonAdd.Enabled = listViewPcmSounds.FocusedItem != null ? true : false;
             buttonDelete.Enabled = listViewPcmSounds.SelectedItems.Count != 0 ? true : false;
 
-            List<PcmSoundBase> insts = new List<PcmSoundBase>();
+            List<PcmTimbreBase> insts = new List<PcmTimbreBase>();
             foreach (ListViewItem item in listViewPcmSounds.SelectedItems)
-                insts.Add((PcmSoundBase)item.Tag);
+                insts.Add((PcmTimbreBase)item.Tag);
             propertyGrid1.SelectedObjects = insts.ToArray();
         }
 
@@ -165,14 +165,14 @@ namespace zanac.MAmidiMEmo.Gui
         /// <param name="e"></param>
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            PcmSoundBase[] insts = (PcmSoundBase[])propertyGrid1.SelectedObjects;
+            PcmTimbreBase[] insts = (PcmTimbreBase[])propertyGrid1.SelectedObjects;
             foreach (var pcm in insts)
             {
                 foreach (ListViewItem item in listViewPcmSounds.SelectedItems)
                 {
                     if (item.Tag == pcm)
                     {
-                        item.SubItems[1].Text = pcm.SoundName;
+                        item.SubItems[1].Text = pcm.TimbreName;
                     }
                 }
             }

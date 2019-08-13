@@ -110,6 +110,7 @@
             // 
             this.listViewIntruments.ContextMenuStrip = this.contextMenuStrip1;
             resources.ApplyResources(this.listViewIntruments, "listViewIntruments");
+            this.listViewIntruments.HideSelection = false;
             this.listViewIntruments.LargeImageList = this.imageList1;
             this.listViewIntruments.Name = "listViewIntruments";
             this.listViewIntruments.SmallImageList = this.imageList1;

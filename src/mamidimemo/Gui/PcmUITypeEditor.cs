@@ -59,7 +59,7 @@ namespace zanac.MAmidiMEmo.Gui
             using (FormPcmEditor frm = new FormPcmEditor())
             {
                 frm.PcmData =
-                    JsonConvert.DeserializeObject<PcmSoundBase[]>(JsonConvert.SerializeObject(((PcmSoundTableBase)value).PcmSounds));
+                    JsonConvert.DeserializeObject<PcmTimbreBase[]>(JsonConvert.SerializeObject(((PcmTimbreTableBase)value).PcmTimbres));
                 if (att != null)
                     frm.FileDialogFilter = att.Exts;
                 else
@@ -69,7 +69,7 @@ namespace zanac.MAmidiMEmo.Gui
                 if (dr == DialogResult.OK)
                 {
                     for (int i = 0; i < frm.PcmData.Length; i++)
-                        ((PcmSoundTableBase)value).PcmSounds[i] = frm.PcmData[i];
+                        ((PcmTimbreTableBase)value).PcmTimbres[i] = frm.PcmData[i];
                     return value;
                 }
                 else

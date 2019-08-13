@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Smf;
+using zanac.MAmidiMEmo.ComponentModel;
 
 namespace zanac.MAmidiMEmo.Instruments
 {

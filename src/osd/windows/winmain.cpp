@@ -287,6 +287,16 @@ const options_entry windows_options::s_option_entries[] =
 int main(int argc, char *argv[])
 {
 	std::vector<std::string> args = osd_get_command_line(argc, argv);
+	//mamidimemo
+	args.push_back("genesis");
+	args.push_back("-cart");
+	//exeファイルのパスを分解
+	char path[_MAX_PATH];
+	char drive[_MAX_DRIVE];
+	char dir[_MAX_DIR];
+	_splitpath(argv[0], drive, dir, nullptr, nullptr);
+	_makepath(path, drive, dir, "dummy", ".out");
+	args.push_back(path);
 
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
@@ -445,13 +455,13 @@ IFrameworkView^ MameViewSource::CreateView()
 //============================================================
 
 windows_options::windows_options()
-: osd_options()
+	: osd_options()
 {
 	add_entries(s_option_entries);
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	String^ path = ApplicationData::Current->LocalFolder->Path + L"\\";
 	set_default_value(OPTION_INIPATH, (osd::text::from_wstring((LPCWSTR)path->Data()) + ";" + ini_path()).c_str());
-	set_default_value(OPTION_CFG_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) +  cfg_directory()).c_str());
+	set_default_value(OPTION_CFG_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + cfg_directory()).c_str());
 	set_default_value(OPTION_NVRAM_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + nvram_directory()).c_str());
 	set_default_value(OPTION_INPUT_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + input_directory()).c_str());
 	set_default_value(OPTION_STATE_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + state_directory()).c_str());
