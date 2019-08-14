@@ -17,5 +17,7 @@ namespace zanac.MAmidiMEmo.Instruments
         NAMCO_CUS30,
         GB_APU,
         RP2A03,
+        SCC1,
+        YM3812,
     }
 }

@@ -23,6 +23,7 @@ public:
 	void    k051649_volume_w(offs_t offset, uint8_t data);
 	void    k051649_frequency_w(offs_t offset, uint8_t data);
 	void    k051649_keyonoff_w(uint8_t data);
+	uint8_t k051649_keyonoff_r();
 	void    k051649_test_w(uint8_t data);
 	uint8_t k051649_test_r();
 

@@ -130,6 +130,9 @@
   <data name="RP2A03" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\RP2A03.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="SCC1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\SCC.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="SN76496" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SN76496.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -141,5 +144,8 @@
   </data>
   <data name="YM2612" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\YM2612.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="YM3812" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Data\YM3812.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

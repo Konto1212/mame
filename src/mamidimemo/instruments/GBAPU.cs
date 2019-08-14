@@ -1106,6 +1106,7 @@ namespace zanac.MAmidiMEmo.Instruments
             private byte[] f_wavedata = new byte[32];
 
             [TypeConverter(typeof(ArrayConverter))]
+            [Editor(typeof(DummyEditor), typeof(System.Drawing.Design.UITypeEditor))]
             [DataMember]
             [Category("Sound")]
             [Description("Wave Table (32 samples, 0-15 levels)")]

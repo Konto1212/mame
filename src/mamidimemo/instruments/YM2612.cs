@@ -397,8 +397,6 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             private List<YM2612Sound> fmOnSounds = new List<YM2612Sound>();
 
-            private List<YM2612Sound> psgOnSounds = new List<YM2612Sound>();
-
             private YM2612 parentModule;
 
             /// <summary>
@@ -518,18 +516,8 @@ namespace zanac.MAmidiMEmo.Instruments
                             return;
                         }
                     }
-                    for (int i = 0; i < psgOnSounds.Count; i++)
-                    {
-                        if (psgOnSounds[i] == removed)
-                        {
-                            psgOnSounds.RemoveAt(i);
-                            return;
-                        }
-                    }
                 }
             }
-
-
         }
 
 

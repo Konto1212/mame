@@ -58,8 +58,7 @@ namespace zanac.MAmidiMEmo.Gui
             // CurrencyValueEditorForm を使用したプロパティエディタの表示
             using (FormPcmEditor frm = new FormPcmEditor())
             {
-                frm.PcmData =
-                    JsonConvert.DeserializeObject<PcmTimbreBase[]>(JsonConvert.SerializeObject(((PcmTimbreTableBase)value).PcmTimbres));
+                frm.PcmData = JsonConvert.DeserializeObject<PcmTimbreBase[]>(JsonConvert.SerializeObject(((PcmTimbreTableBase)value).PcmTimbres));
                 if (att != null)
                     frm.FileDialogFilter = att.Exts;
                 else

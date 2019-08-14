@@ -44,12 +44,14 @@ namespace zanac.MAmidiMEmo
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+                JsonSerializerSettings jss = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
 
                 if (!string.IsNullOrEmpty(Settings.Default.EnvironmentSettings))
                 {
                     try
                     {
-                        var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(StringCompressionUtility.Decompress(Settings.Default.EnvironmentSettings));
+                        var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(
+                            StringCompressionUtility.Decompress(Settings.Default.EnvironmentSettings), jss);
                         InstrumentManager.RestoreSettings(settings);
                     }
                     catch (Exception ex)
@@ -60,7 +62,8 @@ namespace zanac.MAmidiMEmo
 
                 Application.Run(new FormMain());
 
-                Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(JsonConvert.SerializeObject(SaveEnvironmentSettings(), Formatting.Indented));
+                Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(
+                    JsonConvert.SerializeObject(SaveEnvironmentSettings(), Formatting.Indented, jss));
                 Settings.Default.Save();
             }));
             mainThread.SetApartmentState(ApartmentState.STA);

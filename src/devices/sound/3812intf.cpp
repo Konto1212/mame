@@ -67,7 +67,16 @@ void ym3812_device::timer_handler(int c, const attotime &period)
 
 void ym3812_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	if (m_enable == 0)
+	{
+		std::fill(&outputs[0][0], &outputs[0][samples], 0);
+		std::fill(&outputs[1][0], &outputs[1][samples], 0);
+		return;
+	}
+
 	ym3812_update_one(m_chip, outputs[0], samples);
+
+	std::copy_n(&outputs[0][0], samples, &outputs[1][0]);
 }
 
 //-------------------------------------------------
@@ -109,7 +118,7 @@ void ym3812_device::calculate_rates()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
 	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
+		m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
 }
 
 //-------------------------------------------------

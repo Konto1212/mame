@@ -73,7 +73,7 @@ void k051649_device::device_start()
 {
 	// get stream channels
 	m_rate = clock()/16;
-	m_stream = stream_alloc(0, 1, m_rate);
+	m_stream = stream_alloc(0, 2, m_rate);
 	m_mclock = clock();
 
 	// allocate a buffer to mix into - 1 second's worth should be more than enough
@@ -139,6 +139,13 @@ void k051649_device::device_clock_changed()
 
 void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	if (m_enable == 0)
+	{
+		std::fill(&outputs[0][0], &outputs[0][samples], 0);
+		std::fill(&outputs[1][0], &outputs[1][samples], 0);
+		return;
+	}
+
 	// zap the contents of the mixer buffer
 	std::fill(m_mixer_buffer.begin(), m_mixer_buffer.end(), 0);
 
@@ -168,9 +175,12 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	}
 
 	// mix it down
-	stream_sample_t *buffer = outputs[0];
-	for (int i = 0; i < samples; i++)
-		*buffer++ = m_mixer_lookup[m_mixer_buffer[i]];
+	stream_sample_t *bufferl = outputs[0];
+	stream_sample_t *bufferr = outputs[1];
+	for (int i = 0; i < samples; i++){
+		*bufferl++ = m_mixer_lookup[m_mixer_buffer[i]];
+		*bufferr++ = m_mixer_lookup[m_mixer_buffer[i]];
+	}
 }
 
 
@@ -275,6 +285,19 @@ void k051649_device::k051649_keyonoff_w(uint8_t data)
 	}
 }
 
+
+uint8_t k051649_device::k051649_keyonoff_r()
+{
+	int i;
+	uint8_t data = 0;
+
+	for (i = 0; i < 5; i++)
+	{
+		data |= (m_channel_list[i].key & 1) << i;
+	}
+
+	return data;
+}
 
 void k051649_device::k051649_test_w(uint8_t data)
 {

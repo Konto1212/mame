@@ -349,7 +349,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        internal void PrepareSound()
+        internal virtual void PrepareSound()
         {
             set_device_enable(UnitNumber, SoundInterfaceTagNamePrefix, 1);
         }

@@ -14,6 +14,8 @@
 #include "sound/sn76496.h"
 #include "sound/namco.h"
 #include "sound/nes_apu.h"
+#include "sound/k051649.h"
+#include "sound/3812intf.h"
 #include "video/315_5313.h"
 
 /* Megadrive Console Specific */
@@ -74,6 +76,10 @@ public:
 			strcpy(device_names[didx][i], (std::string("ym2612_") + num).c_str());
 			m_ym2612[i] = new optional_device<ym2612_device>(*this, device_names[didx][i]);
 			didx++;
+			//YM3812
+			strcpy(device_names[didx][i], (std::string("ym3812_") + num).c_str());
+			m_ym3812[i] = new optional_device<ym3812_device>(*this, device_names[didx][i]);
+			didx++;
 			//sn76496(PSG)
 			strcpy(device_names[didx][i], (std::string("sn76496_") + num).c_str());
 			m_sn76496[i] = new optional_device<sn76496_device>(*this, device_names[didx][i]);
@@ -90,16 +96,22 @@ public:
 			strcpy(device_names[didx][i], (std::string("nes_apu_") + num).c_str());
 			m_nesapu[i] = new optional_device<nesapu_device>(*this, device_names[didx][i]);
 			didx++;
+			//SCC1
+			strcpy(device_names[didx][i], (std::string("scc1_") + num).c_str());
+			m_scc1[i] = new optional_device<k051649_device>(*this, device_names[didx][i]);
+			didx++;
 		}
 	}
 
-	char device_names[ 6 ][8][100];
+	char device_names[ 8 ][8][100];
 	optional_device<ym2151_device> *m_ym2151[8];	//1
 	optional_device<ym2612_device> *m_ym2612[8];	//2
 	optional_device<sn76496_device> *m_sn76496[8];	//3
 	optional_device<namco_cus30_device> *m_namco_cus30[8];	//4
 	optional_device<gameboy_sound_device> *m_gbsnd[8];	//5
 	optional_device<nesapu_device> *m_nesapu[8];	//6
+	optional_device<k051649_device> *m_scc1[8];	//7
+	optional_device<ym3812_device> *m_ym3812[8];	//8
 
 
 	required_device<m68000_base_device> m_maincpu;

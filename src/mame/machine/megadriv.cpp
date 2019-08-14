@@ -963,6 +963,10 @@ void md_base_state::md_ntsc(machine_config &config)
 		(*m_ym2612[i])->add_route(0, "lspeaker", 2.00);
 		(*m_ym2612[i])->add_route(1, "rspeaker", 2.00);
 
+		YM3812(config, *m_ym3812[i], XTAL(3'579'545));
+		(*m_ym3812[i])->add_route(0, "lspeaker", 2.00);
+		(*m_ym3812[i])->add_route(1, "rspeaker", 2.00);
+
 		SN76496(config, *m_sn76496[i], 3579545); //3.579545 MHz
 		(*m_sn76496[i])->add_route(0, "lspeaker", 1.00);
 		(*m_sn76496[i])->add_route(1, "rspeaker", 1.00);
@@ -980,6 +984,10 @@ void md_base_state::md_ntsc(machine_config &config)
 		NES_APU(config, *m_nesapu[i], XTAL(21'477'272)/12);
 		(*m_nesapu[i])->add_route(0, "lspeaker", 1.00);
 		(*m_nesapu[i])->add_route(1, "rspeaker", 1.00);
+
+		K051649(config, *m_scc1[i], XTAL(10'738'635) / 3 / 2);
+		(*m_scc1[i])->add_route(0, "lspeaker", 1.00);
+		(*m_scc1[i])->add_route(1, "rspeaker", 1.00);
 	}
 }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using zanac.MAmidiMEmo.ComponentModel;
@@ -13,28 +14,29 @@ namespace zanac.MAmidiMEmo.Instruments
     {
         private static object lockObject = new object();
 
-        public static List<YM2151> List_ym2151 = new List<YM2151>();
+        public static List<List<InstrumentBase>> Instruments = new List<List<InstrumentBase>>();
 
-        public static List<YM2612> List_ym2612 = new List<YM2612>();
+        /// <summary>
+        /// 
+        /// </summary>
+        static InstrumentManager()
+        {
+            Midi.MidiManager.MidiEventReceived += MidiManager_MidiEventReceived;
 
-        public static List<GB_APU> List_gbapu = new List<GB_APU>();
+            for (int i = 0; i < Enum.GetNames(typeof(InstrumentType)).Length; i++)
+                Instruments.Add(new List<InstrumentBase>());
+        }
 
-        public static List<SN76496> List_sn76496 = new List<SN76496>();
-
-        public static List<NAMCO_CUS30> List_namco_cus30 = new List<NAMCO_CUS30>();
-
-        public static List<RP2A03> List_RP2A03 = new List<RP2A03>();
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public static IEnumerable<InstrumentBase> GetAllInstruments()
         {
             List<InstrumentBase> insts = new List<InstrumentBase>();
 
-            insts.AddRange(List_ym2151);
-            insts.AddRange(List_ym2612);
-            insts.AddRange(List_gbapu);
-            insts.AddRange(List_sn76496);
-            insts.AddRange(List_namco_cus30);
-            insts.AddRange(List_RP2A03);
+            foreach (List<InstrumentBase> i in Instruments)
+                insts.AddRange(i);
 
             return insts.AsEnumerable();
         }
@@ -44,143 +46,37 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public static void RestoreSettings(EnvironmentSettings settings)
         {
-            try
+            if (settings.Instruments != null)
             {
-                if (settings.YM2151 != null)
+                foreach (int v in Enum.GetValues(typeof(InstrumentType)))
                 {
-                    for (int i = List_ym2151.Count - 1; i >= 0; i--)
+                    if (v < settings.Instruments.Count && settings.Instruments[v] != null)
                     {
-                        List_ym2151[i].Dispose();
-                        List_ym2151.RemoveAt(i);
-                    }
-                    foreach (InstrumentBase inst in settings.YM2151)
-                        inst.PrepareSound();
-                    InstrumentManager.List_ym2151 = settings.YM2151;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex is Exception)
-                    throw;
-                if (ex is SystemException)
-                    throw;
+                        try
+                        {
+                            //clear current insts
+                            for (int i = Instruments[v].Count - 1; i >= 0; i--)
+                            {
+                                Instruments[v][i].Dispose();
+                                Instruments[v].RemoveAt(i);
+                            }
+                            //prepare new insts
+                            foreach (InstrumentBase inst in settings.Instruments[v])
+                                inst.PrepareSound();
+                            //set new insts
+                            InstrumentManager.Instruments[v] = settings.Instruments[v];
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ex is Exception)
+                                throw;
+                            if (ex is SystemException)
+                                throw;
 
-                System.Windows.Forms.MessageBox.Show(ex.ToString());
-            }
-            try
-            {
-                if (settings.YM2612 != null)
-                {
-                    for (int i = List_ym2612.Count - 1; i >= 0; i--)
-                    {
-                        List_ym2612[i].Dispose();
-                        List_ym2612.RemoveAt(i);
+                            System.Windows.Forms.MessageBox.Show(ex.ToString());
+                        }
                     }
-                    foreach (InstrumentBase inst in settings.YM2612)
-                        inst.PrepareSound();
-                    InstrumentManager.List_ym2612 = settings.YM2612;
                 }
-            }
-            catch (Exception ex)
-            {
-                if (ex is Exception)
-                    throw;
-                if (ex is SystemException)
-                    throw;
-
-                System.Windows.Forms.MessageBox.Show(ex.ToString());
-            }
-            try
-            {
-                if (settings.GB_APU != null)
-                {
-                    for (int i = List_gbapu.Count - 1; i >= 0; i--)
-                    {
-                        List_gbapu[i].Dispose();
-                        List_gbapu.RemoveAt(i);
-                    }
-                    foreach (InstrumentBase inst in settings.GB_APU)
-                        inst.PrepareSound();
-                    InstrumentManager.List_gbapu = settings.GB_APU;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex is Exception)
-                    throw;
-                if (ex is SystemException)
-                    throw;
-
-                System.Windows.Forms.MessageBox.Show(ex.ToString());
-            }
-            try
-            {
-                if (settings.SN76496 != null)
-                {
-                    for (int i = List_sn76496.Count - 1; i >= 0; i--)
-                    {
-                        List_sn76496[i].Dispose();
-                        List_sn76496.RemoveAt(i);
-                    }
-                    foreach (InstrumentBase inst in settings.SN76496)
-                        inst.PrepareSound();
-                    InstrumentManager.List_sn76496 = settings.SN76496;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex is Exception)
-                    throw;
-                if (ex is SystemException)
-                    throw;
-
-                System.Windows.Forms.MessageBox.Show(ex.ToString());
-            }
-            try
-            {
-                if (settings.NAMCO_CUS30 != null)
-                {
-                    for (int i = List_namco_cus30.Count - 1; i >= 0; i--)
-                    {
-                        List_namco_cus30[i].Dispose();
-                        List_namco_cus30.RemoveAt(i);
-                    }
-                    foreach (InstrumentBase inst in settings.NAMCO_CUS30)
-                        inst.PrepareSound();
-                    InstrumentManager.List_namco_cus30 = settings.NAMCO_CUS30;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex is Exception)
-                    throw;
-                if (ex is SystemException)
-                    throw;
-
-                System.Windows.Forms.MessageBox.Show(ex.ToString());
-            }
-            try
-            {
-                if (settings.RP2A03 != null)
-                {
-                    for (int i = List_RP2A03.Count - 1; i >= 0; i--)
-                    {
-                        List_RP2A03[i].Dispose();
-                        List_RP2A03.RemoveAt(i);
-                    }
-                    foreach (InstrumentBase inst in settings.RP2A03)
-                        inst.PrepareSound();
-                    InstrumentManager.List_RP2A03 = settings.RP2A03;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex is Exception)
-                    throw;
-                if (ex is SystemException)
-                    throw;
-
-                System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
 
             InstrumentChanged?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
@@ -191,12 +87,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public static void SaveSettings(EnvironmentSettings settings)
         {
-            settings.YM2151 = List_ym2151;
-            settings.YM2612 = List_ym2612;
-            settings.NAMCO_CUS30 = List_namco_cus30;
-            settings.SN76496 = List_sn76496;
-            settings.GB_APU = List_gbapu;
-            settings.RP2A03 = List_RP2A03;
+            settings.Instruments = Instruments;
         }
 
         /// <summary>
@@ -214,13 +105,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public static event EventHandler<EventArgs> InstrumentChanged;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        static InstrumentManager()
-        {
-            Midi.MidiManager.MidiEventReceived += MidiManager_MidiEventReceived;
-        }
 
         /// <summary>
         /// 
@@ -230,74 +114,16 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             lock (lockObject)
             {
-                switch (instrumentType)
+                if (Instruments[(int)instrumentType].Count < 8)
                 {
-                    case InstrumentType.YM2151:
-                        {
-                            if (List_ym2151.Count < 7)
-                            {
-                                var inst = new YM2151((uint)List_ym2151.Count);
-                                inst.PrepareSound();
-                                List_ym2151.Add(inst);
-                                InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                            }
-                            break;
-                        }
-                    case InstrumentType.YM2612:
-                        {
-                            if (List_ym2612.Count < 7)
-                            {
-                                var inst = new YM2612((uint)List_ym2612.Count);
-                                inst.PrepareSound();
-                                List_ym2612.Add(inst);
-                                InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                            }
-                            break;
-                        }
-                    case InstrumentType.GB_APU:
-                        {
-                            if (List_gbapu.Count < 7)
-                            {
-                                var inst = new GB_APU((uint)List_gbapu.Count);
-                                inst.PrepareSound();
-                                List_gbapu.Add(inst);
-                                InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                            }
-                            break;
-                        }
-                    case InstrumentType.SN76496:
-                        {
-                            if (List_sn76496.Count < 7)
-                            {
-                                var inst = new SN76496((uint)List_sn76496.Count);
-                                inst.PrepareSound();
-                                List_sn76496.Add(inst);
-                                InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                            }
-                            break;
-                        }
-                    case InstrumentType.NAMCO_CUS30:
-                        {
-                            if (List_namco_cus30.Count < 7)
-                            {
-                                var inst = new NAMCO_CUS30((uint)List_namco_cus30.Count);
-                                inst.PrepareSound();
-                                List_namco_cus30.Add(inst);
-                                InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                            }
-                            break;
-                        }
-                    case InstrumentType.RP2A03:
-                        {
-                            if (List_RP2A03.Count < 7)
-                            {
-                                var inst = new RP2A03((uint)List_RP2A03.Count);
-                                inst.PrepareSound();
-                                List_RP2A03.Add(inst);
-                                InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                            }
-                            break;
-                        }
+                    Assembly asm = Assembly.GetAssembly(typeof(InstrumentType));
+                    string name = Enum.GetName(typeof(InstrumentType), instrumentType);
+                    Type t = asm.GetType("zanac.MAmidiMEmo.Instruments." + name);
+
+                    var inst = (InstrumentBase)Activator.CreateInstance(t, (uint)Instruments[(int)instrumentType].Count);
+                    inst.PrepareSound();
+                    Instruments[(int)instrumentType].Add(inst);
+                    InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
                 }
             }
         }
@@ -307,43 +133,14 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         /// <param name="instrumentType"></param>
-        public static void RemoveInstrument(InstrumentType type)
+        public static void RemoveInstrument(InstrumentType instrumentType)
         {
             lock (lockObject)
             {
-                switch (type)
-                {
-                    case InstrumentType.YM2151:
-                        List_ym2151[List_ym2151.Count - 1].Dispose();
-                        List_ym2151.RemoveAt(List_ym2151.Count - 1);
-                        InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                        break;
-                    case InstrumentType.YM2612:
-                        List_ym2612[List_ym2612.Count - 1].Dispose();
-                        List_ym2612.RemoveAt(List_ym2612.Count - 1);
-                        InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                        break;
-                    case InstrumentType.GB_APU:
-                        List_gbapu[List_gbapu.Count - 1].Dispose();
-                        List_gbapu.RemoveAt(List_gbapu.Count - 1);
-                        InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                        break;
-                    case InstrumentType.SN76496:
-                        List_sn76496[List_sn76496.Count - 1].Dispose();
-                        List_sn76496.RemoveAt(List_sn76496.Count - 1);
-                        InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                        break;
-                    case InstrumentType.NAMCO_CUS30:
-                        List_namco_cus30[List_namco_cus30.Count - 1].Dispose();
-                        List_namco_cus30.RemoveAt(List_namco_cus30.Count - 1);
-                        InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                        break;
-                    case InstrumentType.RP2A03:
-                        List_RP2A03[List_RP2A03.Count - 1].Dispose();
-                        List_RP2A03.RemoveAt(List_RP2A03.Count - 1);
-                        InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
-                        break;
-                }
+                var list = Instruments[(int)instrumentType];
+                list[list.Count - 1].Dispose();
+                list.RemoveAt(list.Count - 1);
+                InstrumentRemoved?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
             }
         }
 
@@ -356,12 +153,8 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             lock (lockObject)
             {
-                List_ym2151.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
-                List_ym2612.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
-                List_gbapu.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
-                List_sn76496.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
-                List_namco_cus30.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
-                List_RP2A03.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
+                foreach (var i in Instruments)
+                    i.ForEach((dev) => { dev.NotifyMidiEvent(e.Event); });
             }
         }
 

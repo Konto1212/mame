@@ -28,7 +28,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 3. Add your favorite chips from the [Instruments] menu on the toolbar.
 
    Note: Currently supported chip is the following.
-         YM2151, YM2612, SN76496, NAMCO CUS30, GB APU, NES APU
+         YM2151, YM2612, SN76496, NAMCO CUS30, GB APU, NES APU, SCC, YM3812
    Note: You can add the chip up to 8 per same chip type and MAmidiMEmo eats more CPU power.
 
 4. Select the chip from the left pane and configure the chip on the right pane.
@@ -58,6 +58,10 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 	SN76489:
 	 http://www.smspower.org/Development/SN76489
 	 http://www.st.rim.or.jp/~nkomatsu/peripheral/SN76489.html
+	SCC:
+	 http://bifi.msxnet.org/msxnet/tech/scc.html
+	YM3812:
+	 http://www.oplx.com/opl2/docs/adlib_sb.txt
 
    *[Channels]
     Select which MIDI ch messages the chip receive.

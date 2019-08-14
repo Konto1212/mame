@@ -65,6 +65,8 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("NAMCO_CUS30", Resources.NAMCO_CUS30);
             imageList1.Images.Add("GB_APU", Resources.GB_APU);
             imageList1.Images.Add("RP2A03", Resources.RP2A03);
+            imageList1.Images.Add("SCC1", Resources.SCC1);
+            imageList1.Images.Add("YM3812", Resources.YM3812);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -206,11 +208,6 @@ namespace zanac.MAmidiMEmo.Gui
             InstrumentManager.AddInstrument(InstrumentType.YM2612);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void addSN76496ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InstrumentManager.AddInstrument(InstrumentType.SN76496);
@@ -234,6 +231,16 @@ namespace zanac.MAmidiMEmo.Gui
         private void extendNESAPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InstrumentManager.AddInstrument(InstrumentType.RP2A03);
+        }
+
+        private void extendSCC1kToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.SCC1);
+        }
+
+        private void extendYM3812ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.YM3812);
         }
 
         /// <summary>
@@ -274,7 +281,8 @@ namespace zanac.MAmidiMEmo.Gui
             try
             {
                 var es = Program.SaveEnvironmentSettings();
-                Settings.Default.EnvironmentSettings = JsonConvert.SerializeObject(es, Formatting.Indented);
+                JsonSerializerSettings settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
+                Settings.Default.EnvironmentSettings = JsonConvert.SerializeObject(es, Formatting.Indented, settings);
                 Settings.Default.Save();
             }
             catch (Exception ex)
@@ -295,8 +303,9 @@ namespace zanac.MAmidiMEmo.Gui
             {
                 try
                 {
+                    JsonSerializerSettings jss = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
                     var es = Program.SaveEnvironmentSettings();
-                    string data = JsonConvert.SerializeObject(es, Formatting.Indented);
+                    string data = JsonConvert.SerializeObject(es, Formatting.Indented, jss);
                     File.WriteAllText(saveFileDialog1.FileName, StringCompressionUtility.Compress(data));
                 }
                 catch (Exception ex)
@@ -318,11 +327,10 @@ namespace zanac.MAmidiMEmo.Gui
             {
                 try
                 {
+                    JsonSerializerSettings jss = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
                     string text = StringCompressionUtility.Decompress(File.ReadAllText(openFileDialog1.FileName));
-                    var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(text);
+                    var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(text, jss);
                     InstrumentManager.RestoreSettings(settings);
-
-
                 }
                 catch (Exception ex)
                 {
@@ -336,5 +344,6 @@ namespace zanac.MAmidiMEmo.Gui
             FormAbout fa = new FormAbout();
             fa.ShowDialog(this);
         }
+
     }
 }
