@@ -85,9 +85,10 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             set
             {
-                if (f_LFOEN != value)
+                byte v = (byte)(value & 1);
+                if (f_LFOEN != v)
                 {
-                    f_LFOEN = value;
+                    f_LFOEN = v;
                     Ym2612WriteData(UnitNumber, 0x22, 0, 0, (byte)(LFOEN << 3 | LFRQ));
                 }
             }
@@ -117,9 +118,10 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             set
             {
-                if (f_LFRQ != value)
+                byte v = (byte)(value & 7);
+                if (f_LFRQ != v)
                 {
-                    f_LFRQ = value;
+                    f_LFRQ = v;
                     Ym2612WriteData(UnitNumber, 0x22, 0, 0, (byte)(LFOEN << 3 | LFRQ));
                 }
             }

@@ -100,7 +100,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [DataMember]
         [Category("Chip")]
-        [Description("Select AMD or PMD(0:AMD 1:PMD)")]
+        [Description("Select AMD or PMD (0:AMD 1:PMD)")]
         public byte LFOF
         {
             get
@@ -109,9 +109,10 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             set
             {
-                if (f_LFOF != value)
+                byte v = (byte)(value & 1);
+                if (f_LFOF != v)
                 {
-                    f_LFOF = value;
+                    f_LFOF = v;
                     Ym2151WriteData(UnitNumber, 0x19, 0, 0, (byte)(LFOF << 7 | LFOD));
                 }
             }
@@ -125,7 +126,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [DataMember]
         [Category("Chip")]
-        [Description("LFO Depth(0-127)")]
+        [Description("LFO Depth (0-127)")]
         public byte LFOD
         {
             get
@@ -134,9 +135,10 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             set
             {
-                if (f_LFOD != value)
+                byte v = (byte)(value & 127);
+                if (f_LFOD != v)
                 {
-                    f_LFOD = value;
+                    f_LFOD = v;
                     Ym2151WriteData(UnitNumber, 0x19, 0, 0, (byte)(LFOF << 7 | LFOD));
                 }
             }
@@ -147,7 +149,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
 
         /// <summary>
-        /// LFO Depth(0-127)
+        /// LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)
         /// </summary>
         [DataMember]
         [Category("Chip")]
@@ -160,14 +162,67 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             set
             {
-                if (f_LFOW != value)
+                byte v = (byte)(value & 3);
+                if (f_LFOW != v)
                 {
-                    f_LFOW = value;
-                    Ym2151WriteData(UnitNumber, 0x1B, 0, 0, (byte)(LFOW << 7 | LFOD));
+                    f_LFOW = v;
+                    Ym2151WriteData(UnitNumber, 0x1B, 0, 0, (byte)LFOW);
                 }
             }
         }
 
+        private byte f_NE;
+
+        /// <summary>
+        /// Noise Enable (0:Disable 1:Enable)
+        /// </summary>
+        [Browsable(false)]
+        [DataMember]
+        [Category("Chip")]
+        [Description("Noise Enable (0:Disable 1:Enable)")]
+        public byte NE
+        {
+            get
+            {
+                return f_NE;
+            }
+            set
+            {
+                byte v = (byte)(value & 1);
+                if (f_NE != v)
+                {
+                    f_NE = v;
+                    Ym2151WriteData(UnitNumber, 0x0f, 0, 0, (byte)(NE << 7 | NFRQ));
+                }
+            }
+        }
+
+        private byte f_NFRQ;
+
+        /// <summary>
+        /// Noise Feequency (0-31)
+        /// </summary>
+        [Browsable(false)]
+        [DataMember]
+        [Category("Chip")]
+        [Description(" Noise Feequency (0-31)\r\n" +
+            "3'579'545/(32*NFRQ)")]
+        public byte NFRQ
+        {
+            get
+            {
+                return f_NFRQ;
+            }
+            set
+            {
+                byte v = (byte)(value & 31);
+                if (f_NFRQ != v)
+                {
+                    f_NFRQ = v;
+                    Ym2151WriteData(UnitNumber, 0x0f, 0, 0, (byte)(NE << 7 | NFRQ));
+                }
+            }
+        }
 
         /// <summary>
         /// 
@@ -560,9 +615,10 @@ namespace zanac.MAmidiMEmo.Instruments
                 UpdateFmVolume();
                 //On
                 byte op = (byte)(Timbre.Ops[0].Enable << 3 | Timbre.Ops[2].Enable << 4 | Timbre.Ops[1].Enable << 5 | Timbre.Ops[3].Enable << 6);
+                Ym2151WriteData(parentModule.UnitNumber, 0x01, 0, 0, (byte)0x2);
+                Ym2151WriteData(parentModule.UnitNumber, 0x01, 0, 0, (byte)0x0);
                 Ym2151WriteData(parentModule.UnitNumber, 0x08, 0, 0, (byte)(op | Slot));
             }
-
 
             /// <summary>
             /// 
@@ -774,7 +830,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                 var timbre = parentModule.Timbres[pn];
 
-                Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)((timbre.PMS << 4 | timbre.AMS)));
+                Ym2151WriteData(parentModule.UnitNumber, 0x38, 0, Slot, (byte)((timbre.PMS << 4 | timbre.AMS)));
                 for (int op = 0; op < 4; op++)
                 {
                     Ym2151WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)((timbre.Ops[op].DT1 << 4 | timbre.Ops[op].MUL)));
@@ -1059,7 +1115,7 @@ namespace zanac.MAmidiMEmo.Instruments
             private byte f_AM;
 
             /// <summary>
-            /// amplitude modulation sensivity(0-1)
+            /// AMS Enable (0:Disable 1:Enable)
             /// </summary>
             [DataMember]
             [Category("Sound")]

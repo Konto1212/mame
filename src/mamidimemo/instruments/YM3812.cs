@@ -53,7 +53,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get
             {
-                return 2;
+                return 8;
             }
         }
 

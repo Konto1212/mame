@@ -733,10 +733,14 @@ void ym2151_device::write_reg(int r, int v)
 			break;
 
 		case 0x19:  /* PMD (bit 7==1) or AMD (bit 7==0) */
-			if (v&0x80)
+			if (v & 0x80) {
 				pmd = v & 0x7f;
-			else
+				amd = 0;
+			}
+			else {
 				amd = v & 0x7f;
+				pmd = 0;
+			}
 			break;
 
 		case 0x1b:  /* CT2, CT1, LFO waveform */

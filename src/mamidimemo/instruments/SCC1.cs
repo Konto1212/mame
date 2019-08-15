@@ -55,7 +55,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get
             {
-                return 4;
+                return 7;
             }
         }
 
