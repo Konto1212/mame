@@ -246,7 +246,7 @@ namespace zanac.MAmidiMEmo.Instruments
             Timbres[0].SoundType = SoundType.PSG;
 
             Timbres[1].SoundType = SoundType.WAV;
-            Timbres[1].WaveData = new byte[]
+            Timbres[1].WsgData = new byte[]
             {
                  7, 10, 12, 13, 14, 13, 12, 10,
                  7,  4,  2,  1,  0,  1,  2,  4,
@@ -587,7 +587,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                             //Wave
                             for (int i = 0; i < 16; i++)
-                                GbApuWaveWriteData(parentModule.UnitNumber, (uint)i, (byte)(((timbre.WaveData[i * 2] & 0xf) << 4) | (timbre.WaveData[(i * 2) + 1] & 0xf)));
+                                GbApuWaveWriteData(parentModule.UnitNumber, (uint)i, (byte)(((timbre.WsgData[i * 2] & 0xf) << 4) | (timbre.WsgData[(i * 2) + 1] & 0xf)));
 
                             GbApuWriteData(parentModule.UnitNumber, reg, 0x80);
 
@@ -882,7 +882,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [JsonConverter(typeof(NoTypeConverterJsonConverter<GBAPUTimbre>))]
         [DataContract]
-        public class GBAPUTimbre : TimbreBase
+        public class GBAPUTimbre : TimbreBase , IWsgEditorByteCapable
         {
             [DataMember]
             [Category("Sound")]
@@ -1105,14 +1105,28 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            [Browsable(false)]
+            [IgnoreDataMember]
+            [JsonIgnore]
+            public byte WsgBitWide
+            {
+                get
+                {
+                    return 4;
+                }
+            }
+
             private byte[] f_wavedata = new byte[32];
 
             [TypeConverter(typeof(ArrayConverter))]
-            [Editor(typeof(DummyEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [Editor(typeof(WsgITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
             [DataMember]
             [Category("Sound")]
             [Description("Wave Table (32 samples, 0-15 levels)")]
-            public byte[] WaveData
+            public byte[] WsgData
             {
                 get
                 {
@@ -1131,16 +1145,16 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Wave Table (32 samples, 0-15 levels)")]
             [IgnoreDataMember]
             [JsonIgnore]
-            public string WaveDataSerializeData
+            public string WsgDataSerializeData
             {
                 get
                 {
                     StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < WaveData.Length; i++)
+                    for (int i = 0; i < WsgData.Length; i++)
                     {
                         if (sb.Length != 0)
                             sb.Append(' ');
-                        sb.Append(WaveData[i].ToString((IFormatProvider)null));
+                        sb.Append(WsgData[i].ToString((IFormatProvider)null));
                     }
                     return sb.ToString();
                 }
@@ -1154,8 +1168,8 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (byte.TryParse(val, out v))
                             vs.Add(v);
                     }
-                    for (int i = 0; i < Math.Min(WaveData.Length, vs.Count); i++)
-                        WaveData[i] = vs[i] > 15 ? (byte)15 : vs[i];
+                    for (int i = 0; i < Math.Min(WsgData.Length, vs.Count); i++)
+                        WsgData[i] = vs[i] > 15 ? (byte)15 : vs[i];
                 }
             }
 

@@ -231,7 +231,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private void setPresetInstruments()
         {
-            Timbres[0].WaveData = new sbyte[] { 8 * 16 - 127, 9 * 16 - 127, 11 * 16 - 127, 12 * 16 - 127, 13 * 16 - 127, 14 * 16 - 127, 15 * 16 - 127, 15 * 16 - 127, 15 * 16 - 127, 15 * 16 - 127, 14 * 16 - 127, 14 * 16 - 127, 13 * 16 - 127, 11 * 16 - 127, 10 * 16 - 127, 9 * 16 - 127, 7 * 16 - 127, 6 * 16 - 127, 4 * 16 - 127, 3 * 16 - 127, 2 * 16 - 127, 1 * 16 - 127, 0 * 16 - 127, 0 * 16 - 127, 0 * 16 - 127, 0 * 16 - 127, 1 * 16 - 127, 1 * 16 - 127, 2 * 16 - 127, 4 * 16 - 127, 5 * 16 - 127, 6 };
+            Timbres[0].WsgData = new sbyte[] { 8 * 16 - 127, 9 * 16 - 127, 11 * 16 - 127, 12 * 16 - 127, 13 * 16 - 127, 14 * 16 - 127, 15 * 16 - 127, 15 * 16 - 127, 15 * 16 - 127, 15 * 16 - 127, 14 * 16 - 127, 14 * 16 - 127, 13 * 16 - 127, 11 * 16 - 127, 10 * 16 - 127, 9 * 16 - 127, 7 * 16 - 127, 6 * 16 - 127, 4 * 16 - 127, 3 * 16 - 127, 2 * 16 - 127, 1 * 16 - 127, 0 * 16 - 127, 0 * 16 - 127, 0 * 16 - 127, 0 * 16 - 127, 1 * 16 - 127, 1 * 16 - 127, 2 * 16 - 127, 4 * 16 - 127, 5 * 16 - 127, 6 };
         }
 
         /// <summary>
@@ -448,7 +448,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                 var timbre = parentModule.Timbres[pn];
 
-                Scc1WriteWaveData(parentModule.UnitNumber, (uint)(Slot << 5), timbre.WaveData);
+                Scc1WriteWaveData(parentModule.UnitNumber, (uint)(Slot << 5), timbre.WsgData);
             }
 
             /// <summary>
@@ -528,16 +528,30 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [JsonConverter(typeof(NoTypeConverterJsonConverter<SCC1Timbre>))]
         [DataContract]
-        public class SCC1Timbre : TimbreBase
+        public class SCC1Timbre : TimbreBase , IWsgEditorSbyteCapable
         {
+            /// <summary>
+            /// 
+            /// </summary>
+            [Browsable(false)]
+            [IgnoreDataMember]
+            [JsonIgnore]
+            public byte WsgBitWide
+            {
+                get
+                {
+                    return 8;
+                }
+            }
+
             private sbyte[] f_wavedata = new sbyte[32];
 
             [TypeConverter(typeof(ArrayConverter))]
-            [Editor(typeof(DummyEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [Editor(typeof(WsgITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
             [DataMember]
             [Category("Sound")]
             [Description("Wave Table (32 samples, 8 bit signed data)")]
-            public sbyte[] WaveData
+            public sbyte[] WsgData
             {
                 get
                 {
@@ -555,16 +569,16 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Wave Table (32 samples, 8 bit signed data)")]
             [IgnoreDataMember]
             [JsonIgnore]
-            public string WaveDataSerializeData
+            public string WsgDataSerializeData
             {
                 get
                 {
                     StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < WaveData.Length; i++)
+                    for (int i = 0; i < WsgData.Length; i++)
                     {
                         if (sb.Length != 0)
                             sb.Append(' ');
-                        sb.Append(WaveData[i].ToString((IFormatProvider)null));
+                        sb.Append(WsgData[i].ToString((IFormatProvider)null));
                     }
                     return sb.ToString();
                 }
@@ -578,8 +592,8 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (sbyte.TryParse(val, out v))
                             vs.Add(v);
                     }
-                    for (int i = 0; i < Math.Min(WaveData.Length, vs.Count); i++)
-                        WaveData[i] = vs[i];
+                    for (int i = 0; i < Math.Min(WsgData.Length, vs.Count); i++)
+                        WsgData[i] = vs[i];
                 }
             }
 

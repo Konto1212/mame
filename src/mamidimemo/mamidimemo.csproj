@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\CustomExpandableObjectConverter.cs" />
+    <Compile Include="ComponentModel\ExpandableCollectionConverterForUIEditor.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverter.cs" />
     <Compile Include="ComponentModel\ImageUtility.cs" />
     <Compile Include="ComponentModel\StringCompressionUtility.cs" />
@@ -102,11 +103,20 @@
     <Compile Include="Gui\FormPcmEditor.Designer.cs">
       <DependentUpon>FormPcmEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Gui\IWsgEditorSbyteCapable.cs" />
     <Compile Include="Gui\PcmEditorAttribute.cs" />
+    <Compile Include="Gui\WsgITypeEditor.cs" />
     <Compile Include="Gui\PcmUITypeEditor.cs" />
+    <Compile Include="Gui\FormWsgEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gui\FormWsgEditor.Designer.cs">
+      <DependentUpon>FormWsgEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Instruments\InstrumentBase.cs" />
     <Compile Include="Instruments\GBAPU.cs" />
     <Compile Include="Instruments\InstrumentManager.cs" />
+    <Compile Include="Gui\IWsgEditorByteCapable.cs" />
     <Compile Include="Instruments\InstrumentType.cs" />
     <Compile Include="Instruments\SCC1.cs" />
     <Compile Include="Instruments\NAMCO_CUS30.cs" />
@@ -132,6 +142,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormPcmEditor.resx">
       <DependentUpon>FormPcmEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Gui\FormWsgEditor.resx">
+      <DependentUpon>FormWsgEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -4,9 +4,6 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using zanac.MAmidiMEmo.ComponentModel;
 
-//http://www.smspower.org/Development/SN76489
-//http://www.st.rim.or.jp/~nkomatsu/peripheral/SN76489.html
-
 namespace zanac.MAmidiMEmo.Instruments
 {
     /// <summary>

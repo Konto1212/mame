@@ -17,13 +17,13 @@ namespace zanac.MAmidiMEmo.Gui
     /// <summary>
     /// 
     /// </summary>
-    public class PcmUITypeEditor : ArrayEditor
+    public class WsgITypeEditor : ArrayEditor
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="type"></param>
-        public PcmUITypeEditor(Type type) : base(type)
+        public WsgITypeEditor(Type type) : base(type)
         {
         }
 
@@ -54,29 +54,26 @@ namespace zanac.MAmidiMEmo.Gui
             if (editorService == null)
                 return value;
 
-            PcmEditorAttribute att = (PcmEditorAttribute)context.PropertyDescriptor.Attributes[typeof(PcmEditorAttribute)];
+            var byteObj = context.Instance as IWsgEditorByteCapable;
+            var sbyteObj = context.Instance as IWsgEditorSbyteCapable;
 
-            // CurrencyValueEditorForm を使用したプロパティエディタの表示
-            using (FormPcmEditor frm = new FormPcmEditor())
+            using (FormWsgEditor frm = new FormWsgEditor())
             {
-                frm.PcmData = JsonConvert.DeserializeObject<PcmTimbreBase[]>(JsonConvert.SerializeObject(((PcmTimbreTableBase)value).PcmTimbres));
-                if (att != null)
-                    frm.FileDialogFilter = att.Exts;
-                else
-                    frm.FileDialogFilter = "All Files(*.*)|*.*";
-                //"HTMLファイル(*.html;*.htm)|*.html;*.htm|すべてのファイル(*.*)|*.*"
-                DialogResult dr = editorService.ShowDialog(frm);
+                if (byteObj != null)
+                    frm.ByteInstance = byteObj;
+                if (sbyteObj != null)
+                    frm.SbyteInstance = sbyteObj;
+
+                DialogResult dr = frm.ShowDialog();
                 if (dr == DialogResult.OK)
                 {
-                    for (int i = 0; i < frm.PcmData.Length; i++)
-                        ((PcmTimbreTableBase)value).PcmTimbres[i] = frm.PcmData[i];
-                    return value;
-                }
-                else
-                {
-                    return value;                   // エディタ呼び出し直前の設定値をそのまま返す
+                    if (byteObj != null)
+                        byteObj.WsgData = frm.ByteWsgData;
+                    if (sbyteObj != null)
+                        sbyteObj.WsgData = frm.SbyteWsgData;
                 }
             }
+            return value;
         }
     }
 }

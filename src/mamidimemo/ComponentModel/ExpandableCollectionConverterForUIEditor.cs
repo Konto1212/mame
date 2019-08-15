@@ -8,12 +8,14 @@ using System.Globalization;
 
 namespace zanac.MAmidiMEmo.ComponentModel
 {
-    /// <summary>
-    /// </summary>
-    public class CustomCollectionConverter : CollectionConverter
+
+    public class ExpandableCollectionConverterForUIEditor : CollectionConverter
     {
 
-        public CustomCollectionConverter()
+        /// <summary>
+        /// 
+        /// </summary>
+        public ExpandableCollectionConverterForUIEditor()
         {
         }
 
@@ -66,7 +68,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
             {
                 get
                 {
-                    return false;
+                    return true;
                 }
             }
 
@@ -98,9 +100,6 @@ namespace zanac.MAmidiMEmo.ComponentModel
 
             public override void SetValue(object component, object value)
             {
-                IList c = component as IList;
-                if(c != null)
-                    c[index]  = value;
             }
 
             public override string Description
@@ -110,6 +109,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
                     return context.PropertyDescriptor.Description;
                 }
             }
+
         }
     }
 }
