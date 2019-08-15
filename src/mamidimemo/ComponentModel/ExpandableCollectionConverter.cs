@@ -12,29 +12,10 @@ namespace zanac.MAmidiMEmo.ComponentModel
     public class CustomCollectionConverter : CollectionConverter
     {
 
-        #region コンストラクタ
-
-        /// <summary>
-        /// コンストラクタです。
-        /// </summary>
         public CustomCollectionConverter()
         {
-            //なにもしない
         }
 
-        #endregion //コンストラクタ end
-
-        #region メソッド
-
-        /// <summary>
-        /// 指定したコンテキストとカルチャ情報を使用して、指定した値オブジェクトを、指定した型に変換します。
-        /// </summary>
-        /// <param name="context">書式指定コンテキストを提供する <see cref="ITypeDescriptorContext"/> 。 </param>
-        /// <param name="culture"><see cref="CultureInfo"/> オブジェクト。 null 参照 (Visual Basic では Nothing) が渡された場合は、現在のカルチャが使用されます。 </param>
-        /// <param name="value">変換対象の <see cref="Object"/> 。 </param>
-        /// <param name="destinationType"></param>
-        /// <returns>value パラメータの変換後の <see cref="Type"/> 。 </returns>
-        /// <exception cref="ArgumentNullException">引数がnull</exception>
         public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
         {
             if (context == null)
@@ -51,15 +32,6 @@ namespace zanac.MAmidiMEmo.ComponentModel
             return base.ConvertTo(context, culture, value, destinationType);
         }
 
-        /// <summary>
-        /// 指定したコンテキストと属性を使用して、value パラメータで指定されたArrayList型のプロパティのコレクションを返します。
-        /// </summary>
-        /// <param name="context">書式指定コンテキストを提供する <see cref="ITypeDescriptorContext"/> 。</param>
-        /// <param name="value">プロパティを取得する対象となる配列の型を指定する <see cref="Object"/> 。またはnull</param>
-        /// <param name="attributes">フィルタとして使用される、 <see cref="Attribute"/> 型の配列。またはnull。この引数は使用されていません。</param>
-        /// <returns>指定されたデータ型に対して公開されているプロパティを格納している <see cref="PropertyDescriptorCollection"/> 。
-        /// コレクションにプロパティが格納されていない場合は null 参照</returns>
-        /// <exception cref="ArgumentNullException">引数がnull</exception>
         public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
         {
             if (context == null)
@@ -85,44 +57,18 @@ namespace zanac.MAmidiMEmo.ComponentModel
             return new PropertyDescriptorCollection(array);
         }
 
-        /// <summary>
-        /// オブジェクトがプロパティをサポートしているかどうかを示す値を返します。
-        /// </summary>
-        /// <param name="context">書式指定コンテキストを提供する <see cref="ITypeDescriptorContext"/> 。</param>
-        /// <returns>常にtrue</returns>
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
         {
             return true;
         }
 
-        #endregion //メソッド end
-
-        #region 内部クラス
-
-        /// <summary>
-        /// IListのプロパティデスクリプタ クラス
-        /// </summary>
         private class CollectionPropertyDescriptor : SimplePropertyDescriptor
         {
 
-            #region フィールド/プロパティ
-
-            /// <summary>
-            /// 書式指定コンテキストを提供する <see cref="ITypeDescriptorContext"/> 。
-            /// </summary>
             private ITypeDescriptorContext context;
 
-            /// <summary>
-            /// IListにおけるインデックス位置
-            /// </summary>
             private int index;
 
-            /// <summary>
-            /// 読み込み専用かどうか
-            /// </summary>
-            /// <remarks>
-            /// 常にtrueを返す。
-            /// </remarks>
             public override bool IsReadOnly
             {
                 get
@@ -131,18 +77,6 @@ namespace zanac.MAmidiMEmo.ComponentModel
                 }
             }
 
-            #endregion
-
-            #region コンストラクタ
-
-            /// <summary>
-            /// コンストラクタ
-            /// </summary>
-            /// <param name="context">書式指定コンテキストを提供する <see cref="ITypeDescriptorContext"/> 。</param>
-            /// <param name="index">IListに対するプロパティのインデックス</param>
-            /// <param name="componentType">プロパティ記述子が関連付けられているコンポーネントの型を表す Type 。 </param>
-            /// <param name="name">プロパティの名前。</param>
-            /// <param name="elementType">プロパティのデータ型を表す <see cref="Type"/> 。 </param>
             public CollectionPropertyDescriptor(ITypeDescriptorContext context, Type componentType, string name, Type elementType, int index)
                 : base(componentType, name, elementType)
             {
@@ -150,15 +84,6 @@ namespace zanac.MAmidiMEmo.ComponentModel
                 this.index = index;
             }
 
-            #endregion
-
-            #region インスタンス メソッド
-
-            /// <summary>
-            /// コンポーネントのプロパティの現在の値を取得します。
-            /// </summary>
-            /// <param name="component">値の取得対象であるプロパティを持つコンポーネント。</param>
-            /// <returns>現在の値</returns>
             public override object GetValue(object component)
             {
                 ICollection c = component as ICollection;
@@ -177,12 +102,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
                 }
                 return null;
             }
-            
-            /// <summary>
-            /// コンポーネントがIListを実装する場合、指定の値に設定します。
-            /// </summary>
-            /// <param name="component">設定する対象のプロパティ値を持つコンポーネント。 </param>
-            /// <param name="value">新しい値。</param>
+
             public override void SetValue(object component, object value)
             {
                 IList c = component as IList;
@@ -190,10 +110,6 @@ namespace zanac.MAmidiMEmo.ComponentModel
                     c[index]  = value;
             }
 
-            /// <summary>
-            /// プロパティの説明を取得します。
-            /// ※このプロパティが無いと説明が表示されません。
-            /// </summary>
             public override string Description
             {
                 get
@@ -201,11 +117,6 @@ namespace zanac.MAmidiMEmo.ComponentModel
                     return context.PropertyDescriptor.Description;
                 }
             }
-
-            #endregion
-
         }
-
-        #endregion //内部クラス end
     }
 }
