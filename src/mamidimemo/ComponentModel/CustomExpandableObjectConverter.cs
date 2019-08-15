@@ -1,15 +1,4 @@
-﻿/*
- * © 2007, 2010, 2011 Renesas Electronics Corporation
- * RENESAS ELECTRONICS CONFIDENTIAL AND PROPRIETARY
- * This program must be used solely for the purpose for which
- * it was furnished by Renesas Electronics Corporation. No part of this
- * program may be reproduced or disclosed to others, in any
- * form, without the prior written permission of Renesas Electronics
- * Corporation.
- * 
- * $Id: DialogEditOnlyExpandableCollectionConverter.cs 8029 2011-01-26 06:29:40Z kenichi.kashima $
- */
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;

@@ -314,7 +314,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             private List<RP2A03Sound> sqOnSounds = new List<RP2A03Sound>();
 
-            private List<RP2A03Sound> sawOnSounds = new List<RP2A03Sound>();
+            private List<RP2A03Sound> triOnSounds = new List<RP2A03Sound>();
 
             private List<RP2A03Sound> noiseOnSounds = new List<RP2A03Sound>();
 
@@ -346,8 +346,8 @@ namespace zanac.MAmidiMEmo.Instruments
                             case SoundType.SQUARE:
                                 t.UpdateSqPitch();
                                 break;
-                            case SoundType.SAW:
-                                t.UpdateSawPitch();
+                            case SoundType.TRIANGLE:
+                                t.UpdateTriPitch();
                                 break;
                             case SoundType.NOISE:
                                 t.UpdateNoisePitch();
@@ -429,9 +429,9 @@ namespace zanac.MAmidiMEmo.Instruments
                         sqOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn SQ ch" + emptySlot + " " + note.ToString());
                         break;
-                    case SoundType.SAW:
-                        sawOnSounds.Add(snd);
-                        FormMain.OutputDebugLog("KeyOn Saw ch" + emptySlot + " " + note.ToString());
+                    case SoundType.TRIANGLE:
+                        triOnSounds.Add(snd);
+                        FormMain.OutputDebugLog("KeyOn Tri ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.NOISE:
                         noiseOnSounds.Add(snd);
@@ -463,9 +463,9 @@ namespace zanac.MAmidiMEmo.Instruments
                             emptySlot = SearchEmptySlot(sqOnSounds.ToList<SoundBase>(), 2);
                             break;
                         }
-                    case SoundType.SAW:
+                    case SoundType.TRIANGLE:
                         {
-                            emptySlot = SearchEmptySlot(sawOnSounds.ToList<SoundBase>(), 1);
+                            emptySlot = SearchEmptySlot(triOnSounds.ToList<SoundBase>(), 1);
                             break;
                         }
                     case SoundType.NOISE:
@@ -501,12 +501,12 @@ namespace zanac.MAmidiMEmo.Instruments
                             return;
                         }
                     }
-                    for (int i = 0; i < sawOnSounds.Count; i++)
+                    for (int i = 0; i < triOnSounds.Count; i++)
                     {
-                        if (sawOnSounds[i] == removed)
+                        if (triOnSounds[i] == removed)
                         {
-                            FormMain.OutputDebugLog("KeyOff Saw ch" + removed.Slot + " " + note.ToString());
-                            sawOnSounds.RemoveAt(i);
+                            FormMain.OutputDebugLog("KeyOff Tri ch" + removed.Slot + " " + note.ToString());
+                            triOnSounds.RemoveAt(i);
                             return;
                         }
                     }
@@ -514,7 +514,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     {
                         if (dpcmOnSounds[i] == removed)
                         {
-                            FormMain.OutputDebugLog("KeyOff Saw ch" + removed.Slot + " " + note.ToString());
+                            FormMain.OutputDebugLog("KeyOff Tri ch" + removed.Slot + " " + note.ToString());
                             dpcmOnSounds.RemoveAt(i);
                             return;
                         }
@@ -592,7 +592,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                             break;
                         }
-                    case SoundType.SAW:
+                    case SoundType.TRIANGLE:
                         {
                             var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                             var timbre = parentModule.Timbres[pn];
@@ -601,10 +601,10 @@ namespace zanac.MAmidiMEmo.Instruments
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
 
                             RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x00),
-                                (byte)(timbre.LengthCounterDisable << 7 | timbre.SawCounterLength));
+                                (byte)(timbre.LengthCounterDisable << 7 | timbre.TriCounterLength));
 
                             //Freq
-                            UpdateSawPitch();
+                            UpdateTriPitch();
 
                             break;
                         }
@@ -751,7 +751,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public void UpdateSawPitch()
+            public void UpdateTriPitch()
             {
                 var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                 var timbre = parentModule.Timbres[pn];
@@ -814,7 +814,7 @@ namespace zanac.MAmidiMEmo.Instruments
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << Slot)));
                             break;
                         }
-                    case SoundType.SAW:
+                    case SoundType.TRIANGLE:
                         {
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 2));
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
@@ -888,8 +888,8 @@ namespace zanac.MAmidiMEmo.Instruments
             private byte f_LengthDisable = 1;
 
             [DataMember]
-            [Category("Sound(SQ/Saw)")]
-            [Description("Square/Saw Length Counter Clock Disable (0:Enable 1:Disable)")]
+            [Category("Sound(SQ/Tri)")]
+            [Description("Square/Tri Length Counter Clock Disable (0:Enable 1:Disable)")]
             public byte LengthCounterDisable
             {
                 get
@@ -1028,7 +1028,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Category("Sound")]
-            [Description("Square/Saw Play Length (0-31)")]
+            [Description("Square/Tri Play Length (0-31)")]
             public byte PlayLength
             {
                 get
@@ -1042,20 +1042,20 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
 
-            private byte f_SawCounterLength = 127;
+            private byte f_TriCounterLength = 127;
 
             [DataMember]
-            [Category("Sound(Saw)")]
-            [Description("Saw Linear Counter Length (0-127)")]
-            public byte SawCounterLength
+            [Category("Sound(Tri)")]
+            [Description("Tri Linear Counter Length (0-127)")]
+            public byte TriCounterLength
             {
                 get
                 {
-                    return f_SawCounterLength;
+                    return f_TriCounterLength;
                 }
                 set
                 {
-                    f_SawCounterLength = (byte)(value & 127);
+                    f_TriCounterLength = (byte)(value & 127);
                 }
             }
 
@@ -1125,7 +1125,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public enum SoundType
         {
             SQUARE,
-            SAW,
+            TRIANGLE,
             NOISE,
             DPCM,
         }
