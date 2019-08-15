@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿// copyright-holders:K.Ito
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using zanac.MAmidiMEmo;

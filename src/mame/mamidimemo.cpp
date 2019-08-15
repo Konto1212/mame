@@ -1,3 +1,4 @@
+// copyright-holders:K.Ito
 #include "emu.h"
 #include "emumem.h"
 #include "machine.h"

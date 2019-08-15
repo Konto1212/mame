@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿// copyright-holders:K.Ito
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;

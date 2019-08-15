@@ -1,4 +1,5 @@
-﻿using System;
+﻿// copyright-holders:K.Ito
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;

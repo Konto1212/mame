@@ -1,4 +1,5 @@
-﻿using Melanchall.DryWetMidi.Devices;
+﻿// copyright-holders:K.Ito
+using Melanchall.DryWetMidi.Devices;
 using Melanchall.DryWetMidi.Smf;
 using System;
 using System.Collections.Concurrent;

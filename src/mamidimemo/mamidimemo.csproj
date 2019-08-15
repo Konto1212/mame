@@ -174,7 +174,6 @@
   <ItemGroup>
     <None Include="Data\YM3812.png" />
     <None Include="Resources\YM3812.png" />
-    <None Include="Resources\YM3128.png" />
     <None Include="Resources\SN76496.png" />
     <None Include="Resources\YM2151.png" />
     <None Include="Resources\RP2A03.png" />

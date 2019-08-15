@@ -1,4 +1,5 @@
-﻿using System;
+﻿// copyright-holders:K.Ito
+using System;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using zanac.MAmidiMEmo.ComponentModel;

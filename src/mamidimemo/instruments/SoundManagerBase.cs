@@ -1,4 +1,5 @@
-﻿using Melanchall.DryWetMidi.Common;
+﻿// copyright-holders:K.Ito
+using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Smf;
 using System;
 using System.Collections.Generic;

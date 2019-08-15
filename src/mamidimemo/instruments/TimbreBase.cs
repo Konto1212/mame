@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿// copyright-holders:K.Ito
+using Newtonsoft.Json;
 using Omu.ValueInjecter;
 using System;
 using System.Collections.Generic;
