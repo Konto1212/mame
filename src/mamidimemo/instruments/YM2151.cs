@@ -59,11 +59,114 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Timbres (0-127)")]
+        [TypeConverter(typeof(CustomCollectionConverter))]
         public YM2151Timbre[] Timbres
         {
             get;
             set;
         }
+
+
+        private byte f_LFRQ;
+
+        /// <summary>
+        /// LFRQ (0-255)
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("LFO Freq (0-255)")]
+        public byte LFRQ
+        {
+            get
+            {
+                return f_LFRQ;
+            }
+            set
+            {
+                if (f_LFRQ != value)
+                {
+                    f_LFRQ = value;
+                    Ym2151WriteData(UnitNumber, 0x18, 0, 0, LFRQ);
+                }
+            }
+        }
+
+
+        private byte f_LFOF;
+
+        /// <summary>
+        /// Select AMD or PMD(0:AMD 1:PMD)
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("Select AMD or PMD(0:AMD 1:PMD)")]
+        public byte LFOF
+        {
+            get
+            {
+                return f_LFOF;
+            }
+            set
+            {
+                if (f_LFOF != value)
+                {
+                    f_LFOF = value;
+                    Ym2151WriteData(UnitNumber, 0x19, 0, 0, (byte)(LFOF << 7 | LFOD));
+                }
+            }
+        }
+
+        private byte f_LFOD;
+
+
+        /// <summary>
+        /// LFO Depth(0-127)
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("LFO Depth(0-127)")]
+        public byte LFOD
+        {
+            get
+            {
+                return f_LFOD;
+            }
+            set
+            {
+                if (f_LFOD != value)
+                {
+                    f_LFOD = value;
+                    Ym2151WriteData(UnitNumber, 0x19, 0, 0, (byte)(LFOF << 7 | LFOD));
+                }
+            }
+        }
+
+
+        private byte f_LFOW;
+
+
+        /// <summary>
+        /// LFO Depth(0-127)
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)")]
+        public byte LFOW
+        {
+            get
+            {
+                return f_LFOW;
+            }
+            set
+            {
+                if (f_LFOW != value)
+                {
+                    f_LFOW = value;
+                    Ym2151WriteData(UnitNumber, 0x1B, 0, 0, (byte)(LFOW << 7 | LFOD));
+                }
+            }
+        }
+
 
         /// <summary>
         /// 
@@ -78,10 +181,11 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             catch (Exception ex)
             {
-                if (ex is Exception)
+                if (ex.GetType() == typeof(Exception))
                     throw;
-                if (ex is SystemException)
+                else if (ex.GetType() == typeof(SystemException))
                     throw;
+
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
@@ -697,7 +801,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ExpandableObjectConverter))]
         [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2151Timbre>))]
         [DataContract]
         public class YM2151Timbre : TimbreBase
@@ -725,7 +828,15 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Category("Sound")]
-            [Description("Algorithm (0-7)")]
+            [Description("Algorithm (0-7)\r\n" +
+                "0: 1->2->3->4 (for Distortion guitar sound)\r\n" +
+                "1: (1+2)->3->4 (for Harp, PSG sound)\r\n" +
+                "2: (1+(2->3))->4 (for Bass, electric guitar, brass, piano, woods sound)\r\n" +
+                "3: ((1->2)+3)->4 (for Strings, folk guitar, chimes sound)\r\n" +
+                "4: (1->2)+(3->4) (for Flute, bells, chorus, bass drum, snare drum, tom-tom sound)\r\n" +
+                "5: (1->2)+(1->3)+(1->4) (for Brass, organ sound)\r\n" +
+                "6: (1->2)+3+4 (for Xylophone, tom-tom, organ, vibraphone, snare drum, base drum sound)\r\n" +
+                "7: 1+2+3+4 (for Pipe organ sound)")]
             public byte ALG
             {
                 get
@@ -778,6 +889,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Operators")]
+            [TypeConverter(typeof(CustomCollectionConverter))]
             public YM2151Operator[] Ops
             {
                 get;
@@ -803,10 +915,11 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
                 catch (Exception ex)
                 {
-                    if (ex is Exception)
+                    if (ex.GetType() == typeof(Exception))
                         throw;
-                    if (ex is SystemException)
+                    else if (ex.GetType() == typeof(SystemException))
                         throw;
+
 
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
@@ -817,7 +930,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
         [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2151Operator>))]
         [DataContract]
         public class YM2151Operator

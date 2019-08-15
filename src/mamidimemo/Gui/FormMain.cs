@@ -154,9 +154,9 @@ namespace zanac.MAmidiMEmo.Gui
             }
             catch (Exception ex)
             {
-                if (ex is Exception)
+                if (ex.GetType() == typeof(Exception))
                     throw;
-                if (ex is SystemException)
+                else if (ex.GetType() == typeof(SystemException))
                     throw;
 
                 MessageBox.Show(ex.ToString());
@@ -176,10 +176,11 @@ namespace zanac.MAmidiMEmo.Gui
             }
             catch (Exception ex)
             {
-                if (ex is Exception)
+                if (ex.GetType() == typeof(Exception))
                     throw;
-                if (ex is SystemException)
+                else if (ex.GetType() == typeof(SystemException))
                     throw;
+
 
                 MessageBox.Show(ex.ToString());
             }
@@ -287,6 +288,11 @@ namespace zanac.MAmidiMEmo.Gui
             }
             catch (Exception ex)
             {
+                if (ex.GetType() == typeof(Exception))
+                    throw;
+                else if (ex.GetType() == typeof(SystemException))
+                    throw;
+
                 MessageBox.Show(ex.ToString());
             }
         }
@@ -310,6 +316,11 @@ namespace zanac.MAmidiMEmo.Gui
                 }
                 catch (Exception ex)
                 {
+                    if (ex.GetType() == typeof(Exception))
+                        throw;
+                    else if (ex.GetType() == typeof(SystemException))
+                        throw;
+
                     MessageBox.Show(ex.ToString());
                 }
             }
@@ -334,6 +345,11 @@ namespace zanac.MAmidiMEmo.Gui
                 }
                 catch (Exception ex)
                 {
+                    if (ex.GetType() == typeof(Exception))
+                        throw;
+                    else if (ex.GetType() == typeof(SystemException))
+                        throw;
+
                     MessageBox.Show(ex.ToString());
                 }
             }

@@ -74,6 +74,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\CustomExpandableObjectConverter.cs" />
+    <Compile Include="ComponentModel\ExpandableCollectionConverter.cs" />
     <Compile Include="ComponentModel\ImageUtility.cs" />
     <Compile Include="ComponentModel\StringCompressionUtility.cs" />
     <Compile Include="ComponentModel\DummyEditor.cs" />

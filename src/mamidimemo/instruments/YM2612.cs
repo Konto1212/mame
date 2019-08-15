@@ -60,12 +60,69 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Timbres (0-127)")]
+        [TypeConverter(typeof(CustomCollectionConverter))]
         public YM2612Timbre[] Timbres
         {
             get;
             private set;
         }
 
+
+        private byte f_LFOEN;
+
+        /// <summary>
+        /// LFRQ (0-255)
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("LFO Enable (0:Off 1:Enable)")]
+        public byte LFOEN
+        {
+            get
+            {
+                return f_LFOEN;
+            }
+            set
+            {
+                if (f_LFOEN != value)
+                {
+                    f_LFOEN = value;
+                    Ym2612WriteData(UnitNumber, 0x22, 0, 0, (byte)(LFOEN << 3 | LFRQ));
+                }
+            }
+        }
+
+        private byte f_LFRQ;
+
+        /// <summary>
+        /// LFRQ (0-7)
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("LFO Freq (0-7)\r\n" +
+            "0:	3.82 Hz\r\n" +
+            "1: 5.33 Hz\r\n" +
+            "2: 5.77 Hz\r\n" +
+            "3: 6.11 Hz\r\n" +
+            "4: 6.60 Hz\r\n" +
+            "5: 9.23 Hz\r\n" +
+            "6: 46.11 Hz\r\n" +
+            "7: 69.22 Hz\r\n")]
+        public byte LFRQ
+        {
+            get
+            {
+                return f_LFRQ;
+            }
+            set
+            {
+                if (f_LFRQ != value)
+                {
+                    f_LFRQ = value;
+                    Ym2612WriteData(UnitNumber, 0x22, 0, 0, (byte)(LFOEN << 3 | LFRQ));
+                }
+            }
+        }
 
         /// <summary>
         /// 
@@ -80,10 +137,11 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             catch (Exception ex)
             {
-                if (ex is Exception)
+                if (ex.GetType() == typeof(Exception))
                     throw;
-                if (ex is SystemException)
+                else if (ex.GetType() == typeof(SystemException))
                     throw;
+
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
@@ -795,7 +853,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ExpandableObjectConverter))]
         [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2612Timbre>))]
         [DataContract]
         public class YM2612Timbre : TimbreBase
@@ -823,7 +880,15 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Category("Sound")]
-            [Description("Algorithm (0-7)")]
+            [Description("Algorithm (0-7)\r\n" +
+                "0: 1->2->3->4 (for Distortion guitar sound)\r\n" +
+                "1: (1+2)->3->4 (for Harp, PSG sound)\r\n" +
+                "2: (1+(2->3))->4 (for Bass, electric guitar, brass, piano, woods sound)\r\n" +
+                "3: ((1->2)+3)->4 (for Strings, folk guitar, chimes sound)\r\n" +
+                "4: (1->2)+(3->4) (for Flute, bells, chorus, bass drum, snare drum, tom-tom sound)\r\n" +
+                "5: (1->2)+(1->3)+(1->4) (for Brass, organ sound)\r\n" +
+                "6: (1->2)+3+4 (for Xylophone, tom-tom, organ, vibraphone, snare drum, base drum sound)\r\n" +
+                "7: 1+2+3+4 (for Pipe organ sound)")]
             public byte ALG
             {
                 get
@@ -879,6 +944,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Operators")]
+            [TypeConverter(typeof(CustomCollectionConverter))]
             public YM2612Operator[] Ops
             {
                 get;
@@ -902,10 +968,11 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
                 catch (Exception ex)
                 {
-                    if (ex is Exception)
+                    if (ex.GetType() == typeof(Exception))
                         throw;
-                    if (ex is SystemException)
+                    else if (ex.GetType() == typeof(SystemException))
                         throw;
+
 
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
@@ -915,7 +982,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
         [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2612Operator>))]
         [DataContract]
         public class YM2612Operator

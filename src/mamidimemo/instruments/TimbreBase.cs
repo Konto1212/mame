@@ -15,7 +15,7 @@ namespace zanac.MAmidiMEmo.Instruments
     /// <summary>
     /// 
     /// </summary>
-    [TypeConverter(typeof(ExpandableObjectConverter))]
+    [TypeConverter(typeof(CustomExpandableObjectConverter))]
     [JsonConverter(typeof(NoTypeConverterJsonConverter<TimbreBase>))]
     [DataContract]
     [MidiHook]

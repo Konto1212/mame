@@ -56,6 +56,11 @@ namespace zanac.MAmidiMEmo
                     }
                     catch (Exception ex)
                     {
+                        if (ex.GetType() == typeof(Exception))
+                            throw;
+                        else if (ex.GetType() == typeof(SystemException))
+                            throw;
+
                         MessageBox.Show(ex.ToString());
                     }
                 }
@@ -84,6 +89,11 @@ namespace zanac.MAmidiMEmo
             }
             catch (Exception ex)
             {
+                if (ex.GetType() == typeof(Exception))
+                    throw;
+                else if (ex.GetType() == typeof(SystemException))
+                    throw;
+
                 MessageBox.Show(ex.ToString());
             }
             return es;

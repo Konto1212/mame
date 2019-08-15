@@ -131,6 +131,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
+        [DataMember]
         [Category("General")]
         public abstract uint DeviceID
         {
@@ -140,6 +141,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
+        [DataMember]
         [Category("General")]
         public uint UnitNumber
         {
@@ -153,6 +155,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("MIDI")]
         [Description("Receving MIDI ch")]
+        [TypeConverter(typeof(CustomCollectionConverter))]
         public bool[] Channels
         {
             get;
@@ -164,6 +167,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("MIDI")]
         [Description("Pitch (0 - 8192 - 16383)")]
+        [TypeConverter(typeof(CustomCollectionConverter))]
         public ushort[] Pitchs
         {
             get;
@@ -172,6 +176,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("MIDI")]
         [Description("Pitch bend censitivity [halt note]")]
+        [TypeConverter(typeof(CustomCollectionConverter))]
         public byte[] PitchBendRanges
         {
             get;
@@ -180,6 +185,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("MIDI")]
         [Description("Program number (0-127)")]
+        [TypeConverter(typeof(CustomCollectionConverter))]
         public byte[] ProgramNumbers
         {
             get;
@@ -188,6 +194,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("MIDI")]
         [Description("Volume (0-127)")]
+        [TypeConverter(typeof(CustomCollectionConverter))]
         public byte[] Volumes
         {
             get;
@@ -196,6 +203,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("MIDI")]
         [Description("Volume (0-127)")]
+        [TypeConverter(typeof(CustomCollectionConverter))]
         public byte[] Expressions
         {
             get;
@@ -204,6 +212,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("MIDI")]
         [Description("Volume ((L)0-63(C)64-127(R))")]
+        [TypeConverter(typeof(CustomCollectionConverter))]
         public byte[] Panpots
         {
             get;

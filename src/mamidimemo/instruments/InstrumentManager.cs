@@ -68,10 +68,11 @@ namespace zanac.MAmidiMEmo.Instruments
                         }
                         catch (Exception ex)
                         {
-                            if (ex is Exception)
+                            if (ex.GetType() == typeof(Exception))
                                 throw;
-                            if (ex is SystemException)
+                            else if (ex.GetType() == typeof(SystemException))
                                 throw;
+
 
                             System.Windows.Forms.MessageBox.Show(ex.ToString());
                         }

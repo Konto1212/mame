@@ -65,6 +65,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Timbres (0-127)")]
+        [TypeConverter(typeof(CustomCollectionConverter))]
         public GBAPUTimbre[] Timbres
         {
             get;
@@ -84,10 +85,11 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             catch (Exception ex)
             {
-                if (ex is Exception)
+                if (ex.GetType() == typeof(Exception))
                     throw;
-                if (ex is SystemException)
+                else if (ex.GetType() == typeof(SystemException))
                     throw;
+
 
                 System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
@@ -877,7 +879,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(ExpandableObjectConverter))]
         [JsonConverter(typeof(NoTypeConverterJsonConverter<GBAPUTimbre>))]
         [DataContract]
         public class GBAPUTimbre : TimbreBase
@@ -1181,10 +1182,11 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
                 catch (Exception ex)
                 {
-                    if (ex is Exception)
+                    if (ex.GetType() == typeof(Exception))
                         throw;
-                    if (ex is SystemException)
+                    else if (ex.GetType() == typeof(SystemException))
                         throw;
+
 
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
