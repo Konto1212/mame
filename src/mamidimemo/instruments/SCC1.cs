@@ -35,6 +35,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
         public override string Name => "SCC1";
 
+        public override string Group => "WSG";
+
         public override InstrumentType InstrumentType => InstrumentType.SCC1;
 
         [Browsable(false)]
@@ -445,10 +447,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void SetWsgTimbre()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
-                Scc1WriteWaveData(parentModule.UnitNumber, (uint)(Slot << 5), timbre.WsgData);
+                Scc1WriteWaveData(parentModule.UnitNumber, (uint)(Slot << 5), Timbre.WsgData);
             }
 
             /// <summary>
@@ -456,9 +455,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                 var vel = NoteOnEvent.Velocity / 127d;
@@ -474,9 +470,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdatePitch()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 

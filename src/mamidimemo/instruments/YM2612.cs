@@ -34,6 +34,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
         public override string Name => "YM2612";
 
+        public override string Group => "FM";
+
         public override InstrumentType InstrumentType => InstrumentType.YM2612;
 
         [Browsable(false)]
@@ -631,11 +633,8 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateFmVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 List<int> ops = new List<int>();
-                switch (timbre.ALG)
+                switch (Timbre.ALG)
                 {
                     case 0:
                         ops.Add(3);
@@ -676,7 +675,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 foreach (int op in ops)
                 {
                     //$40+: total level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(127 - Math.Round((127 - timbre.Ops[op].TL) * vol * vel * exp)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(127 - Math.Round((127 - Timbre.Ops[op].TL) * vol * vel * exp)));
                 }
             }
 
@@ -686,9 +685,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdateFmPitch()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
@@ -709,7 +705,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     var freq = (ushort)Math.Round(cfreq + dfreq);
                     byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 3);
 
-                    Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | (freq >> 8)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | ((freq >> 8) & 7)));
                     Ym2612WriteData(parentModule.UnitNumber, 0xa0, 0, Slot, (byte)(0xff & freq));
                 }
                 else if (pitch < 0)
@@ -728,14 +724,14 @@ namespace zanac.MAmidiMEmo.Instruments
                     var freq = (ushort)Math.Round(cfreq + dfreq);
                     byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 3);
 
-                    Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | (freq >> 8)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | ((freq >> 8) & 7)));
                     Ym2612WriteData(parentModule.UnitNumber, 0xa0, 0, Slot, (byte)(0xff & freq));
                 }
                 else
                 {
                     var freq = convertFmFrequency(NoteOnEvent);
                     byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 3);
-                    Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | (freq >> 8)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | ((freq >> 8) & 7)));
                     Ym2612WriteData(parentModule.UnitNumber, 0xa0, 0, Slot, (byte)(0xff & freq));
                 }
             }
@@ -745,9 +741,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdatePanpot()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 //$B4+: panning, FMS, AMS
                 byte pan = parentModule.Panpots[NoteOnEvent.Channel];
                 if (pan < 32)
@@ -756,7 +749,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     pan = 0x1;
                 else
                     pan = 0x3;
-                Ym2612WriteData(parentModule.UnitNumber, 0xB4, 0, Slot, (byte)(pan << 6 | (timbre.AMS << 4) | timbre.FMS));
+                Ym2612WriteData(parentModule.UnitNumber, 0xB4, 0, Slot, (byte)(pan << 6 | (Timbre.AMS << 4) | Timbre.FMS));
             }
 
             /// <summary>
@@ -764,29 +757,26 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void SetFmTimbre()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 for (int op = 0; op < 4; op++)
                 {
                     //$30+: multiply and detune
-                    Ym2612WriteData(parentModule.UnitNumber, 0x30, op, Slot, (byte)((timbre.Ops[op].DT1 << 4 | timbre.Ops[op].MUL)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x30, op, Slot, (byte)((Timbre.Ops[op].DT1 << 4 | Timbre.Ops[op].MUL)));
                     //$40+: total level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)timbre.Ops[op].TL);
+                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)Timbre.Ops[op].TL);
                     //$50+: attack rate and rate scaling
-                    Ym2612WriteData(parentModule.UnitNumber, 0x50, op, Slot, (byte)((timbre.Ops[op].RS << 6 | timbre.Ops[op].AR)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x50, op, Slot, (byte)((Timbre.Ops[op].RS << 6 | Timbre.Ops[op].AR)));
                     //$60+: 1st decay rate and AM enable
-                    Ym2612WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)((timbre.Ops[op].AM << 7 | timbre.Ops[op].D1R)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)((Timbre.Ops[op].AM << 7 | Timbre.Ops[op].D1R)));
                     //$70+: 2nd decay rate
-                    Ym2612WriteData(parentModule.UnitNumber, 0x70, op, Slot, (byte)timbre.Ops[op].D2R);
+                    Ym2612WriteData(parentModule.UnitNumber, 0x70, op, Slot, (byte)Timbre.Ops[op].D2R);
                     //$80+: release rate and sustain level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.Ops[op].SL << 4 | timbre.Ops[op].RR)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((Timbre.Ops[op].SL << 4 | Timbre.Ops[op].RR)));
                     //$90+: SSG-EG
-                    Ym2612WriteData(parentModule.UnitNumber, 0x90, op, Slot, (byte)timbre.Ops[op].SSG_EG);
+                    Ym2612WriteData(parentModule.UnitNumber, 0x90, op, Slot, (byte)Timbre.Ops[op].SSG_EG);
                 }
 
                 //$B0+: algorithm and feedback
-                Ym2612WriteData(parentModule.UnitNumber, 0xB0, 0, Slot, (byte)(timbre.FB << 3 | timbre.ALG));
+                Ym2612WriteData(parentModule.UnitNumber, 0xB0, 0, Slot, (byte)(Timbre.FB << 3 | Timbre.ALG));
 
                 UpdatePanpot();
             }

@@ -35,6 +35,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
         public override string Name => "RP2A03";
 
+        public override string Group => "PSG";
+
         public override InstrumentType InstrumentType => InstrumentType.RP2A03;
 
         [Browsable(false)]
@@ -342,15 +344,15 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     if (t.NoteOnEvent.Channel == midiEvent.Channel)
                     {
-                        switch (t.Timbre.SoundType)
+                        switch (t.LastToneType)
                         {
-                            case SoundType.SQUARE:
+                            case ToneType.SQUARE:
                                 t.UpdateSqPitch();
                                 break;
-                            case SoundType.TRIANGLE:
+                            case ToneType.TRIANGLE:
                                 t.UpdateTriPitch();
                                 break;
-                            case SoundType.NOISE:
+                            case ToneType.NOISE:
                                 t.UpdateNoisePitch();
                                 break;
                         }
@@ -375,15 +377,15 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
-                                switch (t.Timbre.SoundType)
+                                switch (t.LastToneType)
                                 {
-                                    case SoundType.SQUARE:
+                                    case ToneType.SQUARE:
                                         t.UpdateSqVolume();
                                         break;
-                                    case SoundType.NOISE:
+                                    case ToneType.NOISE:
                                         t.UpdateNoiseVolume();
                                         break;
-                                    case SoundType.DPCM:
+                                    case ToneType.DPCM:
                                         t.UpdateDpcmVolume();
                                         break;
                                 }
@@ -397,12 +399,12 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
-                                switch (t.Timbre.SoundType)
+                                switch (t.LastToneType)
                                 {
-                                    case SoundType.SQUARE:
+                                    case ToneType.SQUARE:
                                         t.UpdateSqVolume();
                                         break;
-                                    case SoundType.NOISE:
+                                    case ToneType.NOISE:
                                         t.UpdateNoiseVolume();
                                         break;
                                 }
@@ -424,21 +426,21 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 RP2A03Sound snd = new RP2A03Sound(parentModule, note, emptySlot);
                 AllOnSounds.Add(snd);
-                switch (snd.Timbre.SoundType)
+                switch (snd.Timbre.ToneType)
                 {
-                    case SoundType.SQUARE:
+                    case ToneType.SQUARE:
                         sqOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn SQ ch" + emptySlot + " " + note.ToString());
                         break;
-                    case SoundType.TRIANGLE:
+                    case ToneType.TRIANGLE:
                         triOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn Tri ch" + emptySlot + " " + note.ToString());
                         break;
-                    case SoundType.NOISE:
+                    case ToneType.NOISE:
                         noiseOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn Noise ch" + emptySlot + " " + note.ToString());
                         break;
-                    case SoundType.DPCM:
+                    case ToneType.DPCM:
                         dpcmOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn DPCM ch" + emptySlot + " " + note.ToString());
                         break;
@@ -457,24 +459,24 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pn = parentModule.ProgramNumbers[note.Channel];
 
                 var timbre = parentModule.Timbres[pn];
-                switch (timbre.SoundType)
+                switch (timbre.ToneType)
                 {
-                    case SoundType.SQUARE:
+                    case ToneType.SQUARE:
                         {
                             emptySlot = SearchEmptySlot(sqOnSounds.ToList<SoundBase>(), 2);
                             break;
                         }
-                    case SoundType.TRIANGLE:
+                    case ToneType.TRIANGLE:
                         {
                             emptySlot = SearchEmptySlot(triOnSounds.ToList<SoundBase>(), 1);
                             break;
                         }
-                    case SoundType.NOISE:
+                    case ToneType.NOISE:
                         {
                             emptySlot = SearchEmptySlot(noiseOnSounds.ToList<SoundBase>(), 1);
                             break;
                         }
-                    case SoundType.DPCM:
+                    case ToneType.DPCM:
                         {
                             emptySlot = SearchEmptySlot(dpcmOnSounds.ToList<SoundBase>(), 1);
                             break;
@@ -548,7 +550,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             public RP2A03Timbre Timbre;
 
-            private SoundType lastSoundType;
+            public ToneType LastToneType;
 
             /// <summary>
             /// 
@@ -563,7 +565,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
                 this.Timbre = parentModule.Timbres[programNumber];
 
-                lastSoundType = Timbre.SoundType;
+                LastToneType = Timbre.ToneType;
             }
 
             /// <summary>
@@ -571,9 +573,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void On()
             {
-                switch (Timbre.SoundType)
+                switch (Timbre.ToneType)
                 {
-                    case SoundType.SQUARE:
+                    case ToneType.SQUARE:
                         {
                             var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                             var timbre = parentModule.Timbres[pn];
@@ -593,7 +595,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                             break;
                         }
-                    case SoundType.TRIANGLE:
+                    case ToneType.TRIANGLE:
                         {
                             var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                             var timbre = parentModule.Timbres[pn];
@@ -609,7 +611,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                             break;
                         }
-                    case SoundType.NOISE:
+                    case ToneType.NOISE:
                         {
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 3));
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 8));
@@ -622,7 +624,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                             break;
                         }
-                    case SoundType.DPCM:
+                    case ToneType.DPCM:
                         {
                             //https://wiki.nesdev.com/w/index.php/APU_DMC
 
@@ -664,18 +666,15 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateSqVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                 var vel = NoteOnEvent.Velocity / 127d;
 
-                byte fv = (byte)((byte)Math.Round(timbre.Volume * vol * vel * exp) & 0xf);
+                byte fv = (byte)((byte)Math.Round(Timbre.Volume * vol * vel * exp) & 0xf);
 
-                byte dd = timbre.DecayDisable;
-                byte ld = timbre.LengthCounterDisable;
-                byte dc = timbre.SQDutyCycle;
+                byte dd = Timbre.DecayDisable;
+                byte ld = Timbre.LengthCounterDisable;
+                byte dc = Timbre.SQDutyCycle;
 
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x00), (byte)(dc << 6 | ld << 5 | dd << 4 | fv));
             }
@@ -685,17 +684,14 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateNoiseVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                 var vel = NoteOnEvent.Velocity / 127d;
 
-                byte fv = (byte)((byte)Math.Round(timbre.Volume * vol * vel * exp) & 0xf);
+                byte fv = (byte)((byte)Math.Round(Timbre.Volume * vol * vel * exp) & 0xf);
 
-                byte dd = timbre.DecayDisable;
-                byte ld = timbre.LengthCounterDisable;
+                byte dd = Timbre.DecayDisable;
+                byte ld = Timbre.LengthCounterDisable;
 
                 RP2A03WriteData(parentModule.UnitNumber, (uint)(0x0c), (byte)(ld << 5 | dd << 4 | fv));
             }
@@ -705,9 +701,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateDpcmVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var vol = parentModule.Volumes[NoteOnEvent.Channel];
 
                 RP2A03WriteData(parentModule.UnitNumber, (uint)(0x11), vol);
@@ -719,9 +712,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdateSqPitch()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
@@ -745,7 +735,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x02),
                     (byte)(n & 0xff));
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x03),
-                    (byte)((timbre.PlayLength << 3) | (n >> 8) & 0x7));
+                    (byte)((Timbre.PlayLength << 3) | (n >> 8) & 0x7));
             }
 
             /// <summary>
@@ -754,9 +744,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdateTriPitch()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
@@ -780,7 +767,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x02),
                     (byte)(n & 0xff));
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x03),
-                    (byte)((timbre.PlayLength << 3) | (n >> 8) & 0x7));
+                    (byte)((Timbre.PlayLength << 3) | (n >> 8) & 0x7));
             }
 
             /// <summary>
@@ -789,16 +776,13 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdateNoisePitch()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var pitch = (int)(parentModule.Pitchs[NoteOnEvent.Channel] - 8192) / (8192 / 32);
                 int n = 31 - ((NoteOnEvent.NoteNumber + pitch) % 32);
 
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x02),
-                    (byte)((timbre.NoiseType << 7) | (n & 0xf)));
+                    (byte)((Timbre.NoiseType << 7) | (n & 0xf)));
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x03),
-                    (byte)(timbre.PlayLength << 3));
+                    (byte)(Timbre.PlayLength << 3));
             }
 
             /// <summary>
@@ -806,23 +790,23 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void Off()
             {
-                switch (lastSoundType)
+                switch (LastToneType)
                 {
-                    case SoundType.SQUARE:
+                    case ToneType.SQUARE:
                         {
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << Slot));
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << Slot)));
                             break;
                         }
-                    case SoundType.TRIANGLE:
+                    case ToneType.TRIANGLE:
                         {
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 2));
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
                             break;
                         }
-                    case SoundType.NOISE:
+                    case ToneType.NOISE:
                         {
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~8);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
@@ -845,7 +829,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Sound Type")]
-            public SoundType SoundType
+            public ToneType ToneType
             {
                 get;
                 set;
@@ -1123,7 +1107,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public enum SoundType
+        public enum ToneType
         {
             SQUARE,
             TRIANGLE,

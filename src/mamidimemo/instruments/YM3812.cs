@@ -33,6 +33,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
         public override string Name => "YM3812";
 
+        public override string Group => "FM";
+
         public override InstrumentType InstrumentType => InstrumentType.YM3812;
 
         [Browsable(false)]
@@ -87,32 +89,32 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_AMD != v)
                 {
                     f_AMD = v;
-                    YM3812WriteData(UnitNumber, 0xBD, 0, 0, (byte)(AMD << 7 | VD << 6));
+                    YM3812WriteData(UnitNumber, 0xBD, 0, 0, (byte)(AMD << 7 | VIB << 6));
                 }
             }
         }
 
-        private byte f_VD;
+        private byte f_VIB;
 
         /// <summary>
-        /// Waveform Select (0-3)
+        /// Vibrato depth (0:7 cent 1:14 cent)
         /// </summary>
         [DataMember]
         [Category("Chip")]
         [Description("Vibrato depth (0:7 cent 1:14 cent)")]
-        public byte VD
+        public byte VIB
         {
             get
             {
-                return f_VD;
+                return f_VIB;
             }
             set
             {
                 var v = (byte)(value & 1);
-                if (f_VD != v)
+                if (f_VIB != v)
                 {
-                    f_VD = v;
-                    YM3812WriteData(UnitNumber, 0xBD, 0, 0, (byte)(AMD << 7 | VD << 6));
+                    f_VIB = v;
+                    YM3812WriteData(UnitNumber, 0xBD, 0, 0, (byte)(AMD << 7 | VIB << 6));
                 }
             }
         }
@@ -152,25 +154,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="address"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate byte delegate_YM3812_read(uint unitNumber, uint address);
-
-        /// <summary>
-        /// 
-        /// </summary>
         private static delegate_YM3812_write YM3812_write
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private static delegate_YM3812_read YM3812_read
         {
             get;
             set;
@@ -207,9 +191,6 @@ namespace zanac.MAmidiMEmo.Instruments
             IntPtr funcPtr = MameIF.GetProcAddress("ym3812_write");
             if (funcPtr != IntPtr.Zero)
                 YM3812_write = (delegate_YM3812_write)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_YM3812_write));
-            funcPtr = MameIF.GetProcAddress("ym3812_read");
-            if (funcPtr != IntPtr.Zero)
-                YM3812_read = (delegate_YM3812_read)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_YM3812_read));
         }
 
         private YM3812SoundManager soundManager;
@@ -492,17 +473,14 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateFmVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                 var vel = NoteOnEvent.Velocity / 127d;
                 for (int op = 0; op < 2; op++)
                 {
-                    YM3812Operator o = timbre.Ops[op];
+                    YM3812Operator o = Timbre.Ops[op];
                     //$40+: Scaling level/ total level
-                    if (timbre.ALG == 1 || op == 1)
+                    if (Timbre.ALG == 1 || op == 1)
                         YM3812WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(o.KSL << 6 | (63 - (byte)Math.Round((63 - o.TL) * vol * vel * exp))));
                     else
                         YM3812WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(o.KSL << 6 | o.TL));
@@ -515,9 +493,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdateFmPitch()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
@@ -540,7 +515,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                     YM3812WriteData(parentModule.UnitNumber, (byte)(0xa0 + Slot), 0, 0, (byte)(0xff & freq));
                     //keyon
-                    lastFreqData = (byte)(0x20 | octave | (freq >> 8));
+                    lastFreqData = (byte)(0x20 | octave | ((freq >> 8) & 3));
                     YM3812WriteData(parentModule.UnitNumber, (byte)(0xb0 + Slot), 0, 0, lastFreqData);
                 }
                 else if (pitch < 0)
@@ -561,7 +536,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                     YM3812WriteData(parentModule.UnitNumber, (byte)(0xa0 + Slot), 0, 0, (byte)(0xff & freq));
                     //keyon
-                    lastFreqData = (byte)(0x20 | octave | (freq >> 8));
+                    lastFreqData = (byte)(0x20 | octave | ((freq >> 8) & 3));
                     YM3812WriteData(parentModule.UnitNumber, (byte)(0xb0 + Slot), 0, 0, lastFreqData);
                 }
                 else
@@ -570,7 +545,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 2);
                     YM3812WriteData(parentModule.UnitNumber, (byte)(0xa0 + Slot), 0, 0, (byte)(0xff & freq));
                     //keyon
-                    lastFreqData = (byte)(0x20 | octave | (freq >> 8));
+                    lastFreqData = (byte)(0x20 | octave | ((freq >> 8) & 3));
                     YM3812WriteData(parentModule.UnitNumber, (byte)(0xb0 + Slot), 0, 0, lastFreqData);
                 }
             }
@@ -580,12 +555,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void SetFmTimbre()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 for (int op = 0; op < 2; op++)
                 {
-                    YM3812Operator o = timbre.Ops[op];
+                    YM3812Operator o = Timbre.Ops[op];
                     //$20+: Amplitude Modulation / Vibrato / Envelope Generator Type / Keyboard Scaling Rate / Modulator Frequency Multiple
                     YM3812WriteData(parentModule.UnitNumber, 0x20, op, Slot, (byte)((o.AM << 7 | o.EG << 6 | o.KSR | o.MFM)));
                     //$60+: Attack Rate / Decay Rate
@@ -597,7 +569,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
 
                 //$C0+: algorithm and feedback
-                YM3812WriteData(parentModule.UnitNumber, (byte)(0xB0 + Slot), 0, 0, (byte)(timbre.FB << 1 | timbre.ALG));
+                YM3812WriteData(parentModule.UnitNumber, (byte)(0xB0 + Slot), 0, 0, (byte)(Timbre.FB << 1 | Timbre.ALG));
             }
 
             /// <summary>
@@ -605,16 +577,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void Off()
             {
-                /*
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-                for (int op = 0; op < 2; op++)
-                {
-                    YM3812Operator o = timbre.Ops[op];
-                    YM3812WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)0xff);
-                }
-                */
-                
                 YM3812WriteData(parentModule.UnitNumber, (byte)(0xB0 + Slot), 0, 0, (byte)(lastFreqData & 0x1f));
             }
 

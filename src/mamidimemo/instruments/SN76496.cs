@@ -34,6 +34,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
         public override string Name => "SN76496";
 
+        public override string Group => "PSG";
+
         public override InstrumentType InstrumentType => InstrumentType.SN76496;
 
         [Browsable(false)]
@@ -219,8 +221,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class SN76496SoundManager : SoundManagerBase
         {
-            private List<SN76496Sound> allOnSounds = new List<SN76496Sound>();
-
             private List<SN76496Sound> psgOnSounds = new List<SN76496Sound>();
 
             private List<SN76496Sound> noiseOnSounds = new List<SN76496Sound>();
@@ -242,7 +242,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="midiEvent"></param>
             public override void PitchBend(PitchBendEvent midiEvent)
             {
-                foreach (var t in allOnSounds)
+                foreach (SN76496Sound t in AllOnSounds)
                 {
                     if (t.NoteOnEvent.Channel == midiEvent.Channel)
                     {
@@ -272,7 +272,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         //nothing
                         break;
                     case 7:    //Volume
-                        foreach (var t in allOnSounds)
+                        foreach (SN76496Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -291,7 +291,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     case 10:    //Panpot
                         break;
                     case 11:    //Expression
-                        foreach (var t in allOnSounds)
+                        foreach (SN76496Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
@@ -321,7 +321,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     return;
 
                 SN76496Sound snd = new SN76496Sound(parentModule, note, emptySlot);
-                allOnSounds.Add(snd);
+                AllOnSounds.Add(snd);
                 switch (snd.Timbre.SoundType)
                 {
                     case SoundType.PSG:
@@ -369,7 +369,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="note"></param>
             public override void NoteOff(NoteOffEvent note)
             {
-                SN76496Sound removed = SearchAndRemoveOnSound(note, allOnSounds);
+                SN76496Sound removed = (SN76496Sound)SearchAndRemoveOnSound(note, AllOnSounds);
 
                 if (removed != null)
                 {
@@ -459,9 +459,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdatePsgVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                 var vel = NoteOnEvent.Velocity / 127d;
@@ -476,9 +473,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateNoiseVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                 var vel = NoteOnEvent.Velocity / 127d;
@@ -494,9 +488,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdatePsgPitch()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
@@ -527,12 +518,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdateNoisePitch()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 int v = NoteOnEvent.NoteNumber % 3;
 
-                Sn76496WriteData(parentModule.UnitNumber, (byte)(0x80 | (Slot + 3) << 5 | timbre.FB << 2 | v));
+                Sn76496WriteData(parentModule.UnitNumber, (byte)(0x80 | (Slot + 3) << 5 | Timbre.FB << 2 | v));
             }
 
 

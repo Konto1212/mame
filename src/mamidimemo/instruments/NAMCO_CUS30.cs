@@ -36,6 +36,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
         public override string Name => "NAMCO_CUS30";
 
+        public override string Group => "WSG";
+
         public override InstrumentType InstrumentType => InstrumentType.NAMCO_CUS30;
 
         [Browsable(false)]
@@ -437,9 +439,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateWsgVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                 var vel = NoteOnEvent.Velocity / 127d;
@@ -458,7 +457,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 byte noise = NamcoCus30ReadData(parentModule.UnitNumber, 0x100 + (uint)(((Slot - 1) * 8) & 0x3f) + 0x04);
                 noise &= 0x7f;
-                if (timbre.SoundType == SoundType.NOISE)
+                if (Timbre.SoundType == SoundType.NOISE)
                     noise |= 0x80;
 
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x00, fv_l);
@@ -472,9 +471,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdateWsgPitch()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 

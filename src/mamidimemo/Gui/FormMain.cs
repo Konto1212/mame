@@ -34,6 +34,9 @@ namespace zanac.MAmidiMEmo.Gui
         {
             outputListView?.BeginInvoke(new MethodInvoker(() =>
             {
+                if (outputListView.IsDisposed)
+                    return;
+
                 var item = outputListView.Items.Add(log);
                 outputListView.EnsureVisible(item.Index);
             }), null);
@@ -68,6 +71,8 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("RP2A03", Resources.RP2A03);
             imageList1.Images.Add("SCC1", Resources.SCC1);
             imageList1.Images.Add("YM3812", Resources.YM3812);
+            imageList1.Images.Add("YM2413", Resources.YM2413);
+            imageList1.Images.Add("MSM5232", Resources.MSM5232);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -97,11 +102,8 @@ namespace zanac.MAmidiMEmo.Gui
         {
             listViewIntruments.Clear();
             foreach (var inst in InstrumentManager.GetAllInstruments())
-            {
-                var lvi = new ListViewItem(inst.Name, inst.ImageKey);
-                var item = listViewIntruments.Items.Add(lvi);
-                item.Tag = inst;
-            }
+                addItem(inst);
+            listViewIntruments.Sort();
             propertyGrid.SelectedObjects = null;
         }
 
@@ -114,11 +116,8 @@ namespace zanac.MAmidiMEmo.Gui
         {
             listViewIntruments.Clear();
             foreach (var inst in InstrumentManager.GetAllInstruments())
-            {
-                var lvi = new ListViewItem(inst.Name, inst.ImageKey);
-                var item = listViewIntruments.Items.Add(lvi);
-                item.Tag = inst;
-            }
+                addItem(inst);
+            listViewIntruments.Sort();
         }
 
         /// <summary>
@@ -130,11 +129,21 @@ namespace zanac.MAmidiMEmo.Gui
         {
             listViewIntruments.Clear();
             foreach (var inst in InstrumentManager.GetAllInstruments())
-            {
-                var lvi = new ListViewItem(inst.Name, inst.ImageKey);
-                var item = listViewIntruments.Items.Add(lvi);
-                item.Tag = inst;
-            }
+                addItem(inst);
+            listViewIntruments.Sort();
+            propertyGrid.SelectedObjects = null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="inst"></param>
+        private void addItem(InstrumentBase inst)
+        {
+            var lvi = new ListViewItem(inst.Name, inst.ImageKey);
+            lvi.Group = listViewIntruments.Groups[inst.Group];
+            var item = listViewIntruments.Items.Add(lvi);
+            item.Tag = inst;
         }
 
         /// <summary>
@@ -243,6 +252,16 @@ namespace zanac.MAmidiMEmo.Gui
         private void extendYM3812ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InstrumentManager.AddInstrument(InstrumentType.YM3812);
+        }
+
+        private void extendYM2413ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.YM2413);
+        }
+
+        private void extendMSM5232ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.MSM5232);
         }
 
         /// <summary>

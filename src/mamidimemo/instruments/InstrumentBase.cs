@@ -29,6 +29,15 @@ namespace zanac.MAmidiMEmo.Instruments
             get;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [Category("General")]
+        public abstract string Group
+        {
+            get;
+        }
+
         private float f_GainLeft = 1.0f;
 
         /// <summary>
@@ -243,11 +252,19 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        private static delegate_set_device_enable set_device_enable
-        {
-            get;
-            set;
-        }
+        private static delegate_set_device_enable set_device_enable;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_device_reset(uint unitNumber, string tagName);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_device_reset device_reset;
 
 
         /// <summary>
@@ -276,6 +293,18 @@ namespace zanac.MAmidiMEmo.Instruments
             funcPtr = MameIF.GetProcAddress("set_output_gain");
             if (funcPtr != IntPtr.Zero)
                 set_output_gain = Marshal.GetDelegateForFunctionPointer<delegate_set_output_gain>(funcPtr);
+
+            funcPtr = MameIF.GetProcAddress("device_reset");
+            if (funcPtr != IntPtr.Zero)
+                device_reset = Marshal.GetDelegateForFunctionPointer<delegate_device_reset>(funcPtr);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public InstrumentBase()
+        {
+            device_reset(UnitNumber, SoundInterfaceTagNamePrefix);
         }
 
         /// <summary>

@@ -33,6 +33,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
         public override string Name => "YM2151";
 
+        public override string Group => "FM";
+
         public override InstrumentType InstrumentType => InstrumentType.YM2151;
 
         [Browsable(false)]
@@ -571,8 +573,6 @@ namespace zanac.MAmidiMEmo.Instruments
                     }
                 }
             }
-
-
         }
 
 
@@ -625,11 +625,8 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateFmVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 List<int> ops = new List<int>();
-                switch (timbre.ALG)
+                switch (Timbre.ALG)
                 {
                     case 0:
                         ops.Add(3);
@@ -670,7 +667,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 foreach (int op in ops)
                 {
                     //$60+: total level
-                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)(127 - Math.Round((127 - timbre.Ops[op].TL) * vol * vel * exp)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)(127 - Math.Round((127 - Timbre.Ops[op].TL) * vol * vel * exp)));
                 }
             }
 
@@ -680,9 +677,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdateFmPitch()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
                 if (pitch > 0)
@@ -809,9 +803,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdatePanpot()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 byte pan = parentModule.Panpots[NoteOnEvent.Channel];
                 if (pan < 32)
                     pan = 0x2;
@@ -819,7 +810,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     pan = 0x1;
                 else
                     pan = 0x3;
-                Ym2151WriteData(parentModule.UnitNumber, 0x20, 0, Slot, (byte)(pan << 6 | (timbre.FB << 3) | timbre.ALG));
+                Ym2151WriteData(parentModule.UnitNumber, 0x20, 0, Slot, (byte)(pan << 6 | (Timbre.FB << 3) | Timbre.ALG));
             }
 
             /// <summary>
@@ -827,18 +818,15 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void SetFmTimbre()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
-                Ym2151WriteData(parentModule.UnitNumber, 0x38, 0, Slot, (byte)((timbre.PMS << 4 | timbre.AMS)));
+                Ym2151WriteData(parentModule.UnitNumber, 0x38, 0, Slot, (byte)((Timbre.PMS << 4 | Timbre.AMS)));
                 for (int op = 0; op < 4; op++)
                 {
-                    Ym2151WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)((timbre.Ops[op].DT1 << 4 | timbre.Ops[op].MUL)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)timbre.Ops[op].TL);
-                    Ym2151WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.Ops[op].RS << 6 | timbre.Ops[op].AR)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0xa0, op, Slot, (byte)((timbre.Ops[op].AM << 7 | timbre.Ops[op].D1R)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0xc0, op, Slot, (byte)((timbre.Ops[op].DT2 << 7 | timbre.Ops[op].D2R)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0xe0, op, Slot, (byte)((timbre.Ops[op].SL << 7 | timbre.Ops[op].RR)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)((Timbre.Ops[op].DT1 << 4 | Timbre.Ops[op].MUL)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)Timbre.Ops[op].TL);
+                    Ym2151WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((Timbre.Ops[op].RS << 6 | Timbre.Ops[op].AR)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xa0, op, Slot, (byte)((Timbre.Ops[op].AM << 7 | Timbre.Ops[op].D1R)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xc0, op, Slot, (byte)((Timbre.Ops[op].DT2 << 7 | Timbre.Ops[op].D2R)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xe0, op, Slot, (byte)((Timbre.Ops[op].SL << 7 | Timbre.Ops[op].RR)));
                 }
 
                 UpdatePanpot();

@@ -83,6 +83,16 @@ namespace zanac.MAmidiMEmo.Properties {
         /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
+        internal static System.Drawing.Bitmap MSM5232 {
+            get {
+                object obj = ResourceManager.GetObject("MSM5232", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
         internal static System.Drawing.Bitmap NAMCO_CUS30 {
             get {
                 object obj = ResourceManager.GetObject("NAMCO_CUS30", resourceCulture);
@@ -136,6 +146,16 @@ namespace zanac.MAmidiMEmo.Properties {
         internal static System.Drawing.Bitmap YM2151 {
             get {
                 object obj = ResourceManager.GetObject("YM2151", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap YM2413 {
+            get {
+                object obj = ResourceManager.GetObject("YM2413", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

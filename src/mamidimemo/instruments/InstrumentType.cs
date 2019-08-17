@@ -20,5 +20,7 @@ namespace zanac.MAmidiMEmo.Instruments
         RP2A03,
         SCC1,
         YM3812,
+        YM2413,
+        MSM5232,
     }
 }

@@ -75,6 +75,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\CustomExpandableObjectConverter.cs" />
+    <Compile Include="ComponentModel\IStandardValues.cs" />
+    <Compile Include="ComponentModel\StandardValuesDoubleConverter.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverterForUIEditor.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverter.cs" />
     <Compile Include="ComponentModel\ImageUtility.cs" />
@@ -123,11 +125,13 @@
     <Compile Include="Instruments\PcmTimbreBase.cs" />
     <Compile Include="Instruments\PcmTimbreTableBase.cs" />
     <Compile Include="Instruments\RP2A03.cs" />
+    <Compile Include="Instruments\MSM5232.cs" />
     <Compile Include="Instruments\SoundBase.cs" />
     <Compile Include="Instruments\SoundManagerBase.cs" />
     <Compile Include="Instruments\SN76496.cs" />
     <Compile Include="Instruments\TimbreBase.cs" />
     <Compile Include="Instruments\YM2151.cs" />
+    <Compile Include="Instruments\YM2413.cs" />
     <Compile Include="Instruments\YM3812.cs" />
     <Compile Include="Instruments\YM2612.cs" />
     <Compile Include="Mame\MameIf.cs" />
@@ -185,8 +189,10 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\YM3812.png" />
+    <None Include="Resources\MSM5232.png" />
     <None Include="Resources\YM3812.png" />
+    <None Include="Resources\YM2413.png" />
+    <None Include="Data\YM3812.png" />
     <None Include="Resources\SN76496.png" />
     <None Include="Resources\YM2151.png" />
     <None Include="Resources\RP2A03.png" />

@@ -36,6 +36,8 @@ namespace zanac.MAmidiMEmo.Instruments
     {
         public override string Name => "GB_APU";
 
+        public override string Group => "PSG";
+
         public override InstrumentType InstrumentType => InstrumentType.GB_APU;
 
         [Browsable(false)]
@@ -621,10 +623,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateVolume()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
-                switch (timbre.SoundType)
+                switch (Timbre.SoundType)
                 {
                     case SoundType.SPSG:
                     case SoundType.PSG:
@@ -633,10 +632,10 @@ namespace zanac.MAmidiMEmo.Instruments
                             var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                             var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                             var vel = NoteOnEvent.Velocity / 127d;
-                            byte tl = (byte)Math.Round(timbre.EnvInitialVolume * exp * vol * vel);
+                            byte tl = (byte)Math.Round(Timbre.EnvInitialVolume * exp * vol * vel);
 
-                            byte edir = (byte)(timbre.EnvDirection << 3);
-                            byte elen = timbre.EnvLength;
+                            byte edir = (byte)(Timbre.EnvDirection << 3);
+                            byte elen = Timbre.EnvLength;
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 2, (byte)((tl << 4) | edir | elen));
                             break;
@@ -669,10 +668,10 @@ namespace zanac.MAmidiMEmo.Instruments
                             var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                             var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                             var vel = NoteOnEvent.Velocity / 127d;
-                            byte tl = (byte)Math.Round(timbre.EnvInitialVolume * exp * vol * vel);
+                            byte tl = (byte)Math.Round(Timbre.EnvInitialVolume * exp * vol * vel);
 
-                            byte edir = (byte)(timbre.EnvDirection << 3);
-                            byte elen = timbre.EnvLength;
+                            byte edir = (byte)(Timbre.EnvDirection << 3);
+                            byte elen = Timbre.EnvLength;
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 2, (byte)((tl << 4) | edir | elen));
                             break;
@@ -687,9 +686,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdatePitch(byte keyOn)
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
@@ -719,7 +715,7 @@ namespace zanac.MAmidiMEmo.Instruments
                             ushort gfreq = convertPsgFrequency(freq);
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(gfreq & 0xff));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
 
                             break;
                         }
@@ -729,7 +725,7 @@ namespace zanac.MAmidiMEmo.Instruments
                             ushort gfreq = convertWavFrequency(freq);
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(gfreq & 0xff));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
 
                             break;
                         }
@@ -737,14 +733,14 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             uint reg = (uint)((Slot + 3) * 5);
 
-                            var nfreq = (int)timbre.NoiseShiftClockFrequency + ((15 * -pitch) / 8192);
+                            var nfreq = (int)Timbre.NoiseShiftClockFrequency + ((15 * -pitch) / 8192);
                             if (nfreq > 15)
                                 nfreq = 15;
                             else if (nfreq < 0)
                                 nfreq = 0;
 
-                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(nfreq << 4 | timbre.NoiseCounter << 3 | timbre.NoiseDivRatio));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (timbre.EnableLength << 6)));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(nfreq << 4 | Timbre.NoiseCounter << 3 | Timbre.NoiseDivRatio));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6)));
 
                             break;
                         }
@@ -757,17 +753,14 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdatePanpot()
             {
-                var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                var timbre = parentModule.Timbres[pn];
-
                 //Pan
                 byte? cpan = GbApuReadData(parentModule.UnitNumber, 0x15);
                 if (cpan.HasValue)
                 {
                     var rslot = Slot;
-                    if (timbre.SoundType == SoundType.WAV)
+                    if (lastSoundType == SoundType.WAV)
                         rslot += 2;
-                    else if (timbre.SoundType == SoundType.NOISE)
+                    else if (lastSoundType == SoundType.NOISE)
                         rslot += 3;
 
                     byte mask = (byte)(0x11 << rslot);
