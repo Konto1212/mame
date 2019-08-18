@@ -754,7 +754,7 @@ void ym2413_device::chan_calc( OPLL_CH *CH )
 	env = volume_calc(SLOT);
 	if( env < ENV_QUIET )
 	{
-		output[0] += op_calc(SLOT->phase, env, phase_modulation, SLOT->wavetable);
+		output[1] += op_calc(SLOT->phase, env, phase_modulation, SLOT->wavetable);
 	}
 }
 
@@ -1475,6 +1475,13 @@ void ym2413_device::write_reg(int r, int v)
 
 void ym2413_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	if (m_enable == 0)
+	{
+		std::fill(&outputs[0][0], &outputs[0][samples], 0);
+		std::fill(&outputs[1][0], &outputs[1][samples], 0);
+		return;
+	}
+
 	for(int i=0; i < samples ; i++ )
 	{
 		output[0] = 0;
@@ -1496,7 +1503,7 @@ void ym2413_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			rhythm_calc(&P_CH[0], noise_rng & 1 );
 		}
 
-		outputs[0][i] = limit( output[0] , 32767, -32768 );
+		outputs[0][i] = limit( output[1] , 32767, -32768 );
 		outputs[1][i] = limit( output[1] , 32767, -32768 );
 
 		advance();

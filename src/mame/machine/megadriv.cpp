@@ -981,13 +981,21 @@ void md_base_state::md_ntsc(machine_config &config)
 		(*m_gbsnd[i])->add_route(0, "lspeaker", 1.00);
 		(*m_gbsnd[i])->add_route(1, "rspeaker", 1.00);
 
-		NES_APU(config, *m_nesapu[i], XTAL(21'477'272)/12);
+		NES_APU(config, *m_nesapu[i], XTAL(21'477'272) / 12);
 		(*m_nesapu[i])->add_route(0, "lspeaker", 1.00);
 		(*m_nesapu[i])->add_route(1, "rspeaker", 1.00);
 
 		K051649(config, *m_scc1[i], XTAL(10'738'635) / 3 / 2);
 		(*m_scc1[i])->add_route(0, "lspeaker", 1.00);
 		(*m_scc1[i])->add_route(1, "rspeaker", 1.00);
+
+		YM2413(config, *m_ym2413[i], XTAL(3'579'545));
+		(*m_ym2413[i])->add_route(0, "lspeaker", 1.00);
+		(*m_ym2413[i])->add_route(1, "rspeaker", 1.00);
+
+		MSM5232(config, *m_msm5232[i], 2000000);
+		(*m_msm5232[i])->add_route(0, "lspeaker", 1.00);
+		(*m_msm5232[i])->add_route(1, "rspeaker", 1.00);
 	}
 }
 

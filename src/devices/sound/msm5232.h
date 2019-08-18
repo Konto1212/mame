@@ -17,6 +17,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( write );
 	void set_clock(int clock);
+	void set_volume(int ch, u8 data);
 
 protected:
 	// device-level overrides
@@ -95,6 +96,9 @@ private:
 	void init(int clock, int rate);
 	void EG_voices_advance();
 	void TG_group_advance(int groupidx);
+
+	uint8_t m_volume_Ach;
+	uint8_t m_volume_Bch;
 };
 
 DECLARE_DEVICE_TYPE(MSM5232, msm5232_device)

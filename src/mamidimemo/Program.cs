@@ -26,7 +26,7 @@ namespace zanac.MAmidiMEmo
         /// <summary>
         /// 
         /// </summary>
-        public const string FILE_VERSION = "0.1.0.0";
+        public const string FILE_VERSION = "0.5.0.0";
 
         private static Thread mainThread;
 

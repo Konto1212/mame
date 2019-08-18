@@ -18,6 +18,8 @@ msm5232_device::msm5232_device(const machine_config &mconfig, const char *tag, d
 	, m_stream(nullptr)
 	, m_noise_cnt(0), m_noise_step(0), m_noise_rng(0), m_noise_clocks(0), m_UpdateStep(0), m_control1(0), m_control2(0), m_gate(0), m_chip_clock(0), m_rate(0)
 	, m_gate_handler_cb(*this)
+	, m_volume_Ach(0xf), m_volume_Bch(0xf)
+
 {
 }
 
@@ -27,14 +29,14 @@ msm5232_device::msm5232_device(const machine_config &mconfig, const char *tag, d
 
 void msm5232_device::device_start()
 {
-	int rate = clock()/CLOCK_RATE_DIVIDER;
+	int rate = clock() / CLOCK_RATE_DIVIDER;
 	int voicenum;
 
 	m_gate_handler_cb.resolve();
 
 	init(clock(), rate);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 11, rate);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
 
 	/* register with the save state system */
 	save_item(NAME(m_EN_out16));
@@ -102,6 +104,9 @@ void msm5232_device::device_reset()
 	m_EN_out8[1]    = 0;
 	m_EN_out4[1]    = 0;
 	m_EN_out2[1]    = 0;
+
+	m_volume_Ach = 0xf;
+	m_volume_Bch = 0xf;
 
 	gate_update();
 }
@@ -353,7 +358,7 @@ WRITE8_MEMBER( msm5232_device::write )
 		int ch = offset&7;
 
 		m_voi[ch].GF = ((data&0x80)>>7);
-		if (ch == 7)
+		//if (ch == 7)
 			gate_update();
 
 		if(data&0x80)
@@ -437,6 +442,7 @@ WRITE8_MEMBER( msm5232_device::write )
 			    popmessage("msm5232: control1 ctrl=%2x\n", data);*/
 
 			m_control1 = data;
+			gate_update();
 
 			for (i=0; i<4; i++)
 				m_voi[i].eg_arm = data&0x10;
@@ -725,6 +731,13 @@ void msm5232_device::set_clock(int clock)
 	}
 }
 
+void msm5232_device::set_volume(int ch, u8 data)
+{
+	if (ch == 0)
+		m_volume_Ach = data;
+	else if (ch == 1)
+		m_volume_Bch = data;
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -732,6 +745,13 @@ void msm5232_device::set_clock(int clock)
 
 void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	if (m_enable == 0)
+	{
+		std::fill(&outputs[0][0], &outputs[0][samples], 0);
+		std::fill(&outputs[1][0], &outputs[1][samples], 0);
+		return;
+	}
+	/*
 	stream_sample_t *buf1 = outputs[0];
 	stream_sample_t *buf2 = outputs[1];
 	stream_sample_t *buf3 = outputs[2];
@@ -743,18 +763,30 @@ void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	stream_sample_t *bufsolo1 = outputs[8];
 	stream_sample_t *bufsolo2 = outputs[9];
 	stream_sample_t *bufnoise = outputs[10];
+	*/
 	int i;
-
-	for (i=0; i<samples; i++)
+	for (i = 0; i < samples; i++)
 	{
+		stream_sample_t buf1 = 0;
+		stream_sample_t buf2 = 0;
+		stream_sample_t buf3 = 0;
+		stream_sample_t buf4 = 0;
+		stream_sample_t buf5 = 0;
+		stream_sample_t buf6 = 0;
+		stream_sample_t buf7 = 0;
+		stream_sample_t buf8 = 0;
+		stream_sample_t bufsolo1 = 0;
+		stream_sample_t bufsolo2 = 0;
+		stream_sample_t bufnoise = 0;
+
 		/* calculate all voices' envelopes */
 		EG_voices_advance();
 
 		TG_group_advance(0);   /* calculate tones group 1 */
-		buf1[i] = o2;
-		buf2[i] = o4;
-		buf3[i] = o8;
-		buf4[i] = o16;
+		buf1 = o2;
+		buf2 = o4;
+		buf3 = o8;
+		buf4 = o16;
 
 		SAVE_SINGLE_CHANNEL(0,o2)
 		SAVE_SINGLE_CHANNEL(1,o4)
@@ -762,15 +794,15 @@ void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		SAVE_SINGLE_CHANNEL(3,o16)
 
 		TG_group_advance(1);   /* calculate tones group 2 */
-		buf5[i] = o2;
-		buf6[i] = o4;
-		buf7[i] = o8;
-		buf8[i] = o16;
+		buf5 = o2;
+		buf6 = o4;
+		buf7 = o8;
+		buf8 = o16;
 
-		bufsolo1[i] = solo8;
-		bufsolo2[i] = solo16;
+		bufsolo1 = solo8;
+		bufsolo2 = solo16;
 
-		SAVE_SINGLE_CHANNEL(4,o2)
+		SAVE_SINGLE_CHANNEL(4, o2)
 		SAVE_SINGLE_CHANNEL(5,o4)
 		SAVE_SINGLE_CHANNEL(6,o8)
 		SAVE_SINGLE_CHANNEL(7,o16)
@@ -796,6 +828,16 @@ void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			}
 		}
 
-		bufnoise[i] = (m_noise_rng & (1<<16)) ? 32767 : 0;
+		bufnoise = (m_noise_rng & (1 << 16)) ? 32767 : 0;
+
+		double chA = (double)(buf1 + buf2 + buf3 + buf4)*(double)m_volume_Ach / 15.0;
+		double chB = (double)(buf5 + buf6 + buf7 + buf8)*(double)m_volume_Bch / 15.0;
+		double mix = chA + chB; // +bufnoise;
+		if (mix > INT32_MAX)
+			mix = INT32_MAX;
+		else if (mix < INT32_MIN)
+			mix = INT32_MIN;
+		outputs[0][i] = (stream_sample_t)mix;
+		outputs[1][i] = outputs[0][i];
 	}
 }

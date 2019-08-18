@@ -1,6 +1,6 @@
-﻿MAmidiMEmo V0.1.0.0 / Itoken (c)2019
+﻿MAmidiMEmo V0.1.0.0 / Itoken (c)2019 / GPL v2
 
-*** What is MAmidiMEmo? ***
+*** What is the MAmidiMEmo? ***
 
 MAmidiMEmo is a virtual chiptune sound MIDI module using a MAME sound engine.
 You can control various chips and make sound via MIDI I/F.

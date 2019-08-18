@@ -6,6 +6,7 @@
 #include "..\frontend\mame\cheat.h"
 #include "..\devices\sound\fm.h"
 #include "..\devices\sound\ym2151.h"
+#include "..\devices\sound\ym2413.h"
 #include "..\devices\sound\2612intf.h"
 #include "..\devices\sound\gb.h"
 #include "..\devices\sound\sn76496.h"
@@ -13,6 +14,7 @@
 #include "..\devices\sound\nes_apu.h"
 #include "..\devices\sound\3812intf.h"
 #include "..\devices\sound\k051649.h"
+#include "..\devices\sound\msm5232.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -21,6 +23,25 @@ address_space *dummy;
 extern "C"
 {
 	//memodimemo
+
+
+	DllExport void device_reset(unsigned int unitNumber, char* name)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+
+		device_t *dev = dynamic_cast<device_t  *>(rm->device((std::string(name) + num).c_str()));
+		if (dev == nullptr)
+			return;
+
+		dev->reset();
+	}
 
 	DllExport void set_device_enable(unsigned int unitNumber, char* name, int enable)
 	{
@@ -94,7 +115,7 @@ extern "C"
 
 		ym2612->write(address, data);
 	}
-	
+
 	DllExport void ym3812_write(unsigned int unitNumber, unsigned int address, unsigned char data)
 	{
 		mame_machine_manager *mmm = mame_machine_manager::instance();
@@ -110,6 +131,23 @@ extern "C"
 			return;
 
 		ym3812->write(address, data);
+	}
+
+	DllExport void ym2413_write(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		ym2413_device *ym2413 = dynamic_cast<ym2413_device *>(rm->device((std::string("ym2413_") + num).c_str()));
+		if (ym2413 == nullptr)
+			return;
+
+		ym2413->write(address, data);
 	}
 
 	DllExport void gb_apu_write(unsigned int unitNumber, unsigned int address, unsigned char data)
@@ -351,6 +389,56 @@ extern "C"
 		return scc1->k051649_keyonoff_r();
 	}
 
+	DllExport void msm5232_write(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->device((std::string("msm5232_") + num).c_str()));
+		if (msm5232 == nullptr)
+			return;
+
+		msm5232->write(*dummy, address, data);
+	}
+
+	DllExport void msm5232_set_volume(unsigned int unitNumber, unsigned int ch, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->device((std::string("msm5232_") + num).c_str()));
+		if (msm5232 == nullptr)
+			return;
+
+		msm5232->set_volume(ch, data);
+	}
+
+	DllExport void msm5232_set_capacitors(unsigned int unitNumber, double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->device((std::string("msm5232_") + num).c_str()));
+		if (msm5232 == nullptr)
+			return;
+
+		msm5232->set_capacitors(cap1, cap2, cap3, cap4, cap5, cap6, cap7, cap8);
+	}
 }
 
 
