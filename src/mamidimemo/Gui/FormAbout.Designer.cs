@@ -32,6 +32,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.labelVer = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -50,9 +51,19 @@
             // pictureBox1
             // 
             resources.ApplyResources(this.pictureBox1, "pictureBox1");
+            this.pictureBox1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBox1.Image = global::zanac.MAmidiMEmo.Properties.Resources.Title;
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
+            // 
+            // label1
+            // 
+            resources.ApplyResources(this.label1, "label1");
+            this.label1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.label1.Image = global::zanac.MAmidiMEmo.Properties.Resources.donate;
+            this.label1.Name = "label1";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // FormAbout
             // 
@@ -60,6 +71,7 @@
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.button1;
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.labelVer);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.pictureBox1);
@@ -79,5 +91,6 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label labelVer;
+        private System.Windows.Forms.Label label1;
     }
 }

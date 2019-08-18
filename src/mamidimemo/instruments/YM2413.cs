@@ -79,7 +79,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Rhythm mode (0:Off(9ch) 1:On(6ch))\r\n" +
-            "Set DrumMode to ToneType in Timbre to output")]
+            "Set DrumSet to ToneType in Timbre to output")]
         public byte RHY
         {
             get
@@ -387,7 +387,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
                 else
                 {
-                    if (timbre.ToneType != ToneType.DrumMode)
+                    if (timbre.ToneType != ToneType.DrumSet)
                         fmOnSounds.Add(snd);
                     else
                         rhyOnSounds.Add(snd);
@@ -412,7 +412,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
                 else
                 {
-                    if (timbre.ToneType != ToneType.DrumMode)
+                    if (timbre.ToneType != ToneType.DrumSet)
                         emptySlot = SearchEmptySlot(fmOnSounds.ToList<SoundBase>(), 6);
                     else
                         emptySlot = SearchEmptySlot(rhyOnSounds.ToList<SoundBase>(), 6);
@@ -508,9 +508,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 var vel = NoteOnEvent.Velocity / 127d;
 
                 byte tl = (byte)(15 - (byte)Math.Round(15 * vol * vel * exp));
-                if (Timbre.ToneType != ToneType.DrumMode)
+                if (Timbre.ToneType != ToneType.DrumSet)
                 {
-                    if (Timbre.ToneType != ToneType.DrumMode)
+                    if (Timbre.ToneType != ToneType.DrumSet)
                         YM2413WriteData(parentModule.UnitNumber, 0x30, Slot, (byte)((int)Timbre.ToneType << 4 | tl));
                 }
                 else if (parentModule.RHY == 1)
@@ -546,7 +546,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdateFmPitch()
             {
-                if (Timbre.ToneType != ToneType.DrumMode)
+                if (Timbre.ToneType != ToneType.DrumSet)
                 {
                     var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                     var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
@@ -664,7 +664,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void Off()
             {
-                if (Timbre.ToneType != ToneType.DrumMode)
+                if (Timbre.ToneType != ToneType.DrumSet)
                     YM2413WriteData(parentModule.UnitNumber, (byte)(0x20 + Slot), 0, (byte)(Timbre.SUS << 5 | lastFreqData & 0x0f));
             }
 
@@ -781,7 +781,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Category("Sound")]
-            [Description("Feedback (0-7)")]
+            [Description("Tone type")]
             public ToneType ToneType
             {
                 get
@@ -909,7 +909,7 @@ namespace zanac.MAmidiMEmo.Instruments
             SynthesizerBass,
             AcousticBass,
             ElectricGuitar,
-            DrumMode,
+            DrumSet,
         }
 
         /// <summary>

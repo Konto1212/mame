@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -23,5 +24,14 @@ namespace zanac.MAmidiMEmo.Gui
             ImageUtility.AdjustControlImagesDpiScale(this);
         }
 
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://github.com/110-kenichi/mame");
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SNQ9JE3JAQMNQ");
+        }
     }
 }

@@ -160,6 +160,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="..\..\README.md">
+      <Link>README.md</Link>
+    </None>
     <None Include="dummy.out">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -189,6 +192,7 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\donate.png" />
     <None Include="Resources\MSM5232.png" />
     <None Include="Resources\YM3812.png" />
     <None Include="Resources\YM2413.png" />
@@ -199,9 +203,6 @@
     <None Include="Resources\SCC.png" />
     <None Include="Resources\Title.png" />
     <None Include="Resources\Inst.png" />
-    <None Include="ReadMe.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="..\..\build\generated\version.cpp">
       <Link>version.cpp</Link>
     </None>
