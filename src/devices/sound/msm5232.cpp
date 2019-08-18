@@ -320,7 +320,7 @@ void msm5232_device::init_voice(int i)
 
 void msm5232_device::gate_update()
 {
-	int new_state = (m_control2 & 0x20) ? m_voi[7].GF : 0;
+	int new_state = (m_control2 & 0x20);// ? m_voi[7].GF : 0; 	//mamidimemo
 
 	if (m_gate != new_state && !m_gate_handler_cb.isnull())
 	{
@@ -442,7 +442,7 @@ WRITE8_MEMBER( msm5232_device::write )
 			    popmessage("msm5232: control1 ctrl=%2x\n", data);*/
 
 			m_control1 = data;
-			gate_update();
+			gate_update();	//mamidimemo
 
 			for (i=0; i<4; i++)
 				m_voi[i].eg_arm = data&0x10;

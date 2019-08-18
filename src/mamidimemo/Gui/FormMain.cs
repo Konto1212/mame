@@ -82,8 +82,14 @@ namespace zanac.MAmidiMEmo.Gui
                     toolStripComboBoxMidiIf.SelectedIndex = idx;
                 dev.Dispose();
             }
-            if (toolStripComboBoxMidiIf.Items.Count >= 0)
+            if (toolStripComboBoxMidiIf.Items.Count > 0)
+            {
                 toolStripComboBoxMidiIf.SelectedIndex = 0;
+            }
+            else
+            {
+                MessageBox.Show("There are no MIDI IN devices.\r\nPlease install at lease one MIDI IN device to use the MAmidiMEmo.\r\nOr, install the loopMIDI to the PC.");
+            }
             outputListView = listView1;
 
             //MIDI Event

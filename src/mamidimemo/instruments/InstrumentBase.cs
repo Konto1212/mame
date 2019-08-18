@@ -152,7 +152,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         [DataMember]
-        [Category("General")]
+        [Category("MIDI")]
         public uint UnitNumber
         {
             get;
@@ -185,7 +185,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Category("MIDI")]
-        [Description("Pitch bend censitivity [halt note]")]
+        [Description("Pitch bend censitivity [half note]")]
         [TypeConverter(typeof(CustomCollectionConverter))]
         public byte[] PitchBendRanges
         {

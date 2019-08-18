@@ -30,6 +30,8 @@ namespace zanac.MAmidiMEmo
 
         private static Thread mainThread;
 
+        public static event EventHandler ShuttingDown;
+
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
         /// </summary>
@@ -66,11 +68,25 @@ namespace zanac.MAmidiMEmo
                     }
                 }
 
-                Application.Run(new FormMain());
+                try
+                {
+                    Application.Run(new FormMain());
 
-                Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(
-                    JsonConvert.SerializeObject(SaveEnvironmentSettings(), Formatting.Indented, jss));
-                Settings.Default.Save();
+                    Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(
+                        JsonConvert.SerializeObject(SaveEnvironmentSettings(), Formatting.Indented, jss));
+                    Settings.Default.Save();
+                }
+                catch (Exception ex)
+                {
+                    if (ex.GetType() == typeof(Exception))
+                        throw;
+                    else if (ex.GetType() == typeof(SystemException))
+                        throw;
+
+                    MessageBox.Show(ex.ToString());
+                }
+
+                ShuttingDown?.Invoke(typeof(Program), EventArgs.Empty);
             }));
             mainThread.SetApartmentState(ApartmentState.STA);
             mainThread.Start();

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Design;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -62,6 +63,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Timbres (0-127)")]
+        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(CustomCollectionConverter))]
         public YM2151Timbre[] Timbres
         {
@@ -468,6 +470,21 @@ namespace zanac.MAmidiMEmo.Instruments
             public YM2151SoundManager(YM2151 parent)
             {
                 this.parentModule = parent;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="midiEvent"></param>
+            public override void PitchBend(PitchBendEvent midiEvent)
+            {
+                foreach (YM2151Sound t in AllOnSounds)
+                {
+                    if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                    {
+                        t.UpdateFmPitch();
+                    }
+                }
             }
 
             /// <summary>

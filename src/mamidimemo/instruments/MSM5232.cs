@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Design;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -66,6 +67,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Timbres (0-127)")]
+        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(CustomCollectionConverter))]
         public MSM5232Timbre[] Timbres
         {
@@ -651,6 +653,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private byte f_EGE;
 
+            [Browsable(false)]
             [DataMember]
             [Category("Sound")]
             [Description("Envelope Generator Mode (0:Off 1:On)")]

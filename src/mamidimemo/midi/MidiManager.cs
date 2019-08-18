@@ -29,6 +29,17 @@ namespace zanac.MAmidiMEmo.Midi
         //     Occurs when a MIDI event is received.
         public static event EventHandler<MidiEventReceivedEventArgs> MidiEventReceived;
 
+        static MidiManager()
+        {
+            Program.ShuttingDown += Program_ShuttingDown;
+        }
+
+        private static void Program_ShuttingDown(object sender, EventArgs e)
+        {
+            if (inputDevice != null)
+                inputDevice.EventReceived += midiEventReceived;
+        }
+
         /// <summary>
         /// 
         /// </summary>

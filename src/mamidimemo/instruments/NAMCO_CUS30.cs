@@ -68,6 +68,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Timbres (0-127)")]
+        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(CustomCollectionConverter))]
         public NAMCO_CUS30Timbre[] Timbres
         {

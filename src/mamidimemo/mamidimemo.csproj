@@ -162,6 +162,7 @@
     </Compile>
     <None Include="..\..\README.md">
       <Link>README.md</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="dummy.out">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
