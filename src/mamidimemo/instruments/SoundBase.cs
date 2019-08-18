@@ -15,6 +15,12 @@ namespace zanac.MAmidiMEmo.Instruments
     /// </summary>
     public abstract class SoundBase : IDisposable
     {
+        public bool IsDisposed
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -58,7 +64,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public virtual void Dispose()
         {
-            Off();
+            if(!IsDisposed)
+                Off();
         }
     }
 }

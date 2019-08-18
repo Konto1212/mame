@@ -116,8 +116,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var snd = onSounds[0];
                 emptySlot = snd.Slot;
 
-                snd.Dispose();
-                onSounds.RemoveAt(0);
+                NoteOff(new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0));
             }
             return emptySlot;
         }

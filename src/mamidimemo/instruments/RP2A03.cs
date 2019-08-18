@@ -517,7 +517,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     {
                         if (dpcmOnSounds[i] == removed)
                         {
-                            FormMain.OutputDebugLog("KeyOff Tri ch" + removed.Slot + " " + note.ToString());
+                            FormMain.OutputDebugLog("KeyOff Dpcm ch" + removed.Slot + " " + note.ToString());
                             dpcmOnSounds.RemoveAt(i);
                             return;
                         }

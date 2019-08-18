@@ -382,6 +382,7 @@ VIDEOS["UPD7220"] = true
 VIDEOS["UPD7227"] = true
 VIDEOS["V9938"] = true
 VIDEOS["VIC4567"] = true
+VIDEOS["VIRGE_PCI"] = true
 --VIDEOS["VOODOO"] = true
 VIDEOS["SCN2674"] = true
 VIDEOS["GB_LCD"] = true
@@ -2300,6 +2301,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "hegener")
 files {
+	MAME_DIR .. "src/mame/drivers/mephisto_brikett.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_glasgow.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_mm2.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_modena.cpp",
@@ -3072,6 +3074,7 @@ files {
 	MAME_DIR .. "src/mame/includes/saitek_stratos.h",
 	MAME_DIR .. "src/mame/drivers/saitek_stratos.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_corona.cpp", -- subdriver of saitek_stratos
+	MAME_DIR .. "src/mame/drivers/saitek_superstar.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "samcoupe")
@@ -4003,6 +4006,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mini2440.cpp",
 	MAME_DIR .. "src/mame/drivers/miniframe.cpp",
 	MAME_DIR .. "src/mame/drivers/minitel_2_rpic.cpp",
+	MAME_DIR .. "src/mame/drivers/ml20.cpp",
 	MAME_DIR .. "src/mame/drivers/mmd1.cpp",
 	MAME_DIR .. "src/mame/drivers/mod8.cpp",
 	MAME_DIR .. "src/mame/drivers/modellot.cpp",

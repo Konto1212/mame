@@ -930,6 +930,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 		ext_includedir("flac"),
 		ext_includedir("glm"),
 		ext_includedir("jpeg"),
+		ext_includedir("rapidjson"),
 	}
 
 end
@@ -4784,6 +4785,7 @@ files {
 	MAME_DIR .. "src/mame/video/micro3d.cpp",
 	MAME_DIR .. "src/mame/audio/micro3d.cpp",
 	MAME_DIR .. "src/mame/audio/micro3d.h",
+	MAME_DIR .. "src/mame/drivers/microdar.cpp",
 	MAME_DIR .. "src/mame/drivers/midas.cpp",
 	MAME_DIR .. "src/mame/drivers/mil4000.cpp",
 	MAME_DIR .. "src/mame/drivers/miniboy7.cpp",
