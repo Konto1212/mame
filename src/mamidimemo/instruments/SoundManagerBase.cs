@@ -80,6 +80,11 @@ namespace zanac.MAmidiMEmo.Instruments
 
         }
 
+        protected virtual int SearchEmptySlot(List<SoundBase> onSounds, int maxSlot)
+        {
+            return SearchEmptySlot(onSounds, maxSlot, false);
+        }
+
         /// <summary>
         /// 未使用のスロットを検索する
         /// 空が無い場合は最初に鳴った音を消してそこを再利用する
@@ -87,26 +92,49 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="onSounds"></param>
         /// <param name="maxSlot"></param>
         /// <returns></returns>
-        protected virtual int SearchEmptySlot(List<SoundBase> onSounds, int maxSlot)
+        protected virtual int SearchEmptySlot(List<SoundBase> onSounds, int maxSlot, bool reversSlot)
         {
             int emptySlot = -1;
 
             //未使用のスロットを検索する
-            for (int i = 0; i < maxSlot; i++)
+            if (!reversSlot)
             {
-                bool found = false;
-                foreach (var snd in onSounds)
+                for (int i = 0; i < maxSlot; i++)
                 {
-                    if (snd.Slot == i)
+                    bool found = false;
+                    foreach (var snd in onSounds)
                     {
-                        found = true;
+                        if (snd.Slot == i)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        emptySlot = i;
                         break;
                     }
                 }
-                if (!found)
+            }
+            else
+            {
+                for (int i = maxSlot - 1; i >= 0; i--)
                 {
-                    emptySlot = i;
-                    break;
+                    bool found = false;
+                    foreach (var snd in onSounds)
+                    {
+                        if (snd.Slot == i)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        emptySlot = i;
+                        break;
+                    }
                 }
             }
 
@@ -116,7 +144,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 var snd = onSounds[0];
                 emptySlot = snd.Slot;
 
-                NoteOff(new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0));
+                var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0) { Channel = snd.NoteOnEvent.Channel };
+                NoteOff(noff);
             }
             return emptySlot;
         }
