@@ -16,6 +16,17 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 *** How to use MAmidiMEmo ***
 
+0. Requirements
+
+	*H/W
+		*CPU: Intel Core series CPU or equivalent, at least 2.0 GHz
+		*MEM: at least 4GB
+		*Sound: DirectSound capable sound card/onboard audio
+		*MIDI: MIDI IN I/F
+	*S/W
+		*OS: Windows 7 SP1 or lator
+		*Runtime: .NET Framework 4.7 or lator
+
 1. Launch MAmidiMEmo.exe
 
    Note: You can change the value of audio latency, sampling rate and audio output interface by modifying the "mame.ini"
