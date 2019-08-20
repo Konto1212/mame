@@ -447,9 +447,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 byte fv_l = (byte)((int)Math.Round(15 * vol * vel * exp) & 0xf);
                 byte fv_r = fv_l;
 
-                var pan = parentModule.Panpots[NoteOnEvent.Channel] / 127d;
+                var pan = parentModule.Panpots[NoteOnEvent.Channel];
 
-                if (pan < 0.5)   //left
+                if (pan < 63)   //left
                     fv_r = (byte)((byte)(fv_r * pan / 63) & 0xf);
                 else if (pan > 64)  //right
                     fv_l = (byte)((byte)(fv_l * (127 - pan) / 63) & 0xf);
@@ -546,7 +546,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [JsonConverter(typeof(NoTypeConverterJsonConverter<NAMCO_CUS30Timbre>))]
         [DataContract]
-        public class NAMCO_CUS30Timbre : TimbreBase , IWsgEditorByteCapable
+        public class NAMCO_CUS30Timbre : TimbreBase, IWsgEditorByteCapable
         {
             private SoundType f_SoundType;
 

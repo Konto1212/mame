@@ -169,6 +169,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public bool[] Channels
         {
             get;
+            private set;
         }
 
         /// <summary>
@@ -181,6 +182,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public ushort[] Pitchs
         {
             get;
+            private set;
         }
 
         [DataMember]
@@ -190,6 +192,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public byte[] PitchBendRanges
         {
             get;
+            private set;
         }
 
         [DataMember]
@@ -199,6 +202,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public byte[] ProgramNumbers
         {
             get;
+            private set;
         }
 
         [DataMember]
@@ -208,6 +212,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public byte[] Volumes
         {
             get;
+            private set;
         }
 
         [DataMember]
@@ -217,6 +222,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public byte[] Expressions
         {
             get;
+            private set;
         }
 
         [DataMember]
@@ -226,6 +232,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public byte[] Panpots
         {
             get;
+            private set;
         }
 
         [Browsable(false)]

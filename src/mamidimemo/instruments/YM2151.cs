@@ -822,9 +822,9 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 byte pan = parentModule.Panpots[NoteOnEvent.Channel];
                 if (pan < 32)
-                    pan = 0x2;
-                else if (pan > 96)
                     pan = 0x1;
+                else if (pan > 96)
+                    pan = 0x2;
                 else
                     pan = 0x3;
                 Ym2151WriteData(parentModule.UnitNumber, 0x20, 0, Slot, (byte)(pan << 6 | (Timbre.FB << 3) | Timbre.ALG));
@@ -997,7 +997,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataContract]
         public class YM2151Operator
         {
-            private byte f_Enable;
+            private byte f_Enable = 1;
 
             /// <summary>
             /// Enable(0-1)

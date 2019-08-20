@@ -982,7 +982,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataContract]
         public class YM2612Operator
         {
-            private byte f_Enable;
+            private byte f_Enable = 1;
 
             /// <summary>
             /// Enable(0-1)
