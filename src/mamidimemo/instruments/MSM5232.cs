@@ -68,7 +68,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Chip")]
         [Description("Timbres (0-127)")]
         [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
         public MSM5232Timbre[] Timbres
         {
             get;
@@ -389,8 +389,13 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="value"></param>
             public override void ControlChange(ControlChangeEvent midiEvent)
             {
+                base.ControlChange(midiEvent);
+
                 switch (midiEvent.ControlNumber)
                 {
+                    case 1:    //Modulation
+                        //nothing
+                        break;
                     case 6:    //Data Entry
                         //nothing
                         break;
@@ -454,12 +459,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     case SoundGroup.Group1:
                         {
-                            emptySlot = SearchEmptySlot(chAOnSounds.ToList<SoundBase>(), 4);
+                            emptySlot = SearchEmptySlot(chAOnSounds.ToList<SoundBase>(), note, 4);
                             break;
                         }
                     case SoundGroup.Group2:
                         {
-                            emptySlot = SearchEmptySlot(chBOnSounds.ToList<SoundBase>(), 4);
+                            emptySlot = SearchEmptySlot(chBOnSounds.ToList<SoundBase>(), note, 4);
                             break;
                         }
                 }
@@ -470,9 +475,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOff(NoteOffEvent note)
+            public override SoundBase NoteOff(NoteOffEvent note)
             {
-                MSM5232Sound removed = (MSM5232Sound)SearchAndRemoveOnSound(note, AllOnSounds);
+                MSM5232Sound removed = (MSM5232Sound)base.NoteOff(note);
 
                 if (removed != null)
                 {
@@ -482,7 +487,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff A ch" + removed.Slot + " " + note.ToString());
                             chAOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                     for (int i = 0; i < chBOnSounds.Count; i++)
@@ -491,10 +496,12 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff B ch" + removed.Slot + " " + note.ToString());
                             chBOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                 }
+
+                return removed;
             }
         }
 
@@ -520,7 +527,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public MSM5232Sound(MSM5232 parentModule, NoteOnEvent noteOnEvent, int slot) : base(noteOnEvent, slot)
+            public MSM5232Sound(MSM5232 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -533,6 +540,8 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void On()
             {
+                base.On();
+
                 UpdateTimbre();
                 //Volume
                 UpdateVolume();

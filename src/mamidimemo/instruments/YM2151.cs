@@ -22,6 +22,7 @@ using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
 //https://www16.atwiki.jp/mxdrv/pages/24.html
+//http://map.grauw.nl/resources/sound/yamaha_ym2151_synthesis.pdf
 
 namespace zanac.MAmidiMEmo.Instruments
 {
@@ -64,7 +65,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Chip")]
         [Description("Timbres (0-127)")]
         [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
         public YM2151Timbre[] Timbres
         {
             get;
@@ -279,6 +280,7 @@ namespace zanac.MAmidiMEmo.Instruments
             try
             {
                 Program.SoundUpdating();
+
                 switch (op)
                 {
                     case 0:
@@ -494,8 +496,17 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="value"></param>
             public override void ControlChange(ControlChangeEvent midiEvent)
             {
+                base.ControlChange(midiEvent);
+
                 switch (midiEvent.ControlNumber)
                 {
+                    case 1:    //Modulation
+                        foreach (YM2151Sound t in AllOnSounds)
+                        {
+                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                                t.ModulationEnabled = midiEvent.ControlValue != 0;
+                        }
+                        break;
                     case 6:    //Data Entry
                         //nothing
                         break;
@@ -557,7 +568,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pn = parentModule.ProgramNumbers[note.Channel];
 
                 var timbre = parentModule.Timbres[pn];
-                emptySlot = SearchEmptySlot(fmOnSounds.ToList<SoundBase>(), 6);
+                emptySlot = SearchEmptySlot(fmOnSounds.ToList<SoundBase>(), note, 6);
                 return emptySlot;
             }
 
@@ -565,9 +576,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOff(NoteOffEvent note)
+            public override SoundBase NoteOff(NoteOffEvent note)
             {
-                YM2151Sound removed = SearchAndRemoveOnSound(note, AllOnSounds) as YM2151Sound;
+                YM2151Sound removed = (YM2151Sound)base.NoteOff(note);
 
                 if (removed != null)
                 {
@@ -577,7 +588,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff FM ch" + removed.Slot + " " + note.ToString());
                             fmOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                     for (int i = 0; i < psgOnSounds.Count; i++)
@@ -585,10 +596,12 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (psgOnSounds[i] == removed)
                         {
                             psgOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                 }
+
+                return removed;
             }
         }
 
@@ -598,7 +611,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class YM2151Sound : SoundBase
         {
-
             private YM2151 parentModule;
 
             private SevenBitNumber programNumber;
@@ -612,7 +624,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public YM2151Sound(YM2151 parentModule, NoteOnEvent noteOnEvent, int slot) : base(noteOnEvent, slot)
+            public YM2151Sound(YM2151 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -624,6 +636,8 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void On()
             {
+                base.On();
+
                 //
                 SetFmTimbre();
                 //Freq
@@ -635,6 +649,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 Ym2151WriteData(parentModule.UnitNumber, 0x01, 0, 0, (byte)0x2);
                 Ym2151WriteData(parentModule.UnitNumber, 0x01, 0, 0, (byte)0x0);
                 Ym2151WriteData(parentModule.UnitNumber, 0x08, 0, 0, (byte)(op | Slot));
+
+                if (parentModule.Modulations[NoteOnEvent.Channel] != 0)
+                    ModulationEnabled = true;
             }
 
             /// <summary>
@@ -689,6 +706,16 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             /// <summary>
+            /// 10msごとに呼ばれる
+            /// </summary>
+            public override void OnModulationUpdate()
+            {
+                base.OnModulationUpdate();
+
+                UpdateFmPitch();
+            }
+
+            /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
@@ -696,77 +723,44 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
-                if (pitch > 0)
+
+                double d1 = ((double)pitch / 8192d) * range * 63d;
+                double d2 = ModultionTotalLevel *
+                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
+                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d)) * 63d;
+                double d = d1 + d2;
+
+                int kf = 0;
+                if (d > 0)
+                    kf = (int)d % 63;
+                else if (d < 0)
+                    kf = 63 + ((int)d % 63);
+
+                int noted = (int)d / 63;
+                if (d < 0)
+                    noted -= 1;
+
+                int noteNum = NoteOnEvent.NoteNumber + noted;
+                if (noteNum > 127)
+                    noteNum = 127;
+                else if (noteNum < 0)
+                    noteNum = 0;
+
+                var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
+
+                byte nn = getNoteNum(nnOn.GetNoteName());
+                byte octave = (byte)nnOn.GetNoteOctave();
+                if (nn == 14)
                 {
-                    //0x1fff 8192 13bit 0x3f 63 6bit
-                    double range1 = 8192d / range;
-                    int kf = (int)Math.Round(63d * (((double)pitch % range1) / range1));
-
-                    int noted = (int)(pitch / range1);
-                    int noteNum = NoteOnEvent.NoteNumber + noted;
-                    if (noteNum > 127)
-                        noteNum = 127;
-                    var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
-
-                    byte nn = getNoteNum(nnOn.GetNoteName());
-                    byte octave = (byte)nnOn.GetNoteOctave();
-                    if (nn == 0xff)
-                    {
-                        if (octave > 0)
-                        {
-                            octave -= 1;
-                            nn = 14;
-                        }
-                    }
                     if (octave > 0)
                         octave -= 1;
-                    Ym2151WriteData(parentModule.UnitNumber, 0x28, 0, Slot, (byte)((octave << 4) | nn));
-                    Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)(kf << 2));
+                    else
+                        nn = 0;
                 }
-                else if (pitch < 0)
-                {
-                    pitch = -pitch;
-                    double range1 = 8192d / range;
-                    int kf = (int)Math.Round(63d - (63d * (((double)pitch % range1) / range1)));
-
-                    int noted = (int)(pitch / range1) + 1;
-                    int noteNum = NoteOnEvent.NoteNumber - noted;
-                    if (noteNum > 127)
-                        noteNum = 127;
-                    var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
-
-                    byte nn = getNoteNum(nnOn.GetNoteName());
-                    byte octave = (byte)nnOn.GetNoteOctave();
-                    if (nn == 0xff)
-                    {
-                        if (octave > 0)
-                        {
-                            octave -= 1;
-                            nn = 14;
-                        }
-                    }
-                    if (octave > 0)
-                        octave -= 1;
-                    Ym2151WriteData(parentModule.UnitNumber, 0x28, 0, Slot, (byte)((octave << 4) | nn));
-                    Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)(kf << 2));
-                }
-                else
-                {
-                    byte nn = getNoteNum(NoteOnEvent.GetNoteName());
-                    byte octave = (byte)NoteOnEvent.GetNoteOctave();
-                    if (nn == 0xff)
-                    {
-                        if (octave > 0)
-                        {
-                            octave -= 1;
-                            nn = 14;
-                        }
-                    }
-                    if (octave > 0)
-                        octave -= 1;
-                    Ym2151WriteData(parentModule.UnitNumber, 0x28, 0, Slot, (byte)((octave << 4) | nn));
-                    Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)0);
-                }
+                if (octave > 0)
+                    octave -= 1;
+                Ym2151WriteData(parentModule.UnitNumber, 0x28, 0, Slot, (byte)((octave << 4) | nn));
+                Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)(kf << 2));
             }
 
             private byte getNoteNum(NoteName noteName)
@@ -775,7 +769,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 switch (noteName)
                 {
                     case NoteName.C:
-                        nn = 0xff;
+                        nn = 14;
                         break;
                     case NoteName.CSharp:
                         nn = 0;
@@ -951,7 +945,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Operators")]
-            [TypeConverter(typeof(CustomCollectionConverter))]
+            [TypeConverter(typeof(ExpandableCollectionConverter))]
             public YM2151Operator[] Ops
             {
                 get;
@@ -992,7 +986,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(CustomExpandableObjectConverter))]
         [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2151Operator>))]
         [DataContract]
         public class YM2151Operator

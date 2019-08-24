@@ -74,8 +74,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\MaskableExpandableCollectionConverter.cs" />
+    <Compile Include="ComponentModel\MultiMediaTimerComponent.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ComponentModel\CustomExpandableObjectConverter.cs" />
     <Compile Include="ComponentModel\IStandardValues.cs" />
+    <Compile Include="ComponentModel\MaskAttribute.cs" />
     <Compile Include="ComponentModel\StandardValuesDoubleConverter.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverterForUIEditor.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverter.cs" />
@@ -193,6 +198,7 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Panic.png" />
     <None Include="Resources\donate.png" />
     <None Include="Resources\MSM5232.png" />
     <None Include="Resources\YM3812.png" />

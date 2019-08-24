@@ -17,6 +17,8 @@ using zanac.MAmidiMEmo.Instruments;
 using zanac.MAmidiMEmo.ComponentModel;
 using Newtonsoft.Json;
 using System.IO;
+using Melanchall.DryWetMidi.Smf;
+using Melanchall.DryWetMidi.Common;
 
 namespace zanac.MAmidiMEmo.Gui
 {
@@ -25,6 +27,21 @@ namespace zanac.MAmidiMEmo.Gui
 
         private static ListView outputListView;
 
+        private static StreamWriter logStream;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="log"></param>
+        [Conditional("DEBUG")]
+        public static void OutputDebugLogFile(String log)
+        {
+            if (logStream == null)
+                logStream = new StreamWriter("log.txt");
+            logStream.WriteLine(log);
+            logStream.Flush();
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -32,6 +49,8 @@ namespace zanac.MAmidiMEmo.Gui
         [Conditional("DEBUG")]
         public static void OutputDebugLog(String log)
         {
+            if (outputListView == null || outputListView.IsDisposed || !outputListView.IsHandleCreated)
+                return;
             outputListView?.BeginInvoke(new MethodInvoker(() =>
             {
                 if (outputListView.IsDisposed)
@@ -307,9 +326,9 @@ namespace zanac.MAmidiMEmo.Gui
         {
             try
             {
-                var es = Program.SaveEnvironmentSettings();
-                JsonSerializerSettings settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
-                Settings.Default.EnvironmentSettings = JsonConvert.SerializeObject(es, Formatting.Indented, settings);
+                JsonSerializerSettings jss = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
+                Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(
+                    JsonConvert.SerializeObject(Program.SaveEnvironmentSettings(), Formatting.Indented, jss));
                 Settings.Default.Save();
             }
             catch (Exception ex)
@@ -387,5 +406,11 @@ namespace zanac.MAmidiMEmo.Gui
             fa.ShowDialog(this);
         }
 
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            //All Sounds Off
+            var me = new ControlChangeEvent((SevenBitNumber)120, (SevenBitNumber)0);
+            MidiManager.SendMidiEvent(me);
+        }
     }
 }

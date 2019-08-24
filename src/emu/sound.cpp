@@ -288,7 +288,7 @@ void sound_stream::update()
 
 	if (update_sampindex <= m_output_sampindex)
 		return;
-
+	
 	// generate samples to get us up to the appropriate time
 	g_profiler.start(PROFILER_SOUND);
 	assert(m_output_sampindex - m_output_base_sampindex >= 0);

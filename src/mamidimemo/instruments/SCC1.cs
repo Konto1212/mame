@@ -68,7 +68,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Chip")]
         [Description("Timbres (0-127)")]
         [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
         public SCC1Timbre[] Timbres
         {
             get;
@@ -317,8 +317,17 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="value"></param>
             public override void ControlChange(ControlChangeEvent midiEvent)
             {
+                base.ControlChange(midiEvent);
+
                 switch (midiEvent.ControlNumber)
                 {
+                    case 1:    //Modulation
+                        foreach (SCC1Sound t in AllOnSounds)
+                        {
+                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                                t.ModulationEnabled = midiEvent.ControlValue != 0;
+                        }
+                        break;
                     case 6:    //Data Entry
                         //nothing
                         break;
@@ -326,9 +335,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         foreach (SCC1Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
                                 t.UpdateVolume();
-                            }
                         }
                         break;
                     case 10:    //Panpot
@@ -337,9 +344,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         foreach (SCC1Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
                                 t.UpdateVolume();
-                            }
                         }
                         break;
                 }
@@ -373,7 +378,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pn = parentModule.ProgramNumbers[note.Channel];
 
                 var timbre = parentModule.Timbres[pn];
-                emptySlot = SearchEmptySlot(sccOnSounds.ToList<SoundBase>(), 5);
+                emptySlot = SearchEmptySlot(sccOnSounds.ToList<SoundBase>(), note, 5);
                 return emptySlot;
             }
 
@@ -381,9 +386,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOff(NoteOffEvent note)
+            public override SoundBase NoteOff(NoteOffEvent note)
             {
-                SCC1Sound removed = SearchAndRemoveOnSound(note, AllOnSounds) as SCC1Sound;
+                SCC1Sound removed = (SCC1Sound)base.NoteOff(note);
 
                 if (removed != null)
                 {
@@ -393,10 +398,12 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff SCC ch" + removed.Slot + " " + note.ToString());
                             sccOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                 }
+
+                return removed;
             }
         }
 
@@ -420,7 +427,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public SCC1Sound(SCC1 parentModule, NoteOnEvent noteOnEvent, int slot) : base(noteOnEvent, slot)
+            public SCC1Sound(SCC1 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -432,7 +439,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void On()
             {
-                SetWsgTimbre();
+                base.On();
+
+                SetTimbre();
                 //Freq
                 UpdatePitch();
                 //Volume
@@ -446,7 +455,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void SetWsgTimbre()
+            public void SetTimbre()
             {
                 Scc1WriteWaveData(parentModule.UnitNumber, (uint)(Slot << 5), Timbre.WsgData);
             }
@@ -466,6 +475,16 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             /// <summary>
+            /// 10msごとに呼ばれる
+            /// </summary>
+            public override void OnModulationUpdate()
+            {
+                base.OnModulationUpdate();
+
+                UpdatePitch();
+            }
+
+            /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
@@ -474,21 +493,14 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
-                int noteNum = NoteOnEvent.NoteNumber;
-                double freq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - 69.0) / 12.0);
+                double d1 = ((double)pitch / 8192d) * range;
+                double d2 = ModultionTotalLevel *
+                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
+                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
+                double d = d1 + d2;
 
-                if (pitch > 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber + range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
-                else if (pitch < 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)-pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
+                double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
+                double freq = 440.0 * noteNum;
 
                 /*
                  *                fclock
@@ -498,7 +510,6 @@ namespace zanac.MAmidiMEmo.Instruments
                  *     fclock is the clock frequency of the computer. 3,579,545 Hz
                  */
                 // TP = (fclock / (32 * ftone))-1
-
                 uint n = (uint)Math.Round((3579545 / (32 * freq)) - 1) & 0xfff;
 
                 Scc1FrequencyWriteData(parentModule.UnitNumber, (uint)((Slot << 1)) + 0, (byte)(n & 0xff));
@@ -522,7 +533,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [JsonConverter(typeof(NoTypeConverterJsonConverter<SCC1Timbre>))]
         [DataContract]
-        public class SCC1Timbre : TimbreBase , IWsgEditorSbyteCapable
+        public class SCC1Timbre : TimbreBase, IWsgEditorSbyteCapable
         {
             /// <summary>
             /// 

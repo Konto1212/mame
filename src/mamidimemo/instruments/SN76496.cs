@@ -68,7 +68,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Chip")]
         [Description("Timbres (0-127)")]
         [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
         public SN76496Timbre[] Timbres
         {
             get;
@@ -247,17 +247,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 foreach (SN76496Sound t in AllOnSounds)
                 {
                     if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                    {
-                        switch (t.Timbre.SoundType)
-                        {
-                            case SoundType.PSG:
-                                t.UpdatePsgPitch();
-                                break;
-                            case SoundType.NOISE:
-                                t.UpdateNoisePitch();
-                                break;
-                        }
-                    }
+                        t.UpdatePitch();
                 }
             }
 
@@ -268,8 +258,17 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="value"></param>
             public override void ControlChange(ControlChangeEvent midiEvent)
             {
+                base.ControlChange(midiEvent);
+
                 switch (midiEvent.ControlNumber)
                 {
+                    case 1:    //Modulation
+                        foreach (SN76496Sound t in AllOnSounds)
+                        {
+                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                                t.ModulationEnabled = midiEvent.ControlValue != 0;
+                        }
+                        break;
                     case 6:    //Data Entry
                         //nothing
                         break;
@@ -277,17 +276,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         foreach (SN76496Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                switch (t.Timbre.SoundType)
-                                {
-                                    case SoundType.PSG:
-                                        t.UpdatePsgVolume();
-                                        break;
-                                    case SoundType.NOISE:
-                                        t.UpdateNoiseVolume();
-                                        break;
-                                }
-                            }
+                                t.UpdateVolume();
                         }
                         break;
                     case 10:    //Panpot
@@ -296,17 +285,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         foreach (SN76496Sound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                switch (t.Timbre.SoundType)
-                                {
-                                    case SoundType.PSG:
-                                        t.UpdatePsgVolume();
-                                        break;
-                                    case SoundType.NOISE:
-                                        t.UpdateNoiseVolume();
-                                        break;
-                                }
-                            }
+                                t.UpdateVolume();
                         }
                         break;
                 }
@@ -353,12 +332,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     case SoundType.PSG:
                         {
-                            emptySlot = SearchEmptySlot(psgOnSounds.ToList<SoundBase>(), 3);
+                            emptySlot = SearchEmptySlot(psgOnSounds.ToList<SoundBase>(), note, 3);
                             break;
                         }
                     case SoundType.NOISE:
                         {
-                            emptySlot = SearchEmptySlot(noiseOnSounds.ToList<SoundBase>(), 1);
+                            emptySlot = SearchEmptySlot(noiseOnSounds.ToList<SoundBase>(), note, 1);
                             break;
                         }
                 }
@@ -369,7 +348,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOff(NoteOffEvent note)
+            public override SoundBase NoteOff(NoteOffEvent note)
             {
                 SN76496Sound removed = (SN76496Sound)SearchAndRemoveOnSound(note, AllOnSounds);
 
@@ -381,7 +360,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff PSG ch" + removed.Slot + " " + note.ToString());
                             psgOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                     for (int i = 0; i < noiseOnSounds.Count; i++)
@@ -389,10 +368,12 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (noiseOnSounds[i] == removed)
                         {
                             noiseOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                 }
+
+                return removed;
             }
 
 
@@ -420,7 +401,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public SN76496Sound(SN76496 parentModule, NoteOnEvent noteOnEvent, int slot) : base(noteOnEvent, slot)
+            public SN76496Sound(SN76496 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -434,32 +415,32 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void On()
             {
-                switch (Timbre.SoundType)
-                {
-                    case SoundType.PSG:
-                        {
-                            //Freq
-                            UpdatePsgPitch();
-                            //Volume
-                            UpdatePsgVolume();
-                            break;
-                        }
-                    case SoundType.NOISE:
-                        {
-                            //Freq
-                            UpdateNoisePitch();
-                            //Volume
-                            UpdateNoiseVolume();
-                            break;
-                        }
-                }
-            }
+                base.On();
 
+                UpdateVolume();
+                UpdatePitch();
+            }
 
             /// <summary>
             /// 
             /// </summary>
-            public void UpdatePsgVolume()
+            public void UpdateVolume()
+            {
+                switch (lastSoundType)
+                {
+                    case SoundType.PSG:
+                        updatePsgVolume();
+                        break;
+                    case SoundType.NOISE:
+                        updateNoiseVolume();
+                        break;
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            private void updatePsgVolume()
             {
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
@@ -473,7 +454,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void UpdateNoiseVolume()
+            private void updateNoiseVolume()
             {
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
@@ -484,31 +465,53 @@ namespace zanac.MAmidiMEmo.Instruments
                 Sn76496WriteData(parentModule.UnitNumber, (byte)(0x80 | (Slot + 3) << 5 | 0x10 | fv));
             }
 
+
+            /// <summary>
+            /// 10msごとに呼ばれる
+            /// </summary>
+            public override void OnModulationUpdate()
+            {
+                base.OnModulationUpdate();
+
+                UpdatePitch();
+            }
+
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public void UpdatePitch()
+            {
+                switch (lastSoundType)
+                {
+                    case SoundType.PSG:
+                        updatePsgPitch();
+                        break;
+                    case SoundType.NOISE:
+                        updateNoisePitch();
+                        break;
+                }
+            }
+
             /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public void UpdatePsgPitch()
+            private void updatePsgPitch()
             {
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
-                int noteNum = NoteOnEvent.NoteNumber;
-                double freq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - 69.0) / 12.0);
-                ushort n = 0;
-                if (pitch > 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber + range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
-                else if (pitch < 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)-pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
-                n = (ushort)((ushort)Math.Round(3579545 / (freq * 32)) & 0x3ff);
+                double d1 = ((double)pitch / 8192d) * range;
+                double d2 = ModultionTotalLevel *
+                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
+                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
+                double d = d1 + d2;
+
+                double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
+                double freq = 440.0 * noteNum;
+
+                var n = (ushort)((ushort)Math.Round(3579545 / (freq * 32)) & 0x3ff);
                 Sn76496WriteData(parentModule.UnitNumber, (byte)(0x80 | Slot << 5 | n & 0xf));
                 Sn76496WriteData(parentModule.UnitNumber, (byte)((n >> 4) & 0x3f));
             }
@@ -518,7 +521,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public void UpdateNoisePitch()
+            private void updateNoisePitch()
             {
                 int v = NoteOnEvent.NoteNumber % 3;
 

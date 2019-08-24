@@ -69,7 +69,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Chip")]
         [Description("Timbres (0-127)")]
         [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
         public GBAPUTimbre[] Timbres
         {
             get;
@@ -322,8 +322,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class GBSoundManager : SoundManagerBase
         {
-            private List<GbSound> allOnSounds = new List<GbSound>();
-
             private List<GbSound> wavOnSounds = new List<GbSound>();
 
             private List<GbSound> spsgOnSounds = new List<GbSound>();
@@ -353,7 +351,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="midiEvent"></param>
             public override void PitchBend(PitchBendEvent midiEvent)
             {
-                foreach (var t in allOnSounds)
+                foreach (GbSound t in AllOnSounds)
                 {
                     if (t.NoteOnEvent.Channel == midiEvent.Channel)
                     {
@@ -369,27 +367,36 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="value"></param>
             public override void ControlChange(ControlChangeEvent midiEvent)
             {
+                base.ControlChange(midiEvent);
+
                 switch (midiEvent.ControlNumber)
                 {
+                    case 1:    //Modulation
+                        foreach (GbSound t in AllOnSounds)
+                        {
+                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                                t.ModulationEnabled = midiEvent.ControlValue != 0;
+                        }
+                        break;
                     case 6:    //Data Entry
                         //nothing
                         break;
                     case 7:    //Volume
-                        foreach (var t in allOnSounds)
+                        foreach (GbSound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                                 t.UpdateVolume();
                         }
                         break;
                     case 10:    //Panpot
-                        foreach (var t in allOnSounds)
+                        foreach (GbSound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                                 t.UpdatePanpot();
                         }
                         break;
                     case 11:    //Expression
-                        foreach (var t in allOnSounds)
+                        foreach (GbSound t in AllOnSounds)
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                                 t.UpdateVolume();
@@ -409,7 +416,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     return;
 
                 GbSound snd = new GbSound(parentModule, note, emptySlot);
-                allOnSounds.Add(snd);
+                AllOnSounds.Add(snd);
                 switch (snd.Timbre.SoundType)
                 {
                     case SoundType.SPSG:
@@ -447,25 +454,25 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     case SoundType.SPSG:
                         {
-                            emptySlot = SearchEmptySlot(spsgOnSounds.ToList<SoundBase>(), 1);
+                            emptySlot = SearchEmptySlot(spsgOnSounds.ToList<SoundBase>(), note, 1);
                             break;
                         }
                     case SoundType.PSG:
                         {
                             if (parentModule.PartialReserveSPSG && spsgOnSounds.Count != 0)
-                                emptySlot = SearchEmptySlot(psgOnSounds.ToList<SoundBase>(), 1);
+                                emptySlot = SearchEmptySlot(psgOnSounds.ToList<SoundBase>(), note, 1);
                             else
-                                emptySlot = SearchEmptySlot(psgOnSounds.ToList<SoundBase>(), 2);
+                                emptySlot = SearchEmptySlot(psgOnSounds.ToList<SoundBase>(), note, 2);
                             break;
                         }
                     case SoundType.WAV:
                         {
-                            emptySlot = SearchEmptySlot(wavOnSounds.ToList<SoundBase>(), 1);
+                            emptySlot = SearchEmptySlot(wavOnSounds.ToList<SoundBase>(), note, 1);
                             break;
                         }
                     case SoundType.NOISE:
                         {
-                            emptySlot = SearchEmptySlot(noiseOnSounds.ToList<SoundBase>(), 1);
+                            emptySlot = SearchEmptySlot(noiseOnSounds.ToList<SoundBase>(), note, 1);
                             break;
                         }
                 }
@@ -476,9 +483,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOff(NoteOffEvent note)
+            public override SoundBase NoteOff(NoteOffEvent note)
             {
-                GbSound removed = SearchAndRemoveOnSound(note, allOnSounds);
+                GbSound removed = (GbSound)base.NoteOff(note);
 
                 if (removed != null)
                 {
@@ -487,7 +494,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (spsgOnSounds[i] == removed)
                         {
                             spsgOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                     for (int i = 0; i < psgOnSounds.Count; i++)
@@ -495,7 +502,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (psgOnSounds[i] == removed)
                         {
                             psgOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                     for (int i = 0; i < wavOnSounds.Count; i++)
@@ -503,7 +510,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (wavOnSounds[i] == removed)
                         {
                             wavOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                     for (int i = 0; i < noiseOnSounds.Count; i++)
@@ -511,10 +518,11 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (noiseOnSounds[i] == removed)
                         {
                             noiseOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                 }
+                return removed;
             }
 
         }
@@ -541,7 +549,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public GbSound(GB_APU parentModule, NoteOnEvent noteOnEvent, int slot) : base(noteOnEvent, slot)
+            public GbSound(GB_APU parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -555,7 +563,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void On()
             {
-                switch (Timbre.SoundType)
+                base.On();
+
+                switch (lastSoundType)
                 {
                     case SoundType.SPSG:
                         {
@@ -647,7 +657,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void UpdateVolume()
             {
-                switch (Timbre.SoundType)
+                switch (lastSoundType)
                 {
                     case SoundType.SPSG:
                         {
@@ -719,14 +729,24 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             /// <summary>
+            /// 10msごとに呼ばれる
+            /// </summary>
+            public override void OnModulationUpdate()
+            {
+                base.OnModulationUpdate();
+
+                UpdatePitch(0x00);
+            }
+
+            /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
             public void UpdatePitch(byte keyOn)
             {
+                /*
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
-
                 int noteNum = NoteOnEvent.NoteNumber;
                 double freq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - 69.0) / 12.0);
 
@@ -742,6 +762,18 @@ namespace zanac.MAmidiMEmo.Instruments
                     var dfreq = (nfreq - freq) * ((double)-pitch / (double)8192);
                     freq = (ushort)Math.Round(freq + dfreq);
                 }
+                */
+                var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
+                var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
+
+                double d1 = ((double)pitch / 8192d) * range;
+                double d2 = ModultionTotalLevel *
+                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
+                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
+                double d = d1 + d2;
+
+                double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
+                double freq = 440.0 * noteNum;
 
                 //Freq
                 switch (Timbre.SoundType)

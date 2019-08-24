@@ -64,7 +64,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Chip")]
         [Description("Timbres (0-127)")]
         [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
         public YM3812Timbre[] Timbres
         {
             get;
@@ -344,8 +344,17 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="value"></param>
             public override void ControlChange(ControlChangeEvent midiEvent)
             {
+                base.ControlChange(midiEvent);
+
                 switch (midiEvent.ControlNumber)
                 {
+                    case 1:    //Modulation
+                        foreach (YM3812Sound t in AllOnSounds)
+                        {
+                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                                t.ModulationEnabled = midiEvent.ControlValue != 0;
+                        }
+                        break;
                     case 6:    //Data Entry
                         //nothing
                         break;
@@ -400,7 +409,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pn = parentModule.ProgramNumbers[note.Channel];
 
                 var timbre = parentModule.Timbres[pn];
-                emptySlot = SearchEmptySlot(fmOnSounds.ToList<SoundBase>(), 9);
+                emptySlot = SearchEmptySlot(fmOnSounds.ToList<SoundBase>(), note, 9);
                 return emptySlot;
             }
 
@@ -408,9 +417,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOff(NoteOffEvent note)
+            public override SoundBase NoteOff(NoteOffEvent note)
             {
-                YM3812Sound removed = SearchAndRemoveOnSound(note, AllOnSounds) as YM3812Sound;
+                YM3812Sound removed = (YM3812Sound)base.NoteOff(note);
 
                 if (removed != null)
                 {
@@ -420,10 +429,12 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff FM ch" + removed.Slot + " " + note.ToString());
                             fmOnSounds.RemoveAt(i);
-                            return;
+                            return removed;
                         }
                     }
                 }
+
+                return removed;
             }
         }
 
@@ -449,7 +460,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public YM3812Sound(YM3812 parentModule, NoteOnEvent noteOnEvent, int slot) : base(noteOnEvent, slot)
+            public YM3812Sound(YM3812 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -461,6 +472,8 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void On()
             {
+                base.On();
+
                 //
                 SetFmTimbre();
                 //Volume
@@ -490,6 +503,16 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             /// <summary>
+            /// 10msごとに呼ばれる
+            /// </summary>
+            public override void OnModulationUpdate()
+            {
+                base.OnModulationUpdate();
+
+                UpdateFmPitch();
+            }
+
+            /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
@@ -498,58 +521,28 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
-                int noteNum = NoteOnEvent.NoteNumber;
-                if (pitch > 0)
-                {
-                    noteNum = NoteOnEvent.NoteNumber + range;
-                    if (noteNum > 127)
-                        noteNum = 127;
-                    var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
+                double d1 = ((double)pitch / 8192d) * range;
+                double d2 = ModultionTotalLevel *
+                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
+                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
+                double d = d1 + d2;
 
-                    double cfreq = (double)convertFmFrequency(NoteOnEvent);
-                    double nfreq = (double)convertFmFrequency(nnOn);
-                    var doctave = nnOn.GetNoteOctave() - NoteOnEvent.GetNoteOctave() + 1;
-                    nfreq = nfreq * (double)doctave;
+                int noteNum = NoteOnEvent.NoteNumber + (int)d;
+                if (noteNum > 127)
+                    noteNum = 127;
+                else if (noteNum < 0)
+                    noteNum = 0;
+                var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
+                ushort freq = convertFmFrequency(nnOn);
+                byte octave = (byte)(nnOn.GetNoteOctave() << 2);
 
-                    var dfreq = (nfreq - cfreq) * ((double)pitch / (double)8192);
-                    var freq = (ushort)Math.Round(cfreq + dfreq);
-                    byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 2);
+                if (d != 0)
+                    freq += (ushort)(((double)(convertFmFrequency(nnOn, (d < 0) ? false : true) - freq)) * Math.Abs(d - Math.Truncate(d)));
 
-                    YM3812WriteData(parentModule.UnitNumber, (byte)(0xa0 + Slot), 0, 0, (byte)(0xff & freq));
-                    //keyon
-                    lastFreqData = (byte)(0x20 | octave | ((freq >> 8) & 3));
-                    YM3812WriteData(parentModule.UnitNumber, (byte)(0xb0 + Slot), 0, 0, lastFreqData);
-                }
-                else if (pitch < 0)
-                {
-                    noteNum = NoteOnEvent.NoteNumber - range;
-                    if (noteNum < 0)
-                        noteNum = 0;
-                    var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
-
-                    double cfreq = (double)convertFmFrequency(NoteOnEvent);
-                    double nfreq = (double)convertFmFrequency(nnOn);
-                    var doctave = NoteOnEvent.GetNoteOctave() - nnOn.GetNoteOctave() + 1;
-                    nfreq = nfreq / (double)doctave;
-
-                    var dfreq = (nfreq - cfreq) * ((double)-pitch / (double)8192);
-                    var freq = (ushort)Math.Round(cfreq + dfreq);
-                    byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 2);
-
-                    YM3812WriteData(parentModule.UnitNumber, (byte)(0xa0 + Slot), 0, 0, (byte)(0xff & freq));
-                    //keyon
-                    lastFreqData = (byte)(0x20 | octave | ((freq >> 8) & 3));
-                    YM3812WriteData(parentModule.UnitNumber, (byte)(0xb0 + Slot), 0, 0, lastFreqData);
-                }
-                else
-                {
-                    var freq = convertFmFrequency(NoteOnEvent);
-                    byte octave = (byte)((NoteOnEvent.GetNoteOctave()) << 2);
-                    YM3812WriteData(parentModule.UnitNumber, (byte)(0xa0 + Slot), 0, 0, (byte)(0xff & freq));
-                    //keyon
-                    lastFreqData = (byte)(0x20 | octave | ((freq >> 8) & 3));
-                    YM3812WriteData(parentModule.UnitNumber, (byte)(0xb0 + Slot), 0, 0, lastFreqData);
-                }
+                YM3812WriteData(parentModule.UnitNumber, (byte)(0xa0 + Slot), 0, 0, (byte)(0xff & freq));
+                //keyon
+                lastFreqData = (byte)(0x20 | octave | ((freq >> 8) & 3));
+                YM3812WriteData(parentModule.UnitNumber, (byte)(0xb0 + Slot), 0, 0, lastFreqData);
             }
 
             /// <summary>
@@ -582,6 +575,23 @@ namespace zanac.MAmidiMEmo.Instruments
                 YM3812WriteData(parentModule.UnitNumber, (byte)(0xB0 + Slot), 0, 0, (byte)(lastFreqData & 0x1f));
             }
 
+            private ushort[] freqTable = new ushort[] {
+                0x287/2,
+                0x157,
+                0x16B,
+                0x181,
+                0x198,
+                0x1B0,
+                0x1CA,
+                0x1E5,
+                0x202,
+                0x220,
+                0x241,
+                0x263,
+                0x287,
+                0x157*2,
+            };
+
             /// <summary>
             /// 
             /// </summary>
@@ -590,55 +600,27 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <returns></returns>
             private ushort convertFmFrequency(NoteOnEvent note)
             {
-                ushort freq = 0;
-                switch (note.GetNoteName())
-                {
-                    case NoteName.C:
-                        freq = 0x157;
-                        break;
-                    case NoteName.CSharp:
-                        freq = 0x16B;
-                        break;
-                    case NoteName.D:
-                        freq = 0x181;
-                        break;
-                    case NoteName.DSharp:
-                        freq = 0x198;
-                        break;
-                    case NoteName.E:
-                        freq = 0x1B0;
-                        break;
-                    case NoteName.F:
-                        freq = 0x1CA;
-                        break;
-                    case NoteName.FSharp:
-                        freq = 0x1E5;
-                        break;
-                    case NoteName.G:
-                        freq = 0x202;
-                        break;
-                    case NoteName.GSharp:
-                        freq = 0x220;
-                        break;
-                    case NoteName.A:
-                        freq = 0x241;
-                        break;
-                    case NoteName.ASharp:
-                        freq = 0x263;
-                        break;
-                    case NoteName.B:
-                        freq = 0x287;
-                        break;
-                }
+                return freqTable[(int)note.GetNoteName() + 1];
+            }
 
-                return freq;
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="note"></param>
+            /// <param name="freq"></param>
+            /// <returns></returns>
+            private ushort convertFmFrequency(NoteOnEvent note, bool plus)
+            {
+                if (plus)
+                    return freqTable[(int)note.GetNoteName() + 2];
+                else
+                    return freqTable[(int)note.GetNoteName()];
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        [TypeConverter(typeof(CustomExpandableObjectConverter))]
         [JsonConverter(typeof(NoTypeConverterJsonConverter<YM3812Timbre>))]
         [DataContract]
         public class YM3812Timbre : TimbreBase
@@ -690,7 +672,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Operators")]
-            [TypeConverter(typeof(CustomCollectionConverter))]
+            [TypeConverter(typeof(ExpandableCollectionConverter))]
             public YM3812Operator[] Ops
             {
                 get;

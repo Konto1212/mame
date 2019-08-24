@@ -1,4 +1,5 @@
 ﻿// copyright-holders:K.Ito
+using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Devices;
 using Melanchall.DryWetMidi.Smf;
 using System;
@@ -20,24 +21,33 @@ namespace zanac.MAmidiMEmo.Midi
 {
     public static class MidiManager
     {
-        public static BlockingCollection<MidiEvent> MessageQueue = new BlockingCollection<MidiEvent>();
-
         private static InputDevice inputDevice;
 
         //
         // 概要:
         //     Occurs when a MIDI event is received.
-        public static event EventHandler<MidiEventReceivedEventArgs> MidiEventReceived;
+        public static event EventHandler<MidiEvent> MidiEventReceived;
 
+        /// <summary>
+        /// 
+        /// </summary>
         static MidiManager()
         {
             Program.ShuttingDown += Program_ShuttingDown;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private static void Program_ShuttingDown(object sender, EventArgs e)
         {
             if (inputDevice != null)
-                inputDevice.EventReceived += midiEventReceived;
+                inputDevice.EventReceived -= midiEventReceived;
+
+            //All Sounds Off
+            SendMidiEvent(new ControlChangeEvent((SevenBitNumber)120, (SevenBitNumber)0));
         }
 
         /// <summary>
@@ -73,11 +83,27 @@ namespace zanac.MAmidiMEmo.Midi
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void midiEventReceived(object sender, MidiEventReceivedEventArgs e)
+        public static void SendMidiEvent(MidiEvent e)
         {
-            MidiEventReceived?.Invoke(sender, e);
+            MidiEventReceived?.Invoke(typeof(MidiManager), e);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void midiEventReceived(object sender, MidiEventReceivedEventArgs e)
+        {
+            MidiEventReceived?.Invoke(sender, e.Event);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <returns></returns>
         public static byte[] ToByteArray<T>(this T structure) where T : struct
         {
             byte[] bb = new byte[Marshal.SizeOf(typeof(T))];
@@ -87,6 +113,12 @@ namespace zanac.MAmidiMEmo.Midi
             return bb;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static T FromByteArray<T>(byte[] data) where T : struct
         {
             GCHandle? gch = null;

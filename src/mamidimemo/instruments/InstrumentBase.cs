@@ -45,7 +45,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [DataMember]
         [Category("General")]
-        [Description("Gain Left ch. (0.0-*)")]
+        [Description("Gain Left ch. (0.0-*) of this Instrument")]
         public float GainLeft
         {
             get
@@ -66,7 +66,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [DataMember]
         [Category("General")]
-        [Description("Gain Right ch. (0.0-*)")]
+        [Description("Gain Right ch. (0.0-*) of this Instrument")]
         public float GainRight
         {
             get
@@ -164,8 +164,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [DataMember]
         [Category("MIDI")]
-        [Description("Receving MIDI ch")]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [Description("Receving MIDI ch <MIDI 16ch>")]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
         public bool[] Channels
         {
             get;
@@ -177,8 +177,9 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [DataMember]
         [Category("MIDI")]
-        [Description("Pitch (0 - 8192 - 16383)")]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [Description("Pitch (0 - 8192 - 16383) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(16383)]
         public ushort[] Pitchs
         {
             get;
@@ -187,8 +188,9 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Category("MIDI")]
-        [Description("Pitch bend censitivity [half note]")]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [Description("Pitch bend censitivity [half note] <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
         public byte[] PitchBendRanges
         {
             get;
@@ -197,8 +199,9 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Category("MIDI")]
-        [Description("Program number (0-127)")]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [Description("Program number (0-127) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
         public byte[] ProgramNumbers
         {
             get;
@@ -207,8 +210,9 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Category("MIDI")]
-        [Description("Volume (0-127)")]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [Description("Volume (0-127) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
         public byte[] Volumes
         {
             get;
@@ -217,8 +221,9 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Category("MIDI")]
-        [Description("Volume (0-127)")]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [Description("Volume (0-127) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
         public byte[] Expressions
         {
             get;
@@ -227,13 +232,113 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Category("MIDI")]
-        [Description("Volume ((L)0-63(C)64-127(R))")]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [Description("Volume ((L)0-63(C)64-127(R)) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
         public byte[] Panpots
         {
             get;
             private set;
         }
+
+
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Modulation (0-127) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
+        public byte[] Modulations
+        {
+            get;
+            private set;
+        }
+
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Modulation Rate (0-64-127) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
+        public byte[] ModulationRates
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Hz
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public virtual double GetModulationRateHz(int channel)
+        {
+            byte val = ModulationRates[channel];
+
+            double rate = Math.Pow(((double)val / 64d), 2) * 6;
+
+            return rate;
+        }
+
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Modulation Depth (0-64-127) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
+        public byte[] ModulationDepthes
+        {
+            get;
+            private set;
+        }
+
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Modulation Delay (0-64-127) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
+        public byte[] ModulationDelays
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Hz
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public virtual double GetModulationDelaySec(int channel)
+        {
+            byte val = ModulationDelays[channel];
+
+            double rate = Math.Pow(((double)val / 64d), 3.25) - 1;
+            if (rate < 0)
+                rate = 0;
+
+            return rate;
+        }
+
+
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Modulation Depth Range[Half Note] (0-127) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
+        public byte[] ModulationDepthRangesNote
+        {
+            get;
+            private set;
+        }
+
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Modulation Depth Range[Cent] (0-127) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
+        public byte[] ModulationDepthRangesCent
+        {
+            get;
+            private set;
+        }
+
 
         [Browsable(false)]
         public byte[] RpnLsb
@@ -376,12 +481,42 @@ namespace zanac.MAmidiMEmo.Instruments
                     0, 0, 0,
                     0, 0, 0,
                     0, 0, 0, 0};
-            RpnMsb = new byte[] {
+            Modulations = new byte[] {
                     0, 0, 0,
                     0, 0, 0,
                     0, 0, 0,
                     0, 0, 0,
                     0, 0, 0, 0};
+            ModulationRates = new byte[] {
+                    64, 64, 64,
+                    64, 64, 64,
+                    64, 64, 64,
+                    64, 64, 64,
+                    64, 64, 64, 64};
+            ModulationDepthes = new byte[] {
+                    64, 64, 64,
+                    64, 64, 64,
+                    64, 64, 64,
+                    64, 64, 64,
+                    64, 64, 64, 64};
+            ModulationDelays = new byte[] {
+                    64, 64, 64,
+                    64, 64, 64,
+                    64, 64, 64,
+                    64, 64, 64,
+                    64, 64, 64, 64};
+            ModulationDepthRangesNote = new byte[] {
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0, 0};
+            ModulationDepthRangesCent = new byte[] {
+                    0x40, 0x40, 0x40,
+                    0x40, 0x40, 0x40,
+                    0x40, 0x40, 0x40,
+                    0x40, 0x40, 0x40,
+                    0x40, 0x40, 0x40, 0x40};
         }
 
         /// <summary>
@@ -517,12 +652,48 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             switch (midiEvent.ControlNumber)
             {
+                case 1:    //Modulation
+                    Modulations[midiEvent.Channel] = midiEvent.ControlValue;
+                    break;
                 case 6:    //Data Entry
                     switch (RpnMsb[midiEvent.Channel])
                     {
-                        case 0: //PitchBendRanges
+                        case 0:
                             {
-                                PitchBendRanges[midiEvent.Channel] = midiEvent.ControlValue;
+                                switch (RpnLsb[midiEvent.Channel])
+                                {
+                                    case 0: //PitchBendRanges Half Note
+                                        {
+                                            PitchBendRanges[midiEvent.Channel] = midiEvent.ControlValue;
+                                            break;
+                                        }
+                                    case 5: //Mod Depth
+                                        {
+                                            ModulationDepthRangesNote[midiEvent.Channel] = midiEvent.ControlValue;
+                                            break;
+                                        }
+                                }
+                                break;
+                            }
+                    }
+                    break;
+                case 38:    //Data Entry
+                    switch (RpnMsb[midiEvent.Channel])
+                    {
+                        case 0:
+                            {
+                                switch (RpnLsb[midiEvent.Channel])
+                                {
+                                    case 0: //PitchBendRanges Cent
+                                        {
+                                            break;
+                                        }
+                                    case 5: //Mod Depth
+                                        {
+                                            ModulationDepthRangesCent[midiEvent.Channel] = midiEvent.ControlValue;
+                                            break;
+                                        }
+                                }
                                 break;
                             }
                     }
@@ -536,11 +707,36 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 11:    //Expression
                     Expressions[midiEvent.Channel] = midiEvent.ControlValue;
                     break;
+                case 76:    //Modulation Rate
+                    ModulationRates[midiEvent.Channel] = midiEvent.ControlValue;
+                    break;
+                case 77:    //Modulation Depth
+                    ModulationDepthes[midiEvent.Channel] = midiEvent.ControlValue;
+                    break;
+                case 78:    //Modulation Delay
+                    ModulationDelays[midiEvent.Channel] = midiEvent.ControlValue;
+                    break;
                 case 100:    //RPN LSB
                     RpnLsb[midiEvent.Channel] = midiEvent.ControlValue;
                     break;
                 case 101:    //RPN MSB
                     RpnMsb[midiEvent.Channel] = midiEvent.ControlValue;
+                    break;
+                case 121:    //Reset All Controller
+                    for (int i = 0; i < 16; i++)
+                    {
+                        Volumes[i] = 127;
+                        Panpots[i] = 64;
+                        Expressions[i] = 127;
+                        PitchBendRanges[i] = 2;
+                        Pitchs[i] = 8192;
+                        Modulations[i] = 0;
+                        ModulationRates[i] = 64;
+                        ModulationDepthes[i] = 64;
+                        ModulationDelays[i] = 64;
+                        ModulationDepthRangesNote[i] = 0;
+                        ModulationDepthRangesCent[i] = 0x40;
+                    }
                     break;
             }
         }

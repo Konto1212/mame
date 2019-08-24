@@ -10,24 +10,13 @@ namespace zanac.MAmidiMEmo.ComponentModel
 {
     /// <summary>
     /// </summary>
-    public class ExpandableCollectionConverter : CollectionConverter
+    public class MaskableExpandableCollectionConverter : CollectionConverter
     {
-        private int bitMask;
-
         /// <summary>
         /// 
         /// </summary>
-        public ExpandableCollectionConverter()
+        public MaskableExpandableCollectionConverter()
         {
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bitMask"></param>
-        public ExpandableCollectionConverter(int bitMask)
-        {
-            this.bitMask = bitMask;
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
@@ -75,6 +64,8 @@ namespace zanac.MAmidiMEmo.ComponentModel
 
             private int index;
 
+            private uint maskValue;
+
             public override bool IsReadOnly
             {
                 get
@@ -88,6 +79,9 @@ namespace zanac.MAmidiMEmo.ComponentModel
             {
                 this.context = context;
                 this.index = index;
+
+                MaskAttribute att = (MaskAttribute)context.PropertyDescriptor.Attributes[typeof(MaskAttribute)];
+                maskValue = att.MaskValue;
             }
 
             public override object GetValue(object component)
@@ -113,7 +107,36 @@ namespace zanac.MAmidiMEmo.ComponentModel
             {
                 IList c = component as IList;
                 if (c != null)
-                    c[index] = value;
+                {
+                    switch (value)
+                    {
+                        case byte n:
+                            {
+                                c[index] = (byte)(n & maskValue);
+                                break;
+                            }
+                        case short n:
+                            {
+                                c[index] = (short)(n & maskValue);
+                                break;
+                            }
+                        case ushort n:
+                            {
+                                c[index] = (ushort)(n & maskValue);
+                                break;
+                            }
+                        case uint n:
+                            {
+                                c[index] = (uint)(n & maskValue);
+                                break;
+                            }
+                        case int n:
+                            {
+                                c[index] = (int)(n & maskValue);
+                                break;
+                            }
+                    }
+                }
             }
 
             public override string Description

@@ -69,7 +69,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Chip")]
         [Description("Timbres (0-127)")]
         [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(CustomCollectionConverter))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
         public NAMCO_CUS30Timbre[] Timbres
         {
             get;
@@ -281,7 +281,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     if (t.NoteOnEvent.Channel == midiEvent.Channel)
                     {
-                        t.UpdateWsgPitch();
+                        t.UpdatePitch();
                     }
                 }
             }
@@ -293,8 +293,17 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="value"></param>
             public override void ControlChange(ControlChangeEvent midiEvent)
             {
+                base.ControlChange(midiEvent);
+
                 switch (midiEvent.ControlNumber)
                 {
+                    case 1:    //Modulation
+                        foreach (NAMCO_CUS30Sound t in AllOnSounds)
+                        {
+                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                                t.ModulationEnabled = midiEvent.ControlValue != 0;
+                        }
+                        break;
                     case 6:    //Data Entry
                         //nothing
                         break;
@@ -303,7 +312,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
-                                t.UpdateWsgVolume();
+                                t.UpdateVolume();
                             }
                         }
                         break;
@@ -312,7 +321,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
-                                t.UpdateWsgVolume();
+                                t.UpdateVolume();
                             }
                         }
                         break;
@@ -321,7 +330,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
-                                t.UpdateWsgVolume();
+                                t.UpdateVolume();
                             }
                         }
                         break;
@@ -356,7 +365,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pn = parentModule.ProgramNumbers[note.Channel];
 
                 var timbre = parentModule.Timbres[pn];
-                emptySlot = SearchEmptySlot(wsgOnSounds.ToList<SoundBase>(), 8);
+                emptySlot = SearchEmptySlot(wsgOnSounds.ToList<SoundBase>(), note, 8);
                 return emptySlot;
             }
 
@@ -364,9 +373,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOff(NoteOffEvent note)
+            public override SoundBase NoteOff(NoteOffEvent note)
             {
-                NAMCO_CUS30Sound removed = SearchAndRemoveOnSound(note, AllOnSounds) as NAMCO_CUS30Sound;
+                NAMCO_CUS30Sound removed = (NAMCO_CUS30Sound)base.NoteOff(note);
 
                 if (removed != null)
                 {
@@ -376,10 +385,12 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff WSG ch" + removed.Slot + " " + note.ToString());
                             wsgOnSounds.RemoveAt(i);
-                            return;
+                            break;
                         }
                     }
                 }
+
+                return removed;
             }
         }
 
@@ -403,7 +414,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public NAMCO_CUS30Sound(NAMCO_CUS30 parentModule, NoteOnEvent noteOnEvent, int slot) : base(noteOnEvent, slot)
+            public NAMCO_CUS30Sound(NAMCO_CUS30 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -415,17 +426,19 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void On()
             {
-                SetWsgTimbre();
+                base.On();
+
+                SetTimbre();
                 //Freq
-                UpdateWsgPitch();
+                UpdatePitch();
                 //Volume
-                UpdateWsgVolume();
+                UpdateVolume();
             }
 
             /// <summary>
             /// 
             /// </summary>
-            public void SetWsgTimbre()
+            public void SetTimbre()
             {
                 var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                 var timbre = parentModule.Timbres[pn];
@@ -438,7 +451,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void UpdateWsgVolume()
+            public void UpdateVolume()
             {
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
@@ -467,36 +480,38 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             /// <summary>
+            /// 10msごとに呼ばれる
+            /// </summary>
+            public override void OnModulationUpdate()
+            {
+                base.OnModulationUpdate();
+
+                UpdatePitch();
+            }
+
+            /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public void UpdateWsgPitch()
+            public void UpdatePitch()
             {
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
-                int noteNum = NoteOnEvent.NoteNumber;
-                double freq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - 69.0) / 12.0);
+                double d1 = ((double)pitch / 8192d) * range;
+                double d2 = ModultionTotalLevel *
+                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
+                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
+                double d = d1 + d2;
 
-                if (pitch > 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber + range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
-                else if (pitch < 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)-pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
+                double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
+                double freq = 440.0 * noteNum;
                 //max 1048575(20bit)
                 //midi 8.175798915643707 ～ 12543.853951415975Hz
                 // A4 440 -> 440 * 500 = 440000
                 // A6 1760 -> 1760 * 500 = 880000
-
                 //adjust
-                double xfreq = 29.00266666666667 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - 69.0) / 12.0);
+                double xfreq = 29.00266666666667 * noteNum;
 
                 uint n = ((uint)Math.Round((freq - xfreq) * 93.75)) & (uint)0xfffff;
 

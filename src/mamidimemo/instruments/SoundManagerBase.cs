@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using zanac.MAmidiMEmo.ComponentModel;
 
 namespace zanac.MAmidiMEmo.Instruments
 {
@@ -15,7 +16,6 @@ namespace zanac.MAmidiMEmo.Instruments
     /// </summary>
     public class SoundManagerBase : IDisposable
     {
-
         /// <summary>
         /// 
         /// </summary>
@@ -61,7 +61,19 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="value"></param>
         public virtual void ControlChange(ControlChangeEvent midiEvent)
         {
-
+            switch (midiEvent.ControlNumber)
+            {
+                case 120:   //All Sounds Off
+                case 123:   //All Note Off
+                    {
+                        foreach (var snd in new List<SoundBase>(AllOnSounds))
+                        {
+                            var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0) { Channel = snd.NoteOnEvent.Channel };
+                            NoteOff(noff);
+                        }
+                        break;
+                    }
+            }
         }
 
         /// <summary>
@@ -75,14 +87,14 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         /// <param name="note"></param>
-        public virtual void NoteOff(NoteOffEvent note)
+        public virtual SoundBase NoteOff(NoteOffEvent note)
         {
-
+            return SearchAndRemoveOnSound(note, AllOnSounds);
         }
 
-        protected virtual int SearchEmptySlot(List<SoundBase> onSounds, int maxSlot)
+        protected virtual int SearchEmptySlot(List<SoundBase> onSounds, NoteOnEvent newNote, int maxSlot)
         {
-            return SearchEmptySlot(onSounds, maxSlot, false);
+            return SearchEmptySlot(onSounds, newNote, maxSlot, false);
         }
 
         /// <summary>
@@ -92,7 +104,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="onSounds"></param>
         /// <param name="maxSlot"></param>
         /// <returns></returns>
-        protected virtual int SearchEmptySlot(List<SoundBase> onSounds, int maxSlot, bool reversSlot)
+        protected virtual int SearchEmptySlot(List<SoundBase> onSounds, NoteOnEvent newNote, int maxSlot, bool reversSlot)
         {
             int emptySlot = -1;
 
@@ -104,6 +116,9 @@ namespace zanac.MAmidiMEmo.Instruments
                     bool found = false;
                     foreach (var snd in onSounds)
                     {
+                        if (snd.NoteOnEvent.NoteNumber == newNote.NoteNumber)
+                            return -1;
+
                         if (snd.Slot == i)
                         {
                             found = true;

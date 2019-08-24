@@ -246,13 +246,19 @@ void cgb04_apu_device::device_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
+//mamidimemo
+void SoundUpdating();
+void SoundUpdated();
+
 TIMER_CALLBACK_MEMBER(gameboy_sound_device::timer_callback)
 {
 	if (m_enable == 0)
 		return;
 
+	SoundUpdating();
 	m_channel->update();
 	update_state();
+	SoundUpdated();
 }
 
 
