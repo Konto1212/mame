@@ -483,7 +483,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     if (t.NoteOnEvent.Channel == midiEvent.Channel)
                     {
-                        t.UpdateFmPitch();
+                        t.UpdatePitch();
                     }
                 }
             }
@@ -514,7 +514,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
-                                t.UpdateFmVolume();
+                                t.UpdateVolume();
                             }
                         }
                         break;
@@ -532,7 +532,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             {
-                                t.UpdateFmVolume();
+                                t.UpdateVolume();
                             }
                         }
                         break;
@@ -549,11 +549,13 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                YM2612Sound snd = new YM2612Sound(parentModule, note, emptySlot);
+                YM2612Sound snd = new YM2612Sound(parentModule, this, note, emptySlot);
                 AllOnSounds.Add(snd);
                 fmOnSounds.Add(snd);
                 FormMain.OutputDebugLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
                 snd.On();
+
+                base.NoteOn(note);
             }
 
             /// <summary>
@@ -616,7 +618,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public YM2612Sound(YM2612 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
+            public YM2612Sound(YM2612 parentModule, YM2612SoundManager manager,  NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -633,9 +635,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 //
                 SetFmTimbre();
                 //Freq
-                UpdateFmPitch();
+                UpdatePitch();
                 //Volume
-                UpdateFmVolume();
+                UpdateVolume();
                 //On
                 uint reg = (uint)(Slot / 3) * 2;
                 byte op = (byte)(Timbre.Ops[0].Enable << 4 | Timbre.Ops[1].Enable << 5 | Timbre.Ops[2].Enable << 6 | Timbre.Ops[3].Enable << 7);
@@ -645,7 +647,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void UpdateFmVolume()
+            public void UpdateVolume()
             {
                 List<int> ops = new List<int>();
                 switch (Timbre.ALG)
@@ -696,27 +698,24 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 10msごとに呼ばれる
             /// </summary>
-            public override void OnModulationUpdate()
+            public override void OnPeriodicAction()
             {
-                base.OnModulationUpdate();
+                base.OnPeriodicAction();
 
-                UpdateFmPitch();
+                UpdatePitch();
             }
 
             /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public void UpdateFmPitch()
+            public void UpdatePitch()
             {
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
                 double d1 = ((double)pitch / 8192d) * range;
-                double d2 = ModultionTotalLevel *
-                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
-                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
-                double d = d1 + d2;
+                double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
 
                 int noteNum = NoteOnEvent.NoteNumber + (int)d;
                 if (noteNum > 127)
@@ -730,8 +729,10 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (d != 0)
                     freq += (ushort)(((double)(convertFmFrequency(nnOn, (d < 0) ? false : true) - freq)) * Math.Abs(d - Math.Truncate(d)));
 
+                Program.SoundUpdating();
                 Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | ((freq >> 8) & 7)));
                 Ym2612WriteData(parentModule.UnitNumber, 0xa0, 0, Slot, (byte)(0xff & freq));
+                Program.SoundUpdated();
             }
 
             /// <summary>

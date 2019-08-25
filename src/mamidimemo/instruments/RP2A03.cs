@@ -399,7 +399,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                RP2A03Sound snd = new RP2A03Sound(parentModule, note, emptySlot);
+                RP2A03Sound snd = new RP2A03Sound(parentModule, this, note, emptySlot);
                 AllOnSounds.Add(snd);
                 switch (snd.Timbre.ToneType)
                 {
@@ -421,6 +421,8 @@ namespace zanac.MAmidiMEmo.Instruments
                         break;
                 }
                 snd.On();
+
+                base.NoteOn(note);
             }
 
             /// <summary>
@@ -536,7 +538,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public RP2A03Sound(RP2A03 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
+            public RP2A03Sound(RP2A03 parentModule, RP2A03SoundManager manager, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -704,9 +706,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 10msごとに呼ばれる
             /// </summary>
-            public override void OnModulationUpdate()
+            public override void OnPeriodicAction()
             {
-                base.OnModulationUpdate();
+                base.OnPeriodicAction();
 
                 UpdatePitch();
             }
@@ -735,38 +737,17 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
-                /*
-                int noteNum = NoteOnEvent.NoteNumber;
-                double freq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - 69.0) / 12.0);
-                ushort n = 0;
-                if (pitch > 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber + range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
-                else if (pitch < 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)-pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
-                */
-
                 double d1 = ((double)pitch / 8192d) * range;
-                double d2 = ModultionTotalLevel *
-                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
-                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
-                double d = d1 + d2;
+                double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
 
                 double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
                 double freq = 440.0 * noteNum;
 
                 var n = (ushort)((ushort)(Math.Round(1790000d / (freq * 32)) - 1) & 0x7ff);
-                RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x02),
-                    (byte)(n & 0xff));
-                RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x03),
-                    (byte)((Timbre.PlayLength << 3) | (n >> 8) & 0x7));
+                Program.SoundUpdating();
+                RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x02), (byte)(n & 0xff));
+                RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x03), (byte)((Timbre.PlayLength << 3) | (n >> 8) & 0x7));
+                Program.SoundUpdated();
             }
 
             private void updateTriPitch()
@@ -775,37 +756,16 @@ namespace zanac.MAmidiMEmo.Instruments
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
                 double d1 = ((double)pitch / 8192d) * range;
-                double d2 = ModultionTotalLevel *
-                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
-                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
-                double d = d1 + d2;
+                double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
 
                 double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
                 double freq = 440.0 * noteNum;
-
-                /*
-                int noteNum = NoteOnEvent.NoteNumber;
-                double freq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - 69.0) / 12.0);
-                ushort n = 0;
-                if (pitch > 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber + range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
-                else if (pitch < 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)-pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
-                */
-
+                
                 var n = (ushort)((ushort)(Math.Round(1790000d / (freq * 32)) - 1) & 0x7ff);
-                RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x02),
-                    (byte)(n & 0xff));
-                RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x03),
-                    (byte)((Timbre.PlayLength << 3) | (n >> 8) & 0x7));
+                Program.SoundUpdating();
+                RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x02), (byte)(n & 0xff));
+                RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x03), (byte)((Timbre.PlayLength << 3) | (n >> 8) & 0x7));
+                Program.SoundUpdated();
             }
 
             public void UpdateNoisePitch()
@@ -813,10 +773,10 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pitch = (int)(parentModule.Pitchs[NoteOnEvent.Channel] - 8192) / (8192 / 32);
                 int n = 31 - ((NoteOnEvent.NoteNumber + pitch) % 32);
 
-                RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x02),
-                    (byte)((Timbre.NoiseType << 7) | (n & 0xf)));
-                RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x03),
-                    (byte)(Timbre.PlayLength << 3));
+                Program.SoundUpdating();
+                RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x02), (byte)((Timbre.NoiseType << 7) | (n & 0xf)));
+                RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x03), (byte)(Timbre.PlayLength << 3));
+                Program.SoundUpdated();
             }
 
             /// <summary>
@@ -829,22 +789,28 @@ namespace zanac.MAmidiMEmo.Instruments
                     case ToneType.SQUARE:
                         {
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << Slot));
+                            Program.SoundUpdating();
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << Slot)));
+                            Program.SoundUpdated();
                             break;
                         }
                     case ToneType.TRIANGLE:
                         {
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 2));
+                            Program.SoundUpdating();
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
+                            Program.SoundUpdated();
                             break;
                         }
                     case ToneType.NOISE:
                         {
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~8);
+                            Program.SoundUpdating();
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 8));
+                            Program.SoundUpdated();
                             break;
                         }
                 }

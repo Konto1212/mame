@@ -159,7 +159,7 @@ bool windows_osd_interface::window_init()
 		-1                  // No SOFT on Windows OSD
 	};
 
-	video_config.mode = VIDEO_MODE_NONE;
+	video_config.mode = VIDEO_MODE_NONE;	//mamidimemo
 	int current_mode = video_config.mode;
 	while (current_mode != VIDEO_MODE_NONE)
 	{

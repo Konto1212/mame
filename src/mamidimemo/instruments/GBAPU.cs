@@ -20,6 +20,7 @@ using zanac.MAmidiMEmo.Gui;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
+//http://mydocuments.g2.xrea.com/html/gb/soundspec.html
 //http://bgb.bircd.org/pandocs.htm#soundcontrolregisters
 //https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
 //http://mydocuments.g2.xrea.com/
@@ -415,7 +416,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                GbSound snd = new GbSound(parentModule, note, emptySlot);
+                GbSound snd = new GbSound(parentModule, this, note, emptySlot);
                 AllOnSounds.Add(snd);
                 switch (snd.Timbre.SoundType)
                 {
@@ -437,6 +438,8 @@ namespace zanac.MAmidiMEmo.Instruments
                         break;
                 }
                 snd.On();
+
+                base.NoteOn(note);
             }
 
             /// <summary>
@@ -549,7 +552,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public GbSound(GB_APU parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
+            public GbSound(GB_APU parentModule, GBSoundManager manager, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -731,9 +734,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 10msごとに呼ばれる
             /// </summary>
-            public override void OnModulationUpdate()
+            public override void OnPeriodicAction()
             {
-                base.OnModulationUpdate();
+                base.OnPeriodicAction();
 
                 UpdatePitch(0x00);
             }
@@ -744,33 +747,11 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdatePitch(byte keyOn)
             {
-                /*
-                var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
-                var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
-                int noteNum = NoteOnEvent.NoteNumber;
-                double freq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - 69.0) / 12.0);
-
-                if (pitch > 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber + range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
-                else if (pitch < 0)
-                {
-                    var nfreq = 440.0 * Math.Pow(2.0, (NoteOnEvent.NoteNumber - range - 69.0) / 12.0);
-                    var dfreq = (nfreq - freq) * ((double)-pitch / (double)8192);
-                    freq = (ushort)Math.Round(freq + dfreq);
-                }
-                */
                 var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
                 double d1 = ((double)pitch / 8192d) * range;
-                double d2 = ModultionTotalLevel *
-                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
-                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
-                double d = d1 + d2;
+                double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
 
                 double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
                 double freq = 440.0 * noteNum;
@@ -783,8 +764,10 @@ namespace zanac.MAmidiMEmo.Instruments
                             uint reg = (uint)(Slot * 5);
                             ushort gfreq = convertPsgFrequency(freq);
 
+                            Program.SoundUpdating();
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(gfreq & 0xff));
                             GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
+                            Program.SoundUpdated();
 
                             break;
                         }
@@ -794,8 +777,10 @@ namespace zanac.MAmidiMEmo.Instruments
                             uint reg = (uint)(((Slot + 1) & 1) * 5);
                             ushort gfreq = convertPsgFrequency(freq);
 
+                            Program.SoundUpdating();
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(gfreq & 0xff));
                             GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
+                            Program.SoundUpdated();
 
                             break;
                         }
@@ -804,8 +789,10 @@ namespace zanac.MAmidiMEmo.Instruments
                             uint reg = (uint)((Slot + 2) * 5);
                             ushort gfreq = convertWavFrequency(freq);
 
+                            Program.SoundUpdating();
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(gfreq & 0xff));
                             GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
+                            Program.SoundUpdated();
 
                             break;
                         }
@@ -819,8 +806,10 @@ namespace zanac.MAmidiMEmo.Instruments
                             else if (nfreq < 0)
                                 nfreq = 0;
 
+                            Program.SoundUpdating();
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(nfreq << 4 | Timbre.NoiseCounter << 3 | Timbre.NoiseDivRatio));
                             GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6)));
+                            Program.SoundUpdated();
 
                             break;
                         }

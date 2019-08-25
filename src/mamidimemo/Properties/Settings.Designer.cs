@@ -46,5 +46,77 @@ namespace zanac.MAmidiMEmo.Properties {
                 this["EnvironmentSettings"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int SoundType {
+            get {
+                return ((int)(this["SoundType"]));
+            }
+            set {
+                this["SoundType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("48000")]
+        public string SampleRate {
+            get {
+                return ((string)(this["SampleRate"]));
+            }
+            set {
+                this["SampleRate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int AudioLatency {
+            get {
+                return ((int)(this["AudioLatency"]));
+            }
+            set {
+                this["AudioLatency"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\"Windows WASAPI\"")]
+        public string PaApi {
+            get {
+                return ((string)(this["PaApi"]));
+            }
+            set {
+                this["PaApi"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("default")]
+        public string PaDevice {
+            get {
+                return ((string)(this["PaDevice"]));
+            }
+            set {
+                this["PaDevice"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.003334")]
+        public string PaLatency {
+            get {
+                return ((string)(this["PaLatency"]));
+            }
+            set {
+                this["PaLatency"] = value;
+            }
+        }
     }
 }

@@ -110,6 +110,12 @@
     <Compile Include="Gui\FormPcmEditor.Designer.cs">
       <DependentUpon>FormPcmEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Gui\FormSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gui\FormSettings.Designer.cs">
+      <DependentUpon>FormSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Gui\IWsgEditorSbyteCapable.cs" />
     <Compile Include="Gui\PcmEditorAttribute.cs" />
     <Compile Include="Gui\WsgITypeEditor.cs" />
@@ -151,6 +157,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormPcmEditor.resx">
       <DependentUpon>FormPcmEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Gui\FormSettings.resx">
+      <DependentUpon>FormSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormWsgEditor.resx">
       <DependentUpon>FormWsgEditor.cs</DependentUpon>
@@ -198,6 +207,7 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Rst.png" />
     <None Include="Resources\Panic.png" />
     <None Include="Resources\donate.png" />
     <None Include="Resources\MSM5232.png" />

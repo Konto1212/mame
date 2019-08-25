@@ -76,13 +76,29 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        private Dictionary<int, int> LastNoteNumbers = new Dictionary<int, int>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public int GetLastNoteNumber(int channel)
+        {
+            if (LastNoteNumbers.ContainsKey(channel))
+                return LastNoteNumbers[channel];
+            return -1;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="note"></param>
         public virtual void NoteOn(NoteOnEvent note)
         {
+            LastNoteNumbers[note.Channel] = note.NoteNumber;
         }
+
         /// <summary>
         /// 
         /// </summary>

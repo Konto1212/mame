@@ -428,7 +428,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                MSM5232Sound snd = new MSM5232Sound(parentModule, note, emptySlot);
+                MSM5232Sound snd = new MSM5232Sound(parentModule, this, note, emptySlot);
                 AllOnSounds.Add(snd);
                 switch (snd.Timbre.SoundGroup)
                 {
@@ -442,6 +442,8 @@ namespace zanac.MAmidiMEmo.Instruments
                         break;
                 }
                 snd.On();
+
+                base.NoteOn(note);
             }
 
             /// <summary>
@@ -527,7 +529,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public MSM5232Sound(MSM5232 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
+            public MSM5232Sound(MSM5232 parentModule, MSM5232SoundManager manager, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -542,7 +544,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 base.On();
 
-                UpdateTimbre();
+                SetTimbre();
                 //Volume
                 UpdateVolume();
                 //Freq
@@ -552,7 +554,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void UpdateTimbre()
+            public void SetTimbre()
             {
                 var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                 var timbre = parentModule.Timbres[pn];

@@ -8,5 +8,23 @@
     <Setting Name="EnvironmentSettings" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="SoundType" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="SampleRate" Type="System.String" Scope="User">
+      <Value Profile="(Default)">48000</Value>
+    </Setting>
+    <Setting Name="AudioLatency" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="PaApi" Type="System.String" Scope="User">
+      <Value Profile="(Default)">"Windows WASAPI"</Value>
+    </Setting>
+    <Setting Name="PaDevice" Type="System.String" Scope="User">
+      <Value Profile="(Default)">default</Value>
+    </Setting>
+    <Setting Name="PaLatency" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0.003334</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

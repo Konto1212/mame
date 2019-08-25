@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -29,6 +30,14 @@ namespace zanac.MAmidiMEmo
         public const string FILE_VERSION = "0.5.0.0";
 
         private static Thread mainThread;
+
+        internal static string RestartRequiredApplication;
+
+        public static void RestartApplication()
+        {
+            if (RestartRequiredApplication != null)
+                Process.Start(RestartRequiredApplication);
+        }
 
         public static event EventHandler ShuttingDown;
 
@@ -126,7 +135,7 @@ namespace zanac.MAmidiMEmo
             return ret;
         }
 
-        private static ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+        private static ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         /// <summary>
         /// 
@@ -145,5 +154,7 @@ namespace zanac.MAmidiMEmo
         {
             lockSlim.ExitWriteLock();
         }
+
+
     }
 }

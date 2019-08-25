@@ -347,11 +347,13 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                NAMCO_CUS30Sound snd = new NAMCO_CUS30Sound(parentModule, note, emptySlot);
+                NAMCO_CUS30Sound snd = new NAMCO_CUS30Sound(parentModule, this, note, emptySlot);
                 AllOnSounds.Add(snd);
                 wsgOnSounds.Add(snd);
                 FormMain.OutputDebugLog("KeyOn WSG ch" + emptySlot + " " + note.ToString());
                 snd.On();
+
+                base.NoteOn(note);
             }
 
             /// <summary>
@@ -414,7 +416,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public NAMCO_CUS30Sound(NAMCO_CUS30 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
+            public NAMCO_CUS30Sound(NAMCO_CUS30 parentModule, NAMCO_CUS30SoundManager manager, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -474,17 +476,19 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (Timbre.SoundType == SoundType.NOISE)
                     noise |= 0x80;
 
+                Program.SoundUpdating();
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x00, fv_l);
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x04, fv_r);
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)(((Slot - 1) * 8) & 0x3f) + 0x04, noise);
+                Program.SoundUpdated();
             }
 
             /// <summary>
             /// 10msごとに呼ばれる
             /// </summary>
-            public override void OnModulationUpdate()
+            public override void OnPeriodicAction()
             {
-                base.OnModulationUpdate();
+                base.OnPeriodicAction();
 
                 UpdatePitch();
             }
@@ -499,10 +503,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
                 double d1 = ((double)pitch / 8192d) * range;
-                double d2 = ModultionTotalLevel *
-                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
-                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
-                double d = d1 + d2;
+                double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
 
                 double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
                 double freq = 440.0 * noteNum;
@@ -515,9 +516,11 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 uint n = ((uint)Math.Round((freq - xfreq) * 93.75)) & (uint)0xfffff;
 
+                Program.SoundUpdating();
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x01, (byte)((byte)((Slot & 0xf) << 4) | ((n >> 16) & 0xf)));
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x02, (byte)((n >> 8) & 0xff));
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x03, (byte)(n & 0xff));
+                Program.SoundUpdated();
             }
 
             /// <summary>

@@ -412,5 +412,42 @@ namespace zanac.MAmidiMEmo.Gui
             var me = new ControlChangeEvent((SevenBitNumber)120, (SevenBitNumber)0);
             MidiManager.SendMidiEvent(me);
         }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            var me = new ControlChangeEvent((SevenBitNumber)121, (SevenBitNumber)0);
+            MidiManager.SendMidiEvent(me);
+        }
+
+        private static FormSettings f_formSetting;
+
+        private static FormSettings FormSetting
+        {
+            get
+            {
+                if (f_formSetting == null)
+                    f_formSetting = new FormSettings();
+
+                return f_formSetting;
+            }
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult dr = FormSetting.ShowDialog(this);
+            if (dr == DialogResult.OK)
+            {
+                Settings.Default.Save();
+                var rdr = MessageBox.Show(this, "Do you restart to apply new settings?", "Message", MessageBoxButtons.YesNo);
+                if (rdr == DialogResult.Yes)
+                {
+                    Close();
+                    Program.RestartRequiredApplication = Application.ExecutablePath;
+                }
+            }
+            else
+                Settings.Default.Reload();
+        }
+
     }
 }

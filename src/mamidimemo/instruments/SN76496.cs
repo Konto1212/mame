@@ -301,7 +301,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                SN76496Sound snd = new SN76496Sound(parentModule, note, emptySlot);
+                SN76496Sound snd = new SN76496Sound(parentModule, this, note, emptySlot);
                 AllOnSounds.Add(snd);
                 switch (snd.Timbre.SoundType)
                 {
@@ -315,6 +315,8 @@ namespace zanac.MAmidiMEmo.Instruments
                         break;
                 }
                 snd.On();
+
+                base.NoteOn(note);
             }
 
             /// <summary>
@@ -401,7 +403,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public SN76496Sound(SN76496 parentModule, NoteOnEvent noteOnEvent, int slot) : base(parentModule, noteOnEvent, slot)
+            public SN76496Sound(SN76496 parentModule, SN76496SoundManager manager, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -469,9 +471,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 10msごとに呼ばれる
             /// </summary>
-            public override void OnModulationUpdate()
+            public override void OnPeriodicAction()
             {
-                base.OnModulationUpdate();
+                base.OnPeriodicAction();
 
                 UpdatePitch();
             }
@@ -503,10 +505,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
 
                 double d1 = ((double)pitch / 8192d) * range;
-                double d2 = ModultionTotalLevel *
-                    ((double)parentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
-                    ((double)parentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
-                double d = d1 + d2;
+                double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
 
                 double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
                 double freq = 440.0 * noteNum;

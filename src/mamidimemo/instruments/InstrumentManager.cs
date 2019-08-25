@@ -67,7 +67,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             lock (lockObject)
             {
-                foreach (var snd in timerSounds.Keys)
+                foreach (var snd in timerSounds.Keys.ToList())
                     snd();
                 if (timerSounds.ContainsKey(action))
                     timerSounds.Remove(action);
@@ -83,7 +83,7 @@ namespace zanac.MAmidiMEmo.Instruments
             lock (lockObject)
             {
                 //Gui.FormMain.OutputDebugLogFile("timer enter");
-                foreach (var snd in timerSounds.Keys)
+                foreach (var snd in timerSounds.Keys.ToList())
                     snd();
                 //Gui.FormMain.OutputDebugLogFile("timer leave");
             }

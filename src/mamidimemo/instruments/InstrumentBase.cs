@@ -339,6 +339,27 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Portamento (0:Off 64:On) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
+        public byte[] Portamentos
+        {
+            get;
+            private set;
+        }
+
+        [DataMember]
+        [Category("MIDI")]
+        [Description("Portamento Time (0-127) <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
+        public byte[] PortamentoTimes
+        {
+            get;
+            private set;
+        }
 
         [Browsable(false)]
         public byte[] RpnLsb
@@ -517,6 +538,18 @@ namespace zanac.MAmidiMEmo.Instruments
                     0x40, 0x40, 0x40,
                     0x40, 0x40, 0x40,
                     0x40, 0x40, 0x40, 0x40};
+            Portamentos = new byte[] {
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0, 0};
+            PortamentoTimes = new byte[] {
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0, 0};
         }
 
         /// <summary>
@@ -698,6 +731,9 @@ namespace zanac.MAmidiMEmo.Instruments
                             }
                     }
                     break;
+                case 5:    //Portamento Time
+                    PortamentoTimes[midiEvent.Channel] = midiEvent.ControlValue;
+                    break;
                 case 7:    //Volume
                     Volumes[midiEvent.Channel] = midiEvent.ControlValue;
                     break;
@@ -706,6 +742,9 @@ namespace zanac.MAmidiMEmo.Instruments
                     break;
                 case 11:    //Expression
                     Expressions[midiEvent.Channel] = midiEvent.ControlValue;
+                    break;
+                case 65:    //Portamento
+                    Portamentos[midiEvent.Channel] = midiEvent.ControlValue;
                     break;
                 case 76:    //Modulation Rate
                     ModulationRates[midiEvent.Channel] = midiEvent.ControlValue;
@@ -736,6 +775,8 @@ namespace zanac.MAmidiMEmo.Instruments
                         ModulationDelays[i] = 64;
                         ModulationDepthRangesNote[i] = 0;
                         ModulationDepthRangesCent[i] = 0x40;
+                        Portamentos[i] = 0;
+                        PortamentoTimes[i] = 0;
                     }
                     break;
             }

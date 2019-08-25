@@ -285,6 +285,9 @@ const options_entry windows_options::s_option_entries[] =
 //  main
 //============================================================
 
+//mamidimemo
+void RestartApplication();
+
 int main(int argc, char *argv[])
 {
 	std::vector<std::string> args = osd_get_command_line(argc, argv);
@@ -298,6 +301,7 @@ int main(int argc, char *argv[])
 	_splitpath(argv[0], drive, dir, nullptr, nullptr);
 	_makepath(path, drive, dir, "dummy", ".out");
 	args.push_back(path);
+	//args.push_back("-log");
 
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
@@ -335,6 +339,7 @@ int main(int argc, char *argv[])
 		osd_output::pop(&winerror);
 	}
 
+	RestartApplication();	//mamidimemo
 	return result;
 }
 
