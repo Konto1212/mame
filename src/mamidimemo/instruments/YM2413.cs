@@ -308,6 +308,8 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             private SoundList<YM2413Sound> fmOnSounds = new SoundList<YM2413Sound>(9);
 
+            private SoundList<YM2413Sound> drumOnSounds = new SoundList<YM2413Sound>(9);
+
             private YM2413 parentModule;
 
             /// <summary>
@@ -366,7 +368,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     if (timbre.ToneType != ToneType.DrumSet)
                         emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, 6);
                     else
-                        emptySlot = 0;
+                        emptySlot = SearchEmptySlotAndOff(drumOnSounds, note, 6);
                 }
                 return emptySlot;
             }
@@ -376,10 +378,11 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void NoteOffAll()
             {
-                foreach (var n in AllOnSounds)
-                    n.Dispose();
-                AllOnSounds.Clear();
-                fmOnSounds.Clear();
+                foreach (var snd in AllOnSounds)
+                {
+                    var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0) { Channel = snd.NoteOnEvent.Channel };
+                    NoteOff(noff);
+                }
             }
 
             /// <summary>
@@ -398,6 +401,15 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff FM ch" + removed.Slot + " " + note.ToString());
                             fmOnSounds.RemoveAt(i);
+                            return removed;
+                        }
+                    }
+                    for (int i = 0; i < drumOnSounds.Count; i++)
+                    {
+                        if (drumOnSounds[i] == removed)
+                        {
+                            FormMain.OutputDebugLog("KeyOff drum ch" + removed.Slot + " " + note.ToString());
+                            drumOnSounds.RemoveAt(i);
                             return removed;
                         }
                     }

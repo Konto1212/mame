@@ -84,6 +84,7 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        private int maxSlot;
 
         /// <summary>
         /// コンストラクタ
@@ -91,6 +92,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="maxSlot"></param>
         public SoundList(int maxSlot)
         {
+            this.maxSlot = maxSlot;
             for (int i = 0; i < maxSlot; i++)
                 soundQueue.Add(i);
         }
@@ -129,6 +131,8 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             soundList.Clear();
             soundQueue.Clear();
+            for (int i = 0; i < maxSlot; i++)
+                soundQueue.Add(i);
         }
         //
         // 概要:

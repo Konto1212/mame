@@ -428,28 +428,28 @@ namespace zanac.MAmidiMEmo.Instruments
                     }
                     for (int i = 0; i < triOnSounds.Count; i++)
                     {
-                        if (sqOnSounds[i] == removed)
+                        if (triOnSounds[i] == removed)
                         {
                             FormMain.OutputDebugLog("KeyOff Tri ch" + removed.Slot + " " + note.ToString());
-                            sqOnSounds.RemoveAt(i);
+                            triOnSounds.RemoveAt(i);
                             return removed;
                         }
                     }
                     for (int i = 0; i < noiseOnSounds.Count; i++)
                     {
-                        if (sqOnSounds[i] == removed)
+                        if (noiseOnSounds[i] == removed)
                         {
                             FormMain.OutputDebugLog("KeyOff Noise ch" + removed.Slot + " " + note.ToString());
-                            sqOnSounds.RemoveAt(i);
+                            noiseOnSounds.RemoveAt(i);
                             return removed;
                         }
                     }
                     for (int i = 0; i < dpcmOnSounds.Count; i++)
                     {
-                        if (sqOnSounds[i] == removed)
+                        if (dpcmOnSounds[i] == removed)
                         {
                             FormMain.OutputDebugLog("KeyOff DPCM ch" + removed.Slot + " " + note.ToString());
-                            sqOnSounds.RemoveAt(i);
+                            dpcmOnSounds.RemoveAt(i);
                             return removed;
                         }
                     }

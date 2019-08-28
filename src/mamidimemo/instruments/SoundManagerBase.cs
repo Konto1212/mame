@@ -109,7 +109,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 120:   //All Sounds Off
                 case 123:   //All Note Off
                     {
-                        foreach (var snd in new List<SoundBase>(AllOnSounds))
+                        foreach (var snd in AllOnSounds)
                         {
                             var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0) { Channel = snd.NoteOnEvent.Channel };
                             NoteOff(noff);
