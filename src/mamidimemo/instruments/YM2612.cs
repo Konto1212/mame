@@ -476,72 +476,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            /// <param name="midiEvent"></param>
-            public override void PitchBend(PitchBendEvent midiEvent)
-            {
-                foreach (YM2612Sound t in AllOnSounds)
-                {
-                    if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                    {
-                        t.UpdatePitch();
-                    }
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="channel"></param>
-            /// <param name="value"></param>
-            public override void ControlChange(ControlChangeEvent midiEvent)
-            {
-                base.ControlChange(midiEvent);
-
-                switch (midiEvent.ControlNumber)
-                {
-                    case 1:    //Modulation
-                        foreach (YM2612Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                                t.ModulationEnabled = midiEvent.ControlValue != 0;
-                        }
-                        break;
-                    case 6:    //Data Entry
-                        //nothing
-                        break;
-                    case 7:    //Volume
-                        foreach (YM2612Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                t.UpdateVolume();
-                            }
-                        }
-                        break;
-                    case 10:    //Panpot
-                        foreach (YM2612Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                t.UpdatePanpot();
-                            }
-                        }
-                        break;
-                    case 11:    //Expression
-                        foreach (YM2612Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                t.UpdateVolume();
-                            }
-                        }
-                        break;
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
             /// <param name="note"></param>
             public override void NoteOn(NoteOnEvent note)
             {
@@ -550,8 +484,8 @@ namespace zanac.MAmidiMEmo.Instruments
                     return;
 
                 YM2612Sound snd = new YM2612Sound(parentModule, this, note, emptySlot);
-                AllOnSounds.Add(snd);
                 fmOnSounds.Add(snd);
+
                 FormMain.OutputDebugLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
                 snd.On();
 
@@ -569,7 +503,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pn = parentModule.ProgramNumbers[note.Channel];
 
                 var timbre = parentModule.Timbres[pn];
-                emptySlot = SearchEmptySlot(fmOnSounds.ToList<SoundBase>(), note, 6);
+                emptySlot = SearchEmptySlotAndOff(fmOnSounds.ToList<SoundBase>(), note, 6);
                 return emptySlot;
             }
 
@@ -647,7 +581,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void UpdateVolume()
+            public override void UpdateVolume()
             {
                 List<int> ops = new List<int>();
                 switch (Timbre.ALG)
@@ -696,26 +630,12 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             /// <summary>
-            /// 10msごとに呼ばれる
-            /// </summary>
-            public override void OnPeriodicAction()
-            {
-                base.OnPeriodicAction();
-
-                UpdatePitch();
-            }
-
-            /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public void UpdatePitch()
+            public override void UpdatePitch()
             {
-                var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
-                var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
-
-                double d1 = ((double)pitch / 8192d) * range;
-                double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
+                double d = CalcCurrentPitch();
 
                 int noteNum = NoteOnEvent.NoteNumber + (int)d;
                 if (noteNum > 127)
@@ -738,7 +658,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void UpdatePanpot()
+            public override void UpdatePanpot()
             {
                 //$B4+: panning, FMS, AMS
                 byte pan = parentModule.Panpots[NoteOnEvent.Channel];
@@ -927,6 +847,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound")]
             [Description("Operators")]
             [TypeConverter(typeof(ExpandableCollectionConverter))]
+            [DisplayName("Operators")]
             public YM2612Operator[] Ops
             {
                 get;

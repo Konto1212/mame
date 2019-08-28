@@ -63,11 +63,26 @@ namespace zanac.MAmidiMEmo.Instruments
             this.ParentManager = manager;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void Dispose()
+        {
+            if (periodicAction != null)
+                InstrumentManager.UnsetPeriodicCallback(periodicAction);
+
+            if (!IsDisposed)
+                Off();
+        }
+
         /// <summary>
         /// サウンドオン
         /// </summary>
         public virtual void On()
         {
+            ParentManager.AddOnSound(this);
+
             if (ParentModule.ModulationDepthes[NoteOnEvent.Channel] > 64 ||
                 ParentModule.Modulations[NoteOnEvent.Channel] > 0)
                 ModulationEnabled = true;
@@ -91,6 +106,56 @@ namespace zanac.MAmidiMEmo.Instruments
         public virtual void Off()
         {
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void UpdateVolume()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void UpdatePanpot()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void UpdatePitch()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected double CalcCurrentFrequency()
+        {
+            double d = CalcCurrentPitch();
+
+            double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
+            double freq = 440.0 * noteNum;
+            return freq;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected double CalcCurrentPitch()
+        {
+            var pitch = (int)ParentModule.Pitchs[NoteOnEvent.Channel] - 8192;
+            var range = (int)ParentModule.PitchBendRanges[NoteOnEvent.Channel];
+
+            double d1 = ((double)pitch / 8192d) * range;
+            double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
+
+            return d;
+        }
+
 
         /// <summary>
         /// 0.0 - 100.0
@@ -202,7 +267,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 if (PortamentoDeltaNoteNumber != 0)
                 {
-                    double delta = -portStartNoteDeltSign * 12d / Math.Pow(((double)ParentModule.PortamentoTimes[NoteOnEvent.Channel]/2d) + 1d, 1.25);
+                    double delta = -portStartNoteDeltSign * 12d / Math.Pow(((double)ParentModule.PortamentoTimes[NoteOnEvent.Channel] / 2d) + 1d, 1.25);
                     PortamentoDeltaNoteNumber += delta;
 
                     if (portStartNoteDeltSign < 0 && PortamentoDeltaNoteNumber >= 0)
@@ -214,6 +279,9 @@ namespace zanac.MAmidiMEmo.Instruments
                         PortamentoEnabled = false;
                 }
             }
+
+            if (ModulationEnabled || PortamentoEnabled)
+                UpdatePitch();
         }
 
         public double PortamentoDeltaNoteNumber
@@ -245,17 +313,6 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public virtual void Dispose()
-        {
-            if (periodicAction != null)
-                InstrumentManager.UnsetPeriodicCallback(periodicAction);
-
-            if (!IsDisposed)
-                Off();
-        }
 
     }
 }

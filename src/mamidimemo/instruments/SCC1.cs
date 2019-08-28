@@ -298,61 +298,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            /// <param name="midiEvent"></param>
-            public override void PitchBend(PitchBendEvent midiEvent)
-            {
-                foreach (SCC1Sound t in AllOnSounds)
-                {
-                    if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                    {
-                        t.UpdatePitch();
-                    }
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="channel"></param>
-            /// <param name="value"></param>
-            public override void ControlChange(ControlChangeEvent midiEvent)
-            {
-                base.ControlChange(midiEvent);
-
-                switch (midiEvent.ControlNumber)
-                {
-                    case 1:    //Modulation
-                        foreach (SCC1Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                                t.ModulationEnabled = midiEvent.ControlValue != 0;
-                        }
-                        break;
-                    case 6:    //Data Entry
-                        //nothing
-                        break;
-                    case 7:    //Volume
-                        foreach (SCC1Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                                t.UpdateVolume();
-                        }
-                        break;
-                    case 10:    //Panpot
-                        break;
-                    case 11:    //Expression
-                        foreach (SCC1Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                                t.UpdateVolume();
-                        }
-                        break;
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
             /// <param name="note"></param>
             public override void NoteOn(NoteOnEvent note)
             {
@@ -361,7 +306,6 @@ namespace zanac.MAmidiMEmo.Instruments
                     return;
 
                 SCC1Sound snd = new SCC1Sound(parentModule, this, note, emptySlot);
-                AllOnSounds.Add(snd);
                 sccOnSounds.Add(snd);
                 FormMain.OutputDebugLog("KeyOn SCC ch" + emptySlot + " " + note.ToString());
                 snd.On();
@@ -375,13 +319,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <returns></returns>
             private int searchEmptySlot(NoteOnEvent note)
             {
-                int emptySlot = -1;
-
-                var pn = parentModule.ProgramNumbers[note.Channel];
-
-                var timbre = parentModule.Timbres[pn];
-                emptySlot = SearchEmptySlot(sccOnSounds.ToList<SoundBase>(), note, 5);
-                return emptySlot;
+                return SearchEmptySlotAndOff(sccOnSounds.ToList<SoundBase>(), note, 5);
             }
 
             /// <summary>
@@ -465,7 +403,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void UpdateVolume()
+            public override void UpdateVolume()
             {
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
@@ -477,29 +415,12 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             /// <summary>
-            /// 10msごとに呼ばれる
-            /// </summary>
-            public override void OnPeriodicAction()
-            {
-                base.OnPeriodicAction();
-
-                UpdatePitch();
-            }
-
-            /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public void UpdatePitch()
+            public override void UpdatePitch()
             {
-                var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
-                var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
-
-                double d1 = ((double)pitch / 8192d) * range;
-                double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
-
-                double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
-                double freq = 440.0 * noteNum;
+                double freq = CalcCurrentFrequency();
 
                 /*
                  *                fclock

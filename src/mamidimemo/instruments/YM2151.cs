@@ -1,15 +1,11 @@
 ﻿// copyright-holders:K.Ito
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.MusicTheory;
 using Melanchall.DryWetMidi.Smf;
@@ -19,7 +15,6 @@ using Omu.ValueInjecter.Injections;
 using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Gui;
 using zanac.MAmidiMEmo.Mame;
-using zanac.MAmidiMEmo.Midi;
 
 //https://www16.atwiki.jp/mxdrv/pages/24.html
 //http://map.grauw.nl/resources/sound/yamaha_ym2151_synthesis.pdf
@@ -477,72 +472,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            /// <param name="midiEvent"></param>
-            public override void PitchBend(PitchBendEvent midiEvent)
-            {
-                foreach (YM2151Sound t in AllOnSounds)
-                {
-                    if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                    {
-                        t.UpdatePitch();
-                    }
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="channel"></param>
-            /// <param name="value"></param>
-            public override void ControlChange(ControlChangeEvent midiEvent)
-            {
-                base.ControlChange(midiEvent);
-
-                switch (midiEvent.ControlNumber)
-                {
-                    case 1:    //Modulation
-                        foreach (YM2151Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                                t.ModulationEnabled = midiEvent.ControlValue != 0;
-                        }
-                        break;
-                    case 6:    //Data Entry
-                        //nothing
-                        break;
-                    case 7:    //Volume
-                        foreach (YM2151Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                t.UpdateVolume();
-                            }
-                        }
-                        break;
-                    case 10:    //Panpot
-                        foreach (YM2151Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                t.UpdatePanpot();
-                            }
-                        }
-                        break;
-                    case 11:    //Expression
-                        foreach (YM2151Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                t.UpdateVolume();
-                            }
-                        }
-                        break;
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
             /// <param name="note"></param>
             public override void NoteOn(NoteOnEvent note)
             {
@@ -551,7 +480,6 @@ namespace zanac.MAmidiMEmo.Instruments
                     return;
 
                 YM2151Sound snd = new YM2151Sound(parentModule, this, note, emptySlot);
-                AllOnSounds.Add(snd);
                 fmOnSounds.Add(snd);
                 FormMain.OutputDebugLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
                 snd.On();
@@ -565,13 +493,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <returns></returns>
             private int searchEmptySlot(NoteOnEvent note)
             {
-                int emptySlot = -1;
-
-                var pn = parentModule.ProgramNumbers[note.Channel];
-
-                var timbre = parentModule.Timbres[pn];
-                emptySlot = SearchEmptySlot(fmOnSounds.ToList<SoundBase>(), note, 6);
-                return emptySlot;
+                return SearchEmptySlotAndOff(fmOnSounds.ToList<SoundBase>(), note, 6);
             }
 
             /// <summary>
@@ -656,7 +578,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void UpdateVolume()
+            public override void UpdateVolume()
             {
                 List<int> ops = new List<int>();
                 switch (Timbre.ALG)
@@ -705,26 +627,12 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             /// <summary>
-            /// 10msごとに呼ばれる
-            /// </summary>
-            public override void OnPeriodicAction()
-            {
-                base.OnPeriodicAction();
-
-                UpdatePitch();
-            }
-
-            /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public void UpdatePitch()
+            public override void UpdatePitch()
             {
-                var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
-                var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
-
-                double d1 = ((double)pitch / 8192d) * range;
-                double d = (d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber) * 63d;
+                double d = CalcCurrentPitch() * 63d;
 
                 int kf = 0;
                 if (d > 0)
@@ -810,7 +718,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void UpdatePanpot()
+            public override void UpdatePanpot()
             {
                 byte pan = parentModule.Panpots[NoteOnEvent.Channel];
                 if (pan < 32)
@@ -944,6 +852,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound")]
             [Description("Operators")]
             [TypeConverter(typeof(ExpandableCollectionConverter))]
+            [DisplayName("Operators")]
             public YM2151Operator[] Ops
             {
                 get;

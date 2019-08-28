@@ -25,6 +25,11 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        internal void AddOnSound(SoundBase sound)
+        {
+            AllOnSounds.Add(sound);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -52,6 +57,13 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="midiEvent"></param>
         public virtual void PitchBend(PitchBendEvent midiEvent)
         {
+            foreach (var t in AllOnSounds)
+            {
+                if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                {
+                    t.UpdatePitch();
+                }
+            }
         }
 
         /// <summary>
@@ -63,6 +75,37 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             switch (midiEvent.ControlNumber)
             {
+                case 1:    //Modulation
+                    foreach (var t in AllOnSounds)
+                    {
+                        if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                            t.ModulationEnabled = midiEvent.ControlValue != 0;
+                    }
+                    break;
+                case 6:    //Data Entry
+                           //nothing
+                    break;
+                case 7:    //Volume
+                    foreach (var t in AllOnSounds)
+                    {
+                        if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                            t.UpdateVolume();
+                    }
+                    break;
+                case 10:    //Panpot
+                    foreach (var t in AllOnSounds)
+                    {
+                        if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                            t.UpdatePanpot();
+                    }
+                    break;
+                case 11:    //Expression
+                    foreach (var t in AllOnSounds)
+                    {
+                        if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                            t.UpdateVolume();
+                    }
+                    break;
                 case 120:   //All Sounds Off
                 case 123:   //All Note Off
                     {
@@ -105,67 +148,39 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="note"></param>
         public virtual SoundBase NoteOff(NoteOffEvent note)
         {
-            return SearchAndRemoveOnSound(note, AllOnSounds);
-        }
-
-        protected virtual int SearchEmptySlot(List<SoundBase> onSounds, NoteOnEvent newNote, int maxSlot)
-        {
-            return SearchEmptySlot(onSounds, newNote, maxSlot, false);
+            return RemoveOnSound(note, AllOnSounds);
         }
 
         /// <summary>
         /// 未使用のスロットを検索する
-        /// 空が無い場合は最初に鳴った音を消してそこを再利用する
+        /// 空が無い場合は最初に鳴った音を消す
         /// </summary>
         /// <param name="onSounds"></param>
         /// <param name="maxSlot"></param>
         /// <returns></returns>
-        protected virtual int SearchEmptySlot(List<SoundBase> onSounds, NoteOnEvent newNote, int maxSlot, bool reversSlot)
+        protected virtual int SearchEmptySlotAndOff(List<SoundBase> onSounds, NoteOnEvent newNote, int maxSlot)
         {
             int emptySlot = -1;
 
             //未使用のスロットを検索する
-            if (!reversSlot)
+            for (int i = 0; i < maxSlot; i++)
             {
-                for (int i = 0; i < maxSlot; i++)
+                bool found = false;
+                foreach (var snd in onSounds)
                 {
-                    bool found = false;
-                    foreach (var snd in onSounds)
-                    {
-                        if (snd.NoteOnEvent.NoteNumber == newNote.NoteNumber)
-                            return -1;
+                    if (snd.NoteOnEvent.NoteNumber == newNote.NoteNumber)
+                        return -1;
 
-                        if (snd.Slot == i)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)
+                    if (snd.Slot == i)
                     {
-                        emptySlot = i;
+                        found = true;
                         break;
                     }
                 }
-            }
-            else
-            {
-                for (int i = maxSlot - 1; i >= 0; i--)
+                if (!found)
                 {
-                    bool found = false;
-                    foreach (var snd in onSounds)
-                    {
-                        if (snd.Slot == i)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        emptySlot = i;
-                        break;
-                    }
+                    emptySlot = i;
+                    break;
                 }
             }
 
@@ -175,7 +190,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 var snd = onSounds[0];
                 emptySlot = snd.Slot;
 
-                var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0) { Channel = snd.NoteOnEvent.Channel };
+                var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber,
+                    (SevenBitNumber)0)
+                { Channel = snd.NoteOnEvent.Channel };
                 NoteOff(noff);
             }
             return emptySlot;
@@ -188,7 +205,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="note"></param>
         /// <param name="onOnSounds"></param>
         /// <returns></returns>
-        protected static T SearchAndRemoveOnSound<T>(NoteOffEvent note, List<T> onOnSounds) where T : SoundBase
+        protected static T RemoveOnSound<T>(NoteOffEvent note, List<T> onOnSounds) where T : SoundBase
         {
             T removed = null;
             for (int i = 0; i < onOnSounds.Count; i++)
@@ -207,5 +224,6 @@ namespace zanac.MAmidiMEmo.Instruments
 
             return removed;
         }
+
     }
 }

@@ -274,72 +274,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            /// <param name="midiEvent"></param>
-            public override void PitchBend(PitchBendEvent midiEvent)
-            {
-                foreach (NAMCO_CUS30Sound t in AllOnSounds)
-                {
-                    if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                    {
-                        t.UpdatePitch();
-                    }
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="channel"></param>
-            /// <param name="value"></param>
-            public override void ControlChange(ControlChangeEvent midiEvent)
-            {
-                base.ControlChange(midiEvent);
-
-                switch (midiEvent.ControlNumber)
-                {
-                    case 1:    //Modulation
-                        foreach (NAMCO_CUS30Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                                t.ModulationEnabled = midiEvent.ControlValue != 0;
-                        }
-                        break;
-                    case 6:    //Data Entry
-                        //nothing
-                        break;
-                    case 7:    //Volume
-                        foreach (NAMCO_CUS30Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                t.UpdateVolume();
-                            }
-                        }
-                        break;
-                    case 10:    //Panpot
-                        foreach (NAMCO_CUS30Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                t.UpdateVolume();
-                            }
-                        }
-                        break;
-                    case 11:    //Expression
-                        foreach (NAMCO_CUS30Sound t in AllOnSounds)
-                        {
-                            if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            {
-                                t.UpdateVolume();
-                            }
-                        }
-                        break;
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
             /// <param name="note"></param>
             public override void NoteOn(NoteOnEvent note)
             {
@@ -348,7 +282,6 @@ namespace zanac.MAmidiMEmo.Instruments
                     return;
 
                 NAMCO_CUS30Sound snd = new NAMCO_CUS30Sound(parentModule, this, note, emptySlot);
-                AllOnSounds.Add(snd);
                 wsgOnSounds.Add(snd);
                 FormMain.OutputDebugLog("KeyOn WSG ch" + emptySlot + " " + note.ToString());
                 snd.On();
@@ -362,13 +295,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <returns></returns>
             private int searchEmptySlot(NoteOnEvent note)
             {
-                int emptySlot = -1;
-
-                var pn = parentModule.ProgramNumbers[note.Channel];
-
-                var timbre = parentModule.Timbres[pn];
-                emptySlot = SearchEmptySlot(wsgOnSounds.ToList<SoundBase>(), note, 8);
-                return emptySlot;
+                return SearchEmptySlotAndOff(wsgOnSounds.ToList<SoundBase>(), note, 8);
             }
 
             /// <summary>
@@ -453,7 +380,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void UpdateVolume()
+            public override void UpdateVolume()
             {
                 var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
@@ -484,29 +411,15 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             /// <summary>
-            /// 10msごとに呼ばれる
-            /// </summary>
-            public override void OnPeriodicAction()
-            {
-                base.OnPeriodicAction();
-
-                UpdatePitch();
-            }
-
-            /// <summary>
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public void UpdatePitch()
+            public override void UpdatePitch()
             {
-                var pitch = (int)parentModule.Pitchs[NoteOnEvent.Channel] - 8192;
-                var range = (int)parentModule.PitchBendRanges[NoteOnEvent.Channel];
-
-                double d1 = ((double)pitch / 8192d) * range;
-                double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
-
+                double d = CalcCurrentPitch();
                 double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
                 double freq = 440.0 * noteNum;
+
                 //max 1048575(20bit)
                 //midi 8.175798915643707 ～ 12543.853951415975Hz
                 // A4 440 -> 440 * 500 = 440000

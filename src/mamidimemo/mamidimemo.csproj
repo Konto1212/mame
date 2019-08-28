@@ -81,6 +81,7 @@
     <Compile Include="ComponentModel\CustomExpandableObjectConverter.cs" />
     <Compile Include="ComponentModel\IStandardValues.cs" />
     <Compile Include="ComponentModel\MaskAttribute.cs" />
+    <Compile Include="Instruments\SoundList.cs" />
     <Compile Include="ComponentModel\StandardValuesDoubleConverter.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverterForUIEditor.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverter.cs" />
