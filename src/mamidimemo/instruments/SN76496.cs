@@ -225,6 +225,8 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             private SoundList<SN76496Sound> psgOnSounds = new SoundList<SN76496Sound>(3);
 
+            private SoundList<SN76496Sound> noiseOnSounds = new SoundList<SN76496Sound>(1);
+
             private SN76496 parentModule;
 
             /// <summary>
@@ -254,6 +256,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         FormMain.OutputDebugLog("KeyOn PSG ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.NOISE:
+                        noiseOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn NOISE ch" + emptySlot + " " + note.ToString());
                         break;
                 }
@@ -281,7 +284,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         }
                     case SoundType.NOISE:
                         {
-                            emptySlot = 0;
+                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, 3);
                             break;
                         }
                 }
@@ -304,6 +307,14 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff PSG ch" + removed.Slot + " " + note.ToString());
                             psgOnSounds.RemoveAt(i);
+                            return removed;
+                        }
+                    }
+                    for (int i = 0; i < noiseOnSounds.Count; i++)
+                    {
+                        if (noiseOnSounds[i] == removed)
+                        {
+                            noiseOnSounds.RemoveAt(i);
                             return removed;
                         }
                     }

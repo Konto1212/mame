@@ -327,6 +327,11 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private SoundList<GbSound> psgOnSounds = new SoundList<GbSound>(2);
 
+            private SoundList<GbSound> wavOnSounds = new SoundList<GbSound>(1);
+
+            private SoundList<GbSound> noiseOnSounds = new SoundList<GbSound>(1);
+
+
             private GB_APU parentModule;
 
             /// <summary>
@@ -364,9 +369,11 @@ namespace zanac.MAmidiMEmo.Instruments
                         FormMain.OutputDebugLog("KeyOn PSG ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.WAV:
+                        wavOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn WAV ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.NOISE:
+                        noiseOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn NOISE ch" + emptySlot + " " + note.ToString());
                         break;
                 }
@@ -401,9 +408,13 @@ namespace zanac.MAmidiMEmo.Instruments
                             break;
                         }
                     case SoundType.WAV:
+                        {
+                            emptySlot = SearchEmptySlotAndOff(wavOnSounds, note, 1);
+                            break;
+                        }
                     case SoundType.NOISE:
                         {
-                            emptySlot = 0;
+                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, 1);
                             break;
                         }
                 }
@@ -433,6 +444,22 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (psgOnSounds[i] == removed)
                         {
                             psgOnSounds.RemoveAt(i);
+                            return removed;
+                        }
+                    }
+                    for (int i = 0; i < wavOnSounds.Count; i++)
+                    {
+                        if (wavOnSounds[i] == removed)
+                        {
+                            wavOnSounds.RemoveAt(i);
+                            return removed;
+                        }
+                    }
+                    for (int i = 0; i < noiseOnSounds.Count; i++)
+                    {
+                        if (noiseOnSounds[i] == removed)
+                        {
+                            noiseOnSounds.RemoveAt(i);
                             return removed;
                         }
                     }

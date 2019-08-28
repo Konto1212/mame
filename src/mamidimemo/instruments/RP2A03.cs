@@ -319,6 +319,12 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             private SoundList<RP2A03Sound> sqOnSounds = new SoundList<RP2A03Sound>(2);
 
+            private SoundList<RP2A03Sound> triOnSounds = new SoundList<RP2A03Sound>(1);
+
+            private SoundList<RP2A03Sound> noiseOnSounds = new SoundList<RP2A03Sound>(1);
+
+            private SoundList<RP2A03Sound> dpcmOnSounds = new SoundList<RP2A03Sound>(1);
+
             private RP2A03 parentModule;
 
             /// <summary>
@@ -348,12 +354,15 @@ namespace zanac.MAmidiMEmo.Instruments
                         FormMain.OutputDebugLog("KeyOn SQ ch" + emptySlot + " " + note.ToString());
                         break;
                     case ToneType.TRIANGLE:
+                        triOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn Tri ch" + emptySlot + " " + note.ToString());
                         break;
                     case ToneType.NOISE:
+                        noiseOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn Noise ch" + emptySlot + " " + note.ToString());
                         break;
                     case ToneType.DPCM:
+                        dpcmOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn DPCM ch" + emptySlot + " " + note.ToString());
                         break;
                 }
@@ -380,10 +389,18 @@ namespace zanac.MAmidiMEmo.Instruments
                             break;
                         }
                     case ToneType.TRIANGLE:
+                        {
+                            emptySlot = SearchEmptySlotAndOff(triOnSounds, note, 1);
+                            break;
+                        }
                     case ToneType.NOISE:
+                        {
+                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, 1);
+                            break;
+                        }
                     case ToneType.DPCM:
                         {
-                            emptySlot = 0;
+                            emptySlot = SearchEmptySlotAndOff(dpcmOnSounds, note, 1);
                             break;
                         }
                 }
@@ -405,6 +422,33 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (sqOnSounds[i] == removed)
                         {
                             FormMain.OutputDebugLog("KeyOff SQ ch" + removed.Slot + " " + note.ToString());
+                            sqOnSounds.RemoveAt(i);
+                            return removed;
+                        }
+                    }
+                    for (int i = 0; i < triOnSounds.Count; i++)
+                    {
+                        if (sqOnSounds[i] == removed)
+                        {
+                            FormMain.OutputDebugLog("KeyOff Tri ch" + removed.Slot + " " + note.ToString());
+                            sqOnSounds.RemoveAt(i);
+                            return removed;
+                        }
+                    }
+                    for (int i = 0; i < noiseOnSounds.Count; i++)
+                    {
+                        if (sqOnSounds[i] == removed)
+                        {
+                            FormMain.OutputDebugLog("KeyOff Noise ch" + removed.Slot + " " + note.ToString());
+                            sqOnSounds.RemoveAt(i);
+                            return removed;
+                        }
+                    }
+                    for (int i = 0; i < dpcmOnSounds.Count; i++)
+                    {
+                        if (sqOnSounds[i] == removed)
+                        {
+                            FormMain.OutputDebugLog("KeyOff DPCM ch" + removed.Slot + " " + note.ToString());
                             sqOnSounds.RemoveAt(i);
                             return removed;
                         }

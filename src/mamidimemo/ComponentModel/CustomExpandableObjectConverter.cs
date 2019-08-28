@@ -5,6 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Collections;
 using System.Globalization;
+using System.Reflection;
 
 namespace zanac.MAmidiMEmo.ComponentModel
 {
@@ -34,8 +35,17 @@ namespace zanac.MAmidiMEmo.ComponentModel
             if (context == null)
                 throw new ArgumentNullException("context");
 
-            var props = base.GetProperties(context, value, attributes);
-            return props;
+            // TypeDescriptorを使用してプロパティ一覧を取得する
+            PropertyDescriptorCollection pdc = TypeDescriptor.GetProperties(value, attributes);
+
+            // プロパティ一覧をリフレクションから取得
+            Type type = value.GetType();
+            List<string> list = new List<string>();
+            foreach (PropertyInfo propertyInfo in type.GetProperties())
+                list.Add(propertyInfo.Name);
+
+            // リフレクションから取得した順でソート
+            return pdc.Sort(list.ToArray());
         }
 
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
