@@ -306,7 +306,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class YM2413SoundManager : SoundManagerBase
         {
-            private List<YM2413Sound> fmOnSounds = new List<YM2413Sound>();
+            private SoundList<YM2413Sound> fmOnSounds = new SoundList<YM2413Sound>(9);
 
             private YM2413 parentModule;
 
@@ -357,14 +357,14 @@ namespace zanac.MAmidiMEmo.Instruments
                 int emptySlot = -1;
                 if (parentModule.RHY == 0)
                 {
-                    emptySlot = SearchEmptySlotAndOff(fmOnSounds.ToList<SoundBase>(), note, 9);
+                    emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, 9);
                 }
                 else
                 {
                     var pn = parentModule.ProgramNumbers[note.Channel];
                     var timbre = parentModule.Timbres[pn];
                     if (timbre.ToneType != ToneType.DrumSet)
-                        emptySlot = SearchEmptySlotAndOff(fmOnSounds.ToList<SoundBase>(), note, 6);
+                        emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, 6);
                     else
                         emptySlot = 0;
                 }

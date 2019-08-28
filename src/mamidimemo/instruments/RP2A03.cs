@@ -317,13 +317,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class RP2A03SoundManager : SoundManagerBase
         {
-            private List<RP2A03Sound> sqOnSounds = new List<RP2A03Sound>();
-
-            private List<RP2A03Sound> triOnSounds = new List<RP2A03Sound>();
-
-            private List<RP2A03Sound> noiseOnSounds = new List<RP2A03Sound>();
-
-            private List<RP2A03Sound> dpcmOnSounds = new List<RP2A03Sound>();
+            private SoundList<RP2A03Sound> sqOnSounds = new SoundList<RP2A03Sound>(2);
 
             private RP2A03 parentModule;
 
@@ -354,15 +348,12 @@ namespace zanac.MAmidiMEmo.Instruments
                         FormMain.OutputDebugLog("KeyOn SQ ch" + emptySlot + " " + note.ToString());
                         break;
                     case ToneType.TRIANGLE:
-                        triOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn Tri ch" + emptySlot + " " + note.ToString());
                         break;
                     case ToneType.NOISE:
-                        noiseOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn Noise ch" + emptySlot + " " + note.ToString());
                         break;
                     case ToneType.DPCM:
-                        dpcmOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn DPCM ch" + emptySlot + " " + note.ToString());
                         break;
                 }
@@ -385,22 +376,14 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     case ToneType.SQUARE:
                         {
-                            emptySlot = SearchEmptySlotAndOff(sqOnSounds.ToList<SoundBase>(), note, 2);
+                            emptySlot = SearchEmptySlotAndOff(sqOnSounds, note, 2);
                             break;
                         }
                     case ToneType.TRIANGLE:
-                        {
-                            emptySlot = SearchEmptySlotAndOff(triOnSounds.ToList<SoundBase>(), note, 1);
-                            break;
-                        }
                     case ToneType.NOISE:
-                        {
-                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds.ToList<SoundBase>(), note, 1);
-                            break;
-                        }
                     case ToneType.DPCM:
                         {
-                            emptySlot = SearchEmptySlotAndOff(dpcmOnSounds.ToList<SoundBase>(), note, 1);
+                            emptySlot = 0;
                             break;
                         }
                 }
@@ -423,33 +406,6 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff SQ ch" + removed.Slot + " " + note.ToString());
                             sqOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                    for (int i = 0; i < triOnSounds.Count; i++)
-                    {
-                        if (triOnSounds[i] == removed)
-                        {
-                            FormMain.OutputDebugLog("KeyOff Tri ch" + removed.Slot + " " + note.ToString());
-                            triOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                    for (int i = 0; i < dpcmOnSounds.Count; i++)
-                    {
-                        if (dpcmOnSounds[i] == removed)
-                        {
-                            FormMain.OutputDebugLog("KeyOff Dpcm ch" + removed.Slot + " " + note.ToString());
-                            dpcmOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                    for (int i = 0; i < noiseOnSounds.Count; i++)
-                    {
-                        if (noiseOnSounds[i] == removed)
-                        {
-                            FormMain.OutputDebugLog("KeyOff Noisse ch" + removed.Slot + " " + note.ToString());
-                            noiseOnSounds.RemoveAt(i);
                             return removed;
                         }
                     }

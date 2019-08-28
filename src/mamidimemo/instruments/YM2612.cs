@@ -460,7 +460,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class YM2612SoundManager : SoundManagerBase
         {
-            private List<YM2612Sound> fmOnSounds = new List<YM2612Sound>();
+            private SoundList<YM2612Sound> fmOnSounds = new SoundList<YM2612Sound>(6);
 
             private YM2612 parentModule;
 
@@ -503,7 +503,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pn = parentModule.ProgramNumbers[note.Channel];
 
                 var timbre = parentModule.Timbres[pn];
-                emptySlot = SearchEmptySlotAndOff(fmOnSounds.ToList<SoundBase>(), note, 6);
+                emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, 6);
                 return emptySlot;
             }
 

@@ -454,9 +454,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private class YM2151SoundManager : SoundManagerBase
         {
 
-            private List<YM2151Sound> fmOnSounds = new List<YM2151Sound>();
-
-            private List<YM2151Sound> psgOnSounds = new List<YM2151Sound>();
+            private SoundList<YM2151Sound> fmOnSounds = new SoundList<YM2151Sound>(8);
 
             private YM2151 parentModule;
 
@@ -493,7 +491,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <returns></returns>
             private int searchEmptySlot(NoteOnEvent note)
             {
-                return SearchEmptySlotAndOff(fmOnSounds.ToList<SoundBase>(), note, 6);
+                return SearchEmptySlotAndOff(fmOnSounds, note, 8);
             }
 
             /// <summary>
@@ -512,14 +510,6 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff FM ch" + removed.Slot + " " + note.ToString());
                             fmOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                    for (int i = 0; i < psgOnSounds.Count; i++)
-                    {
-                        if (psgOnSounds[i] == removed)
-                        {
-                            psgOnSounds.RemoveAt(i);
                             return removed;
                         }
                     }

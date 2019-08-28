@@ -282,7 +282,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class SCC1SoundManager : SoundManagerBase
         {
-            private List<SCC1Sound> sccOnSounds = new List<SCC1Sound>();
+            private SoundList<SCC1Sound> sccOnSounds = new SoundList<SCC1Sound>(5);
 
             private SCC1 parentModule;
 
@@ -319,7 +319,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <returns></returns>
             private int searchEmptySlot(NoteOnEvent note)
             {
-                return SearchEmptySlotAndOff(sccOnSounds.ToList<SoundBase>(), note, 5);
+                return SearchEmptySlotAndOff(sccOnSounds, note, 5);
             }
 
             /// <summary>

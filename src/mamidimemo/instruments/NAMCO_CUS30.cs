@@ -258,7 +258,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class NAMCO_CUS30SoundManager : SoundManagerBase
         {
-            private List<NAMCO_CUS30Sound> wsgOnSounds = new List<NAMCO_CUS30Sound>();
+            private SoundList<NAMCO_CUS30Sound> wsgOnSounds = new SoundList<NAMCO_CUS30Sound>(8);
 
             private NAMCO_CUS30 parentModule;
 
@@ -295,7 +295,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <returns></returns>
             private int searchEmptySlot(NoteOnEvent note)
             {
-                return SearchEmptySlotAndOff(wsgOnSounds.ToList<SoundBase>(), note, 8);
+                return SearchEmptySlotAndOff(wsgOnSounds, note, 8);
             }
 
             /// <summary>

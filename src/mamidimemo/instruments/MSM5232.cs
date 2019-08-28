@@ -359,8 +359,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class MSM5232SoundManager : SoundManagerBase
         {
-            private List<MSM5232Sound> chAOnSounds = new List<MSM5232Sound>();
-            private List<MSM5232Sound> chBOnSounds = new List<MSM5232Sound>();
+            private SoundList<MSM5232Sound> chAOnSounds = new SoundList<MSM5232Sound>(4);
+            private SoundList<MSM5232Sound> chBOnSounds = new SoundList<MSM5232Sound>(4);
 
             private MSM5232 parentModule;
 
@@ -414,12 +414,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     case SoundGroup.Group1:
                         {
-                            emptySlot = SearchEmptySlotAndOff(chAOnSounds.ToList<SoundBase>(), note, 4);
+                            emptySlot = SearchEmptySlotAndOff(chAOnSounds, note, 4);
                             break;
                         }
                     case SoundGroup.Group2:
                         {
-                            emptySlot = SearchEmptySlotAndOff(chBOnSounds.ToList<SoundBase>(), note, 4);
+                            emptySlot = SearchEmptySlotAndOff(chBOnSounds, note, 4);
                             break;
                         }
                 }

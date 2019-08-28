@@ -223,9 +223,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class SN76496SoundManager : SoundManagerBase
         {
-            private List<SN76496Sound> psgOnSounds = new List<SN76496Sound>();
-
-            private List<SN76496Sound> noiseOnSounds = new List<SN76496Sound>();
+            private SoundList<SN76496Sound> psgOnSounds = new SoundList<SN76496Sound>(3);
 
             private SN76496 parentModule;
 
@@ -256,7 +254,6 @@ namespace zanac.MAmidiMEmo.Instruments
                         FormMain.OutputDebugLog("KeyOn PSG ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.NOISE:
-                        noiseOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn NOISE ch" + emptySlot + " " + note.ToString());
                         break;
                 }
@@ -279,12 +276,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     case SoundType.PSG:
                         {
-                            emptySlot = SearchEmptySlotAndOff(psgOnSounds.ToList<SoundBase>(), note, 3);
+                            emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, 3);
                             break;
                         }
                     case SoundType.NOISE:
                         {
-                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds.ToList<SoundBase>(), note, 1);
+                            emptySlot = 0;
                             break;
                         }
                 }
@@ -307,14 +304,6 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             FormMain.OutputDebugLog("KeyOff PSG ch" + removed.Slot + " " + note.ToString());
                             psgOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                    for (int i = 0; i < noiseOnSounds.Count; i++)
-                    {
-                        if (noiseOnSounds[i] == removed)
-                        {
-                            noiseOnSounds.RemoveAt(i);
                             return removed;
                         }
                     }

@@ -19,23 +19,23 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        protected List<SoundBase> AllOnSounds
+        protected SoundList<SoundBase> AllOnSounds
         {
             get;
             private set;
         }
 
-        internal void AddOnSound(SoundBase sound)
-        {
-            AllOnSounds.Add(sound);
-        }
+        /// <summary>
+        /// ポルタメント用の最後に鳴ったキー番号
+        /// </summary>
+        private Dictionary<int, int> LastNoteNumbers = new Dictionary<int, int>();
 
         /// <summary>
         /// 
         /// </summary>
         public SoundManagerBase()
         {
-            AllOnSounds = new List<SoundBase>();
+            AllOnSounds = new SoundList<SoundBase>(-1);
         }
 
         /// <summary>
@@ -119,8 +119,6 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private Dictionary<int, int> LastNoteNumbers = new Dictionary<int, int>();
-
         /// <summary>
         /// 
         /// </summary>
@@ -145,10 +143,34 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="sound"></param>
+        internal void AddOnSound(SoundBase sound)
+        {
+            AllOnSounds.Add(sound);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="note"></param>
         public virtual SoundBase NoteOff(NoteOffEvent note)
         {
-            return RemoveOnSound(note, AllOnSounds);
+            SoundBase removed = null;
+            for (int i = 0; i < AllOnSounds.Count; i++)
+            {
+                if (AllOnSounds[i].NoteOnEvent.Channel == note.Channel)
+                {
+                    if (AllOnSounds[i].NoteOnEvent.NoteNumber == note.NoteNumber)
+                    {
+                        removed = AllOnSounds[i];
+                        AllOnSounds.RemoveAt(i);
+                        removed.Dispose();
+                        break;
+                    }
+                }
+            }
+
+            return removed;
         }
 
         /// <summary>
@@ -158,71 +180,23 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="onSounds"></param>
         /// <param name="maxSlot"></param>
         /// <returns></returns>
-        protected virtual int SearchEmptySlotAndOff(List<SoundBase> onSounds, NoteOnEvent newNote, int maxSlot)
+        protected virtual int SearchEmptySlotAndOff<T>(SoundList<T> onSounds, NoteOnEvent newNote, int maxSlot) where T : SoundBase
         {
-            int emptySlot = -1;
+            int emptySlot = onSounds.GetEmptySlot(maxSlot);
 
-            //未使用のスロットを検索する
-            for (int i = 0; i < maxSlot; i++)
+            for (int i = 0; i < onSounds.Count; i++)
             {
-                bool found = false;
-                foreach (var snd in onSounds)
+                var snd = onSounds[i];
+                if (emptySlot == snd.Slot)
                 {
-                    if (snd.NoteOnEvent.NoteNumber == newNote.NoteNumber)
-                        return -1;
-
-                    if (snd.Slot == i)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    emptySlot = i;
+                    var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0);
+                    noff.Channel = snd.NoteOnEvent.Channel;
+                    NoteOff(noff);
                     break;
                 }
             }
 
-            //空が無いので最初に鳴った音を消してそこを再利用する
-            if (emptySlot < 0)
-            {
-                var snd = onSounds[0];
-                emptySlot = snd.Slot;
-
-                var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber,
-                    (SevenBitNumber)0)
-                { Channel = snd.NoteOnEvent.Channel };
-                NoteOff(noff);
-            }
             return emptySlot;
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="note"></param>
-        /// <param name="onOnSounds"></param>
-        /// <returns></returns>
-        protected static T RemoveOnSound<T>(NoteOffEvent note, List<T> onOnSounds) where T : SoundBase
-        {
-            T removed = null;
-            for (int i = 0; i < onOnSounds.Count; i++)
-            {
-                if (onOnSounds[i].NoteOnEvent.Channel == note.Channel)
-                {
-                    if (onOnSounds[i].NoteOnEvent.NoteNumber == note.NoteNumber)
-                    {
-                        removed = onOnSounds[i];
-                        onOnSounds.RemoveAt(i);
-                        removed.Dispose();
-                        break;
-                    }
-                }
-            }
-
-            return removed;
         }
 
     }
