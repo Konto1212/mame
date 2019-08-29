@@ -19,7 +19,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        protected SoundList<SoundBase> AllOnSounds
+        protected SoundList<SoundBase> AllSounds
         {
             get;
             private set;
@@ -35,7 +35,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public SoundManagerBase()
         {
-            AllOnSounds = new SoundList<SoundBase>(-1);
+            AllSounds = new SoundList<SoundBase>(-1);
         }
 
         /// <summary>
@@ -43,10 +43,10 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public virtual void Dispose()
         {
-            for (int i = AllOnSounds.Count - 1; i >= 0; i--)
+            for (int i = AllSounds.Count - 1; i >= 0; i--)
             {
-                var removed = AllOnSounds[i];
-                AllOnSounds.RemoveAt(i);
+                var removed = AllSounds[i];
+                AllSounds.RemoveAt(i);
                 removed.Dispose();
             }
         }
@@ -57,12 +57,10 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="midiEvent"></param>
         public virtual void PitchBend(PitchBendEvent midiEvent)
         {
-            foreach (var t in AllOnSounds)
+            foreach (var t in AllSounds)
             {
                 if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                {
                     t.UpdatePitch();
-                }
             }
         }
 
@@ -76,7 +74,7 @@ namespace zanac.MAmidiMEmo.Instruments
             switch (midiEvent.ControlNumber)
             {
                 case 1:    //Modulation
-                    foreach (var t in AllOnSounds)
+                    foreach (var t in AllSounds)
                     {
                         if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             t.ModulationEnabled = midiEvent.ControlValue != 0;
@@ -86,21 +84,21 @@ namespace zanac.MAmidiMEmo.Instruments
                            //nothing
                     break;
                 case 7:    //Volume
-                    foreach (var t in AllOnSounds)
+                    foreach (var t in AllSounds)
                     {
                         if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             t.UpdateVolume();
                     }
                     break;
                 case 10:    //Panpot
-                    foreach (var t in AllOnSounds)
+                    foreach (var t in AllSounds)
                     {
                         if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             t.UpdatePanpot();
                     }
                     break;
                 case 11:    //Expression
-                    foreach (var t in AllOnSounds)
+                    foreach (var t in AllSounds)
                     {
                         if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             t.UpdateVolume();
@@ -109,10 +107,10 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 120:   //All Sounds Off
                 case 123:   //All Note Off
                     {
-                        foreach (var snd in AllOnSounds)
+                        foreach (var snd in AllSounds)
                         {
                             var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0) { Channel = snd.NoteOnEvent.Channel };
-                            NoteOff(noff);
+                            KeyOff(noff);
                         }
                         break;
                     }
@@ -135,7 +133,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         /// <param name="note"></param>
-        public virtual void NoteOn(NoteOnEvent note)
+        public virtual void KeyOn(NoteOnEvent note)
         {
             LastNoteNumbers[note.Channel] = note.NoteNumber;
         }
@@ -144,33 +142,35 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         /// <param name="sound"></param>
-        internal void AddOnSound(SoundBase sound)
+        internal void AddKeyOnSound(SoundBase sound)
         {
-            AllOnSounds.Add(sound);
+            AllSounds.Add(sound);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="note"></param>
-        public virtual SoundBase NoteOff(NoteOffEvent note)
+        public virtual SoundBase KeyOff(NoteOffEvent note)
         {
-            SoundBase removed = null;
-            for (int i = 0; i < AllOnSounds.Count; i++)
+            SoundBase offsnd = null;
+            for (int i = 0; i < AllSounds.Count; i++)
             {
-                if (AllOnSounds[i].NoteOnEvent.Channel == note.Channel)
+                if (AllSounds[i].IsKeyOff)
+                    continue;
+
+                if (AllSounds[i].NoteOnEvent.Channel == note.Channel)
                 {
-                    if (AllOnSounds[i].NoteOnEvent.NoteNumber == note.NoteNumber)
+                    if (AllSounds[i].NoteOnEvent.NoteNumber == note.NoteNumber)
                     {
-                        removed = AllOnSounds[i];
-                        AllOnSounds.RemoveAt(i);
-                        removed.Dispose();
+                        offsnd = AllSounds[i];
+                        offsnd.KeyOff();
                         break;
                     }
                 }
             }
 
-            return removed;
+            return offsnd;
         }
 
         /// <summary>
@@ -180,23 +180,43 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="onSounds"></param>
         /// <param name="maxSlot"></param>
         /// <returns></returns>
-        protected virtual int SearchEmptySlotAndOff<T>(SoundList<T> onSounds, NoteOnEvent newNote, int maxSlot) where T : SoundBase
+        protected virtual int SearchEmptySlotAndOff<T>(List<T> onSounds, NoteOnEvent newNote, int maxSlot) where T : SoundBase
         {
-            int emptySlot = onSounds.GetEmptySlot(maxSlot);
+            Dictionary<int, bool> usedTable = new Dictionary<int, bool>();
+            for (int i = 0; i < onSounds.Count; i++)
+                usedTable.Add(onSounds[i].Slot, true);
+            //使っていないスロットがあればそれを返す
+            for (int i = 0; i < maxSlot; i++)
+            {
+                if (!usedTable.ContainsKey(i))
+                    return i;
+            }
 
+            //使っているスロットの内、一番古いのを返す
             for (int i = 0; i < onSounds.Count; i++)
             {
                 var snd = onSounds[i];
-                if (emptySlot == snd.Slot)
+                if (snd.Slot < maxSlot && snd.IsKeyOff)
                 {
-                    var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0);
-                    noff.Channel = snd.NoteOnEvent.Channel;
-                    NoteOff(noff);
-                    break;
+                    AllSounds.Remove(snd);
+                    onSounds.RemoveAt(i);
+                    snd.Dispose();
+                    return snd.Slot;
                 }
             }
-
-            return emptySlot;
+            for (int i = 0; i < onSounds.Count; i++)
+            {
+                var snd = onSounds[i];
+                if (snd.Slot < maxSlot)
+                {
+                    AllSounds.Remove(snd);
+                    onSounds.RemoveAt(i);
+                    snd.Dispose();
+                    return snd.Slot;
+                }
+            }
+ 
+            return -1;
         }
 
     }

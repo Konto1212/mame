@@ -421,7 +421,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="midiEvent"></param>
         protected override void OnNoteOnEvent(NoteOnEvent midiEvent)
         {
-            soundManager.NoteOn(midiEvent);
+            soundManager.KeyOn(midiEvent);
         }
 
         /// <summary>
@@ -430,7 +430,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="midiEvent"></param>
         protected override void OnNoteOffEvent(NoteOffEvent midiEvent)
         {
-            soundManager.NoteOff(midiEvent);
+            soundManager.KeyOff(midiEvent);
         }
 
         /// <summary>
@@ -477,7 +477,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOn(NoteOnEvent note)
+            public override void KeyOn(NoteOnEvent note)
             {
                 int emptySlot = searchEmptySlot(note);
                 if (emptySlot < 0)
@@ -487,9 +487,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 fmOnSounds.Add(snd);
 
                 FormMain.OutputDebugLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
-                snd.On();
+                snd.KeyOn();
 
-                base.NoteOn(note);
+                base.KeyOn(note);
             }
 
             /// <summary>
@@ -511,9 +511,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override SoundBase NoteOff(NoteOffEvent note)
+            public override SoundBase KeyOff(NoteOffEvent note)
             {
-                YM2612Sound removed = (YM2612Sound)base.NoteOff(note);
+                YM2612Sound removed = (YM2612Sound)base.KeyOff(note);
 
                 if (removed != null)
                 {
@@ -562,9 +562,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void On()
+            public override void KeyOn()
             {
-                base.On();
+                base.KeyOn();
 
                 //
                 SetFmTimbre();
@@ -703,8 +703,10 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void Off()
+            public override void KeyOff()
             {
+                base.KeyOff();
+
                 uint reg = (uint)(Slot / 3) * 2;
                 Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(0x00 | (reg << 1) | (byte)(Slot % 3)));
             }

@@ -219,7 +219,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="midiEvent"></param>
         protected override void OnNoteOnEvent(NoteOnEvent midiEvent)
         {
-            soundManager.NoteOn(midiEvent);
+            soundManager.KeyOn(midiEvent);
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="midiEvent"></param>
         protected override void OnNoteOffEvent(NoteOffEvent midiEvent)
         {
-            soundManager.NoteOff(midiEvent);
+            soundManager.KeyOff(midiEvent);
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOn(NoteOnEvent note)
+            public override void KeyOn(NoteOnEvent note)
             {
                 int emptySlot = searchEmptySlot(note);
                 if (emptySlot < 0)
@@ -284,9 +284,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 NAMCO_CUS30Sound snd = new NAMCO_CUS30Sound(parentModule, this, note, emptySlot);
                 wsgOnSounds.Add(snd);
                 FormMain.OutputDebugLog("KeyOn WSG ch" + emptySlot + " " + note.ToString());
-                snd.On();
+                snd.KeyOn();
 
-                base.NoteOn(note);
+                base.KeyOn(note);
             }
 
             /// <summary>
@@ -302,9 +302,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override SoundBase NoteOff(NoteOffEvent note)
+            public override SoundBase KeyOff(NoteOffEvent note)
             {
-                NAMCO_CUS30Sound removed = (NAMCO_CUS30Sound)base.NoteOff(note);
+                NAMCO_CUS30Sound removed = (NAMCO_CUS30Sound)base.KeyOff(note);
 
                 if (removed != null)
                 {
@@ -353,9 +353,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void On()
+            public override void KeyOn()
             {
-                base.On();
+                base.KeyOn();
 
                 SetTimbre();
                 //Freq
@@ -439,8 +439,10 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void Off()
+            public override void KeyOff()
             {
+                base.KeyOff();
+
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x00, 0x0);
                 byte org = (byte)(NamcoCus30ReadData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x04) & 0x80);
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x04, org);

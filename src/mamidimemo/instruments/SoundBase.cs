@@ -33,6 +33,12 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        public bool IsKeyOff
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// チップ上の物理的なチャンネル(MIDI chと区別するためスロットとする)
         /// </summary>
@@ -73,15 +79,17 @@ namespace zanac.MAmidiMEmo.Instruments
                 InstrumentManager.UnsetPeriodicCallback(periodicAction);
 
             if (!IsDisposed)
-                Off();
+                KeyOff();
+
+            IsDisposed = true;
         }
 
         /// <summary>
         /// サウンドオン
         /// </summary>
-        public virtual void On()
+        public virtual void KeyOn()
         {
-            ParentManager.AddOnSound(this);
+            ParentManager.AddKeyOnSound(this);
 
             if (ParentModule.ModulationDepthes[NoteOnEvent.Channel] > 64 ||
                 ParentModule.Modulations[NoteOnEvent.Channel] > 0)
@@ -101,10 +109,11 @@ namespace zanac.MAmidiMEmo.Instruments
         }
 
         /// <summary>
-        /// サウンドオフ
+        ///キーオフ
         /// </summary>
-        public virtual void Off()
+        public virtual void KeyOff()
         {
+            IsKeyOff = true;
         }
 
         /// <summary>

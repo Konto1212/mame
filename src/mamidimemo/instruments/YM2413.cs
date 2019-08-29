@@ -94,7 +94,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_RHY != v)
                 {
                     f_RHY = v;
-                    soundManager.NoteOffAll();
+
+                    OnControlChangeEvent(new ControlChangeEvent((SevenBitNumber)120, (SevenBitNumber)0));
+
                     YM2413WriteData(UnitNumber, 0x0e, 0, (byte)(RHY << 5));
                     if (RHY == 1)
                     {
@@ -267,7 +269,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="midiEvent"></param>
         protected override void OnNoteOnEvent(NoteOnEvent midiEvent)
         {
-            soundManager.NoteOn(midiEvent);
+            soundManager.KeyOn(midiEvent);
         }
 
         /// <summary>
@@ -276,7 +278,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="midiEvent"></param>
         protected override void OnNoteOffEvent(NoteOffEvent midiEvent)
         {
-            soundManager.NoteOff(midiEvent);
+            soundManager.KeyOff(midiEvent);
         }
 
         /// <summary>
@@ -306,9 +308,9 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private class YM2413SoundManager : SoundManagerBase
         {
-            private SoundList<YM2413Sound> fmOnSounds = new SoundList<YM2413Sound>(9);
+            private List<YM2413Sound> fmOnSounds = new List<YM2413Sound>(9);
 
-            private SoundList<YM2413Sound> drumOnSounds = new SoundList<YM2413Sound>(9);
+            private List<YM2413Sound> drumOnSounds = new List<YM2413Sound>(9);
 
             private YM2413 parentModule;
 
@@ -325,7 +327,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOn(NoteOnEvent note)
+            public override void KeyOn(NoteOnEvent note)
             {
                 int emptySlot = searchEmptySlot(note);
                 if (emptySlot < 0)
@@ -345,9 +347,9 @@ namespace zanac.MAmidiMEmo.Instruments
                         fmOnSounds.Add(snd);
                 }
                 FormMain.OutputDebugLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
-                snd.On();
+                snd.KeyOn();
 
-                base.NoteOn(note);
+                base.KeyOn(note);
             }
 
             /// <summary>
@@ -376,46 +378,34 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public void NoteOffAll()
-            {
-                foreach (var snd in AllOnSounds)
-                {
-                    var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0) { Channel = snd.NoteOnEvent.Channel };
-                    NoteOff(noff);
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
             /// <param name="note"></param>
-            public override SoundBase NoteOff(NoteOffEvent note)
+            public override SoundBase KeyOff(NoteOffEvent note)
             {
-                YM2413Sound removed = (YM2413Sound)base.NoteOff(note);
+                YM2413Sound offsnd = (YM2413Sound)base.KeyOff(note);
 
-                if (removed != null)
+                if (offsnd != null)
                 {
                     for (int i = 0; i < fmOnSounds.Count; i++)
                     {
-                        if (fmOnSounds[i] == removed)
+                        if (fmOnSounds[i] == offsnd)
                         {
-                            FormMain.OutputDebugLog("KeyOff FM ch" + removed.Slot + " " + note.ToString());
+                            FormMain.OutputDebugLog("KeyOff FM ch" + offsnd.Slot + " " + note.ToString());
                             fmOnSounds.RemoveAt(i);
-                            return removed;
+                            return offsnd;
                         }
                     }
                     for (int i = 0; i < drumOnSounds.Count; i++)
                     {
-                        if (drumOnSounds[i] == removed)
+                        if (drumOnSounds[i] == offsnd)
                         {
-                            FormMain.OutputDebugLog("KeyOff drum ch" + removed.Slot + " " + note.ToString());
+                            FormMain.OutputDebugLog("KeyOff drum ch" + offsnd.Slot + " " + note.ToString());
                             drumOnSounds.RemoveAt(i);
-                            return removed;
+                            return offsnd;
                         }
                     }
                 }
 
-                return removed;
+                return offsnd;
             }
         }
 
@@ -451,9 +441,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void On()
+            public override void KeyOn()
             {
-                base.On();
+                base.KeyOn();
 
                 //
                 SetTimbre();
@@ -596,8 +586,10 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void Off()
+            public override void KeyOff()
             {
+                base.KeyOff();
+
                 if (Timbre.ToneType != ToneType.DrumSet)
                     YM2413WriteData(parentModule.UnitNumber, (byte)(0x20 + Slot), 0, (byte)(Timbre.SUS << 5 | lastFreqData & 0x0f));
             }

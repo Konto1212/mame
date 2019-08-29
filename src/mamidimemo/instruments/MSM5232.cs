@@ -320,7 +320,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="midiEvent"></param>
         protected override void OnNoteOnEvent(NoteOnEvent midiEvent)
         {
-            soundManager.NoteOn(midiEvent);
+            soundManager.KeyOn(midiEvent);
         }
 
         /// <summary>
@@ -329,7 +329,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="midiEvent"></param>
         protected override void OnNoteOffEvent(NoteOffEvent midiEvent)
         {
-            soundManager.NoteOff(midiEvent);
+            soundManager.KeyOff(midiEvent);
         }
 
         /// <summary>
@@ -377,7 +377,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void NoteOn(NoteOnEvent note)
+            public override void KeyOn(NoteOnEvent note)
             {
                 int emptySlot = searchEmptySlot(note);
                 if (emptySlot < 0)
@@ -395,9 +395,9 @@ namespace zanac.MAmidiMEmo.Instruments
                         FormMain.OutputDebugLog("KeyOn B ch" + emptySlot + " " + note.ToString());
                         break;
                 }
-                snd.On();
+                snd.KeyOn();
 
-                base.NoteOn(note);
+                base.KeyOn(note);
             }
 
             /// <summary>
@@ -430,9 +430,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override SoundBase NoteOff(NoteOffEvent note)
+            public override SoundBase KeyOff(NoteOffEvent note)
             {
-                MSM5232Sound removed = (MSM5232Sound)base.NoteOff(note);
+                MSM5232Sound removed = (MSM5232Sound)base.KeyOff(note);
 
                 if (removed != null)
                 {
@@ -493,9 +493,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void On()
+            public override void KeyOn()
             {
-                base.On();
+                base.KeyOn();
 
                 SetTimbre();
                 //Volume
@@ -557,8 +557,10 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void Off()
+            public override void KeyOff()
             {
+                base.KeyOff();
+
                 MSM5232WriteData(parentModule.UnitNumber, (uint)(Slot + (lastGroup * 4)), 0);
             }
 
