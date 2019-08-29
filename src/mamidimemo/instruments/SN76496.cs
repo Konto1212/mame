@@ -248,8 +248,10 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                SN76496Sound snd = new SN76496Sound(parentModule, this, note, emptySlot);
-                switch (snd.Timbre.SoundType)
+                var programNumber = (SevenBitNumber)parentModule.ProgramNumbers[note.Channel];
+                var timbre = parentModule.Timbres[programNumber];
+                SN76496Sound snd = new SN76496Sound(parentModule, this, timbre, note, emptySlot);
+                switch (((SN76496Timbre)timbre).SoundType)
                 {
                     case SoundType.PSG:
                         psgOnSounds.Add(snd);
@@ -291,38 +293,6 @@ namespace zanac.MAmidiMEmo.Instruments
                 return emptySlot;
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="note"></param>
-            public override SoundBase KeyOff(NoteOffEvent note)
-            {
-                SN76496Sound removed = (SN76496Sound)base.KeyOff(note);
-
-                if (removed != null)
-                {
-                    for (int i = 0; i < psgOnSounds.Count; i++)
-                    {
-                        if (psgOnSounds[i] == removed)
-                        {
-                            FormMain.OutputDebugLog("KeyOff PSG ch" + removed.Slot + " " + note.ToString());
-                            psgOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                    for (int i = 0; i < noiseOnSounds.Count; i++)
-                    {
-                        if (noiseOnSounds[i] == removed)
-                        {
-                            noiseOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                }
-
-                return removed;
-            }
-
 
         }
 
@@ -337,7 +307,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private SevenBitNumber programNumber;
 
-            public SN76496Timbre Timbre;
+            private SN76496Timbre timbre;
 
             private SoundType lastSoundType;
 
@@ -348,13 +318,13 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public SN76496Sound(SN76496 parentModule, SN76496SoundManager manager, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
+            public SN76496Sound(SN76496 parentModule, SN76496SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
-                this.Timbre = parentModule.Timbres[programNumber];
+                this.timbre = parentModule.Timbres[programNumber];
 
-                lastSoundType = Timbre.SoundType;
+                lastSoundType = this.timbre.SoundType;
             }
 
             /// <summary>
@@ -450,7 +420,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 int v = NoteOnEvent.NoteNumber % 3;
 
-                Sn76496WriteData(parentModule.UnitNumber, (byte)(0x80 | (Slot + 3) << 5 | Timbre.FB << 2 | v));
+                Sn76496WriteData(parentModule.UnitNumber, (byte)(0x80 | (Slot + 3) << 5 | timbre.FB << 2 | v));
             }
 
 

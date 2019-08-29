@@ -483,7 +483,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                YM2612Sound snd = new YM2612Sound(parentModule, this, note, emptySlot);
+                var pn = parentModule.ProgramNumbers[note.Channel];
+                var timbre = parentModule.Timbres[pn];
+                YM2612Sound snd = new YM2612Sound(parentModule, this, timbre, note, emptySlot);
                 fmOnSounds.Add(snd);
 
                 FormMain.OutputDebugLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
@@ -507,29 +509,6 @@ namespace zanac.MAmidiMEmo.Instruments
                 return emptySlot;
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="note"></param>
-            public override SoundBase KeyOff(NoteOffEvent note)
-            {
-                YM2612Sound removed = (YM2612Sound)base.KeyOff(note);
-
-                if (removed != null)
-                {
-                    for (int i = 0; i < fmOnSounds.Count; i++)
-                    {
-                        if (fmOnSounds[i] == removed)
-                        {
-                            FormMain.OutputDebugLog("KeyOff FM ch" + removed.Slot + " " + note.ToString());
-                            fmOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                }
-
-                return removed;
-            }
         }
 
 
@@ -543,7 +522,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private SevenBitNumber programNumber;
 
-            public YM2612Timbre Timbre;
+            private YM2612Timbre timbre;
 
             /// <summary>
             /// 
@@ -552,11 +531,11 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public YM2612Sound(YM2612 parentModule, YM2612SoundManager manager,  NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
+            public YM2612Sound(YM2612 parentModule, YM2612SoundManager manager, TimbreBase timbre,  NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
-                this.Timbre = parentModule.Timbres[programNumber];
+                this.timbre = parentModule.Timbres[programNumber];
             }
 
             /// <summary>
@@ -574,7 +553,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 UpdateVolume();
                 //On
                 uint reg = (uint)(Slot / 3) * 2;
-                byte op = (byte)(Timbre.Ops[0].Enable << 4 | Timbre.Ops[1].Enable << 5 | Timbre.Ops[2].Enable << 6 | Timbre.Ops[3].Enable << 7);
+                byte op = (byte)(timbre.Ops[0].Enable << 4 | timbre.Ops[1].Enable << 5 | timbre.Ops[2].Enable << 6 | timbre.Ops[3].Enable << 7);
                 Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(op | (reg << 1) | (byte)(Slot % 3)));
             }
 
@@ -584,7 +563,7 @@ namespace zanac.MAmidiMEmo.Instruments
             public override void UpdateVolume()
             {
                 List<int> ops = new List<int>();
-                switch (Timbre.ALG)
+                switch (timbre.ALG)
                 {
                     case 0:
                         ops.Add(3);
@@ -625,7 +604,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 foreach (int op in ops)
                 {
                     //$40+: total level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(127 - Math.Round((127 - Timbre.Ops[op].TL) * vol * vel * exp)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(127 - Math.Round((127 - timbre.Ops[op].TL) * vol * vel * exp)));
                 }
             }
 
@@ -668,7 +647,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     pan = 0x1;
                 else
                     pan = 0x3;
-                Ym2612WriteData(parentModule.UnitNumber, 0xB4, 0, Slot, (byte)(pan << 6 | (Timbre.AMS << 4) | Timbre.FMS));
+                Ym2612WriteData(parentModule.UnitNumber, 0xB4, 0, Slot, (byte)(pan << 6 | (timbre.AMS << 4) | timbre.FMS));
             }
 
             /// <summary>
@@ -679,23 +658,23 @@ namespace zanac.MAmidiMEmo.Instruments
                 for (int op = 0; op < 4; op++)
                 {
                     //$30+: multiply and detune
-                    Ym2612WriteData(parentModule.UnitNumber, 0x30, op, Slot, (byte)((Timbre.Ops[op].DT1 << 4 | Timbre.Ops[op].MUL)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x30, op, Slot, (byte)((timbre.Ops[op].DT1 << 4 | timbre.Ops[op].MUL)));
                     //$40+: total level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)Timbre.Ops[op].TL);
+                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)timbre.Ops[op].TL);
                     //$50+: attack rate and rate scaling
-                    Ym2612WriteData(parentModule.UnitNumber, 0x50, op, Slot, (byte)((Timbre.Ops[op].RS << 6 | Timbre.Ops[op].AR)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x50, op, Slot, (byte)((timbre.Ops[op].RS << 6 | timbre.Ops[op].AR)));
                     //$60+: 1st decay rate and AM enable
-                    Ym2612WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)((Timbre.Ops[op].AM << 7 | Timbre.Ops[op].D1R)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)((timbre.Ops[op].AM << 7 | timbre.Ops[op].D1R)));
                     //$70+: 2nd decay rate
-                    Ym2612WriteData(parentModule.UnitNumber, 0x70, op, Slot, (byte)Timbre.Ops[op].D2R);
+                    Ym2612WriteData(parentModule.UnitNumber, 0x70, op, Slot, (byte)timbre.Ops[op].D2R);
                     //$80+: release rate and sustain level
-                    Ym2612WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((Timbre.Ops[op].SL << 4 | Timbre.Ops[op].RR)));
+                    Ym2612WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.Ops[op].SL << 4 | timbre.Ops[op].RR)));
                     //$90+: SSG-EG
-                    Ym2612WriteData(parentModule.UnitNumber, 0x90, op, Slot, (byte)Timbre.Ops[op].SSG_EG);
+                    Ym2612WriteData(parentModule.UnitNumber, 0x90, op, Slot, (byte)timbre.Ops[op].SSG_EG);
                 }
 
                 //$B0+: algorithm and feedback
-                Ym2612WriteData(parentModule.UnitNumber, 0xB0, 0, Slot, (byte)(Timbre.FB << 3 | Timbre.ALG));
+                Ym2612WriteData(parentModule.UnitNumber, 0xB0, 0, Slot, (byte)(timbre.FB << 3 | timbre.ALG));
 
                 UpdatePanpot();
             }

@@ -22,6 +22,23 @@ namespace zanac.MAmidiMEmo.Instruments
     [MidiHook]
     public abstract class TimbreBase : ContextBoundObject
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public TimbreBase()
+        {
+            SDP = new SoundDriver();
+        }
+
+        [DataMember]
+        [Description("Sound Driver Parameters")]
+        [DisplayName("Sound Driver Parameters")]
+        public SoundDriver SDP
+        {
+            get;
+            set;
+        }
+
         [DataMember]
         [Description("Memo")]
         public string Memo

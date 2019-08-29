@@ -141,6 +141,7 @@
     <Compile Include="Instruments\SoundBase.cs" />
     <Compile Include="Instruments\SoundManagerBase.cs" />
     <Compile Include="Instruments\SN76496.cs" />
+    <Compile Include="Instruments\SoundDriver.cs" />
     <Compile Include="Instruments\TimbreBase.cs" />
     <Compile Include="Instruments\YM2151.cs" />
     <Compile Include="Instruments\YM2413.cs" />

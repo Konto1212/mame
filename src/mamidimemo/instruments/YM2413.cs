@@ -335,8 +335,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 var pn = parentModule.ProgramNumbers[note.Channel];
                 var timbre = parentModule.Timbres[pn];
-
-                YM2413Sound snd = new YM2413Sound(parentModule, this, note, emptySlot);
+                YM2413Sound snd = new YM2413Sound(parentModule, this, timbre, note, emptySlot);
                 if (parentModule.RHY == 0)
                 {
                     fmOnSounds.Add(snd);
@@ -375,38 +374,6 @@ namespace zanac.MAmidiMEmo.Instruments
                 return emptySlot;
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="note"></param>
-            public override SoundBase KeyOff(NoteOffEvent note)
-            {
-                YM2413Sound offsnd = (YM2413Sound)base.KeyOff(note);
-
-                if (offsnd != null)
-                {
-                    for (int i = 0; i < fmOnSounds.Count; i++)
-                    {
-                        if (fmOnSounds[i] == offsnd)
-                        {
-                            FormMain.OutputDebugLog("KeyOff FM ch" + offsnd.Slot + " " + note.ToString());
-                            fmOnSounds.RemoveAt(i);
-                            return offsnd;
-                        }
-                    }
-                    for (int i = 0; i < drumOnSounds.Count; i++)
-                    {
-                        if (drumOnSounds[i] == offsnd)
-                        {
-                            FormMain.OutputDebugLog("KeyOff drum ch" + offsnd.Slot + " " + note.ToString());
-                            drumOnSounds.RemoveAt(i);
-                            return offsnd;
-                        }
-                    }
-                }
-
-                return offsnd;
-            }
         }
 
 
@@ -419,7 +386,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private SevenBitNumber programNumber;
 
-            public YM2413Timbre Timbre;
+            private YM2413Timbre timbre;
 
             private byte lastFreqData;
 
@@ -430,12 +397,12 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public YM2413Sound(YM2413 parentModule, YM2413SoundManager manager, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
+            public YM2413Sound(YM2413 parentModule, YM2413SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
 
-                this.Timbre = parentModule.Timbres[programNumber];
+                this.timbre = parentModule.Timbres[programNumber];
             }
 
             /// <summary>
@@ -464,10 +431,10 @@ namespace zanac.MAmidiMEmo.Instruments
                 var vel = NoteOnEvent.Velocity / 127d;
 
                 byte tl = (byte)(15 - (byte)Math.Round(15 * vol * vel * exp));
-                if (Timbre.ToneType != ToneType.DrumSet)
+                if (timbre.ToneType != ToneType.DrumSet)
                 {
-                    if (Timbre.ToneType != ToneType.DrumSet)
-                        YM2413WriteData(parentModule.UnitNumber, 0x30, Slot, (byte)((int)Timbre.ToneType << 4 | tl));
+                    if (timbre.ToneType != ToneType.DrumSet)
+                        YM2413WriteData(parentModule.UnitNumber, 0x30, Slot, (byte)((int)timbre.ToneType << 4 | tl));
                 }
                 else if (parentModule.RHY == 1)
                 {
@@ -502,7 +469,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public override void UpdatePitch()
             {
-                if (Timbre.ToneType != ToneType.DrumSet)
+                if (timbre.ToneType != ToneType.DrumSet)
                 {
                     double d = CalcCurrentPitch();
 
@@ -519,7 +486,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         freq += (ushort)(((double)(convertFmFrequency(nnOn, (d < 0) ? false : true) - freq)) * Math.Abs(d - Math.Truncate(d)));
 
                     //keyon
-                    lastFreqData = (byte)(Timbre.SUS << 5 | 0x10 | octave | ((freq >> 8) & 1));
+                    lastFreqData = (byte)(timbre.SUS << 5 | 0x10 | octave | ((freq >> 8) & 1));
 
                     Program.SoundUpdating();
                     YM2413WriteData(parentModule.UnitNumber, (byte)(0x10 + Slot), 0, (byte)(0xff & freq));
@@ -563,18 +530,18 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public void SetTimbre()
             {
-                if (Timbre.ToneType != ToneType.Custom)
+                if (timbre.ToneType != ToneType.Custom)
                     return;
 
-                YM2413Modulator m = Timbre.Modulator;
-                YM2413Career c = Timbre.Career;
+                YM2413Modulator m = timbre.Modulator;
+                YM2413Career c = timbre.Career;
 
                 //$00+:
                 YM2413WriteData(parentModule.UnitNumber, 0x00, 0, (byte)((m.AM << 7 | m.VIB << 6 | m.EG << 5 | m.KSR << 4 | m.MUL)));
                 YM2413WriteData(parentModule.UnitNumber, 0x01, 0, (byte)((c.AM << 7 | c.VIB << 6 | c.EG << 5 | c.KSR << 4 | c.MUL)));
                 //$02+:
                 YM2413WriteData(parentModule.UnitNumber, 0x02, 0, (byte)((m.KSL << 6 | m.TL)));
-                YM2413WriteData(parentModule.UnitNumber, 0x03, 0, (byte)((c.KSL << 6 | c.DIST << 4 | m.DIST << 3 | Timbre.FB)));
+                YM2413WriteData(parentModule.UnitNumber, 0x03, 0, (byte)((c.KSL << 6 | c.DIST << 4 | m.DIST << 3 | timbre.FB)));
                 //$04+:
                 YM2413WriteData(parentModule.UnitNumber, 0x04, 0, (byte)((m.AR << 4 | m.DR)));
                 YM2413WriteData(parentModule.UnitNumber, 0x05, 0, (byte)((c.AR << 4 | c.DR)));
@@ -590,8 +557,8 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 base.KeyOff();
 
-                if (Timbre.ToneType != ToneType.DrumSet)
-                    YM2413WriteData(parentModule.UnitNumber, (byte)(0x20 + Slot), 0, (byte)(Timbre.SUS << 5 | lastFreqData & 0x0f));
+                if (timbre.ToneType != ToneType.DrumSet)
+                    YM2413WriteData(parentModule.UnitNumber, (byte)(0x20 + Slot), 0, (byte)(timbre.SUS << 5 | lastFreqData & 0x0f));
             }
 
 

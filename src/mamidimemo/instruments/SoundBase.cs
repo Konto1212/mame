@@ -27,6 +27,15 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public TimbreBase Timbre
+        {
+            get;
+            private set;
+        }
+
         public bool IsDisposed
         {
             get;
@@ -57,16 +66,18 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="slot">チップ上の物理的なチャンネル(MIDI chと区別するためスロットとする)</param>
-        protected SoundBase(InstrumentBase parentModule, SoundManagerBase manager, NoteOnEvent noteOnEvent, int slot)
+        protected SoundBase(InstrumentBase parentModule, SoundManagerBase manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot)
         {
             NoteOnEvent = noteOnEvent;
             Slot = slot;
-            this.ParentModule = parentModule;
-            this.ParentManager = manager;
+            ParentModule = parentModule;
+            ParentManager = manager;
+            Timbre = timbre;
         }
 
 
@@ -106,6 +117,8 @@ namespace zanac.MAmidiMEmo.Instruments
                     PortamentoEnabled = true;
                 }
             }
+
+            SoundDriverEnabled = Timbre.SDP.Enable;
         }
 
         /// <summary>
@@ -165,30 +178,6 @@ namespace zanac.MAmidiMEmo.Instruments
             return d;
         }
 
-
-        /// <summary>
-        /// 0.0 - 100.0
-        /// </summary>
-        public double modulationStep;
-
-        /// <summary>
-        /// </summary>
-        public double modulationStart;
-
-        /// <summary>
-        /// モジュレーションの効き具合(0-1.0)
-        /// </summary>
-        public double ModultionTotalLevel
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// モジュレーションホイール値(0-1.0)
-        /// </summary>
-        private double modultionLevel;
-
         private Action periodicAction;
 
         /// <summary>
@@ -209,35 +198,6 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private bool f_modulationEnabled;
-
-        public bool ModulationEnabled
-        {
-            get
-            {
-                return f_modulationEnabled;
-            }
-            set
-            {
-                if (value != f_modulationEnabled)
-                {
-                    if (value)
-                    {
-                        f_modulationEnabled = value;
-                        updatePeriodicAction();
-                    }
-                    else
-                    {
-                        if (ParentModule.ModulationDepthes[NoteOnEvent.Channel] > 64)
-                            return;
-
-                        f_modulationEnabled = value;
-                        updatePeriodicAction();
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// モジュレーション値を更新する
         /// 10msごとに呼ばれる
@@ -251,10 +211,10 @@ namespace zanac.MAmidiMEmo.Instruments
                 double mdepth = 0;
                 if (ParentModule.ModulationDepthes[NoteOnEvent.Channel] > 64)
                 {
-                    if (modulationStart < 10d * InstrumentManager.TIMER_HZ)
-                        modulationStart += 1.0;
+                    if (modulationStartCounter < 10d * InstrumentManager.TIMER_HZ)
+                        modulationStartCounter += 1.0;
 
-                    if (modulationStart > ParentModule.GetModulationDelaySec(NoteOnEvent.Channel) * InstrumentManager.TIMER_HZ)
+                    if (modulationStartCounter > ParentModule.GetModulationDelaySec(NoteOnEvent.Channel) * InstrumentManager.TIMER_HZ)
                         mdepth = (double)ParentModule.ModulationDepthes[NoteOnEvent.Channel] / 127d;
                 }
                 //急激な変化を抑制
@@ -289,8 +249,72 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
+            if (SoundDriverEnabled)
+            {
+
+            }
+
             if (ModulationEnabled || PortamentoEnabled)
                 UpdatePitch();
+
+            if (SoundDriverEnabled)
+                UpdateVolume();
+        }
+
+        /// <summary>
+        /// モジュレーションの進角
+        /// </summary>
+        public double modulationStep;
+
+        /// <summary>
+        /// モジュレーションの開始カウンタ
+        /// </summary>
+        public double modulationStartCounter;
+
+        /// <summary>
+        /// モジュレーションの効き具合(0-1.0)
+        /// </summary>
+        public double ModultionTotalLevel
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// モジュレーションホイール値(0-1.0)
+        /// </summary>
+        private double modultionLevel;
+
+        private bool f_modulationEnabled;
+
+        /// <summary>
+        /// モジュレーションの有効/無効
+        /// </summary>
+        public bool ModulationEnabled
+        {
+            get
+            {
+                return f_modulationEnabled;
+            }
+            set
+            {
+                if (value != f_modulationEnabled)
+                {
+                    if (value)
+                    {
+                        f_modulationEnabled = value;
+                        updatePeriodicAction();
+                    }
+                    else
+                    {
+                        if (ParentModule.ModulationDepthes[NoteOnEvent.Channel] > 64)
+                            return;
+
+                        f_modulationEnabled = value;
+                        updatePeriodicAction();
+                    }
+                }
+            }
         }
 
         public double PortamentoDeltaNoteNumber
@@ -304,7 +328,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private bool f_portamentoEnabled;
 
         /// <summary>
-        /// 
+        /// ポルタメントの有効無効
         /// </summary>
         public bool PortamentoEnabled
         {
@@ -322,6 +346,26 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        private bool f_soundDriverEnabled;
+
+        /// <summary>
+        /// サウンドドライバの有効無効
+        /// </summary>
+        public bool SoundDriverEnabled
+        {
+            get
+            {
+                return f_soundDriverEnabled;
+            }
+            set
+            {
+                if (value != f_soundDriverEnabled)
+                {
+                    f_soundDriverEnabled = value;
+                    updatePeriodicAction();
+                }
+            }
+        }
 
     }
 }

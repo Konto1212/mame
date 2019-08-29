@@ -281,7 +281,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                NAMCO_CUS30Sound snd = new NAMCO_CUS30Sound(parentModule, this, note, emptySlot);
+                var programNumber = (SevenBitNumber)parentModule.ProgramNumbers[note.Channel];
+                var timbre = parentModule.Timbres[programNumber];
+                NAMCO_CUS30Sound snd = new NAMCO_CUS30Sound(parentModule, this, timbre, note, emptySlot);
                 wsgOnSounds.Add(snd);
                 FormMain.OutputDebugLog("KeyOn WSG ch" + emptySlot + " " + note.ToString());
                 snd.KeyOn();
@@ -298,29 +300,6 @@ namespace zanac.MAmidiMEmo.Instruments
                 return SearchEmptySlotAndOff(wsgOnSounds, note, 8);
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="note"></param>
-            public override SoundBase KeyOff(NoteOffEvent note)
-            {
-                NAMCO_CUS30Sound removed = (NAMCO_CUS30Sound)base.KeyOff(note);
-
-                if (removed != null)
-                {
-                    for (int i = 0; i < wsgOnSounds.Count; i++)
-                    {
-                        if (wsgOnSounds[i] == removed)
-                        {
-                            FormMain.OutputDebugLog("KeyOff WSG ch" + removed.Slot + " " + note.ToString());
-                            wsgOnSounds.RemoveAt(i);
-                            break;
-                        }
-                    }
-                }
-
-                return removed;
-            }
         }
 
 
@@ -334,7 +313,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private SevenBitNumber programNumber;
 
-            public NAMCO_CUS30Timbre Timbre;
+            private NAMCO_CUS30Timbre timbre;
 
             /// <summary>
             /// 
@@ -343,11 +322,11 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public NAMCO_CUS30Sound(NAMCO_CUS30 parentModule, NAMCO_CUS30SoundManager manager, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
+            public NAMCO_CUS30Sound(NAMCO_CUS30 parentModule, NAMCO_CUS30SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
-                this.Timbre = parentModule.Timbres[programNumber];
+                this.timbre = parentModule.Timbres[programNumber];
             }
 
             /// <summary>
@@ -400,7 +379,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 byte noise = NamcoCus30ReadData(parentModule.UnitNumber, 0x100 + (uint)(((Slot - 1) * 8) & 0x3f) + 0x04);
                 noise &= 0x7f;
-                if (Timbre.SoundType == SoundType.NOISE)
+                if (timbre.SoundType == SoundType.NOISE)
                     noise |= 0x80;
 
                 Program.SoundUpdating();

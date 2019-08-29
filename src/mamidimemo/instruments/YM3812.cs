@@ -332,7 +332,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                YM3812Sound snd = new YM3812Sound(parentModule, this, note, emptySlot);
+                var pn = parentModule.ProgramNumbers[note.Channel];
+                var timbre = parentModule.Timbres[pn];
+                YM3812Sound snd = new YM3812Sound(parentModule, this, timbre, note, emptySlot);
                 fmOnSounds.Add(snd);
                 FormMain.OutputDebugLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
                 snd.KeyOn();
@@ -355,29 +357,6 @@ namespace zanac.MAmidiMEmo.Instruments
                 return emptySlot;
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="note"></param>
-            public override SoundBase KeyOff(NoteOffEvent note)
-            {
-                YM3812Sound removed = (YM3812Sound)base.KeyOff(note);
-
-                if (removed != null)
-                {
-                    for (int i = 0; i < fmOnSounds.Count; i++)
-                    {
-                        if (fmOnSounds[i] == removed)
-                        {
-                            FormMain.OutputDebugLog("KeyOff FM ch" + removed.Slot + " " + note.ToString());
-                            fmOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                }
-
-                return removed;
-            }
         }
 
 
@@ -391,7 +370,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private SevenBitNumber programNumber;
 
-            public YM3812Timbre Timbre;
+            private YM3812Timbre timbre;
 
             private byte lastFreqData;
 
@@ -402,11 +381,11 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public YM3812Sound(YM3812 parentModule, YM3812SoundManager manager, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
+            public YM3812Sound(YM3812 parentModule, YM3812SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
-                this.Timbre = parentModule.Timbres[programNumber];
+                this.timbre = parentModule.Timbres[programNumber];
             }
 
             /// <summary>
@@ -435,9 +414,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 var vel = NoteOnEvent.Velocity / 127d;
                 for (int op = 0; op < 2; op++)
                 {
-                    YM3812Operator o = Timbre.Ops[op];
+                    YM3812Operator o = timbre.Ops[op];
                     //$40+: Scaling level/ total level
-                    if (Timbre.ALG == 1 || op == 1)
+                    if (timbre.ALG == 1 || op == 1)
                         YM3812WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(o.KSL << 6 | (63 - (byte)Math.Round((63 - o.TL) * vol * vel * exp))));
                     else
                         YM3812WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(o.KSL << 6 | o.TL));
@@ -479,7 +458,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 for (int op = 0; op < 2; op++)
                 {
-                    YM3812Operator o = Timbre.Ops[op];
+                    YM3812Operator o = timbre.Ops[op];
                     //$20+: Amplitude Modulation / Vibrato / Envelope Generator Type / Keyboard Scaling Rate / Modulator Frequency Multiple
                     YM3812WriteData(parentModule.UnitNumber, 0x20, op, Slot, (byte)((o.AM << 7 | o.EG << 6 | o.KSR | o.MFM)));
                     //$60+: Attack Rate / Decay Rate
@@ -491,7 +470,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
 
                 //$C0+: algorithm and feedback
-                YM3812WriteData(parentModule.UnitNumber, (byte)(0xB0 + Slot), 0, 0, (byte)(Timbre.FB << 1 | Timbre.ALG));
+                YM3812WriteData(parentModule.UnitNumber, (byte)(0xB0 + Slot), 0, 0, (byte)(timbre.FB << 1 | timbre.ALG));
             }
 
             /// <summary>

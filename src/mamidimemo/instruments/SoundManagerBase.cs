@@ -192,7 +192,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     return i;
             }
 
-            //使っているスロットの内、一番古いのを返す
+            //一番古いキーオフされたスロットを探す
             for (int i = 0; i < onSounds.Count; i++)
             {
                 var snd = onSounds[i];
@@ -204,6 +204,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     return snd.Slot;
                 }
             }
+            //一番古いキーオンされたスロットを探す
             for (int i = 0; i < onSounds.Count; i++)
             {
                 var snd = onSounds[i];

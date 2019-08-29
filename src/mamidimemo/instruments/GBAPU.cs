@@ -357,8 +357,10 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (emptySlot < 0)
                     return;
 
-                GbSound snd = new GbSound(parentModule, this, note, emptySlot);
-                switch (snd.Timbre.SoundType)
+                var programNumber = (SevenBitNumber)parentModule.ProgramNumbers[note.Channel];
+                var timbre = parentModule.Timbres[programNumber];
+                GbSound snd = new GbSound(parentModule, this, timbre, note, emptySlot);
+                switch (timbre.SoundType)
                 {
                     case SoundType.SPSG:
                         spsgOnSounds.Add(snd);
@@ -390,8 +392,8 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 int emptySlot = -1;
 
-                var pn = parentModule.ProgramNumbers[note.Channel];
-                var timbre = parentModule.Timbres[pn];
+                var programNumber = (SevenBitNumber)parentModule.ProgramNumbers[note.Channel];
+                var timbre = parentModule.Timbres[programNumber];
                 switch (timbre.SoundType)
                 {
                     case SoundType.SPSG:
@@ -421,52 +423,6 @@ namespace zanac.MAmidiMEmo.Instruments
                 return emptySlot;
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="note"></param>
-            public override SoundBase KeyOff(NoteOffEvent note)
-            {
-                GbSound removed = (GbSound)base.KeyOff(note);
-
-                if (removed != null)
-                {
-                    for (int i = 0; i < spsgOnSounds.Count; i++)
-                    {
-                        if (spsgOnSounds[i] == removed)
-                        {
-                            spsgOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                    for (int i = 0; i < psgOnSounds.Count; i++)
-                    {
-                        if (psgOnSounds[i] == removed)
-                        {
-                            psgOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                    for (int i = 0; i < wavOnSounds.Count; i++)
-                    {
-                        if (wavOnSounds[i] == removed)
-                        {
-                            wavOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                    for (int i = 0; i < noiseOnSounds.Count; i++)
-                    {
-                        if (noiseOnSounds[i] == removed)
-                        {
-                            noiseOnSounds.RemoveAt(i);
-                            return removed;
-                        }
-                    }
-                }
-                return removed;
-            }
-
         }
 
 
@@ -480,7 +436,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private SevenBitNumber programNumber;
 
-            public GBAPUTimbre Timbre;
+            private GBAPUTimbre timbre;
 
             private SoundType lastSoundType;
 
@@ -491,13 +447,13 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public GbSound(GB_APU parentModule, GBSoundManager manager, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, noteOnEvent, slot)
+            public GbSound(GB_APU parentModule, GBSoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
-                this.Timbre = parentModule.Timbres[programNumber];
+                this.timbre = parentModule.Timbres[programNumber];
 
-                lastSoundType = Timbre.SoundType;
+                lastSoundType = this.timbre.SoundType;
             }
 
             /// <summary>
@@ -510,33 +466,14 @@ namespace zanac.MAmidiMEmo.Instruments
                 switch (lastSoundType)
                 {
                     case SoundType.SPSG:
-                        {
-                            uint reg = (uint)(0 * 5);
-
-                            var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                            var timbre = parentModule.Timbres[pn];
-
-                            GbApuWriteData(parentModule.UnitNumber, reg, (byte)(timbre.SweepTime << 4 | timbre.SweepDir << 3 | timbre.SweepNumber));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 1, (byte)(timbre.Duty << 6 | timbre.SoundLength));
-
-                            UpdateVolume();
-
-                            UpdatePanpot();
-
-                            UpdatePitch(0x80);
-
-                            break;
-                        }
                     case SoundType.PSG:
                         {
                             uint reg = (uint)(Slot * 5);
-                            ////SPSG(1ch)を活かすため2ch目を優先する
-                            //uint reg = (uint)(((Slot + 1) & 1) * 5);
 
-                            var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                            var timbre = parentModule.Timbres[pn];
-
-                            GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
+                            if(lastSoundType == SoundType.SPSG)
+                                GbApuWriteData(parentModule.UnitNumber, reg, (byte)(timbre.SweepTime << 4 | timbre.SweepDir << 3 | timbre.SweepNumber));
+                            else
+                                GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, (byte)(timbre.Duty << 6 | timbre.SoundLength));
 
                             UpdateVolume();
@@ -550,9 +487,6 @@ namespace zanac.MAmidiMEmo.Instruments
                     case SoundType.WAV:
                         {
                             uint reg = (uint)((Slot + 2) * 5);
-
-                            var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                            var timbre = parentModule.Timbres[pn];
 
                             GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, timbre.SoundLength);
@@ -578,9 +512,6 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             uint reg = (uint)((Slot + 3) * 5);
 
-                            var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                            var timbre = parentModule.Timbres[pn];
-
                             //GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, timbre.SoundLength);
 
@@ -603,31 +534,16 @@ namespace zanac.MAmidiMEmo.Instruments
                 switch (lastSoundType)
                 {
                     case SoundType.SPSG:
-                        {
-                            uint reg = (uint)(Slot * 5);
-                            var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                            var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                            var vel = NoteOnEvent.Velocity / 127d;
-                            byte tl = (byte)Math.Round(Timbre.EnvInitialVolume * exp * vol * vel);
-
-                            byte edir = (byte)(Timbre.EnvDirection << 3);
-                            byte elen = Timbre.EnvLength;
-
-                            GbApuWriteData(parentModule.UnitNumber, reg + 2, (byte)((tl << 4) | edir | elen));
-                            break;
-                        }
                     case SoundType.PSG:
                         {
                             uint reg = (uint)(Slot * 5);
-                            ////SPSG(1ch)を活かすため2ch目を優先する
-                            //uint reg = (uint)(((Slot + 1) & 1) * 5);
                             var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                             var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                             var vel = NoteOnEvent.Velocity / 127d;
-                            byte tl = (byte)Math.Round(Timbre.EnvInitialVolume * exp * vol * vel);
+                            byte tl = (byte)Math.Round(timbre.EnvInitialVolume * exp * vol * vel);
 
-                            byte edir = (byte)(Timbre.EnvDirection << 3);
-                            byte elen = Timbre.EnvLength;
+                            byte edir = (byte)(timbre.EnvDirection << 3);
+                            byte elen = timbre.EnvLength;
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 2, (byte)((tl << 4) | edir | elen));
                             break;
@@ -660,10 +576,10 @@ namespace zanac.MAmidiMEmo.Instruments
                             var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
                             var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
                             var vel = NoteOnEvent.Velocity / 127d;
-                            byte tl = (byte)Math.Round(Timbre.EnvInitialVolume * exp * vol * vel);
+                            byte tl = (byte)Math.Round(timbre.EnvInitialVolume * exp * vol * vel);
 
-                            byte edir = (byte)(Timbre.EnvDirection << 3);
-                            byte elen = Timbre.EnvLength;
+                            byte edir = (byte)(timbre.EnvDirection << 3);
+                            byte elen = timbre.EnvLength;
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 2, (byte)((tl << 4) | edir | elen));
                             break;
@@ -690,30 +606,17 @@ namespace zanac.MAmidiMEmo.Instruments
                 double freq = CalcCurrentFrequency();
 
                 //Freq
-                switch (Timbre.SoundType)
+                switch (timbre.SoundType)
                 {
                     case SoundType.SPSG:
-                        {
-                            uint reg = (uint)(Slot * 5);
-                            ushort gfreq = convertPsgFrequency(freq);
-
-                            Program.SoundUpdating();
-                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(gfreq & 0xff));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
-                            Program.SoundUpdated();
-
-                            break;
-                        }
                     case SoundType.PSG:
                         {
                             uint reg = (uint)(Slot * 5);
-                            ////SPSG(1ch)を活かすため2ch目を優先する
-                            //uint reg = (uint)(((Slot + 1) & 1) * 5);
                             ushort gfreq = convertPsgFrequency(freq);
 
                             Program.SoundUpdating();
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(gfreq & 0xff));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
                             Program.SoundUpdated();
 
                             break;
@@ -725,7 +628,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                             Program.SoundUpdating();
                             GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(gfreq & 0xff));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (timbre.EnableLength << 6) | ((gfreq >> 8) & 0x07)));
                             Program.SoundUpdated();
 
                             break;
@@ -735,15 +638,15 @@ namespace zanac.MAmidiMEmo.Instruments
                             var pitch = (int)ParentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                             uint reg = (uint)((Slot + 3) * 5);
 
-                            var nfreq = (int)Timbre.NoiseShiftClockFrequency + ((15 * -pitch) / 8192);
+                            var nfreq = (int)timbre.NoiseShiftClockFrequency + ((15 * -pitch) / 8192);
                             if (nfreq > 15)
                                 nfreq = 15;
                             else if (nfreq < 0)
                                 nfreq = 0;
 
                             Program.SoundUpdating();
-                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(nfreq << 4 | Timbre.NoiseCounter << 3 | Timbre.NoiseDivRatio));
-                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (Timbre.EnableLength << 6)));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(nfreq << 4 | timbre.NoiseCounter << 3 | timbre.NoiseDivRatio));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (timbre.EnableLength << 6)));
                             Program.SoundUpdated();
 
                             break;
@@ -765,10 +668,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     switch (lastSoundType)
                     {
                         case SoundType.SPSG:
-                            break;
                         case SoundType.PSG:
-                            //SPSG(1ch)を活かすため2ch目を優先する
-                            rslot = (rslot + 1) & 1;
                             break;
                         case SoundType.WAV:
                             rslot += 2;
@@ -806,17 +706,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 switch (lastSoundType)
                 {
                     case SoundType.SPSG:
-                        {
-                            uint reg = (uint)(Slot * 5);
-
-                            GbApuWriteData(parentModule.UnitNumber, reg + 2, 0x00);
-
-                            break;
-                        }
                     case SoundType.PSG:
                         {
                             uint reg = (uint)(Slot * 5);
-                            //uint reg = (uint)(((Slot + 1) & 1) * 5);
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 2, 0x00);
 
