@@ -23,8 +23,14 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private static object lockObject = new object();
 
+        /// <summary>
+        /// Periodic Action Timer Interval
+        /// </summary>
         public const uint TIMER_INTERVAL = 10;
 
+        /// <summary>
+        /// Periodic Action Timer Hz
+        /// </summary>
         public const double TIMER_HZ = 1000d / (double)TIMER_INTERVAL;
 
         /// <summary>

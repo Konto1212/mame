@@ -361,11 +361,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void UpdateVolume()
             {
-                var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                var vel = NoteOnEvent.Velocity / 127d;
-
-                byte fv_l = (byte)((int)Math.Round(15 * vol * vel * exp) & 0xf);
+                byte fv_l = (byte)((int)Math.Round(15 * CalcCurrentVolume()) & 0xf);
                 byte fv_r = fv_l;
 
                 var pan = parentModule.Panpots[NoteOnEvent.Channel];
@@ -418,9 +414,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void KeyOff()
+            public override void SoundOff()
             {
-                base.KeyOff();
+                base.SoundOff();
 
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x00, 0x0);
                 byte org = (byte)(NamcoCus30ReadData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x04) & 0x80);

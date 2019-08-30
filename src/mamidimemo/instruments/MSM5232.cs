@@ -492,11 +492,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void UpdateVolume()
             {
-                var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                var vel = NoteOnEvent.Velocity / 127d;
-
-                byte fv = (byte)((byte)Math.Round(15 * vol * vel * exp) & 0xf);
+                byte fv = (byte)((byte)Math.Round(15 * CalcCurrentVolume()) & 0xf);
 
                 MSM5232SetVolume(parentModule.UnitNumber, lastGroup, fv);
             }
@@ -507,6 +503,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public override void UpdatePitch()
             {
+                if (IsSoundOff)
+                    return;
+
                 if (!timbre.NoiseTone)
                 {
                     byte noteNum = (byte)NoteOnEvent.NoteNumber;
@@ -527,9 +526,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void KeyOff()
+            public override void SoundOff()
             {
-                base.KeyOff();
+                base.SoundOff();
 
                 MSM5232WriteData(parentModule.UnitNumber, (uint)(Slot + (lastGroup * 4)), 0);
             }

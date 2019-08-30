@@ -495,9 +495,6 @@ namespace zanac.MAmidiMEmo.Instruments
 
                             UpdatePanpot();
 
-                            //Freq
-                            ushort freq = convertWavFrequency(NoteOnEvent);
-
                             //Wave
                             for (int i = 0; i < 16; i++)
                                 GbApuWaveWriteData(parentModule.UnitNumber, (uint)i, (byte)(((timbre.WsgData[i * 2] & 0xf) << 4) | (timbre.WsgData[(i * 2) + 1] & 0xf)));
@@ -537,10 +534,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     case SoundType.PSG:
                         {
                             uint reg = (uint)(Slot * 5);
-                            var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                            var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                            var vel = NoteOnEvent.Velocity / 127d;
-                            byte tl = (byte)Math.Round(timbre.EnvInitialVolume * exp * vol * vel);
+                            byte tl = (byte)Math.Round(timbre.EnvInitialVolume * CalcCurrentVolume());
 
                             byte edir = (byte)(timbre.EnvDirection << 3);
                             byte elen = timbre.EnvLength;
@@ -551,10 +545,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     case SoundType.WAV:
                         {
                             uint reg = (uint)((Slot + 2) * 5);
-                            var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                            var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                            var vel = NoteOnEvent.Velocity / 127d;
-                            byte tl = (byte)(Math.Round(3d * exp * vol * vel));
+                            byte tl = (byte)(Math.Round(3d * CalcCurrentVolume()));
                             switch (tl)
                             {
                                 case 3:
@@ -573,10 +564,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     case SoundType.NOISE:
                         {
                             uint reg = (uint)((Slot + 3) * 5);
-                            var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                            var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                            var vel = NoteOnEvent.Velocity / 127d;
-                            byte tl = (byte)Math.Round(timbre.EnvInitialVolume * exp * vol * vel);
+                            byte tl = (byte)Math.Round(timbre.EnvInitialVolume * CalcCurrentVolume());
 
                             byte edir = (byte)(timbre.EnvDirection << 3);
                             byte elen = timbre.EnvLength;
@@ -603,6 +591,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public void UpdatePitch(byte keyOn)
             {
+                if (IsSoundOff)
+                    return;
+
                 double freq = CalcCurrentFrequency();
 
                 //Freq
@@ -699,9 +690,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void KeyOff()
+            public override void SoundOff()
             {
-                base.KeyOff();
+                base.SoundOff();
 
                 switch (lastSoundType)
                 {
@@ -738,17 +729,6 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             /// <param name="note"></param>
             /// <returns></returns>
-            private ushort convertPsgFrequency(NoteOnEvent note)
-            {
-                var realfreq = 440.0 * Math.Pow(2.0, (note.NoteNumber - 69.0) / 12.0);
-                return convertPsgFrequency(realfreq);
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="note"></param>
-            /// <returns></returns>
             private ushort convertPsgFrequency(double freq)
             {
                 /*
@@ -762,18 +742,6 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 return (ushort)Math.Round(2048d - (131072d / freq));
             }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="note"></param>
-            /// <returns></returns>
-            private ushort convertWavFrequency(NoteOnEvent note)
-            {
-                var realfreq = 440.0 * Math.Pow(2.0, (note.NoteNumber - 69.0) / 12.0);
-                return convertWavFrequency(realfreq);
-            }
-
 
             /// <summary>
             /// 

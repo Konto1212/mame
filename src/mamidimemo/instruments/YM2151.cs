@@ -585,13 +585,11 @@ namespace zanac.MAmidiMEmo.Instruments
                         ops.Add(3);
                         break;
                 }
-                var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                var vel = NoteOnEvent.Velocity / 127d;
+                var v = CalcCurrentVolume();
                 foreach (int op in ops)
                 {
                     //$60+: total level
-                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)(127 - Math.Round((127 - timbre.Ops[op].TL) * vol * vel * exp)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)(127 - Math.Round((127 - timbre.Ops[op].TL) * v)));
                 }
             }
 
@@ -721,9 +719,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void KeyOff()
+            public override void SoundOff()
             {
-                base.KeyOff();
+                base.SoundOff();
 
                 Ym2151WriteData(parentModule.UnitNumber, 0x08, 0, 0, (byte)(0x00 | Slot));
             }

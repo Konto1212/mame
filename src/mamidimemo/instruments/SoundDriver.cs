@@ -18,10 +18,10 @@ namespace zanac.MAmidiMEmo.Instruments
     /// 
     /// </summary>
     [TypeConverter(typeof(CustomExpandableObjectConverter))]
-    [JsonConverter(typeof(NoTypeConverterJsonConverter<SoundDriver>))]
+    [JsonConverter(typeof(NoTypeConverterJsonConverter<SoundDriverSettings>))]
     [DataContract]
     [MidiHook]
-    public class SoundDriver : ContextBoundObject
+    public class SoundDriverSettings : ContextBoundObject
     {
         private bool f_Enable;
 
@@ -42,6 +42,7 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        /*
         private byte f_KSR;
 
         /// <summary>
@@ -80,15 +81,17 @@ namespace zanac.MAmidiMEmo.Instruments
                 f_KSL = (byte)(value & 3);
             }
         }
+        */
 
-        private byte f_AR = 127;
+        private byte f_AR = 110;
 
         /// <summary>
-        /// Attack Rate (0-15)
+        /// Attack Rate (0(10s)-127(0s))
+        /// 0s - 10s
         /// </summary>
         [DataMember]
         [Category("Sound")]
-        [Description("Sound Driver Level Attack Rate (0-127)")]
+        [Description("Sound Driver Level Attack Rate (0(max)-127(0s))")]
         public byte AR
         {
             get
@@ -101,14 +104,14 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private byte f_DR;
+        private byte f_DR = 64;
 
         /// <summary>
-        /// Decay Rate (0-127)
+        /// Decay Rate (0(0s)-127(10s))
         /// </summary>
         [DataMember]
         [Category("Sound")]
-        [Description("Sound Driver Level Decay Rate (0-127)")]
+        [Description("Sound Driver Level Decay Rate  (0(0s)-127(max))")]
         public byte DR
         {
             get
@@ -121,14 +124,14 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private byte f_SL = 127;
+        private byte f_SL = 16;
 
         /// <summary>
-        /// Sustain Level (0-127)
+        /// Sustain Level (0(min)-127(max))
         /// </summary>
         [DataMember]
         [Category("Sound")]
-        [Description("Sound Driver Level Sustain Level (0-127)")]
+        [Description("Sound Driver Level Sustain Level (0(none)-127(max))")]
         public byte SL
         {
             get
@@ -141,14 +144,14 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private byte f_RR;
+        private byte f_RR = 48;
 
         /// <summary>
-        /// release rate(0-127)
+        /// release rate (0(0s)-127(60s))
         /// </summary>
         [DataMember]
         [Category("Sound")]
-        [Description("Sound Driver Level Release Rate (0-127)")]
+        [Description("Sound Driver Level Release Rate (0(0s)-127(max))")]
         public byte RR
         {
             get
@@ -190,7 +193,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject<SoundDriver>(serializeData);
+                var obj = JsonConvert.DeserializeObject<SoundDriverSettings>(serializeData);
                 this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
             }
             catch (Exception ex)

@@ -27,13 +27,13 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public TimbreBase()
         {
-            SDP = new SoundDriver();
+            SDS = new SoundDriverSettings();
         }
 
         [DataMember]
-        [Description("Sound Driver Parameters")]
-        [DisplayName("Sound Driver Parameters")]
-        public SoundDriver SDP
+        [Description("Sound Driver Settings")]
+        [DisplayName("Sound Driver Settings")]
+        public SoundDriverSettings SDS
         {
             get;
             set;

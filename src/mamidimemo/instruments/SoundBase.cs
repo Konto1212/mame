@@ -48,6 +48,12 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        public bool IsSoundOff
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// チップ上の物理的なチャンネル(MIDI chと区別するためスロットとする)
         /// </summary>
@@ -90,7 +96,10 @@ namespace zanac.MAmidiMEmo.Instruments
                 InstrumentManager.UnsetPeriodicCallback(periodicAction);
 
             if (!IsDisposed)
+            {
                 KeyOff();
+                SoundOff();
+            }
 
             IsDisposed = true;
         }
@@ -118,7 +127,16 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            SoundDriverEnabled = Timbre.SDP.Enable;
+            SoundDriverEnabled = Timbre.SDS.Enable;
+            if (SoundDriverEnabled)
+            {
+                adsr = new ADSR();
+                adsr.SetAttackRate(Math.Pow(10d * (127d - Timbre.SDS.AR) / 127d, 2));
+                adsr.SetDecayRate(Math.Pow(10d * (Timbre.SDS.DR / 127d), 2));
+                adsr.SetReleaseRate(Math.Pow(60d * (Timbre.SDS.RR / 127d), 2));
+                adsr.SetSustainLevel((127d - Timbre.SDS.SL) / 127d);
+                adsr?.Gate(true);
+            }
         }
 
         /// <summary>
@@ -127,6 +145,19 @@ namespace zanac.MAmidiMEmo.Instruments
         public virtual void KeyOff()
         {
             IsKeyOff = true;
+            adsr?.Gate(false);
+
+            if (CurrentDriverEnvelopeState == EnvelopeState.Idle)
+                SoundOff();
+        }
+
+        /// <summary>
+        ///キーオフ
+        /// </summary>
+        public virtual void SoundOff()
+        {
+            IsSoundOff = true;
+            adsr?.Reset();
         }
 
         /// <summary>
@@ -178,6 +209,24 @@ namespace zanac.MAmidiMEmo.Instruments
             return d;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected double CalcCurrentVolume()
+        {
+            double v = 1;
+
+            v *= ParentModule.Expressions[NoteOnEvent.Channel] / 127d;
+            v *= ParentModule.Volumes[NoteOnEvent.Channel] / 127d;
+            v *= NoteOnEvent.Velocity / 127d;
+
+            if (adsr != null)
+                v *= adsr.GetOutputLevel();
+
+            return v;
+        }
+
         private Action periodicAction;
 
         /// <summary>
@@ -185,7 +234,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private void updatePeriodicAction()
         {
-            if (ModulationEnabled || PortamentoEnabled)
+            if (ModulationEnabled || PortamentoEnabled || SoundDriverEnabled)
             {
                 if (periodicAction == null)
                     periodicAction = new Action(OnPeriodicAction);
@@ -251,8 +300,14 @@ namespace zanac.MAmidiMEmo.Instruments
 
             if (SoundDriverEnabled)
             {
-
+                adsr.Process();
+                if (adsr.GetCurrentEnvelopeState() == EnvelopeState.Idle)
+                {
+                    SoundDriverEnabled = false;
+                    SoundOff();
+                }
             }
+
 
             if (ModulationEnabled || PortamentoEnabled)
                 UpdatePitch();
@@ -260,6 +315,29 @@ namespace zanac.MAmidiMEmo.Instruments
             if (SoundDriverEnabled)
                 UpdateVolume();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public EnvelopeState CurrentDriverEnvelopeState
+        {
+            get
+            {
+                if (adsr != null)
+                {
+                    return adsr.GetCurrentEnvelopeState();
+                }
+                else
+                {
+                    if (!IsKeyOff)
+                        return EnvelopeState.Sustain;
+                    else
+                        return EnvelopeState.Idle;
+                }
+            }
+        }
+
+        #region modulation
 
         /// <summary>
         /// モジュレーションの進角
@@ -317,6 +395,10 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        #endregion
+
+        #region portamento
+
         public double PortamentoDeltaNoteNumber
         {
             get;
@@ -366,6 +448,206 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
         }
+
+        #endregion
+
+        #region envelope
+
+        private ADSR adsr;
+
+        //https://www.earlevel.com/main/2013/06/03/envelope-generators-adsr-code/
+        /// <summary>
+        /// 
+        /// </summary>
+        private class ADSR
+        {
+            EnvelopeState state;
+            double output;
+            double attackRate;
+            double decayRate;
+            double releaseRate;
+            double attackCoef;
+            double decayCoef;
+            double releaseCoef;
+            double sustainLevel;
+            double targetRatioA;
+            double targetRatioDR;
+            double attackBase;
+            double decayBase;
+            double releaseBase;
+
+            public ADSR()
+            {
+                Reset();
+                SetAttackRate(0);
+                SetDecayRate(0);
+                SetReleaseRate(30);
+                SetSustainLevel(1.0);
+                SetTargetRatioA(0.3);
+                SetTargetRatioDR(0.0001);
+            }
+
+            /// <summary>
+            /// set attack rate
+            /// </summary>
+            /// <param name="rate">[sec]</param>
+            public void SetAttackRate(double rate)
+            {
+                attackRate = rate * InstrumentManager.TIMER_HZ;
+                attackCoef = calcCoef(rate, targetRatioA);
+                attackBase = (1.0 + targetRatioA) * (1.0 - attackCoef);
+            }
+
+            /// <summary>
+            /// set decay rate
+            /// </summary>
+            /// <param name="rate">[sec]</param>
+            public void SetDecayRate(double rate)
+            {
+                decayRate = rate * InstrumentManager.TIMER_HZ;
+                decayCoef = calcCoef(rate, targetRatioDR);
+                decayBase = (sustainLevel - targetRatioDR) * (1.0 - decayCoef);
+            }
+
+            /// <summary>
+            /// set release rate
+            /// </summary>
+            /// <param name="rate">[sec]</param>
+            public void SetReleaseRate(double rate)
+            {
+                releaseRate = rate * InstrumentManager.TIMER_HZ;
+                releaseCoef = calcCoef(rate, targetRatioDR);
+                releaseBase = -targetRatioDR * (1.0 - releaseCoef);
+            }
+
+            private double calcCoef(double rate, double targetRatio)
+            {
+                return (rate <= 0) ? 0.0 : Math.Exp(-Math.Log((1.0 + targetRatio) / targetRatio) / rate);
+            }
+
+            /// <summary>
+            /// set sustain level
+            /// </summary>
+            /// <param name="level"></param>
+            public void SetSustainLevel(double level)
+            {
+                sustainLevel = level;
+                decayBase = (sustainLevel - targetRatioDR) * (1.0 - decayCoef);
+            }
+
+            /// <summary>
+            /// Adjust the curves of the Attack, or Decay and Release segments,
+            /// from the initial default values (small number such as 0.0001 to 0.01 for mostly-exponential,
+            /// large numbers like 100 for virtually linear):
+            /// </summary>
+            /// <param name="targetRatio">0.0001 to 0.01</param>
+            public void SetTargetRatioA(double targetRatio)
+            {
+                if (targetRatio < 0.000000001)
+                    targetRatio = 0.000000001;  // -180 dB
+                targetRatioA = targetRatio;
+                attackCoef = calcCoef(attackRate, targetRatioA);
+                attackBase = (1.0 + targetRatioA) * (1.0 - attackCoef);
+            }
+
+            /// <summary>
+            /// Adjust the curves of the Attack, or Decay and Release segments,
+            /// from the initial default values (small number such as 0.0001 to 0.01 for mostly-exponential,
+            /// large numbers like 100 for virtually linear):
+            /// </summary>
+            /// <param name="targetRatio">0.0001 to 0.01</param>
+            public void SetTargetRatioDR(double targetRatio)
+            {
+                if (targetRatio < 0.000000001)
+                    targetRatio = 0.000000001;  // -180 dB
+                targetRatioDR = targetRatio;
+                decayCoef = calcCoef(decayRate, targetRatioDR);
+                releaseCoef = calcCoef(releaseRate, targetRatioDR);
+                decayBase = (sustainLevel - targetRatioDR) * (1.0 - decayCoef);
+                releaseBase = -targetRatioDR * (1.0 - releaseCoef);
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
+            public double Process()
+            {
+                switch (state)
+                {
+                    case EnvelopeState.Idle:
+                        break;
+                    case EnvelopeState.Attack:
+                        output = attackBase + output * attackCoef;
+                        if (output >= 1.0)
+                        {
+                            output = 1.0;
+                            state = EnvelopeState.Decay;
+                        }
+                        break;
+                    case EnvelopeState.Decay:
+                        output = decayBase + output * decayCoef;
+                        if (output <= sustainLevel)
+                        {
+                            output = sustainLevel;
+                            state = EnvelopeState.Sustain;
+                        }
+                        break;
+                    case EnvelopeState.Sustain:
+                        break;
+                    case EnvelopeState.Release:
+                        output = releaseBase + output * releaseCoef;
+                        if (output <= 0.0)
+                        {
+                            output = 0.0;
+                            state = EnvelopeState.Idle;
+                        }
+                        break;
+                }
+                return output;
+            }
+
+
+            public void Gate(bool keyOn)
+            {
+                if (keyOn)
+                    state = EnvelopeState.Attack;
+                else if (state != EnvelopeState.Idle)
+                    state = EnvelopeState.Release;
+            }
+
+            public EnvelopeState GetCurrentEnvelopeState()
+            {
+                return state;
+            }
+
+            public void Reset()
+            {
+                state = EnvelopeState.Idle;
+                output = 0.0;
+            }
+
+            public double GetOutputLevel()
+            {
+                return output;
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public enum EnvelopeState
+        {
+            Idle = 0,
+            Attack,
+            Decay,
+            Sustain,
+            Release
+        };
+
+        #endregion
+
 
     }
 }

@@ -384,11 +384,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void UpdateVolume()
             {
-                var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                var vel = NoteOnEvent.Velocity / 127d;
-
-                byte fv = (byte)((int)Math.Round(15 * vol * vel * exp) & 0xf);
+                byte fv = (byte)((int)Math.Round(15 * CalcCurrentVolume()) & 0xf);
 
                 Scc1VolumeWriteData(parentModule.UnitNumber, (uint)Slot, fv);
             }
@@ -415,18 +411,14 @@ namespace zanac.MAmidiMEmo.Instruments
                 Scc1FrequencyWriteData(parentModule.UnitNumber, (uint)((Slot << 1)) + 1, (byte)((n >> 8) & 0xf));
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            public override void KeyOff()
+            public override void SoundOff()
             {
-                base.KeyOff();
+                base.SoundOff();
 
                 byte data = Scc1KeyOnOffReadData(parentModule.UnitNumber);
                 data &= (byte)~(1 << Slot);
                 Scc1KeyOnOffWriteData(parentModule.UnitNumber, data);
             }
-
         }
 
         /// <summary>

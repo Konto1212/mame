@@ -409,15 +409,13 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void UpdateVolume()
             {
-                var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                var vel = NoteOnEvent.Velocity / 127d;
+                var v = CalcCurrentVolume();
                 for (int op = 0; op < 2; op++)
                 {
                     YM3812Operator o = timbre.Ops[op];
                     //$40+: Scaling level/ total level
                     if (timbre.ALG == 1 || op == 1)
-                        YM3812WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(o.KSL << 6 | (63 - (byte)Math.Round((63 - o.TL) * vol * vel * exp))));
+                        YM3812WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(o.KSL << 6 | (63 - (byte)Math.Round((63 - o.TL) * v))));
                     else
                         YM3812WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(o.KSL << 6 | o.TL));
                 }
@@ -476,9 +474,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public override void KeyOff()
+            public override void SoundOff()
             {
-                base.KeyOff();
+                base.SoundOff();
 
                 YM3812WriteData(parentModule.UnitNumber, (byte)(0xB0 + Slot), 0, 0, (byte)(lastFreqData & 0x1f));
             }

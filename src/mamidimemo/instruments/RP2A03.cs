@@ -536,6 +536,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
             public override void UpdateVolume()
             {
                 switch (lastToneType)
@@ -557,11 +560,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             private void updateSqVolume()
             {
-                var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                var vel = NoteOnEvent.Velocity / 127d;
-
-                byte fv = (byte)((byte)Math.Round(timbre.Volume * vol * vel * exp) & 0xf);
+                byte fv = (byte)((byte)Math.Round(timbre.Volume * CalcCurrentVolume()) & 0xf);
 
                 byte dd = timbre.DecayDisable;
                 byte ld = timbre.LengthCounterDisable;
@@ -575,11 +574,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             private void updateNoiseVolume()
             {
-                var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                var vel = NoteOnEvent.Velocity / 127d;
-
-                byte fv = (byte)((byte)Math.Round(timbre.Volume * vol * vel * exp) & 0xf);
+                byte fv = (byte)((byte)Math.Round(timbre.Volume * CalcCurrentVolume()) & 0xf);
 
                 byte dd = timbre.DecayDisable;
                 byte ld = timbre.LengthCounterDisable;
@@ -618,6 +613,9 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private void updateSqPitch()
             {
+                if (IsSoundOff)
+                    return;
+
                 double freq = CalcCurrentFrequency();
 
                 var n = (ushort)((ushort)(Math.Round(1790000d / (freq * 32)) - 1) & 0x7ff);
@@ -629,6 +627,9 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private void updateTriPitch()
             {
+                if (IsSoundOff)
+                    return;
+
                 double freq = CalcCurrentFrequency();
 
                 var n = (ushort)((ushort)(Math.Round(1790000d / (freq * 32)) - 1) & 0x7ff);
@@ -640,6 +641,9 @@ namespace zanac.MAmidiMEmo.Instruments
 
             public void UpdateNoisePitch()
             {
+                if (IsSoundOff)
+                    return;
+
                 var pitch = (int)(parentModule.Pitchs[NoteOnEvent.Channel] - 8192) / (8192 / 32);
                 int n = 31 - ((NoteOnEvent.NoteNumber + pitch) % 32);
 
@@ -649,12 +653,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 Program.SoundUpdated();
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            public override void KeyOff()
+            public override void SoundOff()
             {
-                base.KeyOff();
+                base.SoundOff();
 
                 switch (lastToneType)
                 {
@@ -687,7 +688,6 @@ namespace zanac.MAmidiMEmo.Instruments
                         }
                 }
             }
-
         }
 
         /// <summary>
