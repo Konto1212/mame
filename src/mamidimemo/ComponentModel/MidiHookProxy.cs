@@ -51,19 +51,23 @@ namespace zanac.MAmidiMEmo.ComponentModel
             {
                 //以下、コンストラクタ以外のメソッドを実行する処理
 
-                try
+                lock (Instruments.InstrumentManager.LockObject)
                 {
-                    //メソッド前処理
-                    lockSlim.EnterWriteLock();
-
-                    //メソッド実行
                     res = RemotingServices.ExecuteMessage(this.f_Target, call);
                 }
-                finally
-                {
-                    //メソッド後処理
-                    lockSlim.ExitWriteLock();
-                }
+                //try
+                //{
+                //    //メソッド前処理
+                //    lockSlim.EnterWriteLock();
+
+                //    //メソッド実行
+                //    res = RemotingServices.ExecuteMessage(this.f_Target, call);
+                //}
+                //finally
+                //{
+                //    //メソッド後処理
+                //    lockSlim.ExitWriteLock();
+                //}
             }
 
             return res;

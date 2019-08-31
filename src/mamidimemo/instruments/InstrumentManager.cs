@@ -21,12 +21,12 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private static Dictionary<Action, object> timerSounds = new Dictionary<Action, object>();
 
-        private static object lockObject = new object();
+        public static object LockObject = new object();
 
         /// <summary>
         /// Periodic Action Timer Interval
         /// </summary>
-        public const uint TIMER_INTERVAL = 10;
+        public const uint TIMER_INTERVAL = 5;
 
         /// <summary>
         /// Periodic Action Timer Hz
@@ -47,7 +47,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             multiMediaTimerComponent = new MultiMediaTimerComponent();
             multiMediaTimerComponent.Interval = TIMER_INTERVAL;
-            multiMediaTimerComponent.Resolution = 2;
+            multiMediaTimerComponent.Resolution = 1;
             multiMediaTimerComponent.OnTimer += MultiMediaTimerComponent_OnTimer;
             multiMediaTimerComponent.Enabled = true;
         }
@@ -58,7 +58,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="instance"></param>
         public static void SetPeriodicCallback(Action action)
         {
-            lock (lockObject)
+            lock (LockObject)
             {
                 if (!timerSounds.ContainsKey(action))
                     timerSounds.Add(action, null);
@@ -71,22 +71,20 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="instance"></param>
         public static void UnsetPeriodicCallback(Action action)
         {
-            lock (lockObject)
+            lock (LockObject)
             {
-                foreach (var snd in timerSounds.Keys.ToList())
-                    snd();
-                if (timerSounds.ContainsKey(action))
-                    timerSounds.Remove(action);
+                timerSounds.Remove(action);
             }
         }
 
+        /// <s
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         private static void MultiMediaTimerComponent_OnTimer(object sender)
         {
-            lock (lockObject)
+            lock (LockObject)
             {
                 //Gui.FormMain.OutputDebugLogFile("timer enter");
                 foreach (var snd in timerSounds.Keys.ToList())
@@ -95,16 +93,10 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private static void Program_ShuttingDown(object sender, EventArgs e)
         {
             multiMediaTimerComponent?.Dispose();
         }
-
 
         /// <summary>
         /// 
@@ -112,7 +104,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <returns></returns>
         public static IEnumerable<InstrumentBase> GetAllInstruments()
         {
-            lock (lockObject)
+            lock (LockObject)
             {
                 List<InstrumentBase> insts = new List<InstrumentBase>();
 
@@ -128,7 +120,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public static void RestoreSettings(EnvironmentSettings settings)
         {
-            lock (lockObject)
+            lock (LockObject)
             {
                 if (settings.Instruments != null)
                 {
@@ -198,7 +190,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="instrumentType"></param>
         public static void AddInstrument(InstrumentType instrumentType)
         {
-            lock (lockObject)
+            lock (LockObject)
             {
                 if (instruments[(int)instrumentType].Count < 8)
                 {
@@ -221,7 +213,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="instrumentType"></param>
         public static void RemoveInstrument(InstrumentType instrumentType)
         {
-            lock (lockObject)
+            lock (LockObject)
             {
                 var list = instruments[(int)instrumentType];
                 list[list.Count - 1].Dispose();
@@ -237,7 +229,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="e"></param>
         private static void MidiManager_MidiEventReceived(object sender, MidiEvent e)
         {
-            lock (lockObject)
+            lock (LockObject)
             {
                 foreach (var i in instruments)
                     i.ForEach((dev) => { dev.NotifyMidiEvent(e); });

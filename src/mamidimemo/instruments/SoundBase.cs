@@ -109,8 +109,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public virtual void KeyOn()
         {
-            ParentManager.AddKeyOnSound(this);
-
             if (ParentModule.ModulationDepthes[NoteOnEvent.Channel] > 64 ||
                 ParentModule.Modulations[NoteOnEvent.Channel] > 0)
                 ModulationEnabled = true;
@@ -127,8 +125,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            SoundDriverEnabled = Timbre.SDS.Enable;
-            if (SoundDriverEnabled)
+            EnableADSR = Timbre.SDS.ADSREnable;
+            if (EnableADSR)
             {
                 adsr = new ADSR();
                 adsr.SetAttackRate(Math.Pow(10d * (127d - Timbre.SDS.AR) / 127d, 2));
@@ -234,7 +232,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private void updatePeriodicAction()
         {
-            if (ModulationEnabled || PortamentoEnabled || SoundDriverEnabled)
+            if (ModulationEnabled || PortamentoEnabled || EnableADSR)
             {
                 if (periodicAction == null)
                     periodicAction = new Action(OnPeriodicAction);
@@ -253,6 +251,9 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public virtual void OnPeriodicAction()
         {
+            if (IsDisposed)
+                return;
+
             if (ModulationEnabled)
             {
                 double radian = 2 * Math.PI * (modulationStep / InstrumentManager.TIMER_HZ);
@@ -298,12 +299,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            if (SoundDriverEnabled)
+            if (EnableADSR)
             {
                 adsr.Process();
                 if (adsr.GetCurrentEnvelopeState() == EnvelopeState.Idle)
                 {
-                    SoundDriverEnabled = false;
+                    EnableADSR = false;
                     SoundOff();
                 }
             }
@@ -312,7 +313,7 @@ namespace zanac.MAmidiMEmo.Instruments
             if (ModulationEnabled || PortamentoEnabled)
                 UpdatePitch();
 
-            if (SoundDriverEnabled)
+            if (EnableADSR)
                 UpdateVolume();
         }
 
@@ -433,7 +434,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// サウンドドライバの有効無効
         /// </summary>
-        public bool SoundDriverEnabled
+        public bool EnableADSR
         {
             get
             {

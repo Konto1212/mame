@@ -208,6 +208,13 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public abstract TimbreBase GetTimbre(int channel);
+
+
         [DataMember]
         [Category("MIDI")]
         [Description("Volume (0-127) <MIDI 16ch>")]

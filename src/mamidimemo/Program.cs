@@ -138,18 +138,18 @@ namespace zanac.MAmidiMEmo
         private static ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         /// <summary>
-        /// 
+        /// MAMEとMAmiの排他制御
+        /// MAmiがMAMEのレジスタを書き換えるときに呼び出す必要がある
         /// </summary>
-        /// <returns></returns>
         public static void SoundUpdating()
         {
             lockSlim.EnterWriteLock();
         }
 
         /// <summary>
-        /// 
+        /// MAMEとMAmiの排他制御
+        /// MAmiがMAMEのレジスタを書き換えたあとに呼び出す必要がある
         /// </summary>
-        /// <returns></returns>
         public static void SoundUpdated()
         {
             lockSlim.ExitWriteLock();

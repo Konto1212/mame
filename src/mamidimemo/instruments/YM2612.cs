@@ -72,6 +72,15 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override TimbreBase GetTimbre(int channel)
+        {
+            var pn = (SevenBitNumber)ProgramNumbers[channel];
+            return Timbres[pn];
+        }
 
         private byte f_LFOEN;
 
@@ -468,7 +477,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="parent"></param>
-            public YM2612SoundManager(YM2612 parent)
+            public YM2612SoundManager(YM2612 parent) : base(parent)
             {
                 this.parentModule = parent;
             }
@@ -477,21 +486,20 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void KeyOn(NoteOnEvent note)
+            public override SoundBase SoundOn(NoteOnEvent note)
             {
                 int emptySlot = searchEmptySlot(note);
                 if (emptySlot < 0)
-                    return;
+                    return null;
 
                 var pn = parentModule.ProgramNumbers[note.Channel];
                 var timbre = parentModule.Timbres[pn];
                 YM2612Sound snd = new YM2612Sound(parentModule, this, timbre, note, emptySlot);
                 fmOnSounds.Add(snd);
-
                 FormMain.OutputDebugLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
                 snd.KeyOn();
 
-                base.KeyOn(note);
+                return snd;
             }
 
             /// <summary>

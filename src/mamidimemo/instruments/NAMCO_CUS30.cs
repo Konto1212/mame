@@ -76,6 +76,15 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override TimbreBase GetTimbre(int channel)
+        {
+            var pn = (SevenBitNumber)ProgramNumbers[channel];
+            return Timbres[pn];
+        }
 
         /// <summary>
         /// 
@@ -266,7 +275,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="parent"></param>
-            public NAMCO_CUS30SoundManager(NAMCO_CUS30 parent)
+            public NAMCO_CUS30SoundManager(NAMCO_CUS30 parent) : base(parent)
             {
                 this.parentModule = parent;
             }
@@ -275,11 +284,11 @@ namespace zanac.MAmidiMEmo.Instruments
             /// 
             /// </summary>
             /// <param name="note"></param>
-            public override void KeyOn(NoteOnEvent note)
+            public override SoundBase SoundOn(NoteOnEvent note)
             {
                 int emptySlot = searchEmptySlot(note);
                 if (emptySlot < 0)
-                    return;
+                    return null;
 
                 var programNumber = (SevenBitNumber)parentModule.ProgramNumbers[note.Channel];
                 var timbre = parentModule.Timbres[programNumber];
@@ -288,7 +297,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 FormMain.OutputDebugLog("KeyOn WSG ch" + emptySlot + " " + note.ToString());
                 snd.KeyOn();
 
-                base.KeyOn(note);
+                return snd;
             }
 
             /// <summary>
