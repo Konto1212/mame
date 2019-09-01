@@ -59,8 +59,6 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBoxMidiIf = new System.Windows.Forms.ToolStripComboBox();
-            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.addYM2151ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addYM2612ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -74,6 +72,9 @@
             this.extendMSM5232ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.extendAY38910ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -276,20 +277,6 @@
             this.toolStripComboBoxMidiIf.DropDown += new System.EventHandler(this.toolStripComboBox1_DropDown);
             this.toolStripComboBoxMidiIf.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
-            // saveFileDialog1
-            // 
-            this.saveFileDialog1.DefaultExt = "MAmi";
-            this.saveFileDialog1.FileName = "MyEnvironment";
-            resources.ApplyResources(this.saveFileDialog1, "saveFileDialog1");
-            this.saveFileDialog1.SupportMultiDottedExtensions = true;
-            // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.DefaultExt = "*.MAmi";
-            this.openFileDialog1.FileName = "openFileDialog1";
-            resources.ApplyResources(this.openFileDialog1, "openFileDialog1");
-            this.openFileDialog1.SupportMultiDottedExtensions = true;
-            // 
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -302,7 +289,8 @@
             this.extendGBAPUToolStripMenuItem,
             this.extendNESAPUToolStripMenuItem,
             this.addSN76496ToolStripMenuItem,
-            this.extendMSM5232ToolStripMenuItem});
+            this.extendMSM5232ToolStripMenuItem,
+            this.extendAY38910ToolStripMenuItem});
             resources.ApplyResources(this.toolStripDropDownButton1, "toolStripDropDownButton1");
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
             // 
@@ -382,6 +370,26 @@
             this.toolStripButton2.Name = "toolStripButton2";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.DefaultExt = "MAmi";
+            this.saveFileDialog1.FileName = "MyEnvironment";
+            resources.ApplyResources(this.saveFileDialog1, "saveFileDialog1");
+            this.saveFileDialog1.SupportMultiDottedExtensions = true;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.DefaultExt = "*.MAmi";
+            this.openFileDialog1.FileName = "openFileDialog1";
+            resources.ApplyResources(this.openFileDialog1, "openFileDialog1");
+            this.openFileDialog1.SupportMultiDottedExtensions = true;
+            // 
+            // extendAY38910ToolStripMenuItem
+            // 
+            this.extendAY38910ToolStripMenuItem.Name = "extendAY38910ToolStripMenuItem";
+            resources.ApplyResources(this.extendAY38910ToolStripMenuItem, "extendAY38910ToolStripMenuItem");
+            this.extendAY38910ToolStripMenuItem.Click += new System.EventHandler(this.extendAY38910ToolStripMenuItem_Click);
+            // 
             // FormMain
             // 
             resources.ApplyResources(this, "$this");
@@ -452,6 +460,7 @@
         private System.Windows.Forms.ToolStripMenuItem toolToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
+        private System.Windows.Forms.ToolStripMenuItem extendAY38910ToolStripMenuItem;
     }
 }
 

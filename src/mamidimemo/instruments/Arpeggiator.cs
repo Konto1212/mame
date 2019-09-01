@@ -35,14 +35,25 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private int arpStep;
 
+        private ArpStepStyle f_StepStyle;
 
         /// <summary>
         /// 
         /// </summary>
         public ArpStepStyle StepStyle
         {
-            get;
-            set;
+            get
+            {
+                return f_StepStyle;
+            }
+            set
+            {
+                if (f_StepStyle != value)
+                {
+                    f_StepStyle = value;
+                    calculateArp();
+                }
+            }
         }
 
         /// <summary>

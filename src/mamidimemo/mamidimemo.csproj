@@ -83,6 +83,7 @@
     <Compile Include="ComponentModel\IStandardValues.cs" />
     <Compile Include="ComponentModel\MaskAttribute.cs" />
     <Compile Include="Instruments\Arpeggiator.cs" />
+    <Compile Include="Instruments\AY8910.cs" />
     <Compile Include="Instruments\SoundList.cs" />
     <Compile Include="ComponentModel\StandardValuesDoubleConverter.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverterForUIEditor.cs" />

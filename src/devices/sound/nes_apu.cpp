@@ -29,13 +29,13 @@
    LAST MODIFIED 02/29/2004
 
    - Based on Matthew Conte's Nofrendo/Nosefart core and redesigned to
-     use MAME system calls and to enable multiple APUs.  Sound at this
-     point should be just about 100% accurate, though I cannot tell for
-     certain as yet.
+	 use MAME system calls and to enable multiple APUs.  Sound at this
+	 point should be just about 100% accurate, though I cannot tell for
+	 certain as yet.
 
-     A queue interface is also available for additional speed.  However,
-     the implementation is not yet 100% (DPCM sounds are inaccurate),
-     so it is disabled by default.
+	 A queue interface is also available for additional speed.  However,
+	 the implementation is not yet 100% (DPCM sounds are inaccurate),
+	 so it is disabled by default.
 
  *****************************************************************************
 
@@ -48,11 +48,10 @@
 
 #include "emu.h"
 #include "nes_apu.h"
+ /* INTERNAL FUNCTIONS */
 
-/* INTERNAL FUNCTIONS */
-
-/* INITIALIZE WAVE TIMES RELATIVE TO SAMPLE RATE */
-static void create_vbltimes(u32 * table,const u8 *vbl,unsigned int rate)
+ /* INITIALIZE WAVE TIMES RELATIVE TO SAMPLE RATE */
+static void create_vbltimes(u32 * table, const u8 *vbl, unsigned int rate)
 {
 	int i;
 
@@ -105,8 +104,6 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	, device_sound_interface(mconfig, *this)
 	, m_samps_per_sync(0)
 	, m_buffer_size(0)
-	, m_last_out(0)
-	, m_last_in(0)
 	, m_stream(nullptr)
 	, m_irq_handler(*this)
 	, m_mem_read_cb(*this)
@@ -149,11 +146,11 @@ void nesapu_device::calculate_rates()
 	m_samps_per_sync = 89490 / 12; // Is there a different PAL value?
 	m_buffer_size = m_samps_per_sync;
 
-	create_vbltimes(m_vbl_times,vbl_length,m_samps_per_sync);
+	create_vbltimes(m_vbl_times, vbl_length, m_samps_per_sync);
 	create_syncs(m_samps_per_sync);
 
 	/* Adjust buffer size if 16 bits */
-	m_buffer_size+=m_samps_per_sync;
+	m_buffer_size += m_samps_per_sync;
 
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
@@ -222,14 +219,14 @@ void nesapu_device::device_start()
 
 	save_item(NAME(m_APU.regs));
 
-	#ifdef USE_QUEUE
+#ifdef USE_QUEUE
 	save_item(NAME(m_APU.queue));
 	save_item(NAME(m_APU.head));
 	save_item(NAME(m_APU.tail));
-	#else
+#else
 	save_item(NAME(m_APU.buf_pos));
 	save_item(NAME(m_APU.step_mode));
-	#endif
+#endif
 }
 
 /* TODO: sound channels should *ALL* have DC volume decay */
@@ -265,7 +262,7 @@ s8 nesapu_device::apu_square(apu_t::square_t *chan)
 	}
 
 	/* vbl length counter */
-	if (chan->vbl_length > 0 && 0 == (chan->regs [0] & 0x20))
+	if (chan->vbl_length > 0 && 0 == (chan->regs[0] & 0x20))
 		chan->vbl_length--;
 
 	if (0 == chan->vbl_length)
@@ -287,7 +284,7 @@ s8 nesapu_device::apu_square(apu_t::square_t *chan)
 	}
 
 	if ((1 == (chan->regs[1] & 8) && (chan->freq >> 16) > freq_limit[chan->regs[1] & 7])
-			|| (chan->freq >> 16) < 4)
+		|| (chan->freq >> 16) < 4)
 		return 0;
 
 	chan->phaseacc -= 4;
@@ -306,7 +303,7 @@ s8 nesapu_device::apu_square(apu_t::square_t *chan)
 	if (chan->adder < (duty_lut[chan->regs[0] >> 6]))
 		output = -output;
 
-	return (s8) output;
+	return (s8)output;
 }
 
 /* OUTPUT TRIANGLE WAVE SAMPLE (VALUES FROM -16 to +15) */
@@ -335,7 +332,7 @@ s8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 		if (chan->linear_length > 0)
 			chan->linear_length--;
 		if (chan->vbl_length && 0 == (chan->regs[0] & 0x80))
-				chan->vbl_length--;
+			chan->vbl_length--;
 
 		if (0 == chan->vbl_length)
 			return 0;
@@ -364,7 +361,7 @@ s8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 		chan->output_vol = output;
 	}
 
-	return (s8) chan->output_vol;
+	return (s8)chan->output_vol;
 }
 
 /* OUTPUT NOISE WAVE SAMPLE (VALUES FROM -16 to +15) */
@@ -431,7 +428,7 @@ s8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 	if (m_noise_lut[chan->cur_pos] & 0x80) /* make it negative */
 		output = -output;
 
-	return (s8) output;
+	return (s8)output;
 }
 
 /* RESET DPCM PARAMETERS */
@@ -469,7 +466,7 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 			if (0 == chan->length)
 			{
 				chan->enabled = false; /* Fixed * Proper DPCM channel ENABLE/DISABLE flag behaviour*/
-				chan->vol=0; /* Fixed * DPCM DAC resets itself when restarted */
+				chan->vol = 0; /* Fixed * DPCM DAC resets itself when restarted */
 				if (chan->regs[0] & 0x40)
 					apu_dpcmreset(chan);
 				else
@@ -488,18 +485,18 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 			bit_pos = 7 - (chan->bits_left & 7);
 			if (7 == bit_pos)
 			{
-//				chan->cur_byte = m_mem_read_cb(chan->address);
+				//				chan->cur_byte = m_mem_read_cb(chan->address);
 				chan->cur_byte = m_dpcm_buffer[chan->address];
 				chan->address++;
 				chan->length--;
 			}
 
 			if (chan->cur_byte & (1 << bit_pos))
-//              chan->regs[1]++;
-				chan->vol+=2; /* FIXED * DPCM channel only uses the upper 6 bits of the DAC */
+				//              chan->regs[1]++;
+				chan->vol += 2; /* FIXED * DPCM channel only uses the upper 6 bits of the DAC */
 			else
-//              chan->regs[1]--;
-				chan->vol-=2;
+				//              chan->regs[1]--;
+				chan->vol -= 2;
 		}
 	}
 
@@ -508,7 +505,7 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 	else if (chan->vol < -64)
 		chan->vol = -64;
 
-	return (s8) (chan->vol);
+	return (s8)(chan->vol);
 }
 
 /* WRITE REGISTER VALUE */
@@ -518,7 +515,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 
 	switch (address)
 	{
-	/* squares */
+		/* squares */
 	case apu_t::WRA0:
 	case apu_t::WRB0:
 		m_APU.squ[chan].regs[0] = value;
@@ -549,7 +546,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 
 		break;
 
-	/* triangle */
+		/* triangle */
 	case apu_t::WRC0:
 		m_APU.tri.regs[0] = value;
 
@@ -588,7 +585,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 		** dereferences and load up the other triregs
 		*/
 
-	/* used to be 3, but now we run the clock faster, so base it on samples/sync */
+		/* used to be 3, but now we run the clock faster, so base it on samples/sync */
 		m_APU.tri.write_latency = (m_samps_per_sync + 239) / 240;
 
 		if (m_APU.tri.enabled)
@@ -600,7 +597,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 
 		break;
 
-	/* noise */
+		/* noise */
 	case apu_t::WRD0:
 		m_APU.noi.regs[0] = value;
 		break;
@@ -624,7 +621,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 		}
 		break;
 
-	/* DMC */
+		/* DMC */
 	case apu_t::WRE0:
 		m_APU.dpcm.regs[0] = value;
 		if (0 == (value & 0x80)) {
@@ -636,7 +633,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 	case apu_t::WRE1: /* 7-bit DAC */
 		//m_APU.dpcm.regs[1] = value - 0x40;
 		m_APU.dpcm.regs[1] = value & 0x7F;
-		m_APU.dpcm.vol = (m_APU.dpcm.regs[1]-64);
+		m_APU.dpcm.vol = (m_APU.dpcm.regs[1] - 64);
 		break;
 
 	case apu_t::WRE2:
@@ -649,7 +646,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 		break;
 
 	case apu_t::IRQCTRL:
-		if(value & 0x80)
+		if (value & 0x80)
 			m_APU.step_mode = 5;
 		else
 			m_APU.step_mode = 4;
@@ -709,7 +706,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 		break;
 	default:
 #ifdef MAME_DEBUG
-logerror("invalid apu write: $%02X at $%04X\n", value, address);
+		logerror("invalid apu write: $%02X at $%04X\n", value, address);
 #endif
 		break;
 	}
@@ -750,9 +747,9 @@ u8 nesapu_device::read(offs_t address)
 /* WRITE VALUE TO TEMP REGISTRY AND QUEUE EVENT */
 void nesapu_device::write(offs_t address, u8 value)
 {
-	m_APU.regs[address]=value;
+	m_APU.regs[address] = value;
 	m_stream->update();
-	apu_regwrite(address,value);
+	apu_regwrite(address, value);
 }
 
 void nesapu_device::set_dpcm(u8 *dpcm_data, u32 length)
@@ -777,9 +774,10 @@ void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	}
 
 	int accum;
-	memset( outputs[0], 0, samples*sizeof(*outputs[0]) );
-	memset( outputs[1], 0, samples*sizeof(*outputs[1]) );
+	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
+	int num = samples;
 	while (samples--)
 	{
 		accum = apu_square(&m_APU.squ[0]);
@@ -793,27 +791,10 @@ void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			accum = 127;
 		else if (accum < -128)
 			accum = -128;
-		///*
+		
 		*(outputs[0]++) = accum << 8;
 		*(outputs[1]++) = accum << 8;
-		//*/
-		/*
-		//https://wiki.nesdev.com/w/index.php/APU_Mixer
-		//http://nesdev.com/NESAudio.gif
-		//http://forums.nesdev.com/viewtopic.php?p=44255#p44255
-		//The filter that seems to approximate low-pass characteristics is just out[i]=(in[i]-out[i-1])*0.815686.
-		//EDIT: And for high - pass, using out[i] = out[i - 1] * k + in[i] - in[i - 1] twice,
-		//with k = 0.996039 and k = 0.999835 seems to approximate it well(step response,
-		//red is NES RCA, blue is raw run through above filter) :
-		s32 org = accum << 8;
-		s32 out = org;
-		out = (out - m_last_out)*0.815686;
-		out = (m_last_out * 0.996039) + out - m_last_in;
-		//out = (m_last_out * 0.999835) + out - m_last_in;
-		*(outputs[0]++)= out;
-		*(outputs[1]++)= out;
-		m_last_out = out;
-		m_last_in = org;
-		//*/
+
 	}
+
 }

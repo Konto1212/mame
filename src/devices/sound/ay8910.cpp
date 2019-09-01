@@ -1046,6 +1046,13 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 
 void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	if (m_enable == 0)
+	{
+		std::fill(&outputs[0][0], &outputs[0][samples], 0);
+		std::fill(&outputs[1][0], &outputs[1][samples], 0);
+		return;
+	}
+
 	stream_sample_t *buf[NUM_CHANNELS];
 	int chan;
 
@@ -1170,6 +1177,8 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		}
 		samples--;
 	}
+
+	std::memcpy(&outputs[1][0], &outputs[0][0], samples*sizeof(stream_sample_t));
 }
 
 void ay8910_device::build_mixer_table()
@@ -1268,7 +1277,7 @@ void ay8910_device::device_start()
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
 	/* This handled by the step parameter. Consequently we use a divider of 8 here. */
-	m_channel = machine().sound().stream_alloc(*this, 0, m_streams, master_clock / 8);
+	m_channel = machine().sound().stream_alloc(*this, 0, m_streams + 1, master_clock / 8);
 
 	ay_set_clock(master_clock);
 	ay8910_statesave();

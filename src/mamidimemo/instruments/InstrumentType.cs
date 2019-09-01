@@ -22,5 +22,6 @@ namespace zanac.MAmidiMEmo.Instruments
         YM3812,
         YM2413,
         MSM5232,
+        AY8910,
     }
 }

@@ -18,9 +18,8 @@
 #include "sound/k051649.h"
 #include "sound/3812intf.h"
 #include "sound/msm5232.h"
+#include "sound/ay8910.h"
 #include "video/315_5313.h"
-#include "sound/flt_vol.h"
-#include "sound/flt_rc.h"
 
 /* Megadrive Console Specific */
 #include "bus/megadrive/md_slot.h"
@@ -113,18 +112,14 @@ public:
 			strcpy(device_names[didx][i], (std::string("msm5232_") + num).c_str());
 			m_msm5232[i] = new optional_device<msm5232_device>(*this, device_names[didx][i]);
 			didx++;
-			/*
-			//nes filter
-			strcpy(device_names[didx][i], (std::string("filter_nes_l_") + num).c_str());
-			m_filter_nes_l[i] = new optional_device<filter_rc_device>(*this, device_names[didx][i]);
+			//AY-3-8910
+			strcpy(device_names[didx][i], (std::string("ay8910_") + num).c_str());
+			m_ay8910[i] = new optional_device<ay8910_device>(*this, device_names[didx][i]);
 			didx++;
-			strcpy(device_names[didx][i], (std::string("filter_nes_r_") + num).c_str());
-			m_filter_nes_r[i] = new optional_device<filter_rc_device>(*this, device_names[didx][i]);
-			didx++;*/
 		}
 	}
 
-	char device_names[ 10 ][8][100];
+	char device_names[ 11 ][8][100];
 	optional_device<ym2151_device> *m_ym2151[8];	//1
 	optional_device<ym2612_device> *m_ym2612[8];	//2
 	optional_device<sn76496_device> *m_sn76496[8];	//3
@@ -135,10 +130,8 @@ public:
 	optional_device<ym3812_device> *m_ym3812[8];	//8
 	optional_device<ym2413_device> *m_ym2413[8];	//9
 	optional_device<msm5232_device> *m_msm5232[8];	//10
-	/*
-	optional_device<filter_rc_device> *m_filter_nes_l[8]; //11
-	optional_device<filter_rc_device> *m_filter_nes_r[8]; //12
-	*/
+	optional_device<ay8910_device> *m_ay8910[8];	//11
+
 	required_device<m68000_base_device> m_maincpu;
 	/*
 	optional_device<cpu_device> m_z80snd;

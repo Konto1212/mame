@@ -15,6 +15,7 @@
 #include "..\devices\sound\3812intf.h"
 #include "..\devices\sound\k051649.h"
 #include "..\devices\sound\msm5232.h"
+#include "..\devices\sound\ay8910.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -439,6 +440,42 @@ extern "C"
 
 		msm5232->set_capacitors(cap1, cap2, cap3, cap4, cap5, cap6, cap7, cap8);
 	}
+
+	DllExport void ay8910_address_data_w(unsigned int unitNumber, int offset, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		ay8910_device *ay8910 = dynamic_cast<ay8910_device*>(rm->device((std::string("ay8910_") + num).c_str()));
+		if (ay8910 == nullptr)
+			return;
+
+		ay8910->address_data_w(offset, data);
+	}
+
+	DllExport unsigned char ay8910_read_ym(unsigned int unitNumber)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return 0;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return 0;
+
+		std::string num = std::to_string(unitNumber);
+		ay8910_device *ay8910 = dynamic_cast<ay8910_device*>(rm->device((std::string("ay8910_") + num).c_str()));
+		if (ay8910 == nullptr)
+			return 0;
+
+		return ay8910->data_r();
+	}
+
+	
 }
 
 
