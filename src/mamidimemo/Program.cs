@@ -1,13 +1,17 @@
 ﻿// copyright-holders:K.Ito
+using Accessibility;
 using Melanchall.DryWetMidi.Devices;
 using Melanchall.DryWetMidi.Smf;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -41,12 +45,28 @@ namespace zanac.MAmidiMEmo
 
         public static event EventHandler ShuttingDown;
 
+#pragma warning disable CS0414
+        /// <summary>
+        /// ダミー(遅延Assemblyロード回避)
+        /// </summary>
+        private static MultilineStringEditor dummyEditor = new MultilineStringEditor();
+
+        /// <summary>
+        /// ダミー(遅延Assemblyロード回避)
+        /// </summary>
+        private static AnnoScope dummyAnnoScope = AnnoScope.ANNO_CONTAINER;
+#pragma warning restore  CS0414
+
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
         /// </summary>
         /// <param name="parentModule">親モジュール</param>
         public static void Main(IntPtr parentModule)
         {
+            System.Resources.ResourceManager rm =
+                new System.Resources.ResourceManager("System", typeof(UriFormat).Assembly);
+            string dummy = rm.GetString("Arg_EmptyOrNullString");
+
             MameIF.Initialize(parentModule);
             var threadStart = new ManualResetEvent(false);
             mainThread = new Thread(new ThreadStart(() =>

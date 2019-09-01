@@ -248,6 +248,7 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+
         private RP2A03SoundManager soundManager;
 
         /// <summary>
@@ -263,6 +264,9 @@ namespace zanac.MAmidiMEmo.Instruments
             setPresetInstruments();
 
             this.soundManager = new RP2A03SoundManager(this);
+
+            //device_reset(UnitNumber, "filter_nes_l_");
+            //device_reset(UnitNumber, "filter_nes_r_");
         }
 
         /// <summary>
@@ -271,7 +275,22 @@ namespace zanac.MAmidiMEmo.Instruments
         public override void Dispose()
         {
             soundManager?.Dispose();
+
+            //set_device_enable(UnitNumber, "filter_nes_l_", 0);
+            //set_device_enable(UnitNumber, "filter_nes_r_", 0);
+
             base.Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal override void PrepareSound()
+        {
+            base.PrepareSound();
+
+            //set_device_enable(UnitNumber, "filter_nes_l_", 1);
+            //set_device_enable(UnitNumber, "filter_nes_r_", 1);
         }
 
         /// <summary>
@@ -488,6 +507,7 @@ namespace zanac.MAmidiMEmo.Instruments
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 2));
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
 
+
                             RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x00),
                                 (byte)(timbre.LengthCounterDisable << 7 | timbre.TriCounterLength));
 
@@ -683,7 +703,7 @@ namespace zanac.MAmidiMEmo.Instruments
                             Program.SoundUpdating();
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
-                            Program.SoundUpdated();
+                                Program.SoundUpdated();
                             break;
                         }
                     case ToneType.NOISE:

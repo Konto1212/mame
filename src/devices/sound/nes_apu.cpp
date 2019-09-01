@@ -105,6 +105,8 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	, device_sound_interface(mconfig, *this)
 	, m_samps_per_sync(0)
 	, m_buffer_size(0)
+	, m_last_out(0)
+	, m_last_in(0)
 	, m_stream(nullptr)
 	, m_irq_handler(*this)
 	, m_mem_read_cb(*this)
@@ -791,8 +793,27 @@ void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			accum = 127;
 		else if (accum < -128)
 			accum = -128;
-
-		*(outputs[0]++)=accum<<8;
-		*(outputs[1]++)=accum<<8;
+		///*
+		*(outputs[0]++) = accum << 8;
+		*(outputs[1]++) = accum << 8;
+		//*/
+		/*
+		//https://wiki.nesdev.com/w/index.php/APU_Mixer
+		//http://nesdev.com/NESAudio.gif
+		//http://forums.nesdev.com/viewtopic.php?p=44255#p44255
+		//The filter that seems to approximate low-pass characteristics is just out[i]=(in[i]-out[i-1])*0.815686.
+		//EDIT: And for high - pass, using out[i] = out[i - 1] * k + in[i] - in[i - 1] twice,
+		//with k = 0.996039 and k = 0.999835 seems to approximate it well(step response,
+		//red is NES RCA, blue is raw run through above filter) :
+		s32 org = accum << 8;
+		s32 out = org;
+		out = (out - m_last_out)*0.815686;
+		out = (m_last_out * 0.996039) + out - m_last_in;
+		//out = (m_last_out * 0.999835) + out - m_last_in;
+		*(outputs[0]++)= out;
+		*(outputs[1]++)= out;
+		m_last_out = out;
+		m_last_in = org;
+		//*/
 	}
 }

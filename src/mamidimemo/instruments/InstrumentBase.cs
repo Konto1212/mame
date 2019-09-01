@@ -387,24 +387,24 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="address"></param>
         /// <param name="data"></param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void delegate_set_device_enable(uint unitNumber, string tagName, byte enable);
+        public delegate void delegate_set_device_enable(uint unitNumber, string tagName, byte enable);
 
         /// <summary>
         /// 
         /// </summary>
-        private static delegate_set_device_enable set_device_enable;
+        public static delegate_set_device_enable set_device_enable;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="address"></param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void delegate_device_reset(uint unitNumber, string tagName);
+        public delegate void delegate_device_reset(uint unitNumber, string tagName);
 
         /// <summary>
         /// 
         /// </summary>
-        private static delegate_device_reset device_reset;
+        public static delegate_device_reset device_reset;
 
 
         /// <summary>

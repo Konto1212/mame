@@ -125,14 +125,15 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            EnableADSR = Timbre.SDS.ADSREnable;
+            var adsrs = Timbre.SDS.ADSR;
+            EnableADSR = adsrs.Enable;
             if (EnableADSR)
             {
                 adsr = new ADSR();
-                adsr.SetAttackRate(Math.Pow(10d * (127d - Timbre.SDS.AR) / 127d, 2));
-                adsr.SetDecayRate(Math.Pow(10d * (Timbre.SDS.DR / 127d), 2));
-                adsr.SetReleaseRate(Math.Pow(60d * (Timbre.SDS.RR / 127d), 2));
-                adsr.SetSustainLevel((127d - Timbre.SDS.SL) / 127d);
+                adsr.SetAttackRate(Math.Pow(10d * (127d - adsrs.AR) / 127d, 2));
+                adsr.SetDecayRate(Math.Pow(10d * (adsrs.DR / 127d), 2));
+                adsr.SetReleaseRate(Math.Pow(60d * (adsrs.RR / 127d), 2));
+                adsr.SetSustainLevel((127d - adsrs.SL) / 127d);
                 adsr?.Gate(true);
             }
         }

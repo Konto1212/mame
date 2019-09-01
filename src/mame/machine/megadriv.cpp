@@ -26,6 +26,8 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "emu.h"
 #include "includes/megadriv.h"
 #include "speaker.h"
+#include "sound/flt_vol.h"
+#include "sound/flt_rc.h"
 
 
 void md_base_state::megadriv_z80_bank_w(uint16_t data)
@@ -984,6 +986,17 @@ void md_base_state::md_ntsc(machine_config &config)
 		NES_APU(config, *m_nesapu[i], XTAL(21'477'272) / 12);
 		(*m_nesapu[i])->add_route(0, "lspeaker", 1.00);
 		(*m_nesapu[i])->add_route(1, "rspeaker", 1.00);
+		/*
+		(*m_nesapu[i])->add_route(0, device_names[10][i], 1.00);
+		(*m_nesapu[i])->add_route(1, device_names[11][i], 1.00);
+		FILTER_RC(config, *m_filter_nes_l[i]);
+		(*m_filter_nes_l[i])->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+		(*m_filter_nes_l[i])->set_rc(filter_rc_device::LOWPASS, 356 + 1000, 10000, 0, CAP_N(33));
+		FILTER_RC(config, *m_filter_nes_r[i]);
+		(*m_filter_nes_r[i])->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+		(*m_filter_nes_r[i])->set_rc(filter_rc_device::LOWPASS, 356 + 1000, 10000, 0, CAP_N(33));
+		}
+		*/
 
 		K051649(config, *m_scc1[i], XTAL(10'738'635) / 3 / 2);
 		(*m_scc1[i])->add_route(0, "lspeaker", 1.00);
@@ -996,7 +1009,10 @@ void md_base_state::md_ntsc(machine_config &config)
 		MSM5232(config, *m_msm5232[i], 2000000);
 		(*m_msm5232[i])->add_route(0, "lspeaker", 1.00);
 		(*m_msm5232[i])->add_route(1, "rspeaker", 1.00);
+
 	}
+
+
 }
 
 void md_cons_state::dcat16_megadriv_base(machine_config &config)

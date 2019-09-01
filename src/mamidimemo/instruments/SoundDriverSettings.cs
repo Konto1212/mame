@@ -28,26 +28,113 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public SoundDriverSettings()
         {
-            ArpStep = (60d * InstrumentManager.TIMER_HZ / ArpTempo) / (double)ArpResolution;
+            ADSR = new ADSRSettings();
+            ARP = new ARPSettings();
         }
 
         #region ADSR 
 
-        private bool f_EnableAdsr;
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Description("ADSR Settings")]
+        public ADSRSettings ADSR
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
+        #region Arp
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Description("ARP Settings")]
+        public ARPSettings ARP
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
+        #region Etc
 
         [DataMember]
-        [Description("Whether enable Sound Driver Level ADSR")]
-        public bool ADSREnable
+        [Description("Memo")]
+        public string Memo
+        {
+            get;
+            set;
+        }
+
+        [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+            typeof(UITypeEditor)), Localizable(false)]
+        [IgnoreDataMember]
+        [JsonIgnore]
+        [Description("You can copy and paste this text data to other same type timber.")]
+        public string SerializeData
         {
             get
             {
-                return f_EnableAdsr;
+                return JsonConvert.SerializeObject(this, Formatting.Indented);
             }
             set
             {
-                if (f_EnableAdsr != value)
+                RestoreFrom(value);
+            }
+        }
+
+        public void RestoreFrom(string serializeData)
+        {
+            try
+            {
+                var obj = JsonConvert.DeserializeObject<SoundDriverSettings>(serializeData);
+                this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+            }
+            catch (Exception ex)
+            {
+                if (ex.GetType() == typeof(Exception))
+                    throw;
+                else if (ex.GetType() == typeof(SystemException))
+                    throw;
+
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
+        }
+
+        #endregion
+
+    }
+
+    [TypeConverter(typeof(CustomExpandableObjectConverter))]
+    [JsonConverter(typeof(NoTypeConverterJsonConverter<ADSRSettings>))]
+    [DataContract]
+    [MidiHook]
+    public class ADSRSettings
+    {
+        #region ADSR 
+
+        private bool f_Enable;
+
+        [DataMember]
+        [Description("Whether enable Sound Driver Level ADSR")]
+        public bool Enable
+        {
+            get
+            {
+                return f_Enable;
+            }
+            set
+            {
+                if (f_Enable != value)
                 {
-                    f_EnableAdsr = value;
+                    f_Enable = value;
                 }
             }
         }
@@ -176,42 +263,95 @@ namespace zanac.MAmidiMEmo.Instruments
 
         #endregion
 
-        #region Arp
-
-        private bool f_ArpEnable;
+        #region Etc
 
         [DataMember]
-        [Description("Whether enable Sound Driver Level Arpeggio")]
-        public bool ArpEnable
+        [Description("Memo")]
+        public string Memo
+        {
+            get;
+            set;
+        }
+
+        [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+            typeof(UITypeEditor)), Localizable(false)]
+        [IgnoreDataMember]
+        [JsonIgnore]
+        [Description("You can copy and paste this text data to other same type timber.")]
+        public string SerializeData
         {
             get
             {
-                return f_ArpEnable;
+                return JsonConvert.SerializeObject(this, Formatting.Indented);
             }
             set
             {
-                if (f_ArpEnable != value)
+                RestoreFrom(value);
+            }
+        }
+
+        public void RestoreFrom(string serializeData)
+        {
+            try
+            {
+                var obj = JsonConvert.DeserializeObject<ADSRSettings>(serializeData);
+                this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+            }
+            catch (Exception ex)
+            {
+                if (ex.GetType() == typeof(Exception))
+                    throw;
+                else if (ex.GetType() == typeof(SystemException))
+                    throw;
+
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
+        }
+
+        #endregion
+    }
+
+    [TypeConverter(typeof(CustomExpandableObjectConverter))]
+    [JsonConverter(typeof(NoTypeConverterJsonConverter<ARPSettings>))]
+    [DataContract]
+    [MidiHook]
+    public class ARPSettings
+    {
+        private bool f_Enable;
+
+        [DataMember]
+        [Description("Whether enable Sound Driver Level Arpeggio")]
+        public bool Enable
+        {
+            get
+            {
+                return f_Enable;
+            }
+            set
+            {
+                if (f_Enable != value)
                 {
-                    f_ArpEnable = value;
+                    f_Enable = value;
                 }
             }
         }
 
-        private bool f_ArpHold;
+        private bool f_Hold;
 
         [DataMember]
         [Description("Select whether Arpeggio key hold or no")]
-        public bool ArpHold
+        public bool Hold
         {
             get
             {
-                return f_ArpHold;
+                return f_Hold;
             }
             set
             {
-                if (f_ArpHold != value)
+                if (f_Hold != value)
                 {
-                    f_ArpHold = value;
+                    f_Hold = value;
                 }
             }
         }
@@ -254,90 +394,67 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private ArpStepStyle f_ArpStepStyle;
+        private ArpStepStyle f_StepStyle;
 
         [DataMember]
         [Description("Select Arpeggio Step Style")]
-        public ArpStepStyle ArpStepStyle
+        public ArpStepStyle StepStyle
         {
             get
             {
-                return f_ArpStepStyle;
+                return f_StepStyle;
             }
             set
             {
-                if (f_ArpStepStyle != value)
+                if (f_StepStyle != value)
                 {
-                    f_ArpStepStyle = value;
+                    f_StepStyle = value;
                 }
             }
         }
 
-
-        private int f_ArpRange = 1;
+        private int f_OctaveRange = 1;
 
         [DataMember]
-        [Description("Select Arpeggio Range (1-4)")]
-        public int ArpRange
+        [Description("Select Arpeggio Octave Range (1-4)")]
+        public int OctaveRange
         {
             get
             {
-                return f_ArpRange;
+                return f_OctaveRange;
             }
             set
             {
-                if (f_ArpRange != value && value >= 1 && value <= 4)
+                if (f_OctaveRange != value && value >= 1 && value <= 4)
                 {
-                    f_ArpRange = value;
+                    f_OctaveRange = value;
                 }
             }
         }
 
-        private int f_ArpTempo = 120;
+        private int f_Beat = 120;
 
         [DataMember]
-        [Description("Select Arpeggio Tempo (20-300)")]
-        public int ArpTempo
+        [Description("Select Arpeggio Beat (20-300)")]
+        public int Beat
         {
             get
             {
-                return f_ArpTempo;
+                return f_Beat;
             }
             set
             {
-                if (f_ArpTempo != value && value >= 20 && value <= 300)
+                if (f_Beat != value && value >= 20 && value <= 300)
                 {
-                    f_ArpTempo = value;
+                    f_Beat = value;
                 }
             }
         }
 
-
-        private int f_ArpGate = 127;
-
-        [DataMember]
-        [Description("Select Arpeggio Gate Time (0(0%)-127(100%))")]
-        public int ArpGate
-        {
-            get
-            {
-                return f_ArpGate;
-            }
-            set
-            {
-                value = value & 127;
-                if (f_ArpGate != value)
-                {
-                    f_ArpGate = value;
-                    ArpStep = (60d * InstrumentManager.TIMER_HZ / ArpTempo) / (double)ArpResolution;
-                }
-            }
-        }
-        
         private ArpResolution f_ArpResolution = ArpResolution.QuarterNote;
 
         [DataMember]
-        [Description("Select Arpeggio Resolution")]
+        [Description("Select Arpeggio Tempo Resolution")]
         public ArpResolution ArpResolution
         {
             get
@@ -349,7 +466,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_ArpResolution != value)
                 {
                     f_ArpResolution = value;
-                    ArpStep = (60d * InstrumentManager.TIMER_HZ / ArpTempo) / (double)ArpResolution;
+                    ArpStep = (60d * InstrumentManager.TIMER_HZ / Beat) / (double)ArpResolution;
                 }
             }
         }
@@ -362,26 +479,57 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
-        private bool f_ArpKeySync;
+
+        private int f_GateTime = 127;
 
         [DataMember]
-        [Description("Select Arpeggio Key Sync Mode ")]
-        public bool ArpKeySync
+        [Description("Select Arpeggio Note Gate Time (0(0%)-127(100%))")]
+        public int GateTime
         {
             get
             {
-                return f_ArpKeySync;
+                return f_GateTime;
             }
             set
             {
-                if (f_ArpKeySync != value)
+                value = value & 127;
+                if (f_GateTime != value)
                 {
-                    f_ArpKeySync = value;
+                    f_GateTime = value;
+                    ArpStep = (60d * InstrumentManager.TIMER_HZ / Beat) / (double)ArpResolution;
                 }
             }
         }
 
-        #endregion
+
+        private bool f_KeySync;
+
+        [DataMember]
+        [Description("Select Use Key Sync Mode ")]
+        public bool KeySync
+        {
+            get
+            {
+                return f_KeySync;
+            }
+            set
+            {
+                if (f_KeySync != value)
+                {
+                    f_KeySync = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public ARPSettings()
+        {
+            ArpStep = (60d * InstrumentManager.TIMER_HZ / Beat) / (double)ArpResolution;
+        }
+
+        #region Etc
 
         [DataMember]
         [Description("Memo")]
@@ -412,7 +560,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject<SoundDriverSettings>(serializeData);
+                var obj = JsonConvert.DeserializeObject<ARPSettings>(serializeData);
                 this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
             }
             catch (Exception ex)
@@ -427,6 +575,8 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-    }
+        #endregion
 
+    }
 }
+

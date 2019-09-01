@@ -120,22 +120,22 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 120:   //All Sounds Off
                 case 123:   //All Note Off
                     {
+                        //clear all arps
+                        foreach (var ch in Arpeggiators.Keys)
                         {
-                            foreach (var ch in Arpeggiators.Keys)
-                            {
-                                var arp = Arpeggiators[ch];
-                                var lnote = arp.LastNote;
-                                if (lnote != null)
-                                    keyOffCore(new NoteOffEvent(lnote.NoteNumber, (SevenBitNumber)0) { Channel = lnote.Channel });
-                                arp.ClearNotes();
-                            }
-                            Arpeggiators.Clear();
-                            if (processArpeggiatorAction != null)
-                            {
-                                InstrumentManager.UnsetPeriodicCallback(processArpeggiatorAction);
-                                processArpeggiatorAction = null;
-                            }
+                            var arp = Arpeggiators[ch];
+                            var lnote = arp.LastNote;
+                            if (lnote != null)
+                                keyOffCore(new NoteOffEvent(lnote.NoteNumber, (SevenBitNumber)0) { Channel = lnote.Channel });
+                            arp.ClearNotes();
                         }
+                        Arpeggiators.Clear();
+                        if (processArpeggiatorAction != null)
+                        {
+                            InstrumentManager.UnsetPeriodicCallback(processArpeggiatorAction);
+                            processArpeggiatorAction = null;
+                        }
+
                         foreach (var snd in AllSounds)
                         {
                             var noff = new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0) { Channel = snd.NoteOnEvent.Channel };
@@ -170,49 +170,43 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 var arp = Arpeggiators[ch];
                 var timbre = parentModule.GetTimbre(ch);
-                var sds = timbre.SDS;
+                var sds = timbre.SDS.ARP;
                 //end arp
-                if (!sds.ArpEnable || sds.ArpMethod != ArpMethod.NoteOn)
+                if (!sds.Enable || sds.ArpMethod != ArpMethod.NoteOn)
                 {
-                    if (Arpeggiators[ch].LastNote != null)
-                    {
-                        var note = arp.LastNote;
-                        KeyOff(new NoteOffEvent(note.NoteNumber, (SevenBitNumber)0) { Channel = note.Channel });
-                    }
+                    //off last sound
+                    var note = arp.LastNote;
+                    if (note != null)
+                        keyOffCore(new NoteOffEvent(note.NoteNumber, (SevenBitNumber)0) { Channel = note.Channel });
                     arp.ClearNotes();
                     removeArps.Add(ch);
                     continue;
                 }
 
-                arp.StepStyle = sds.ArpStepStyle;
-                arp.Range = sds.ArpRange;
-                if (sds.ArpKeySync)
+                arp.StepStyle = sds.StepStyle;
+                arp.Range = sds.OctaveRange;
+                if (sds.KeySync)
                     arp.RetriggerType = RetriggerType.Note;
-                arp.CounterStep = (60d * InstrumentManager.TIMER_HZ / sds.ArpTempo) / (double)sds.ArpResolution;
+                arp.CounterStep = (60d * InstrumentManager.TIMER_HZ / sds.Beat) / (double)sds.ArpResolution;
                 if (arp.GateCounter != double.MinValue)
                 {
                     arp.GateCounter += InstrumentManager.TIMER_INTERVAL;
-                    if (arp.GateCounter >= arp.CounterStep * ((sds.ArpGate + 1) / 128d))
+                    if (arp.GateCounter >= arp.CounterStep * ((sds.GateTime + 1) / 128d))
                     {
                         arp.GateCounter = double.MinValue;
-                        //if (arp.ArpNotesCount > 1)
-                        {
-                            // key off lsat note
-                            var note = arp.LastNote;
-                            if (note != null)// && arp.ArpNotesCount > 1)  //1つしかなければ消さない
-                                keyOffCore(new NoteOffEvent(note.NoteNumber, (SevenBitNumber)0) { Channel = note.Channel });
-                        }
+                        // key off lsat note
+                        var note = arp.LastNote;
+                        if (note != null)
+                            keyOffCore(new NoteOffEvent(note.NoteNumber, (SevenBitNumber)0) { Channel = note.Channel });
                     }
                 }
                 arp.Counter += InstrumentManager.TIMER_INTERVAL;
+                // key on
                 if (arp.Counter >= arp.CounterStep)
                 {
                     arp.Counter -= arp.CounterStep;
                     arp.GateCounter = arp.Counter;
-                    //key on new note(同じ音の場合は繰り返さない)
-                    var lnote = arp.LastNote;
-                    var note = Arpeggiators[ch].Next();
-                    //if (lnote == null || note.NoteNumber != lnote.NoteNumber)
+                    var note = arp.Next();
                     keyOnCore(new NoteOnEvent(note.NoteNumber, note.Velocity) { Channel = note.Channel });
                 }
             }
@@ -234,19 +228,19 @@ namespace zanac.MAmidiMEmo.Instruments
         public virtual void KeyOn(NoteOnEvent note)
         {
             var timbre = parentModule.GetTimbre(note.Channel);
-            var sds = timbre.SDS;
-            if (sds.ArpEnable && sds.ArpMethod == ArpMethod.NoteOn)
+            var sds = timbre.SDS.ARP;
+            if (sds.Enable && sds.ArpMethod == ArpMethod.NoteOn)
             {
                 //create Arpeggiator
                 if (!Arpeggiators.ContainsKey(note.Channel))
                     Arpeggiators.Add(note.Channel, new Arpeggiator());
 
                 var arp = Arpeggiators[note.Channel];
-                arp.StepStyle = sds.ArpStepStyle;
-                arp.Range = sds.ArpRange;
-                if(sds.ArpKeySync)
+                arp.StepStyle = sds.StepStyle;
+                arp.Range = sds.OctaveRange;
+                if (sds.KeySync)
                     arp.RetriggerType = RetriggerType.Note;
-                arp.CounterStep = (60d * InstrumentManager.TIMER_HZ / sds.ArpTempo) / (double)sds.ArpResolution;
+                arp.CounterStep = (60d * InstrumentManager.TIMER_HZ / sds.Beat) / (double)sds.ArpResolution;
                 //hold reset
                 if (arp.ResetNextNoteOn)
                 {
@@ -260,7 +254,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 //enable Arpeggiator
                 if (processArpeggiatorAction == null)
                 {
-                    ProcessArpeggiators();
+                    //ProcessArpeggiators();
                     processArpeggiatorAction = new Action(ProcessArpeggiators);
                     InstrumentManager.SetPeriodicCallback(processArpeggiatorAction);
                 }
@@ -300,10 +294,11 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 var timbre = parentModule.GetTimbre(note.Channel);
                 var arp = Arpeggiators[ch];
-                if (timbre.SDS.ArpEnable && timbre.SDS.ArpMethod == ArpMethod.NoteOn)
+                var sds = timbre.SDS.ARP;
+                if (sds.Enable && sds.ArpMethod == ArpMethod.NoteOn)
                 {
                     //ignore keyoff if hold mode
-                    if (timbre.SDS.ArpHold)
+                    if (sds.Hold)
                     {
                         arp.ResetNextNoteOn = true;
                         return;

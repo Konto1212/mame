@@ -56,8 +56,17 @@ void filter_rc_device::device_start()
 
 void filter_rc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	/* mamidimemo
+	if (m_enable == 0)
+	{
+		std::fill(&outputs[0][0], &outputs[0][samples], 0);
+		return;
+	}
+	*/
+
 	stream_sample_t *src = inputs[0];
 	stream_sample_t *dst = outputs[0];
+	stream_sample_t *dst2 = outputs[1];
 	int memory = m_memory;
 
 	switch (m_type)
@@ -67,6 +76,7 @@ void filter_rc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 			{
 				memory += ((*src++ - memory) * m_k) / 0x10000;
 				*dst++ = memory;
+				*dst2++ = memory;
 			}
 			break;
 		case HIGHPASS:
@@ -74,6 +84,7 @@ void filter_rc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 			while (samples--)
 			{
 				*dst++ = *src - memory;
+				*dst2++ = memory;
 				memory += ((*src++ - memory) * m_k) / 0x10000;
 			}
 			break;

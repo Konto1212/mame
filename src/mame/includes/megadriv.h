@@ -19,6 +19,8 @@
 #include "sound/3812intf.h"
 #include "sound/msm5232.h"
 #include "video/315_5313.h"
+#include "sound/flt_vol.h"
+#include "sound/flt_rc.h"
 
 /* Megadrive Console Specific */
 #include "bus/megadrive/md_slot.h"
@@ -65,6 +67,7 @@ public:
 		*/
 	{
 		//mamidimemo
+
 		for (int i = 0; i < 8; i++)
 		{
 			int didx = 0;
@@ -110,6 +113,14 @@ public:
 			strcpy(device_names[didx][i], (std::string("msm5232_") + num).c_str());
 			m_msm5232[i] = new optional_device<msm5232_device>(*this, device_names[didx][i]);
 			didx++;
+			/*
+			//nes filter
+			strcpy(device_names[didx][i], (std::string("filter_nes_l_") + num).c_str());
+			m_filter_nes_l[i] = new optional_device<filter_rc_device>(*this, device_names[didx][i]);
+			didx++;
+			strcpy(device_names[didx][i], (std::string("filter_nes_r_") + num).c_str());
+			m_filter_nes_r[i] = new optional_device<filter_rc_device>(*this, device_names[didx][i]);
+			didx++;*/
 		}
 	}
 
@@ -124,7 +135,10 @@ public:
 	optional_device<ym3812_device> *m_ym3812[8];	//8
 	optional_device<ym2413_device> *m_ym2413[8];	//9
 	optional_device<msm5232_device> *m_msm5232[8];	//10
-
+	/*
+	optional_device<filter_rc_device> *m_filter_nes_l[8]; //11
+	optional_device<filter_rc_device> *m_filter_nes_r[8]; //12
+	*/
 	required_device<m68000_base_device> m_maincpu;
 	/*
 	optional_device<cpu_device> m_z80snd;
