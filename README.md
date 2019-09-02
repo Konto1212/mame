@@ -6,8 +6,6 @@ MAmidiMEmo is a virtual chiptune sound MIDI module using a MAME sound engine.
 You can control various chips and make sound via MIDI I/F.
 So, you don't need to use dedicated tracker and so on anymore. You can use your favorite MIDI sequencer to make a chip sound.
 
- Note:MAmidiMEmo is not a sound driver. So, if you want to play fast arpeggio, use the arpeggiator.
-
 MAmidiMEmo adopts multi timbre method. That mean you can play multi chords on MIDI 1ch if the chip has multi ch.
 
 e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 8ch with MIDI 16ch like a SC-55 and so on.
@@ -39,7 +37,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 3. Add your favorite chips from the [Instruments] menu on the toolbar.
 
    Note: Currently supported chip is the following.
-         YM2151, YM2612, YM3812, YM2413, SN76496, NES APU, MSM5232(+TA7630), NAMCO CUS30, GB APU, SCC, 
+         YM2151, YM2612, YM3812, YM2413, SN76496, NES APU, MSM5232(+TA7630), NAMCO CUS30, GB APU, SCC, AY-3-8910
    Note: You can add the chip up to 8 per same chip type and MAmidiMEmo eats more CPU power.
 
 4. Select the chip from the left pane and configure the chip on the right pane.
@@ -80,7 +78,10 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 	MSM5232(+TA7630):
 	 http://www.citylan.it/wiki/images/3/3e/5232.pdf
 	 http://sr4.sakura.ne.jp/acsound/taito/taito5232.html
-
+	AY-3-8910:
+	 http://ngs.no.coocan.jp/doc/wiki.cgi/TechHan?page=1%BE%CF+PSG%A4%C8%B2%BB%C0%BC%BD%D0%CE%CF
+	 https://w.atwiki.jp/msx-sdcc/pages/45.html
+	 http://f.rdw.se/AY-3-8910-datasheet.pdf
 
    *[Channels]
     Select which MIDI ch messages the chip receive.

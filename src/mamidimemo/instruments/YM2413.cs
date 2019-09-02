@@ -237,8 +237,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public YM2413(uint unitNumber) : base(unitNumber)
         {
-            GainLeft = 3.0f;
-            GainRight = 3.0f;
+            GainLeft = 4.0f;
+            GainRight = 4.0f;
 
             Timbres = new YM2413Timbre[128];
             for (int i = 0; i < 128; i++)

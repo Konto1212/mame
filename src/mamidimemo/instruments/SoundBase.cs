@@ -203,7 +203,7 @@ namespace zanac.MAmidiMEmo.Instruments
             var range = (int)ParentModule.PitchBendRanges[NoteOnEvent.Channel];
 
             double d1 = ((double)pitch / 8192d) * range;
-            double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber;
+            double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber + ArpeggiateDeltaNoteNumber;
 
             return d;
         }
@@ -223,7 +223,51 @@ namespace zanac.MAmidiMEmo.Instruments
             if (adsr != null)
                 v *= adsr.GetOutputLevel();
 
+            v *= ArpeggiateVolume;
+
             return v;
+        }
+
+        private double f_ArpeggiateDeltaNoteNumber;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal protected double ArpeggiateDeltaNoteNumber
+        {
+            get
+            {
+                return f_ArpeggiateDeltaNoteNumber;
+            }
+            internal set
+            {
+                if (f_ArpeggiateDeltaNoteNumber != value)
+                {
+                    f_ArpeggiateDeltaNoteNumber = value;
+                    UpdatePitch();
+                }
+            }
+        }
+
+        private double f_ArpeggiateVolume = 1d;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal protected double ArpeggiateVolume
+        {
+            get
+            {
+                return f_ArpeggiateVolume;
+            }
+            internal set
+            {
+                if (f_ArpeggiateVolume != value)
+                {
+                    f_ArpeggiateVolume = value;
+                    UpdateVolume();
+                }
+            }
         }
 
         private Action periodicAction;
@@ -317,6 +361,8 @@ namespace zanac.MAmidiMEmo.Instruments
             if (EnableADSR)
                 UpdateVolume();
         }
+
+
 
         /// <summary>
         /// 
@@ -430,7 +476,7 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private bool f_soundDriverEnabled;
+        private bool f_AdsrEnabled;
 
         /// <summary>
         /// サウンドドライバの有効無効
@@ -439,13 +485,13 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get
             {
-                return f_soundDriverEnabled;
+                return f_AdsrEnabled;
             }
             set
             {
-                if (value != f_soundDriverEnabled)
+                if (value != f_AdsrEnabled)
                 {
-                    f_soundDriverEnabled = value;
+                    f_AdsrEnabled = value;
                     updatePeriodicAction();
                 }
             }

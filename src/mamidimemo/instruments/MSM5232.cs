@@ -632,7 +632,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            private byte f_Horm = 1;
+            private byte f_Horm = 15;
 
             [DataMember]
             [Category("Sound")]

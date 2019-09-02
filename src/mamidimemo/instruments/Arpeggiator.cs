@@ -126,10 +126,30 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public NoteOnEvent LastNote
+        public NoteOnEvent LastSoundNote
         {
             get;
             private set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public NoteOnEvent FirstAddedNote
+        {
+            get;
+            private set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public SoundBase FirstAddedNoteSound
+        {
+            get;
+            internal set;
         }
 
         /// <summary>
@@ -159,6 +179,16 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
+        public bool SkipNextNote
+        {
+            get;
+            set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="noteOn"></param>
         public void AddNote(NoteOnEvent noteOn)
         {
@@ -170,6 +200,9 @@ namespace zanac.MAmidiMEmo.Instruments
                     return;
                 }
             }
+
+            if (orderedNotes.Count == 0)
+                FirstAddedNote = noteOn;
 
             orderedNotes.Add(noteOn);
 
@@ -206,6 +239,12 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <returns></returns>
         public NoteOnEvent Next()
         {
+            if (SkipNextNote)
+            {
+                arpStep++;
+                SkipNextNote = false;
+            }
+
             if (arpStep >= arpNotes.Count)
             {
                 arpStep = 0;
@@ -231,7 +270,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (an.NoteNumber + oc < 128)
                     an.NoteNumber += (SevenBitNumber)oc;
             }
-            LastNote = an;
+            LastSoundNote = an;
             return an;
         }
 

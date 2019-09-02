@@ -212,6 +212,7 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\AY-3-8910.png" />
     <None Include="Resources\Rst.png" />
     <None Include="Resources\Panic.png" />
     <None Include="Resources\donate.png" />

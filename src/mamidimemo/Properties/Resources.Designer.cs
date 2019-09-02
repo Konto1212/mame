@@ -63,6 +63,16 @@ namespace zanac.MAmidiMEmo.Properties {
         /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
+        internal static System.Drawing.Bitmap AY_3_8910 {
+            get {
+                object obj = ResourceManager.GetObject("AY_3_8910", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
         internal static System.Drawing.Bitmap donate {
             get {
                 object obj = ResourceManager.GetObject("donate", resourceCulture);
