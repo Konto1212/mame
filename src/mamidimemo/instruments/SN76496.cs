@@ -411,8 +411,10 @@ namespace zanac.MAmidiMEmo.Instruments
             private void updatePsgPitch()
             {
                 double freq = CalcCurrentFrequency();
-
-                var n = (ushort)((ushort)Math.Round(3579545 / (freq * 32)) & 0x3ff);
+                freq = Math.Round(3579545 / (freq * 32));
+                if (freq > 0x3ff)
+                    freq = 0x3ff;
+                var n = (ushort)freq;
                 Sn76496WriteData(parentModule.UnitNumber, (byte)(0x80 | Slot << 5 | n & 0xf));
                 Sn76496WriteData(parentModule.UnitNumber, (byte)((n >> 4) & 0x3f));
             }

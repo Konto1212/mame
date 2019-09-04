@@ -749,8 +749,10 @@ namespace zanac.MAmidiMEmo.Instruments
                  * Bit 2-0 - Frequency's higher 3 bits (x) (Write Only)
                  * Frequency = 131072/(2048-x) Hz
                  */
-
-                return (ushort)Math.Round(2048d - (131072d / freq));
+                double f = (131072d / freq);
+                if (f > 2048d)
+                    f = 2048d;
+                return (ushort)Math.Round(2048d - f);
             }
 
             /// <summary>
@@ -760,6 +762,9 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <returns></returns>
             private ushort convertWavFrequency(double freq)
             {
+                double f = (65536d / freq);
+                if (f > 2048d)
+                    f = 2048d;
                 return (ushort)Math.Round(2048d - (65536d / freq));
             }
 

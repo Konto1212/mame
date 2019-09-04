@@ -446,7 +446,18 @@ namespace zanac.MAmidiMEmo.Instruments
                     noteNum = 0;
                 var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
                 ushort freq = convertFmFrequency(nnOn);
-                byte octave = (byte)(nnOn.GetNoteOctave() << 2);
+                var octave = nnOn.GetNoteOctave();
+                if (octave < 0)
+                {
+                    octave = 0;
+                    freq = freqTable[0];
+                }
+                if (octave > 7)
+                {
+                    octave = 7;
+                    freq = freqTable[13];
+                }
+                octave = octave << 2;
 
                 if (d != 0)
                     freq += (ushort)(((double)(convertFmFrequency(nnOn, (d < 0) ? false : true) - freq)) * Math.Abs(d - Math.Truncate(d)));

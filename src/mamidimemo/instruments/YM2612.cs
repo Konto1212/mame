@@ -539,7 +539,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public YM2612Sound(YM2612 parentModule, YM2612SoundManager manager, TimbreBase timbre,  NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
+            public YM2612Sound(YM2612 parentModule, YM2612SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -629,7 +629,18 @@ namespace zanac.MAmidiMEmo.Instruments
                     noteNum = 0;
                 var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
                 ushort freq = convertFmFrequency(nnOn);
-                byte octave = (byte)(nnOn.GetNoteOctave() << 3);
+                var octave = nnOn.GetNoteOctave();
+                if (octave < 0)
+                {
+                    octave = 0;
+                    freq = freqTable[0];
+                }
+                if (octave > 7)
+                {
+                    octave = 7;
+                    freq = freqTable[13];
+                }
+                octave = octave << 3;
 
                 if (d != 0)
                     freq += (ushort)(((double)(convertFmFrequency(nnOn, (d < 0) ? false : true) - freq)) * Math.Abs(d - Math.Truncate(d)));

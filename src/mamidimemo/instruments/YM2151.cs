@@ -525,7 +525,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public YM2151Sound(YM2151 parentModule, YM2151SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre , noteOnEvent, slot)
+            public YM2151Sound(YM2151 parentModule, YM2151SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -628,16 +628,21 @@ namespace zanac.MAmidiMEmo.Instruments
                 var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
 
                 byte nn = getNoteNum(nnOn.GetNoteName());
-                byte octave = (byte)nnOn.GetNoteOctave();
+                var octave = nnOn.GetNoteOctave();
                 if (nn == 14)
                 {
-                    if (octave > 0)
-                        octave -= 1;
-                    else
-                        nn = 0;
-                }
-                if (octave > 0)
                     octave -= 1;
+                }
+                if (octave < 0)
+                {
+                    octave = 0;
+                    nn = 0;
+                }
+                if (octave > 7)
+                {
+                    octave = 7;
+                    nn = 14;
+                }
                 Program.SoundUpdating();
                 Ym2151WriteData(parentModule.UnitNumber, 0x28, 0, Slot, (byte)((octave << 4) | nn));
                 Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)(kf << 2));

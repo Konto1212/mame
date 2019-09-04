@@ -486,13 +486,16 @@ namespace zanac.MAmidiMEmo.Instruments
                         noteNum = 0;
                     var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
                     ushort freq = convertFmFrequency(nnOn);
-                    byte octave = (byte)(nnOn.GetNoteOctave() << 1);
+                    var oct = nnOn.GetNoteOctave();
+                    if (oct < 0)
+                        oct = 0;
+                    byte octave = (byte)(oct << 1);
 
                     if (d != 0)
                         freq += (ushort)(((double)(convertFmFrequency(nnOn, (d < 0) ? false : true) - freq)) * Math.Abs(d - Math.Truncate(d)));
 
                     //keyon
-                    byte kon = IsKeyOff ? (byte)0: (byte)0x10;
+                    byte kon = IsKeyOff ? (byte)0 : (byte)0x10;
                     lastFreqData = (byte)(timbre.SUS << 5 | kon | octave | ((freq >> 8) & 1));
 
                     Program.SoundUpdating();

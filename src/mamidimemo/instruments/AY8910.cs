@@ -560,7 +560,10 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 //freq = 111860.78125 / TP
                 //TP = 111860.78125 / freq
-                ushort tp = (ushort)((ushort)Math.Round(111860.78125 / freq) & 0xfff);
+                freq = Math.Round(111860.78125 / freq);
+                if (freq > 0xfff)
+                    freq = 0xfff;
+                ushort tp = (ushort)freq;
 
                 Ay8910WriteData(parentModule.UnitNumber, 0, (byte)(0 + (Slot * 2)));
                 Ay8910WriteData(parentModule.UnitNumber, 1, (byte)(tp & 0xff));

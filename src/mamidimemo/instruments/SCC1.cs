@@ -414,8 +414,10 @@ namespace zanac.MAmidiMEmo.Instruments
                  *     fclock is the clock frequency of the computer. 3,579,545 Hz
                  */
                 // TP = (fclock / (32 * ftone))-1
-                uint n = (uint)Math.Round((3579545 / (32 * freq)) - 1) & 0xfff;
-
+                freq = Math.Round((3579545 / (32 * freq)) - 1);
+                if (freq > 0xfff)
+                    freq = 0xfff;
+                uint n = (uint)freq;
                 Scc1FrequencyWriteData(parentModule.UnitNumber, (uint)((Slot << 1)) + 0, (byte)(n & 0xff));
                 Scc1FrequencyWriteData(parentModule.UnitNumber, (uint)((Slot << 1)) + 1, (byte)((n >> 8) & 0xf));
             }

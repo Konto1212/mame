@@ -1057,7 +1057,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	int chan;
 
 	buf[0] = outputs[0];
-	buf[1] = nullptr;
+	buf[1] = outputs[1];
 	buf[2] = nullptr;
 	if (m_streams == NUM_CHANNELS)
 	{
@@ -1173,12 +1173,14 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		}
 		else
 		{
-			*(buf[0]++) = mix_3D();
+			u16 dt = mix_3D();
+			*(buf[0]++) = dt;
+			*(buf[1]++) = dt;
 		}
 		samples--;
 	}
 
-	std::memcpy(&outputs[1][0], &outputs[0][0], samples*sizeof(stream_sample_t));
+	std::memcpy(outputs[1], outputs[0], samples*sizeof(stream_sample_t));
 }
 
 void ay8910_device::build_mixer_table()

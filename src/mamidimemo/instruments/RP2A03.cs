@@ -646,8 +646,10 @@ namespace zanac.MAmidiMEmo.Instruments
                     return;
 
                 double freq = CalcCurrentFrequency();
-
-                var n = (ushort)((ushort)(Math.Round(1790000d / (freq * 32)) - 1) & 0x7ff);
+                freq = Math.Round(1790000d / (freq * 32)) - 1;
+                if (freq > 0x7ff)
+                    freq = 0x7ff;
+                var n = (ushort)freq;
                 Program.SoundUpdating();
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x02), (byte)(n & 0xff));
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x03), (byte)((timbre.PlayLength << 3) | (n >> 8) & 0x7));
@@ -660,8 +662,10 @@ namespace zanac.MAmidiMEmo.Instruments
                     return;
 
                 double freq = CalcCurrentFrequency();
-
-                var n = (ushort)((ushort)(Math.Round(1790000d / (freq * 32)) - 1) & 0x7ff);
+                freq = Math.Round(1790000d / (freq * 32)) - 1;
+                if (freq > 0x7ff)
+                    freq = 0x7ff;
+                var n = (ushort)freq;
                 Program.SoundUpdating();
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x02), (byte)(n & 0xff));
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x03), (byte)((timbre.PlayLength << 3) | (n >> 8) & 0x7));
@@ -703,7 +707,7 @@ namespace zanac.MAmidiMEmo.Instruments
                             Program.SoundUpdating();
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
-                                Program.SoundUpdated();
+                            Program.SoundUpdated();
                             break;
                         }
                     case ToneType.NOISE:

@@ -359,7 +359,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private ArpType f_ArpType;
 
         [DataMember]
-        [Description("Select Arpeggio Type (Dynamic or Static)")]
+        [Description("Set arpeggio type (Dynamic or Static)")]
         public ArpType ArpType
         {
             get
@@ -378,7 +378,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private ArpMethod f_ArpMethod;
 
         [DataMember]
-        [Description("Select Arpeggio Method (Note On or Pitch Change)")]
+        [Description("Set arpeggio method (Note On or Pitch Change)")]
         public ArpMethod ArpMethod
         {
             get
@@ -397,7 +397,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private ArpStepStyle f_StepStyle;
 
         [DataMember]
-        [Description("Select Arpeggio Step Style")]
+        [Description("Set arpeggio step style *Dynamic Arp Only")]
         public ArpStepStyle StepStyle
         {
             get
@@ -416,7 +416,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private int f_OctaveRange = 1;
 
         [DataMember]
-        [Description("Select Arpeggio Octave Range (1-4)")]
+        [Description("Set arpeggio octave range (1-4) *Dynamic Arp Only")]
         public int OctaveRange
         {
             get
@@ -435,7 +435,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private int f_Beat = 120;
 
         [DataMember]
-        [Description("Select Arpeggio Beat (20-300)")]
+        [Description("Set arpeggio tempo (20-300)")]
         public int Beat
         {
             get
@@ -454,7 +454,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private ArpResolution f_ArpResolution = ArpResolution.QuarterNote;
 
         [DataMember]
-        [Description("Select Arpeggio Tempo Resolution")]
+        [Description("Set arpeggio resolution")]
         public ArpResolution ArpResolution
         {
             get
@@ -483,7 +483,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private int f_GateTime = 127;
 
         [DataMember]
-        [Description("Select Arpeggio Note Gate Time (0(0%)-127(100%))")]
+        [Description("Arpeggio Gate Time of NoteOn (0(0%)-127(100%))")]
         public int GateTime
         {
             get
@@ -505,7 +505,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private bool f_KeySync;
 
         [DataMember]
-        [Description("Select Use Key Sync Mode ")]
+        [Description("When you press a key, arpeggio restart from first. ")]
         public bool KeySync
         {
             get
@@ -517,6 +517,79 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_KeySync != value)
                 {
                     f_KeySync = value;
+                }
+            }
+        }
+
+        [IgnoreDataMember]
+        [JsonIgnore]
+        [Description("Set static arp steps by text. Input note number and split it with space.\r\n" +
+            "Absolute/Relative -127～0～+127\r\n" +
+            "Fixed is 0～127")]
+        public string StaticArpSteps
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < StaticArpStepKeyNums.Length; i++)
+                {
+                    if (sb.Length != 0)
+                        sb.Append(' ');
+                    sb.Append(StaticArpStepKeyNums[i].ToString((IFormatProvider)null));
+                }
+                return sb.ToString();
+            }
+            set
+            {
+                string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                List<int> vs = new List<int>();
+                foreach (var val in vals)
+                {
+                    int v = 0;
+                    if (int.TryParse(val, out v))
+                        vs.Add(v);
+                }
+                StaticArpStepKeyNums = vs.ToArray();
+            }
+        }
+
+        private int[] f_CustomArpStepKeyNums = new int[] { };
+
+        //[TypeConverter(typeof(ArrayConverter))]
+        //[Editor(typeof(WsgITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [DataMember]
+        [Category("Sound")]
+        [Description("Set static arp steps by value. Input note number.\r\n" +
+            "Absolute/Relative -127～0～+127\r\n" +
+            "Fixed 0～127")]
+        public int[] StaticArpStepKeyNums
+        {
+            get
+            {
+                return f_CustomArpStepKeyNums;
+            }
+            set
+            {
+                f_CustomArpStepKeyNums = value;
+            }
+        }
+
+        private CustomArpStepType f_CustomArpStepType;
+
+
+        [DataMember]
+        [Description("Set static arp step type.")]
+        public CustomArpStepType StaticArpStepType
+        {
+            get
+            {
+                return f_CustomArpStepType;
+            }
+            set
+            {
+                if (f_CustomArpStepType != value)
+                {
+                    f_CustomArpStepType = value;
                 }
             }
         }

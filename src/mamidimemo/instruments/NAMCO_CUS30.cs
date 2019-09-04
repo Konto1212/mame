@@ -410,9 +410,10 @@ namespace zanac.MAmidiMEmo.Instruments
                 // A6 1760 -> 1760 * 500 = 880000
                 //adjust
                 double xfreq = 29.00266666666667 * noteNum;
-
-                uint n = ((uint)Math.Round((freq - xfreq) * 93.75)) & (uint)0xfffff;
-
+                freq = Math.Round((freq - xfreq) * 93.75);
+                if (freq > 0xfffff)
+                    freq = 0xfffff;
+                uint n = (uint)freq;
                 Program.SoundUpdating();
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x01, (byte)((byte)((Slot & 0xf) << 4) | ((n >> 16) & 0xf)));
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x02, (byte)((n >> 8) & 0xff));

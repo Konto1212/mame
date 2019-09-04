@@ -16,19 +16,14 @@ namespace zanac.MAmidiMEmo.Instruments
     {
         private static Random random = new Random();
 
+        /// <summary>
+        /// added note
+        /// </summary>
         private List<NoteOnEvent> orderedNotes = new List<NoteOnEvent>();
 
         /// <summary>
-        /// 
+        /// playing note
         /// </summary>
-        public IEnumerable<NoteOnEvent> ArpeggioNotes
-        {
-            get
-            {
-                return orderedNotes.AsEnumerable();
-            }
-        }
-
         private List<NoteOnEvent> arpNotes;
 
         private int arpOctaveCount;
@@ -55,6 +50,27 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ArpType ArpType
+        {
+            get;
+            set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public CustomArpStepType StaticArpStepType
+        {
+            get;
+            set;
+        }
+
 
         /// <summary>
         /// 
@@ -106,7 +122,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public double CounterStep
+        public double StepCounter
         {
             get;
             set;
@@ -115,23 +131,22 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public int ArpNotesCount
+        public int AddedNotesCount
         {
             get
             {
-                return arpNotes.Count;
+                return orderedNotes.Count;
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public NoteOnEvent LastSoundNote
+        public NoteOnEvent LastPassedNote
         {
             get;
             private set;
         }
-
 
         /// <summary>
         /// 
@@ -142,11 +157,10 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
-
         /// <summary>
         /// 
         /// </summary>
-        public SoundBase FirstAddedNoteSound
+        public SoundBase FirstSoundForPitch
         {
             get;
             internal set;
@@ -162,7 +176,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public void ClearNotes()
+        public void ClearAddedNotes()
         {
             orderedNotes.Clear();
         }
@@ -202,7 +216,10 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             if (orderedNotes.Count == 0)
+            {
                 FirstAddedNote = noteOn;
+                LastPassedNote = null;
+            }
 
             orderedNotes.Add(noteOn);
 
@@ -218,7 +235,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="noteOff"></param>
         public bool RemoveNote(NoteOffEvent noteOff)
         {
-            bool result = true;
+            bool result = false;
             for (int i = 0; i < orderedNotes.Count; i++)
             {
                 if (orderedNotes[i].NoteNumber == noteOff.NoteNumber)
@@ -237,7 +254,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         /// <returns></returns>
-        public NoteOnEvent Next()
+        public NoteOnEvent NextNote()
         {
             if (SkipNextNote)
             {
@@ -247,34 +264,64 @@ namespace zanac.MAmidiMEmo.Instruments
 
             if (arpStep >= arpNotes.Count)
             {
-                arpStep = 0;
-                arpOctaveCount++;
-                if (arpOctaveCount >= Range)
-                    arpOctaveCount = 0;
+                if (ArpType != ArpType.Static || StaticArpStepType != CustomArpStepType.Relative)
+                {
+                    //ステップをループする
+                    arpStep = 0;
+                    arpOctaveCount++;
+                    if (arpOctaveCount >= Range)
+                        arpOctaveCount = 0;
+                }
+                else
+                {
+                    //相対指定の場合は1つ目の音は2回目以降はならなさない
+                    arpStep = 1;
+                }
             }
+
+            //次のノートを取得
             NoteOnEvent an = null;
             if (StepStyle != ArpStepStyle.Random)
                 an = arpNotes[arpStep];
             else
                 an = arpNotes[random.Next(arpNotes.Count)];
             arpStep++;
+            var nan = new NoteOnEvent(an.NoteNumber, an.Velocity) { Channel = an.Channel };
 
-            an = new NoteOnEvent(an.NoteNumber, an.Velocity) { Channel = an.Channel };
-
+            //オクターブを上げる処理
             if (arpOctaveCount > 0)
             {
                 int oc = arpOctaveCount;
                 if (StepStyle == ArpStepStyle.Random)
                     oc = random.Next(Range - 1);
                 oc *= 12;
-                if (an.NoteNumber + oc < 128)
-                    an.NoteNumber += (SevenBitNumber)oc;
+                if (nan.NoteNumber + oc < 128)
+                    nan.NoteNumber += (SevenBitNumber)oc;
             }
-            LastSoundNote = an;
-            return an;
+
+            //相対指定の場合のノート番号を動的に計算
+            if (ArpType == ArpType.Static && StaticArpStepType == CustomArpStepType.Relative)
+            {
+                int no = nan.NoteNumber;
+                if (LastPassedNote != null)
+                {
+                    no -= (int)FirstAddedNote.NoteNumber;
+                    no = LastPassedNote.NoteNumber + no;
+                }
+                if (no < 0)
+                    no = 0;
+                else if (no > 127)
+                    no = 127;
+                nan.NoteNumber = (SevenBitNumber)no;
+            }
+
+            LastPassedNote = nan;
+            return nan;
         }
 
-
+        /// <summary>
+        /// 最初のステップから再スタート
+        /// </summary>
         public void Retrigger()
         {
             arpStep = 0;
@@ -285,7 +332,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private void calculateArp()
         {
-            arpStep = 0;
+            //arpStep = 0;
+            bool sorted = true;
             switch (StepStyle)
             {
                 case ArpStepStyle.Up:
@@ -534,6 +582,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 case ArpStepStyle.Random:
                     arpNotes = new List<NoteOnEvent>(orderedNotes);
+                    sorted = false;
                     break;
 
                 case ArpStepStyle.RandomOnce:
@@ -551,7 +600,35 @@ namespace zanac.MAmidiMEmo.Instruments
                     break;
 
                 default:
+                    sorted = false;
                     break;
+            }
+
+            //ソート後、同じ音が続けてならないように次の音を別の音にする
+            if (sorted)
+            {
+                if (LastPassedNote != null)
+                {
+                    for (int i = 0; i < arpNotes.Count; i++)
+                    {
+                        if (arpNotes[i].NoteNumber == LastPassedNote.NoteNumber)
+                        {
+                            arpStep = i + 1;
+                            break;
+                        }
+                    }
+                }
+                else if (FirstSoundForPitch != null)
+                {
+                    for (int i = 0; i < arpNotes.Count; i++)
+                    {
+                        if (arpNotes[i].NoteNumber == FirstSoundForPitch.NoteOnEvent.NoteNumber)
+                        {
+                            arpStep = i + 1;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -606,8 +683,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
     public enum ArpMethod
     {
-        NoteOn,
-        Pitch
+        KeyOn,
+        PitchChange
     }
 
     public enum ArpResolution
@@ -620,5 +697,14 @@ namespace zanac.MAmidiMEmo.Instruments
         SixteenthTriplet = 12,
         ThirtySecondNote = 8,
     }
+
+
+    public enum CustomArpStepType
+    {
+        Absolute,
+        Relative,
+        Fixed,
+    }
+
 
 }
