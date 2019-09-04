@@ -264,7 +264,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             if (arpStep >= arpNotes.Count)
             {
-                if (ArpType != ArpType.Static || StaticArpStepType != CustomArpStepType.Relative)
+                if (ArpType != ArpType.Static)
                 {
                     //ステップをループする
                     arpStep = 0;
@@ -275,7 +275,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 else
                 {
                     //相対指定の場合は1つ目の音は2回目以降はならなさない
-                    arpStep = 1;
+                    arpStep = StaticArpStepType == CustomArpStepType.Relative ? 1 : 0;
                 }
             }
 

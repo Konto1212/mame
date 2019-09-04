@@ -190,7 +190,6 @@ namespace zanac.MAmidiMEmo.Instruments
             return -1;
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -241,17 +240,6 @@ namespace zanac.MAmidiMEmo.Instruments
             foreach (int ch in removeArps)
                 ArpeggiatorsForKeyOn.Remove(ch);
             tryToDisableArpTimerForKeyOn();
-        }
-
-        private void tryToDisableArpTimerForKeyOn()
-        {
-            //全アルペジオ終了
-            if (ArpeggiatorsForKeyOn.Count != 0)
-                return;
-
-            if (processArpeggiatorKeyOnAction != null)
-                InstrumentManager.UnsetPeriodicCallback(processArpeggiatorKeyOnAction);
-            processArpeggiatorKeyOnAction = null;
         }
 
 
@@ -309,27 +297,89 @@ namespace zanac.MAmidiMEmo.Instruments
             tryToDisableArpTimerForPitch();
         }
 
-        private void tryToDisableArpTimerForPitch()
-        {
-            //全アルペジオ終了
-            if (ArpeggiatorsForPitch.Count != 0)
-                return;
-
-            if (processArpeggiatorPitchAction != null)
-                InstrumentManager.UnsetPeriodicCallback(processArpeggiatorPitchAction);
-            processArpeggiatorPitchAction = null;
-        }
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="note"></param>
         public virtual void KeyOn(NoteOnEvent note)
         {
-            var ch = note.Channel;
-            var timbre = parentModule.GetTimbre(ch);
-            var sds = timbre.SDS.ARP;
+            if (preProcessArrpegioForKeyOn(note))
+                return;
 
+            var snd = keyOnCore(note);
+
+            postProcessArrpegioForKeyOn(note, snd);
+        }
+        
+        private SoundBase keyOnCore(NoteOnEvent note)
+        {
+            var snd = SoundOn(note);
+            if (snd != null)
+            {
+                AllSounds.Add(snd);
+                LastNoteNumbers[note.Channel] = note.NoteNumber;
+                return snd;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="note"></param>
+        public virtual SoundBase SoundOn(NoteOnEvent note)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="note"></param>
+        public virtual void KeyOff(NoteOffEvent note)
+        {
+            if (preProcessArpeggioForKeyOff(note))
+                return;
+
+            keyOffCore(note);
+        }
+
+        private void keyOffCore(NoteOnEvent onote)
+        {
+            if (onote != null)
+                keyOffCore(new NoteOffEvent(onote.NoteNumber, (SevenBitNumber)0) { Channel = onote.Channel });
+        }
+
+        private SoundBase keyOffCore(NoteOffEvent note)
+        {
+            SoundBase offsnd = null;
+
+            for (int i = 0; i < AllSounds.Count; i++)
+            {
+                if (AllSounds[i].IsKeyOff)
+                    continue;
+
+                if (AllSounds[i].NoteOnEvent.Channel == note.Channel)
+                {
+                    if (AllSounds[i].NoteOnEvent.NoteNumber == note.NoteNumber)
+                    {
+                        offsnd = AllSounds[i];
+                        offsnd.KeyOff();
+                        break;
+                    }
+                }
+            }
+
+            return offsnd;
+        }
+
+        #region アルペジオ関係
+
+
+        private bool preProcessArrpegioForKeyOn(NoteOnEvent note)
+        {
+            FourBitNumber ch = note.Channel;
+            ARPSettings sds = parentModule.GetTimbre(ch).SDS.ARP;
             if (sds.Enable)
             {
                 if (sds.ArpMethod == ArpMethod.KeyOn)
@@ -377,7 +427,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     }
 
                     tryToEnableArpTimerForKeyOn();
-                    return;
+                    return true;
                 }
                 else if (sds.ArpMethod == ArpMethod.PitchChange)
                 {
@@ -401,7 +451,7 @@ namespace zanac.MAmidiMEmo.Instruments
                             else
                             {
                                 arp.AddNote(note);
-                                return;
+                                return true;
                             }
                         }
                         else if (sds.ArpType == ArpType.Static)
@@ -412,9 +462,14 @@ namespace zanac.MAmidiMEmo.Instruments
                     }
                 }
             }
+            return false;
+        }
 
-            var snd = keyOnCore(note);
 
+        private void postProcessArrpegioForKeyOn(NoteOnEvent note, SoundBase snd)
+        {
+            FourBitNumber ch = note.Channel;
+            ARPSettings sds = parentModule.GetTimbre(ch).SDS.ARP;
             if (snd != null && sds.Enable)
             {
                 if (sds.ArpMethod == ArpMethod.PitchChange)
@@ -451,15 +506,85 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        private bool preProcessArpeggioForKeyOff(NoteOffEvent note)
+        {
+            int ch = note.Channel;
+            if (ArpeggiatorsForKeyOn.ContainsKey(ch))
+            {
+                var timbre = parentModule.GetTimbre(ch);
+                var sds = timbre.SDS.ARP;
+                Arpeggiator arp = ArpeggiatorsForKeyOn[ch];
+                if (sds.Enable)
+                {
+                    //ignore keyoff if hold mode
+                    if (sds.Hold)
+                    {
+                        arp.ResetNextNoteOn = true;
+                        return true;
+                    }
+                }
+                if (arp.RemoveNote(note))
+                {
+                    if (ArpeggiatorsForKeyOn[ch].LastPassedNote != null)
+                        keyOffCore(ArpeggiatorsForKeyOn[ch].LastPassedNote);
+                    if (arp.ArpType == ArpType.Static)
+                        arp.ClearAddedNotes();
+
+                    //全アルペジオ終了
+                    if (arp.AddedNotesCount == 0)
+                        ArpeggiatorsForKeyOn.Remove(ch);
+                    tryToDisableArpTimerForKeyOn();
+                    return true;
+                }
+            }
+            else if (ArpeggiatorsForPitch.ContainsKey(ch))
+            {
+                var timbre = parentModule.GetTimbre(ch);
+                var sds = timbre.SDS.ARP;
+                Arpeggiator arp = ArpeggiatorsForPitch[ch];
+                if (sds.Enable)
+                {
+                    //ignore keyoff if hold mode
+                    if (sds.Hold)
+                    {
+                        arp.ResetNextNoteOn = true;
+                        return true;
+                    }
+                }
+                if (arp.ArpType == ArpType.Static)
+                {
+                    if (arp.FirstAddedNote.NoteNumber == note.NoteNumber)
+                    {
+                        arp.ClearAddedNotes();
+                        keyOffCore(ArpeggiatorsForPitch[ch].FirstAddedNote);
+                        ArpeggiatorsForPitch.Remove(ch);
+                        tryToDisableArpTimerForPitch();
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (arp.RemoveNote(note))
+                    {
+                        if (arp.AddedNotesCount == 0)
+                        {
+                            keyOffCore(ArpeggiatorsForPitch[ch].FirstAddedNote);
+                            ArpeggiatorsForPitch.Remove(ch);
+                            tryToDisableArpTimerForPitch();
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+
         private static void setupArp(ARPSettings sds, Arpeggiator arp)
         {
-            if (sds.ArpType == ArpType.Static)
-                arp.StepStyle = ArpStepStyle.Order;
-            else
-                arp.StepStyle = sds.StepStyle;
+            arp.StepStyle = sds.ArpType == ArpType.Static ? ArpStepStyle.Order : sds.StepStyle;
             arp.Range = sds.OctaveRange;
-            if (sds.KeySync)
-                arp.RetriggerType = RetriggerType.Note;
+            arp.RetriggerType = sds.KeySync ? RetriggerType.Note : RetriggerType.Off;
             arp.StepCounter = (60d * InstrumentManager.TIMER_HZ / sds.Beat) / (double)sds.ArpResolution;
             arp.ArpType = sds.ArpType;
             arp.StaticArpStepType = sds.StaticArpStepType;
@@ -485,105 +610,27 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private SoundBase keyOnCore(NoteOnEvent note)
+        private void tryToDisableArpTimerForPitch()
         {
-            var snd = SoundOn(note);
-            if (snd != null)
-            {
-                AllSounds.Add(snd);
-                LastNoteNumbers[note.Channel] = note.NoteNumber;
-                return snd;
-            }
-            return null;
+            //全アルペジオ終了
+            if (ArpeggiatorsForPitch.Count != 0)
+                return;
+
+            if (processArpeggiatorPitchAction != null)
+                InstrumentManager.UnsetPeriodicCallback(processArpeggiatorPitchAction);
+            processArpeggiatorPitchAction = null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="note"></param>
-        public virtual SoundBase SoundOn(NoteOnEvent note)
+        private void tryToDisableArpTimerForKeyOn()
         {
-            return null;
+            //全アルペジオ終了
+            if (ArpeggiatorsForKeyOn.Count != 0)
+                return;
+
+            if (processArpeggiatorKeyOnAction != null)
+                InstrumentManager.UnsetPeriodicCallback(processArpeggiatorKeyOnAction);
+            processArpeggiatorKeyOnAction = null;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="note"></param>
-        public virtual void KeyOff(NoteOffEvent note)
-        {
-            int ch = note.Channel;
-            if (ArpeggiatorsForKeyOn.ContainsKey(ch))
-            {
-                var timbre = parentModule.GetTimbre(ch);
-                var sds = timbre.SDS.ARP;
-                Arpeggiator arp = ArpeggiatorsForKeyOn[ch];
-                if (sds.Enable)
-                {
-                    //ignore keyoff if hold mode
-                    if (sds.Hold)
-                    {
-                        arp.ResetNextNoteOn = true;
-                        return;
-                    }
-                }
-                if (arp.RemoveNote(note))
-                {
-                    if (ArpeggiatorsForKeyOn[ch].LastPassedNote != null)
-                        keyOffCore(ArpeggiatorsForKeyOn[ch].LastPassedNote);
-                    if (arp.ArpType == ArpType.Static)
-                        arp.ClearAddedNotes();
-
-                    //全アルペジオ終了
-                    if (arp.AddedNotesCount == 0)
-                        ArpeggiatorsForKeyOn.Remove(ch);
-                    tryToDisableArpTimerForKeyOn();
-                    return;
-                }
-            }
-            else if (ArpeggiatorsForPitch.ContainsKey(ch))
-            {
-                var timbre = parentModule.GetTimbre(ch);
-                var sds = timbre.SDS.ARP;
-                Arpeggiator arp = ArpeggiatorsForPitch[ch];
-                if (sds.Enable)
-                {
-                    //ignore keyoff if hold mode
-                    if (sds.Hold)
-                    {
-                        arp.ResetNextNoteOn = true;
-                        return;
-                    }
-                }
-                if (arp.ArpType == ArpType.Static)
-                {
-                    if (arp.FirstAddedNote.NoteNumber == note.NoteNumber)
-                    {
-                        arp.ClearAddedNotes();
-                        keyOffCore(ArpeggiatorsForPitch[ch].FirstAddedNote);
-                        ArpeggiatorsForPitch.Remove(ch);
-                        tryToDisableArpTimerForPitch();
-                        return;
-                    }
-                }
-                else
-                {
-                    if (arp.RemoveNote(note))
-                    {
-                        if (arp.AddedNotesCount == 0)
-                        {
-                            keyOffCore(ArpeggiatorsForPitch[ch].FirstAddedNote);
-                            ArpeggiatorsForPitch.Remove(ch);
-                            tryToDisableArpTimerForPitch();
-                        }
-                        return;
-                    }
-                }
-            }
-
-            keyOffCore(note);
-        }
-
 
         private void stopArpForPitch()
         {
@@ -619,34 +666,8 @@ namespace zanac.MAmidiMEmo.Instruments
             arp.ClearAddedNotes();
         }
 
-        private void keyOffCore(NoteOnEvent onote)
-        {
-            if (onote != null)
-                keyOffCore(new NoteOffEvent(onote.NoteNumber, (SevenBitNumber)0) { Channel = onote.Channel });
-        }
 
-        private SoundBase keyOffCore(NoteOffEvent note)
-        {
-            SoundBase offsnd = null;
-
-            for (int i = 0; i < AllSounds.Count; i++)
-            {
-                if (AllSounds[i].IsKeyOff)
-                    continue;
-
-                if (AllSounds[i].NoteOnEvent.Channel == note.Channel)
-                {
-                    if (AllSounds[i].NoteOnEvent.NoteNumber == note.NoteNumber)
-                    {
-                        offsnd = AllSounds[i];
-                        offsnd.KeyOff();
-                        break;
-                    }
-                }
-            }
-
-            return offsnd;
-        }
+        #endregion
 
         /// <summary>
         /// 未使用のスロットを検索する
