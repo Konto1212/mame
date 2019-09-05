@@ -310,7 +310,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             postProcessArrpegioForKeyOn(note, snd);
         }
-        
+
         private SoundBase keyOnCore(NoteOnEvent note)
         {
             var snd = SoundOn(note);
@@ -382,84 +382,95 @@ namespace zanac.MAmidiMEmo.Instruments
             ARPSettings sds = parentModule.GetTimbre(ch).SDS.ARP;
             if (sds.Enable)
             {
-                if (sds.ArpMethod == ArpMethod.KeyOn)
+                switch (sds.ArpMethod)
                 {
-                    //create Arpeggiator
-                    if (!ArpeggiatorsForKeyOn.ContainsKey(ch))
-                        ArpeggiatorsForKeyOn.Add(ch, new Arpeggiator());
-                    var arp = ArpeggiatorsForKeyOn[ch];
-                    setupArp(sds, arp);
-                    if (sds.ArpType == ArpType.Dynamic)
-                    {
-                        //hold reset
-                        if (arp.ResetNextNoteOn)
+                    case ArpMethod.KeyOn:
                         {
-                            arp.ResetNextNoteOn = false;
-                            keyOffCore(arp.LastPassedNote);
-                            arp.ClearAddedNotes();
-                        }
-                        arp.AddNote(note);
-                        //即音を鳴らすためカウンターを進める
-                        if (arp.AddedNotesCount == 1)
-                        {
-                            arp.Counter = (60d * InstrumentManager.TIMER_HZ / sds.Beat) / (double)sds.ArpResolution;
-                            arp.Counter -= InstrumentManager.TIMER_INTERVAL;
-                        }
-                    }
-                    else if (sds.ArpType == ArpType.Static)
-                    {
-                        stopArpForKeyOn(arp);
-                        arp.AddNote(note);
-                        //即音を鳴らすためカウンターを進める
-                        arp.Counter = (60d * InstrumentManager.TIMER_HZ / sds.Beat) / (double)sds.ArpResolution;
-                        arp.Counter -= InstrumentManager.TIMER_INTERVAL;
-                        foreach (int i in sds.StaticArpStepKeyNums)
-                        {
-                            int n = i;
-                            if (sds.StaticArpStepType != CustomArpStepType.Fixed)
-                                n = (int)note.NoteNumber + i;
-                            if (n < 0)
-                                n = 0;
-                            else if (n > 127)
-                                n = 127;
-                            arp.AddNote(new NoteOnEvent((SevenBitNumber)n, note.Velocity) { Channel = ch });
-                        }
-                    }
+                            //create Arpeggiator
+                            if (!ArpeggiatorsForKeyOn.ContainsKey(ch))
+                                ArpeggiatorsForKeyOn.Add(ch, new Arpeggiator());
+                            var arp = ArpeggiatorsForKeyOn[ch];
 
-                    tryToEnableArpTimerForKeyOn();
-                    return true;
-                }
-                else if (sds.ArpMethod == ArpMethod.PitchChange)
-                {
-                    //create Arpeggiator
-                    if (ArpeggiatorsForPitch.ContainsKey(ch))
-                    {
-                        var arp = ArpeggiatorsForPitch[ch];
-                        if (sds.ArpType == ArpType.Dynamic)
-                        {
                             setupArp(sds, arp);
-                            if (arp.SkipNextNote == true)
-                                arp.SkipNextNote = false;
 
-                            //hold reset
-                            if (arp.ResetNextNoteOn)
+                            switch (sds.ArpType)
                             {
-                                arp.ResetNextNoteOn = false;
-                                stopArpForPitch(arp);
-                                ArpeggiatorsForPitch.Remove(ch);
+                                case ArpType.Dynamic:
+                                    {
+                                        //hold reset
+                                        if (arp.ResetNextNoteOn)
+                                        {
+                                            arp.ResetNextNoteOn = false;
+                                            keyOffCore(arp.LastPassedNote);
+                                            arp.ClearAddedNotes();
+                                        }
+                                        arp.AddNote(note);
+                                        //即音を鳴らすためカウンターを進める
+                                        if (arp.AddedNotesCount == 1)
+                                        {
+                                            arp.Counter = (60d * InstrumentManager.TIMER_HZ / sds.Beat) / (double)sds.ArpResolution;
+                                            arp.Counter -= InstrumentManager.TIMER_INTERVAL;
+                                        }
+                                        break;
+                                    }
+                                case ArpType.Static:
+                                    {
+                                        stopArpForKeyOn(arp);
+                                        arp.AddNote(note);
+                                        //即音を鳴らすためカウンターを進める
+                                        arp.Counter = (60d * InstrumentManager.TIMER_HZ / sds.Beat) / (double)sds.ArpResolution;
+                                        arp.Counter -= InstrumentManager.TIMER_INTERVAL;
+                                        foreach (int i in sds.StaticArpStepKeyNums)
+                                        {
+                                            int n = i;
+                                            if (sds.StaticArpStepType != CustomArpStepType.Fixed)
+                                                n = (int)note.NoteNumber + i;
+                                            if (n < 0)
+                                                n = 0;
+                                            else if (n > 127)
+                                                n = 127;
+                                            arp.AddNote(new NoteOnEvent((SevenBitNumber)n, note.Velocity) { Channel = ch });
+                                        }
+                                        break;
+                                    }
                             }
-                            else
-                            {
-                                arp.AddNote(note);
-                                return true;
-                            }
+
+                            tryToEnableArpTimerForKeyOn();
+                            return true;
                         }
-                        else if (sds.ArpType == ArpType.Static)
+                    case ArpMethod.PitchChange:
                         {
-                            stopArpForPitch(arp);
-                            ArpeggiatorsForPitch.Remove(ch);
+                            //create Arpeggiator
+                            if (ArpeggiatorsForPitch.ContainsKey(ch))
+                            {
+                                var arp = ArpeggiatorsForPitch[ch];
+                                if (sds.ArpType == ArpType.Dynamic)
+                                {
+                                    setupArp(sds, arp);
+                                    if (arp.SkipNextNote == true)
+                                        arp.SkipNextNote = false;
+
+                                    //hold reset
+                                    if (arp.ResetNextNoteOn)
+                                    {
+                                        arp.ResetNextNoteOn = false;
+                                        stopArpForPitch(arp);
+                                        ArpeggiatorsForPitch.Remove(ch);
+                                    }
+                                    else
+                                    {
+                                        arp.AddNote(note);
+                                        return true;
+                                    }
+                                }
+                                else if (sds.ArpType == ArpType.Static)
+                                {
+                                    stopArpForPitch(arp);
+                                    ArpeggiatorsForPitch.Remove(ch);
+                                }
+                            }
+                            break;
                         }
-                    }
                 }
             }
             return false;
@@ -481,25 +492,26 @@ namespace zanac.MAmidiMEmo.Instruments
                     setupArp(sds, arp);
                     arp.FirstSoundForPitch = snd;
                     arp.AddNote(note);
-                    if (sds.ArpType == ArpType.Dynamic)
+                    switch (sds.ArpType)
                     {
-                        //すでに音が鳴っているのでスキップする
-                        arp.SkipNextNote = true;
-                    }
-                    else if (sds.ArpType == ArpType.Static)
-                    {
-                        //カスタム値をすべて登録
-                        foreach (int i in sds.StaticArpStepKeyNums)
-                        {
-                            int n = i;
-                            if (sds.StaticArpStepType != CustomArpStepType.Fixed)
-                                n = (int)note.NoteNumber + i;
-                            if (n < 0)
-                                n = 0;
-                            else if (n > 127)
-                                n = 127;
-                            arp.AddNote(new NoteOnEvent((SevenBitNumber)n, note.Velocity) { Channel = ch });
-                        }
+                        case ArpType.Dynamic:
+                            //すでに音が鳴っているのでスキップする
+                            arp.SkipNextNote = true;
+                            break;
+                        case ArpType.Static:
+                            //カスタム値をすべて登録
+                            foreach (int i in sds.StaticArpStepKeyNums)
+                            {
+                                int n = i;
+                                if (sds.StaticArpStepType != CustomArpStepType.Fixed)
+                                    n = (int)note.NoteNumber + i;
+                                if (n < 0)
+                                    n = 0;
+                                else if (n > 127)
+                                    n = 127;
+                                arp.AddNote(new NoteOnEvent((SevenBitNumber)n, note.Velocity) { Channel = ch });
+                            }
+                            break;
                     }
                     tryToEnableArpTimerForPitch();
                 }
@@ -514,6 +526,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var timbre = parentModule.GetTimbre(ch);
                 var sds = timbre.SDS.ARP;
                 Arpeggiator arp = ArpeggiatorsForKeyOn[ch];
+
                 if (sds.Enable)
                 {
                     //ignore keyoff if hold mode
@@ -542,6 +555,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 var timbre = parentModule.GetTimbre(ch);
                 var sds = timbre.SDS.ARP;
                 Arpeggiator arp = ArpeggiatorsForPitch[ch];
+
                 if (sds.Enable)
                 {
                     //ignore keyoff if hold mode
@@ -551,29 +565,27 @@ namespace zanac.MAmidiMEmo.Instruments
                         return true;
                     }
                 }
-                if (arp.ArpType == ArpType.Static)
+                switch (arp.ArpType)
                 {
-                    if (arp.FirstAddedNote.NoteNumber == note.NoteNumber)
-                    {
-                        arp.ClearAddedNotes();
-                        keyOffCore(ArpeggiatorsForPitch[ch].FirstAddedNote);
-                        ArpeggiatorsForPitch.Remove(ch);
-                        tryToDisableArpTimerForPitch();
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (arp.RemoveNote(note))
-                    {
-                        if (arp.AddedNotesCount == 0)
+                    case ArpType.Static:
+                        if (arp.FirstAddedNote.NoteNumber == note.NoteNumber)
+                        {
+                            arp.ClearAddedNotes();
+                            keyOffCore(ArpeggiatorsForPitch[ch].FirstAddedNote);
+                            ArpeggiatorsForPitch.Remove(ch);
+                            tryToDisableArpTimerForPitch();
+                            return true;
+                        }
+                        break;
+                    case ArpType.Dynamic:
+                        if (arp.RemoveNote(note) && arp.AddedNotesCount == 0)
                         {
                             keyOffCore(ArpeggiatorsForPitch[ch].FirstAddedNote);
                             ArpeggiatorsForPitch.Remove(ch);
                             tryToDisableArpTimerForPitch();
+                            return true;
                         }
-                        return true;
-                    }
+                        break;
                 }
             }
             return false;
