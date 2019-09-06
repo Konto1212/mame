@@ -52,6 +52,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [Category("MIDI")]
         [Description("MIDI Device ID")]
+        [IgnoreDataMember]
+        [JsonIgnore]
         public override uint DeviceID
         {
             get
@@ -732,6 +734,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Modulator Frequency Multiple (0-1-15)")]
+            [DefaultValue(1)]
             public byte MFM
             {
                 get

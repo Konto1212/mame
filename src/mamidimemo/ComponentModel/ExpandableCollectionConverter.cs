@@ -123,6 +123,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
                     return context.PropertyDescriptor.Description;
                 }
             }
+
         }
     }
 }

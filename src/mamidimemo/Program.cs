@@ -33,6 +33,8 @@ namespace zanac.MAmidiMEmo
         /// </summary>
         public const string FILE_VERSION = "0.5.0.0";
 
+        public static readonly JsonSerializerSettings JsonAutoSettings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, DefaultValueHandling = DefaultValueHandling.Ignore };
+
         private static Thread mainThread;
 
         internal static string RestartRequiredApplication;
@@ -76,14 +78,13 @@ namespace zanac.MAmidiMEmo
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                JsonSerializerSettings jss = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
 
                 if (!string.IsNullOrEmpty(Settings.Default.EnvironmentSettings))
                 {
                     try
                     {
-                        var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(
-                            StringCompressionUtility.Decompress(Settings.Default.EnvironmentSettings), jss);
+                        var dso = StringCompressionUtility.Decompress(Settings.Default.EnvironmentSettings);
+                        var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(dso, JsonAutoSettings);
                         InstrumentManager.RestoreSettings(settings);
                     }
                     catch (Exception ex)
@@ -101,8 +102,8 @@ namespace zanac.MAmidiMEmo
                 {
                     Application.Run(new FormMain());
 
-                    Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(
-                        JsonConvert.SerializeObject(SaveEnvironmentSettings(), Formatting.Indented, jss));
+                    var so = JsonConvert.SerializeObject(SaveEnvironmentSettings(), Formatting.Indented, JsonAutoSettings);
+                    Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(so);
                     Settings.Default.Save();
                 }
                 catch (Exception ex)

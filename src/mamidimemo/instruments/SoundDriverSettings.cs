@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,6 +59,23 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get;
             private set;
+        }
+
+        #endregion
+
+
+        #region Arp
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Description("Envelope Fx Settings")]
+        [JsonConverter(typeof(NoTypeConverterJsonConverterObject<AbstractEnvelopeFxSettingsBase>))]
+        public AbstractEnvelopeFxSettingsBase EFS
+        {
+            get;
+            set;
         }
 
         #endregion
@@ -116,7 +134,7 @@ namespace zanac.MAmidiMEmo.Instruments
     [JsonConverter(typeof(NoTypeConverterJsonConverter<ADSRSettings>))]
     [DataContract]
     [MidiHook]
-    public class ADSRSettings
+    public class ADSRSettings : ContextBoundObject
     {
         #region ADSR 
 
@@ -189,6 +207,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Sound")]
         [Description("Sound Driver Level Attack Rate (0(max)-127(0s))")]
+        [DefaultValue(110)]
         public byte AR
         {
             get
@@ -209,6 +228,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Sound")]
         [Description("Sound Driver Level Decay Rate  (0(0s)-127(max))")]
+        [DefaultValue(64)]
         public byte DR
         {
             get
@@ -229,6 +249,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Sound")]
         [Description("Sound Driver Level Sustain Level (0(none)-127(max))")]
+        [DefaultValue(16)]
         public byte SL
         {
             get
@@ -249,6 +270,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Sound")]
         [Description("Sound Driver Level Release Rate (0(0s)-127(max))")]
+        [DefaultValue(48)]
         public byte RR
         {
             get
@@ -316,7 +338,7 @@ namespace zanac.MAmidiMEmo.Instruments
     [JsonConverter(typeof(NoTypeConverterJsonConverter<ARPSettings>))]
     [DataContract]
     [MidiHook]
-    public class ARPSettings
+    public class ARPSettings : ContextBoundObject
     {
         private bool f_Enable;
 
@@ -417,6 +439,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Set arpeggio octave range (1-4) *Dynamic Arp Only")]
+        [DefaultValue(1)]
         public int OctaveRange
         {
             get
@@ -436,6 +459,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Set arpeggio tempo (20-300)")]
+        [DefaultValue(120)]
         public int Beat
         {
             get
@@ -455,6 +479,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Set arpeggio resolution")]
+        [DefaultValue(ArpResolution.QuarterNote)]
         public ArpResolution ArpResolution
         {
             get
@@ -484,6 +509,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Arpeggio Gate Time of NoteOn (0(0%)-127(100%))")]
+        [DefaultValue(127)]
         public int GateTime
         {
             get
@@ -524,7 +550,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [IgnoreDataMember]
         [JsonIgnore]
         [Description("Set static arp steps by text. Input note number and split it with space.\r\n" +
-            "Absolute/Relative -127～0～+127\r\n" +
+            "Absolute/Relative -64～0～+63\r\n" +
             "Fixed is 0～127")]
         public string StaticArpSteps
         {
@@ -547,7 +573,13 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     int v = 0;
                     if (int.TryParse(val, out v))
+                    {
+                        if (v < -64)
+                            v = 64;
+                        else if (v > 63)
+                            v = 63;
                         vs.Add(v);
+                    }
                 }
                 StaticArpStepKeyNums = vs.ToArray();
             }
@@ -560,7 +592,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Sound")]
         [Description("Set static arp steps by value. Input note number.\r\n" +
-            "Absolute/Relative -127～0～+127\r\n" +
+            "Absolute/Relative -64～0～+63\r\n" +
             "Fixed 0～127")]
         public int[] StaticArpStepKeyNums
         {
@@ -649,7 +681,97 @@ namespace zanac.MAmidiMEmo.Instruments
         }
 
         #endregion
+    }
+
+    [JsonConverter(typeof(NoTypeConverterJsonConverter<AbstractEnvelopeFxSettingsBase>))]
+    [TypeConverter(typeof(CustomExpandableObjectConverter))]
+    [DataContract]
+    [MidiHook]
+    public abstract class AbstractEnvelopeFxSettingsBase : ContextBoundObject
+    {
+        private bool f_Enable;
+
+        [DataMember]
+        [Description("Whether enable Sound Driver Level Fx")]
+        public bool Enable
+        {
+            get
+            {
+                return f_Enable;
+            }
+            set
+            {
+                if (f_Enable != value)
+                {
+                    f_Enable = value;
+                }
+            }
+        }
+
+        private uint f_Interval = InstrumentManager.TIMER_INTERVAL;
+
+        [DataMember]
+        [Description("Set interval of envelope changing")]
+        [DefaultValue(5)]
+        public uint EnvelopeInterval
+        {
+            get
+            {
+                return f_Interval;
+            }
+            set
+            {
+                if (f_Interval != value && value >= InstrumentManager.TIMER_INTERVAL)
+                {
+                    f_Interval = value;
+                }
+            }
+        }
+
+        [Browsable(false)]
+        [IgnoreDataMember]
+        [JsonIgnore]
+        public int EnvelopeCounter
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public AbstractEnvelopeFxSettingsBase()
+        {
+        }
+
+        [DataMember]
+        [Description("Memo")]
+        public string Memo
+        {
+            get;
+            set;
+        }
+
+        [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+            typeof(UITypeEditor)), Localizable(false)]
+        [IgnoreDataMember]
+        [JsonIgnore]
+        [Description("You can copy and paste this text data to other same type timber.")]
+        public string SerializeData
+        {
+            get
+            {
+                return JsonConvert.SerializeObject(this, Formatting.Indented);
+            }
+            set
+            {
+                RestoreFrom(value);
+            }
+        }
+
+        public abstract void RestoreFrom(string serializeData);
 
     }
+
 }
 

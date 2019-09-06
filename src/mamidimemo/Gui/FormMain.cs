@@ -332,9 +332,8 @@ namespace zanac.MAmidiMEmo.Gui
         {
             try
             {
-                JsonSerializerSettings jss = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
                 Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(
-                    JsonConvert.SerializeObject(Program.SaveEnvironmentSettings(), Formatting.Indented, jss));
+                    JsonConvert.SerializeObject(Program.SaveEnvironmentSettings(), Formatting.Indented, Program.JsonAutoSettings));
                 Settings.Default.Save();
             }
             catch (Exception ex)
@@ -360,9 +359,8 @@ namespace zanac.MAmidiMEmo.Gui
             {
                 try
                 {
-                    JsonSerializerSettings jss = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
                     var es = Program.SaveEnvironmentSettings();
-                    string data = JsonConvert.SerializeObject(es, Formatting.Indented, jss);
+                    string data = JsonConvert.SerializeObject(es, Formatting.Indented, Program.JsonAutoSettings);
                     File.WriteAllText(saveFileDialog1.FileName, StringCompressionUtility.Compress(data));
                 }
                 catch (Exception ex)
@@ -389,9 +387,8 @@ namespace zanac.MAmidiMEmo.Gui
             {
                 try
                 {
-                    JsonSerializerSettings jss = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
                     string text = StringCompressionUtility.Decompress(File.ReadAllText(openFileDialog1.FileName));
-                    var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(text, jss);
+                    var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(text, Program.JsonAutoSettings);
                     InstrumentManager.RestoreSettings(settings);
                 }
                 catch (Exception ex)

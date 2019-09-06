@@ -42,8 +42,9 @@ namespace zanac.MAmidiMEmo.ComponentModel
             Type type = value.GetType();
             List<string> list = new List<string>();
             foreach (PropertyInfo propertyInfo in type.GetProperties())
+            {
                 list.Add(propertyInfo.Name);
-
+            }
             // リフレクションから取得した順でソート
             return pdc.Sort(list.ToArray());
         }

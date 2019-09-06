@@ -48,6 +48,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [Category("MIDI")]
         [Description("MIDI Device ID")]
+        [IgnoreDataMember]
+        [JsonIgnore]
         public override uint DeviceID
         {
             get
@@ -888,6 +890,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Whether this operator enable or not")]
+            [DefaultValue(1)]
             public byte Enable
             {
                 get

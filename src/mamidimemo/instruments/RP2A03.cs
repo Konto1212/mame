@@ -48,6 +48,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [Category("MIDI")]
         [Description("MIDI Device ID")]
+        [IgnoreDataMember]
+        [JsonIgnore]
         public override uint DeviceID
         {
             get
@@ -745,6 +747,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ/Noise)")]
             [Description("Square/Noise Volume (0-15)")]
+            [DefaultValue(15)]
             public byte Volume
             {
                 get
@@ -762,6 +765,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ)")]
             [Description("Square Envelope Decay Disable (0:Enable 1:Disable)")]
+            [DefaultValue(1)]
             public byte DecayDisable
             {
                 get
@@ -780,6 +784,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ/Tri)")]
             [Description("Square/Tri Length Counter Clock Disable (0:Enable 1:Disable)")]
+            [DefaultValue(1)]
             public byte LengthCounterDisable
             {
                 get
@@ -937,6 +942,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(Tri)")]
             [Description("Tri Linear Counter Length (0-127)")]
+            [DefaultValue(127)]
             public byte TriCounterLength
             {
                 get
@@ -955,6 +961,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(DPCM)")]
             [Description("DPCM Sample Bit Rate (0:4KHz-15:32KHz)")]
+            [DefaultValue(15)]
             public byte DeltaPcmBitRate
             {
                 get
@@ -967,7 +974,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            private byte f_DeltaPcmLoop = 0;
+            private byte f_DeltaPcmLoop;
 
             [DataMember]
             [Category("Sound(DPCM)")]
@@ -984,6 +991,13 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            public RP2A03Timbre()
+            {
+                this.SDS.EFS = new EnvelopeFxSettings();
+            }
 
             /// <summary>
             /// 
@@ -1007,6 +1021,89 @@ namespace zanac.MAmidiMEmo.Instruments
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<EnvelopeFxSettings>))]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [DataContract]
+        public class EnvelopeFxSettings : AbstractEnvelopeFxSettingsBase
+        {
+
+            [IgnoreDataMember]
+            [JsonIgnore]
+            [Description("Set volume envelop  by text. Input volume value and split it with space.\r\n" +
+                "Absolute/Relative -64(-100%)～0～+63(+100%)")]
+            public string VolumeEnvelopes
+            {
+                get
+                {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < VolumeEnvelopesNums.Length; i++)
+                    {
+                        if (sb.Length != 0)
+                            sb.Append(' ');
+                        sb.Append(VolumeEnvelopesNums[i].ToString((IFormatProvider)null));
+                    }
+                    return sb.ToString();
+                }
+                set
+                {
+                    string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    List<int> vs = new List<int>();
+                    foreach (var val in vals)
+                    {
+                        int v = 0;
+                        if (int.TryParse(val, out v))
+                            vs.Add(v);
+                    }
+                    VolumeEnvelopesNums = vs.ToArray();
+                }
+            }
+
+            private int[] f_VolumeEnvelopesNums = new int[] { };
+
+            [DataMember]
+            [TypeConverter(typeof(ArrayConverter))]
+            [Editor(typeof(WsgITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [Description("Set static arp steps by value. Input note number.\r\n" +
+                "Absolute/Relative -64～0～+127\r\n" +
+                "Fixed 0～127")]
+            public int[] VolumeEnvelopesNums
+            {
+                get
+                {
+                    return f_VolumeEnvelopesNums;
+                }
+                set
+                {
+                    f_VolumeEnvelopesNums = value;
+                }
+            }
+
+            public override void RestoreFrom(string serializeData)
+            {
+                {
+                    try
+                    {
+                        var obj = JsonConvert.DeserializeObject(serializeData);
+                        this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex.GetType() == typeof(Exception))
+                            throw;
+                        else if (ex.GetType() == typeof(SystemException))
+                            throw;
+
+
+                        System.Windows.Forms.MessageBox.Show(ex.ToString());
+                    }
+                }
+            }
+
         }
 
         /// <summary>

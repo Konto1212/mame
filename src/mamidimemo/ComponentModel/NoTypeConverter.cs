@@ -1,21 +1,29 @@
 ﻿// copyright-holders:K.Ito
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace zanac.MAmidiMEmo.ComponentModel
 {
+
     /// <summary>
-    /// 
+    /// クラスのTypeConverterをJSONでシリアライズする時は無効にするコンバータ
+    /// (JSON文字列をクラスのTypeConverterが受け取ってエラーになってしまう)
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class NoTypeConverterJsonConverter<T> : JsonConverter
     {
-        static readonly IContractResolver resolver = new NoTypeConverterContractResolver();
+        protected static readonly IContractResolver Resolver = new NoTypeConverterContractResolver();
+
+        private static readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings { ContractResolver = Resolver, TypeNameHandling = TypeNameHandling.Auto, DefaultValueHandling = DefaultValueHandling.Ignore };
 
         class NoTypeConverterContractResolver : DefaultContractResolver
         {
@@ -38,12 +46,36 @@ namespace zanac.MAmidiMEmo.ComponentModel
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return JsonSerializer.CreateDefault(new JsonSerializerSettings { ContractResolver = resolver }).Deserialize(reader, objectType);
+            return JsonSerializer.CreateDefault(jsonSettings).Deserialize(reader, objectType);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            JsonSerializer.CreateDefault(new JsonSerializerSettings { ContractResolver = resolver }).Serialize(writer, value);
+            JsonSerializer.CreateDefault(jsonSettings).Serialize(writer, value);
         }
     }
+
+
+    /// <summary>
+    /// クラスのTypeConverterをJSONでシリアライズする時は無効にするコンバータ
+    /// (JSON文字列をクラスのTypeConverterが受け取ってエラーになってしまう)
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class NoTypeConverterJsonConverterObject<T> : NoTypeConverterJsonConverter<T>
+    {
+        private static readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings { ContractResolver = Resolver, TypeNameHandling = TypeNameHandling.Objects, DefaultValueHandling = DefaultValueHandling.Ignore };
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            var js = Program.JsonAutoSettings;
+
+            return JsonSerializer.CreateDefault(Program.JsonAutoSettings).Deserialize(reader, objectType);
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            JsonSerializer.CreateDefault(jsonSettings).Serialize(writer, value);
+        }
+    }
+
 }

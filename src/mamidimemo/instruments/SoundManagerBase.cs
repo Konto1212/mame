@@ -422,7 +422,7 @@ namespace zanac.MAmidiMEmo.Instruments
                                         arp.Counter -= InstrumentManager.TIMER_INTERVAL;
                                         foreach (int i in sds.StaticArpStepKeyNums)
                                         {
-                                            int n = i;
+                                            int n = i & 0x7f;
                                             if (sds.StaticArpStepType != CustomArpStepType.Fixed)
                                                 n = (int)note.NoteNumber + i;
                                             if (n < 0)
@@ -502,7 +502,7 @@ namespace zanac.MAmidiMEmo.Instruments
                             //カスタム値をすべて登録
                             foreach (int i in sds.StaticArpStepKeyNums)
                             {
-                                int n = i;
+                                int n = i & 0x7f;
                                 if (sds.StaticArpStepType != CustomArpStepType.Fixed)
                                     n = (int)note.NoteNumber + i;
                                 if (n < 0)
