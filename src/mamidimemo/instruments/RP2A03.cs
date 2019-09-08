@@ -473,8 +473,8 @@ namespace zanac.MAmidiMEmo.Instruments
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << Slot)));
 
                             RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x01),
-                                (byte)(timbre.SQSweepEnable << 7 | timbre.SQSweepUpdateRate << 4 |
-                                timbre.SQSweepDirection << 3 | timbre.SQSweepRange));
+                                (byte)(timbre.SQSweep.Enable << 7 | timbre.SQSweep.UpdateRate << 4 |
+                                timbre.SQSweep.Direction << 3 | timbre.SQSweep.Range));
 
                             //Volume
                             updateSqVolume();
@@ -672,7 +672,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 int n = 31 - ((NoteOnEvent.NoteNumber + pitch) % 32);
 
                 var nt = timbre.NoiseType;
-                if (FxEngine.Active)
+                if (FxEngine != null && FxEngine.Active)
                 {
                     var eng = (NesFxEngine)FxEngine;
                     nt = (byte)(eng.DutyValue & 1);
@@ -760,7 +760,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Category("Sound(SQ)")]
-            [Description("Square Envelope Decay Disable (0:Enable 1:Disable)")]
+            [Description("Square/Noise Envelope Decay Disable (0:Enable 1:Disable)")]
             [DefaultValue((byte)1)]
             public byte DecayDisable
             {
@@ -777,6 +777,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private byte f_LengthDisable = 1;
 
+            [Browsable(false)]
             [DataMember]
             [Category("Sound(SQ/Tri)")]
             [Description("Square/Tri Length Counter Clock Disable (0:Enable 1:Disable)")]
@@ -793,7 +794,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-
+            /*
             private byte f_NoiseEnvDecayEnable;
 
             [DataMember]
@@ -810,6 +811,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     f_NoiseEnvDecayEnable = (byte)(value & 1);
                 }
             }
+            */
 
             private byte f_SQDutyCycle;
 
@@ -828,73 +830,16 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            private byte f_SQSweepEnable;
-
+            /// <summary>
+            /// 
+            /// </summary>
             [DataMember]
             [Category("Sound(SQ)")]
-            [Description("Square Sweep Enable (0:Disable 1:Enable)")]
-            public byte SQSweepEnable
+            [Description("Square Wave Sweep Settings")]
+            public SQSweepSettings SQSweep
             {
-                get
-                {
-                    return f_SQSweepEnable;
-                }
-                set
-                {
-                    f_SQSweepEnable = (byte)(value & 1);
-                }
-            }
-
-
-            private byte f_SQSweepUpdateRate;
-
-            [DataMember]
-            [Category("Sound(SQ)")]
-            [Description("Square Sweep Update Rate (0-7)")]
-            public byte SQSweepUpdateRate
-            {
-                get
-                {
-                    return f_SQSweepUpdateRate;
-                }
-                set
-                {
-                    f_SQSweepUpdateRate = (byte)(value & 7);
-                }
-            }
-
-            private byte f_SQSweepDirection;
-
-            [DataMember]
-            [Category("Sound(SQ)")]
-            [Description("Wave Length (0:Decrease 1:Increse)")]
-            public byte SQSweepDirection
-            {
-                get
-                {
-                    return f_SQSweepDirection;
-                }
-                set
-                {
-                    f_SQSweepDirection = (byte)(value & 1);
-                }
-            }
-
-            private byte f_SQSweepRange;
-
-            [DataMember]
-            [Category("Sound(SQ)")]
-            [Description("Wave Length (0-7)")]
-            public byte SQSweepRange
-            {
-                get
-                {
-                    return f_SQSweepRange;
-                }
-                set
-                {
-                    f_SQSweepRange = (byte)(value & 7);
-                }
+                get;
+                private set;
             }
 
             private byte f_NoiseType;
@@ -917,6 +862,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private byte f_PlayLength;
 
+            [Browsable(false)]
             [DataMember]
             [Category("Sound")]
             [Description("Square/Tri Play Length (0-31)")]
@@ -935,6 +881,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private byte f_TriCounterLength = 127;
 
+            [Browsable(false)]
             [DataMember]
             [Category("Sound(Tri)")]
             [Description("Tri Linear Counter Length (0-127)")]
@@ -992,7 +939,8 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public RP2A03Timbre()
             {
-                this.SDS.FxS = new NesFxSettings();
+                SQSweep = new SQSweepSettings();
+                SDS.FxS = new NesFxSettings();
             }
 
             /// <summary>
@@ -1017,7 +965,6 @@ namespace zanac.MAmidiMEmo.Instruments
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
             }
-
 
         }
 
@@ -1175,6 +1122,83 @@ namespace zanac.MAmidiMEmo.Instruments
                     int vol = settings.DutyEnvelopesNums[f_dutyCounter++];
 
                     DutyValue = (byte)vol;
+                }
+            }
+
+        }
+
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<SQSweepSettings>))]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [DataContract]
+        [MidiHook]
+        public class SQSweepSettings : ContextBoundObject
+        {
+
+            private byte f_Enable;
+
+            [DataMember]
+            [Category("Sound(SQ)")]
+            [Description("Square Sweep Enable (0:Disable 1:Enable)")]
+            public byte Enable
+            {
+                get
+                {
+                    return f_Enable;
+                }
+                set
+                {
+                    f_Enable = (byte)(value & 1);
+                }
+            }
+
+            private byte f_UpdateRate;
+
+            [DataMember]
+            [Category("Sound(SQ)")]
+            [Description("Square Sweep Update Rate (0-7)")]
+            public byte UpdateRate
+            {
+                get
+                {
+                    return f_UpdateRate;
+                }
+                set
+                {
+                    f_UpdateRate = (byte)(value & 7);
+                }
+            }
+
+            private byte f_Direction;
+
+            [DataMember]
+            [Category("Sound(SQ)")]
+            [Description("Wave Length (0:Decrease 1:Increse)")]
+            public byte Direction
+            {
+                get
+                {
+                    return f_Direction;
+                }
+                set
+                {
+                    f_Direction = (byte)(value & 1);
+                }
+            }
+
+            private byte f_Range;
+
+            [DataMember]
+            [Category("Sound(SQ)")]
+            [Description("Wave Length (0-7)")]
+            public byte Range
+            {
+                get
+                {
+                    return f_Range;
+                }
+                set
+                {
+                    f_Range = (byte)(value & 7);
                 }
             }
 

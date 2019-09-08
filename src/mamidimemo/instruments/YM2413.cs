@@ -799,7 +799,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(CustomExpandableObjectConverter))]
         [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2413Operator>))]
         [DataContract]
-        public class YM2413Operator
+        [MidiHook]
+        public class YM2413Operator : ContextBoundObject
         {
 
             private byte f_AM;

@@ -26,7 +26,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
                 throw new ArgumentNullException("destinationType");
 
             if (destinationType == typeof(string))
-                return context.PropertyDescriptor.PropertyType.Name + context.PropertyDescriptor.DisplayName;
+                return context.PropertyDescriptor.DisplayName;
 
             return base.ConvertTo(context, culture, value, destinationType);
         }

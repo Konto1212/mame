@@ -55,19 +55,6 @@ namespace zanac.MAmidiMEmo.ComponentModel
                 {
                     res = RemotingServices.ExecuteMessage(this.f_Target, call);
                 }
-                //try
-                //{
-                //    //メソッド前処理
-                //    lockSlim.EnterWriteLock();
-
-                //    //メソッド実行
-                //    res = RemotingServices.ExecuteMessage(this.f_Target, call);
-                //}
-                //finally
-                //{
-                //    //メソッド後処理
-                //    lockSlim.ExitWriteLock();
-                //}
             }
 
             return res;
