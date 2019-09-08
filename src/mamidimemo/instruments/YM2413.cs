@@ -746,6 +746,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 Modulator = new YM2413Modulator();
                 Career = new YM2413Career();
+                this.SDS.FxS = new BasicFxSettings();
             }
 
             public override void RestoreFrom(string serializeData)

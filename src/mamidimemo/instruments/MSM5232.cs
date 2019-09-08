@@ -668,6 +668,11 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
+            public MSM5232Timbre()
+            {
+                this.SDS.FxS = new BasicFxSettings();
+            }
+
             public override void RestoreFrom(string serializeData)
             {
                 try

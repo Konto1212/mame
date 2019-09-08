@@ -859,7 +859,12 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public YM2612Timbre()
             {
-                Ops = new YM2612Operator[] { new YM2612Operator(), new YM2612Operator(), new YM2612Operator(), new YM2612Operator() };
+                Ops = new YM2612Operator[] {
+                    new YM2612Operator(),
+                    new YM2612Operator(),
+                    new YM2612Operator(),
+                    new YM2612Operator() };
+                this.SDS.FxS = new BasicFxSettings();
             }
 
             public override void RestoreFrom(string serializeData)
@@ -898,7 +903,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Whether this operator enable or not")]
-            [DefaultValue(1)]
+            [DefaultValue((byte)1)]
             public byte Enable
             {
                 get

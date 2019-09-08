@@ -12,7 +12,7 @@ namespace zanac.MAmidiMEmo.Instruments
     //https://cdn.korg.com/jp/support/download/files/6e1e2515cd8d82ff484b6ec38bc91906.pdf?response-content-disposition=inline%3Bfilename*%3DUTF-8''MS2000_OM_J3.pdf&response-content-type=application%2Fpdf%3B
     //https://github.com/wesen/mididuino/blob/develop/hardware/libraries/MidiTools/Arpeggiator.cpp
 
-    public class Arpeggiator
+    public class ArpEngine
     {
         private static Random random = new Random();
 
@@ -169,7 +169,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public Arpeggiator()
+        public ArpEngine()
         {
         }
 

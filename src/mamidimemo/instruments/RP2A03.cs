@@ -266,9 +266,6 @@ namespace zanac.MAmidiMEmo.Instruments
             setPresetInstruments();
 
             this.soundManager = new RP2A03SoundManager(this);
-
-            //device_reset(UnitNumber, "filter_nes_l_");
-            //device_reset(UnitNumber, "filter_nes_r_");
         }
 
         /// <summary>
@@ -278,21 +275,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             soundManager?.Dispose();
 
-            //set_device_enable(UnitNumber, "filter_nes_l_", 0);
-            //set_device_enable(UnitNumber, "filter_nes_r_", 0);
-
             base.Dispose();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        internal override void PrepareSound()
-        {
-            base.PrepareSound();
-
-            //set_device_enable(UnitNumber, "filter_nes_l_", 1);
-            //set_device_enable(UnitNumber, "filter_nes_r_", 1);
         }
 
         /// <summary>
@@ -597,6 +580,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 byte ld = timbre.LengthCounterDisable;
                 byte dc = timbre.SQDutyCycle;
 
+                if (FxEngine != null && FxEngine.Active)
+                {
+                    var eng = (NesFxEngine)FxEngine;
+                    dc = eng.DutyValue;
+                }
+
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x00), (byte)(dc << 6 | ld << 5 | dd << 4 | fv));
             }
 
@@ -682,8 +671,15 @@ namespace zanac.MAmidiMEmo.Instruments
                 var pitch = (int)(parentModule.Pitchs[NoteOnEvent.Channel] - 8192) / (8192 / 32);
                 int n = 31 - ((NoteOnEvent.NoteNumber + pitch) % 32);
 
+                var nt = timbre.NoiseType;
+                if (FxEngine.Active)
+                {
+                    var eng = (NesFxEngine)FxEngine;
+                    nt = (byte)(eng.DutyValue & 1);
+                }
+
                 Program.SoundUpdating();
-                RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x02), (byte)((timbre.NoiseType << 7) | (n & 0xf)));
+                RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x02), (byte)((nt << 7) | (n & 0xf)));
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x03), (byte)(timbre.PlayLength << 3));
                 Program.SoundUpdated();
             }
@@ -747,7 +743,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ/Noise)")]
             [Description("Square/Noise Volume (0-15)")]
-            [DefaultValue(15)]
+            [DefaultValue((byte)15)]
             public byte Volume
             {
                 get
@@ -765,7 +761,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ)")]
             [Description("Square Envelope Decay Disable (0:Enable 1:Disable)")]
-            [DefaultValue(1)]
+            [DefaultValue((byte)1)]
             public byte DecayDisable
             {
                 get
@@ -784,7 +780,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ/Tri)")]
             [Description("Square/Tri Length Counter Clock Disable (0:Enable 1:Disable)")]
-            [DefaultValue(1)]
+            [DefaultValue((byte)1)]
             public byte LengthCounterDisable
             {
                 get
@@ -942,7 +938,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(Tri)")]
             [Description("Tri Linear Counter Length (0-127)")]
-            [DefaultValue(127)]
+            [DefaultValue((byte)127)]
             public byte TriCounterLength
             {
                 get
@@ -961,7 +957,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(DPCM)")]
             [Description("DPCM Sample Bit Rate (0:4KHz-15:32KHz)")]
-            [DefaultValue(15)]
+            [DefaultValue((byte)15)]
             public byte DeltaPcmBitRate
             {
                 get
@@ -996,7 +992,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public RP2A03Timbre()
             {
-                this.SDS.EFS = new EnvelopeFxSettings();
+                this.SDS.FxS = new NesFxSettings();
             }
 
             /// <summary>
@@ -1021,86 +1017,164 @@ namespace zanac.MAmidiMEmo.Instruments
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
             }
+
+
+        }
+
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<BasicFxSettings>))]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [DataContract]
+        public class NesFxSettings : BasicFxSettings
+        {
+
+            private string f_DutyEnvelopes;
+
+            [DataMember]
+            [Description("Set duty/noise envelop by text. Input duty/noise value and split it with space.\r\n" +
+                       "0 ～ 3")]
+            public string DutyEnvelopes
+            {
+                get
+                {
+                    return f_DutyEnvelopes;
+                }
+                set
+                {
+                    if (f_DutyEnvelopes != value)
+                    {
+                        DutyEnvelopesRepeatPoint = -1;
+                        DutyEnvelopesReleasePoint = -1;
+                        if (value == null)
+                        {
+                            DutyEnvelopesNums = new int[] { };
+                            f_DutyEnvelopes = string.Empty;
+                            return;
+                        }
+                        f_DutyEnvelopes = value;
+                        string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        List<int> vs = new List<int>();
+                        for (int i = 0; i < vals.Length; i++)
+                        {
+                            string val = vals[i];
+                            if (val.Equals("|", StringComparison.Ordinal))
+                                DutyEnvelopesRepeatPoint = vs.Count;
+                            else if (val.Equals("/", StringComparison.Ordinal))
+                                DutyEnvelopesReleasePoint = vs.Count;
+                            else
+                            {
+                                int v;
+                                if (int.TryParse(val, out v))
+                                {
+                                    if (v < 0)
+                                        v = 0;
+                                    else if (v > 3)
+                                        v = 3;
+                                    vs.Add(v);
+                                }
+                            }
+                        }
+                        DutyEnvelopesNums = vs.ToArray();
+
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < DutyEnvelopesNums.Length; i++)
+                        {
+                            if (sb.Length != 0)
+                                sb.Append(' ');
+                            if (DutyEnvelopesRepeatPoint == i)
+                                sb.Append("| ");
+                            if (DutyEnvelopesReleasePoint == i)
+                                sb.Append("/ ");
+                            sb.Append(DutyEnvelopesNums[i].ToString((IFormatProvider)null));
+                        }
+                        f_DutyEnvelopes = sb.ToString();
+                    }
+                }
+            }
+
+            [Browsable(false)]
+            [JsonIgnore]
+            [IgnoreDataMember]
+            public int[] DutyEnvelopesNums { get; set; } = new int[] { };
+
+            [Browsable(false)]
+            [JsonIgnore]
+            [IgnoreDataMember]
+            [DefaultValue(-1)]
+            public int DutyEnvelopesRepeatPoint { get; set; } = -1;
+
+            [Browsable(false)]
+            [JsonIgnore]
+            [IgnoreDataMember]
+            [DefaultValue(-1)]
+            public int DutyEnvelopesReleasePoint { get; set; } = -1;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
+            public override AbstractFxEngine CreateEngine()
+            {
+                return new NesFxEngine(this);
+            }
+
         }
 
         /// <summary>
         /// 
         /// </summary>
-        [JsonConverter(typeof(NoTypeConverterJsonConverter<EnvelopeFxSettings>))]
-        [TypeConverter(typeof(CustomExpandableObjectConverter))]
-        [DataContract]
-        public class EnvelopeFxSettings : AbstractEnvelopeFxSettingsBase
+        public class NesFxEngine : BasicFxEngine
         {
+            private NesFxSettings settings;
 
-            [IgnoreDataMember]
-            [JsonIgnore]
-            [Description("Set volume envelop  by text. Input volume value and split it with space.\r\n" +
-                "Absolute/Relative -64(-100%)～0～+63(+100%)")]
-            public string VolumeEnvelopes
+            /// <summary>
+            /// 
+            /// </summary>
+            public NesFxEngine(NesFxSettings settings) : base(settings)
             {
-                get
-                {
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < VolumeEnvelopesNums.Length; i++)
-                    {
-                        if (sb.Length != 0)
-                            sb.Append(' ');
-                        sb.Append(VolumeEnvelopesNums[i].ToString((IFormatProvider)null));
-                    }
-                    return sb.ToString();
-                }
-                set
-                {
-                    string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    List<int> vs = new List<int>();
-                    foreach (var val in vals)
-                    {
-                        int v = 0;
-                        if (int.TryParse(val, out v))
-                            vs.Add(v);
-                    }
-                    VolumeEnvelopesNums = vs.ToArray();
-                }
+                this.settings = settings;
             }
 
-            private int[] f_VolumeEnvelopesNums = new int[] { };
+            private uint f_dutyCounter;
 
-            [DataMember]
-            [TypeConverter(typeof(ArrayConverter))]
-            [Editor(typeof(WsgITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            [Description("Set static arp steps by value. Input note number.\r\n" +
-                "Absolute/Relative -64～0～+127\r\n" +
-                "Fixed 0～127")]
-            public int[] VolumeEnvelopesNums
+            public byte DutyValue
             {
-                get
-                {
-                    return f_VolumeEnvelopesNums;
-                }
-                set
-                {
-                    f_VolumeEnvelopesNums = value;
-                }
+                get;
+                private set;
             }
 
-            public override void RestoreFrom(string serializeData)
+            protected override void ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
             {
+                base.ProcessCore(sound, isKeyOff, isSoundOff);
+
+                if (settings.DutyEnvelopesNums.Length > 0)
                 {
-                    try
+                    if (!isKeyOff)
                     {
-                        var obj = JsonConvert.DeserializeObject(serializeData);
-                        this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+                        var vm = settings.DutyEnvelopesNums.Length;
+                        if (settings.DutyEnvelopesReleasePoint >= 0)
+                            vm = settings.DutyEnvelopesReleasePoint;
+                        if (f_dutyCounter >= vm)
+                        {
+                            if (settings.DutyEnvelopesRepeatPoint >= 0)
+                                f_dutyCounter = (uint)settings.DutyEnvelopesRepeatPoint;
+                            else
+                                f_dutyCounter = (uint)vm;
+
+                            if (f_dutyCounter >= settings.DutyEnvelopesNums.Length)
+                                f_dutyCounter = (uint)(settings.DutyEnvelopesNums.Length - 1);
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        if (ex.GetType() == typeof(Exception))
-                            throw;
-                        else if (ex.GetType() == typeof(SystemException))
-                            throw;
+                        if (settings.DutyEnvelopesRepeatPoint < 0)
+                            f_dutyCounter = (uint)settings.DutyEnvelopesNums.Length;
 
-
-                        System.Windows.Forms.MessageBox.Show(ex.ToString());
+                        if (f_dutyCounter >= settings.DutyEnvelopesNums.Length)
+                            f_dutyCounter = (uint)(settings.DutyEnvelopesNums.Length - 1);
                     }
+                    int vol = settings.DutyEnvelopesNums[f_dutyCounter++];
+
+                    DutyValue = (byte)vol;
                 }
             }
 

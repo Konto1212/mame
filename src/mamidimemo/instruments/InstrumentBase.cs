@@ -188,7 +188,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Category("MIDI")]
-        [Description("Pitch bend censitivity [half note] <MIDI 16ch>")]
+        [Description("Pitch bend sensitivity [half note] <MIDI 16ch>")]
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         public byte[] PitchBendRanges

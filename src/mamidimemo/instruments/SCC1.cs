@@ -508,6 +508,11 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
+            public SCC1Timbre()
+            {
+                this.SDS.FxS = new BasicFxSettings();
+            }
+
             public override void RestoreFrom(string serializeData)
             {
                 try

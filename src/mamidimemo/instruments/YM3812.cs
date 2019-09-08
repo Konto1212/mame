@@ -614,7 +614,10 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public YM3812Timbre()
             {
-                Ops = new YM3812Operator[] { new YM3812Operator(), new YM3812Operator() };
+                Ops = new YM3812Operator[] {
+                    new YM3812Operator(),
+                    new YM3812Operator() };
+                this.SDS.FxS = new BasicFxSettings();
             }
 
             public override void RestoreFrom(string serializeData)
@@ -734,7 +737,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Modulator Frequency Multiple (0-1-15)")]
-            [DefaultValue(1)]
+            [DefaultValue((byte)1)]
             public byte MFM
             {
                 get

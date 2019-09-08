@@ -482,11 +482,11 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             uint reg = (uint)(Slot * 5);
 
-                            if(lastSoundType == SoundType.SPSG)
+                            if (lastSoundType == SoundType.SPSG)
                                 GbApuWriteData(parentModule.UnitNumber, reg, (byte)(timbre.SweepTime << 4 | timbre.SweepDir << 3 | timbre.SweepNumber));
                             else
                                 GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
-                            GbApuWriteData(parentModule.UnitNumber, reg + 1, (byte)(timbre.Duty << 6 | timbre.SoundLength));
+
 
                             UpdateVolume();
 
@@ -521,7 +521,6 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             uint reg = (uint)((Slot + 3) * 5);
 
-                            //GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, timbre.SoundLength);
 
                             UpdateVolume();
@@ -546,6 +545,16 @@ namespace zanac.MAmidiMEmo.Instruments
                     case SoundType.PSG:
                         {
                             uint reg = (uint)(Slot * 5);
+
+                            byte dt = timbre.Duty;
+                            if (FxEngine != null && FxEngine.Active)
+                            {
+                                var eng = (GbFxEngine)FxEngine;
+                                dt = eng.DutyValue;
+                            }
+
+                            GbApuWriteData(parentModule.UnitNumber, reg + 1, (byte)(dt << 6 | timbre.SoundLength));
+
                             byte tl = (byte)Math.Round(timbre.EnvInitialVolume * CalcCurrentVolume());
 
                             byte edir = (byte)(timbre.EnvDirection << 3);
@@ -638,17 +647,19 @@ namespace zanac.MAmidiMEmo.Instruments
                         }
                     case SoundType.NOISE:
                         {
-                            var pitch = (int)ParentModule.Pitchs[NoteOnEvent.Channel] - 8192;
                             uint reg = (uint)((Slot + 3) * 5);
 
-                            var nfreq = (int)timbre.NoiseShiftClockFrequency + ((15 * -pitch) / 8192);
-                            if (nfreq > 15)
-                                nfreq = 15;
-                            else if (nfreq < 0)
-                                nfreq = 0;
+                            int d = 15 - ((69 + (int)Math.Round(12 * Math.Log(freq / 440d, 2))) % 16);
+
+                            byte dt = timbre.NoiseCounter;
+                            if (FxEngine != null && FxEngine.Active)
+                            {
+                                var eng = (GbFxEngine)FxEngine;
+                                dt = (byte)(eng.DutyValue & 1);
+                            }
 
                             Program.SoundUpdating();
-                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(nfreq << 4 | timbre.NoiseCounter << 3 | timbre.NoiseDivRatio));
+                            GbApuWriteData(parentModule.UnitNumber, reg + 3, (byte)(d << 4 | dt << 3 | timbre.NoiseDivRatio));
                             GbApuWriteData(parentModule.UnitNumber, reg + 4, (byte)(keyOn | (timbre.EnableLength << 6)));
                             Program.SoundUpdated();
 
@@ -839,11 +850,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            private byte f_Duty;
+            private byte f_Duty = 2;
 
             [DataMember]
             [Category("Sound")]
             [Description("Duty (0:12.5% 1:25% 2:50% 3:75%)")]
+            [DefaultValue((byte)2)]
             public byte Duty
             {
                 get
@@ -858,6 +870,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private byte f_SoundLength;
 
+            [Browsable(false)]
             [DataMember]
             [Category("Sound")]
             [Description("Sound Length (0-64,0-255)[(64-N)*(1/256) seconds]")]
@@ -882,6 +895,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private byte f_EnableLength;
 
+            [Browsable(false)]
             [DataMember]
             [Category("Sound")]
             [Description("Whether Sound Length is enable or not (0:Disable 1:Enable)")]
@@ -898,11 +912,12 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
 
-            private byte f_EnvInitialVolume;
+            private byte f_EnvInitialVolume = 15;
 
             [DataMember]
             [Category("Sound")]
             [Description("Initial Volume of envelope (0-15(0:No Sound))")]
+            [DefaultValue((byte)15)]
             public byte EnvInitialVolume
             {
                 get
@@ -915,11 +930,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            private byte f_EnvDirection;
+            private byte f_EnvDirection = 1;
 
             [DataMember]
             [Category("Sound")]
             [Description("Envelope Direction (0=Decrease, 1=Increase)")]
+            [DefaultValue((byte)1)]
             public byte EnvDirection
             {
                 get
@@ -932,11 +948,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            private byte f_EnvLength;
+            private byte f_EnvLength = 7;
 
             [DataMember]
             [Category("Sound")]
             [Description("Envelope Length (0-7 (0:Stop)[1step = N*(1/64) sec]")]
+            [DefaultValue((byte)7)]
             public byte EnvLength
             {
                 get
@@ -951,6 +968,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private byte f_NoiseShiftClockFrequency;
 
+            [Browsable(false)]
             [DataMember]
             [Category("Sound(Noise)")]
             [Description("Shift Clock Frequency (0-15) This parameter is affected by Pitch Bend MIDI message")]
@@ -985,6 +1003,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private byte f_NoiseDivRatio;
 
+            [Browsable(false)]
             [DataMember]
             [Category("Sound(Noise)")]
             [Description("Dividing Ratio of Frequencies(0-7)")]
@@ -1071,12 +1090,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             public GBAPUTimbre()
             {
-                Duty = 2;
-                SoundLength = 0;
-                EnableLength = 0;
-                EnvInitialVolume = 15;
-                EnvDirection = 1;
-                EnvLength = 7;
+                this.SDS.FxS = new GbFxSettings();
             }
 
 
@@ -1102,6 +1116,166 @@ namespace zanac.MAmidiMEmo.Instruments
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
             }
+        }
+
+
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<BasicFxSettings>))]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [DataContract]
+        public class GbFxSettings : BasicFxSettings
+        {
+
+            private string f_DutyEnvelopes;
+
+            [DataMember]
+            [Description("Set duty/noise envelop by text. Input duty/noise value and split it with space.\r\n" +
+                       "0 ～ 3")]
+            public string DutyEnvelopes
+            {
+                get
+                {
+                    return f_DutyEnvelopes;
+                }
+                set
+                {
+                    if (f_DutyEnvelopes != value)
+                    {
+                        DutyEnvelopesRepeatPoint = -1;
+                        DutyEnvelopesReleasePoint = -1;
+                        if (value == null)
+                        {
+                            DutyEnvelopesNums = new int[] { };
+                            f_DutyEnvelopes = string.Empty;
+                            return;
+                        }
+                        f_DutyEnvelopes = value;
+                        string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        List<int> vs = new List<int>();
+                        for (int i = 0; i < vals.Length; i++)
+                        {
+                            string val = vals[i];
+                            if (val.Equals("|", StringComparison.Ordinal))
+                                DutyEnvelopesRepeatPoint = vs.Count;
+                            else if (val.Equals("/", StringComparison.Ordinal))
+                                DutyEnvelopesReleasePoint = vs.Count;
+                            else
+                            {
+                                int v;
+                                if (int.TryParse(val, out v))
+                                {
+                                    if (v < 0)
+                                        v = 0;
+                                    else if (v > 3)
+                                        v = 3;
+                                    vs.Add(v);
+                                }
+                            }
+                        }
+                        DutyEnvelopesNums = vs.ToArray();
+
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < DutyEnvelopesNums.Length; i++)
+                        {
+                            if (sb.Length != 0)
+                                sb.Append(' ');
+                            if (DutyEnvelopesRepeatPoint == i)
+                                sb.Append("| ");
+                            if (DutyEnvelopesReleasePoint == i)
+                                sb.Append("/ ");
+                            sb.Append(DutyEnvelopesNums[i].ToString((IFormatProvider)null));
+                        }
+                        f_DutyEnvelopes = sb.ToString();
+                    }
+                }
+            }
+
+            [Browsable(false)]
+            [JsonIgnore]
+            [IgnoreDataMember]
+            public int[] DutyEnvelopesNums { get; set; } = new int[] { };
+
+            [Browsable(false)]
+            [JsonIgnore]
+            [IgnoreDataMember]
+            [DefaultValue(-1)]
+            public int DutyEnvelopesRepeatPoint { get; set; } = -1;
+
+            [Browsable(false)]
+            [JsonIgnore]
+            [IgnoreDataMember]
+            [DefaultValue(-1)]
+            public int DutyEnvelopesReleasePoint { get; set; } = -1;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
+            public override AbstractFxEngine CreateEngine()
+            {
+                return new GbFxEngine(this);
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class GbFxEngine : BasicFxEngine
+        {
+            private GbFxSettings settings;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public GbFxEngine(GbFxSettings settings) : base(settings)
+            {
+                this.settings = settings;
+            }
+
+            private uint f_dutyCounter;
+
+            public byte DutyValue
+            {
+                get;
+                private set;
+            }
+
+            protected override void ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
+            {
+                base.ProcessCore(sound, isKeyOff, isSoundOff);
+
+                if (settings.DutyEnvelopesNums.Length > 0)
+                {
+                    if (!isKeyOff)
+                    {
+                        var vm = settings.DutyEnvelopesNums.Length;
+                        if (settings.DutyEnvelopesReleasePoint >= 0)
+                            vm = settings.DutyEnvelopesReleasePoint;
+                        if (f_dutyCounter >= vm)
+                        {
+                            if (settings.DutyEnvelopesRepeatPoint >= 0)
+                                f_dutyCounter = (uint)settings.DutyEnvelopesRepeatPoint;
+                            else
+                                f_dutyCounter = (uint)vm;
+
+                            if (f_dutyCounter >= settings.DutyEnvelopesNums.Length)
+                                f_dutyCounter = (uint)(settings.DutyEnvelopesNums.Length - 1);
+                        }
+                    }
+                    else
+                    {
+                        if (settings.DutyEnvelopesRepeatPoint < 0)
+                            f_dutyCounter = (uint)settings.DutyEnvelopesNums.Length;
+
+                        if (f_dutyCounter >= settings.DutyEnvelopesNums.Length)
+                            f_dutyCounter = (uint)(settings.DutyEnvelopesNums.Length - 1);
+                    }
+                    int vol = settings.DutyEnvelopesNums[f_dutyCounter++];
+
+                    DutyValue = (byte)vol;
+                }
+            }
+
         }
 
         /// <summary>

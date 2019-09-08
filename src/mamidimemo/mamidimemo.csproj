@@ -82,8 +82,15 @@
     <Compile Include="ComponentModel\CustomExpandableObjectConverter.cs" />
     <Compile Include="ComponentModel\IStandardValues.cs" />
     <Compile Include="ComponentModel\MaskAttribute.cs" />
-    <Compile Include="Instruments\Arpeggiator.cs" />
+    <Compile Include="Instruments\AbstractFxEngine.cs" />
+    <Compile Include="Instruments\AbstractFxSettingsBase.cs" />
+    <Compile Include="Instruments\AdsrEngine.cs" />
+    <Compile Include="Instruments\AdsrSettings.cs" />
+    <Compile Include="Instruments\ArpEngine.cs" />
+    <Compile Include="Instruments\ArpSettings.cs" />
     <Compile Include="Instruments\AY8910.cs" />
+    <Compile Include="Instruments\BasicFxEngine.cs" />
+    <Compile Include="Instruments\BasicFxSettings.cs" />
     <Compile Include="Instruments\SoundList.cs" />
     <Compile Include="ComponentModel\StandardValuesDoubleConverter.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverterForUIEditor.cs" />

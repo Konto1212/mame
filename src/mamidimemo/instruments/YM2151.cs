@@ -848,7 +848,12 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public YM2151Timbre()
             {
-                Ops = new YM2151Operator[] { new YM2151Operator(), new YM2151Operator(), new YM2151Operator(), new YM2151Operator() };
+                Ops = new YM2151Operator[] {
+                    new YM2151Operator(),
+                    new YM2151Operator(),
+                    new YM2151Operator(),
+                    new YM2151Operator() };
+                this.SDS.FxS = new BasicFxSettings();
             }
 
             #endregion
@@ -890,7 +895,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Whether this operator enable or not")]
-            [DefaultValue(1)]
+            [DefaultValue((byte)1)]
             public byte Enable
             {
                 get

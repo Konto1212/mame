@@ -129,12 +129,20 @@ namespace zanac.MAmidiMEmo.Instruments
             EnableADSR = adsrs.Enable;
             if (EnableADSR)
             {
-                adsr = new ADSR();
-                adsr.SetAttackRate(Math.Pow(10d * (127d - adsrs.AR) / 127d, 2));
-                adsr.SetDecayRate(Math.Pow(10d * (adsrs.DR / 127d), 2));
-                adsr.SetReleaseRate(Math.Pow(60d * (adsrs.RR / 127d), 2));
-                adsr.SetSustainLevel((127d - adsrs.SL) / 127d);
-                adsr?.Gate(true);
+                AdsrEngine = new AdsrEngine();
+                AdsrEngine.SetAttackRate(Math.Pow(10d * (127d - adsrs.AR) / 127d, 2));
+                AdsrEngine.SetDecayRate(Math.Pow(10d * (adsrs.DR / 127d), 2));
+                AdsrEngine.SetReleaseRate(Math.Pow(60d * (adsrs.RR / 127d), 2));
+                AdsrEngine.SetSustainLevel((127d - adsrs.SL) / 127d);
+                AdsrEngine?.Gate(true);
+            }
+
+            var efs = Timbre.SDS.FxS;
+            if (efs != null)
+            {
+                EnableFx = efs.Enable;
+                if (EnableFx)
+                    FxEngine = efs.CreateEngine();
             }
         }
 
@@ -144,9 +152,9 @@ namespace zanac.MAmidiMEmo.Instruments
         public virtual void KeyOff()
         {
             IsKeyOff = true;
-            adsr?.Gate(false);
+            AdsrEngine?.Gate(false);
 
-            if (CurrentDriverEnvelopeState == EnvelopeState.Idle)
+            if (CurrentAdsrState == AdsrState.SoundOff)
                 SoundOff();
         }
 
@@ -156,7 +164,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public virtual void SoundOff()
         {
             IsSoundOff = true;
-            adsr?.Reset();
+            AdsrEngine?.Reset();
         }
 
         /// <summary>
@@ -203,7 +211,10 @@ namespace zanac.MAmidiMEmo.Instruments
             var range = (int)ParentModule.PitchBendRanges[NoteOnEvent.Channel];
 
             double d1 = ((double)pitch / 8192d) * range;
-            double d = d1 + ModultionTotalLevel + PortamentoDeltaNoteNumber + ArpeggiateDeltaNoteNumber;
+            double d = d1 + ModultionDeltaNoteNumber + PortamentoDeltaNoteNumber + ArpeggiateDeltaNoteNumber;
+
+            if (FxEngine != null)
+                d += FxEngine.DeltaNoteNumber;
 
             return d;
         }
@@ -220,10 +231,13 @@ namespace zanac.MAmidiMEmo.Instruments
             v *= ParentModule.Volumes[NoteOnEvent.Channel] / 127d;
             v *= NoteOnEvent.Velocity / 127d;
 
-            if (adsr != null)
-                v *= adsr.GetOutputLevel();
+            if (AdsrEngine != null)
+                v *= AdsrEngine.OutputLevel;
 
-            v *= ArpeggiateVolume;
+            if (FxEngine != null)
+                v *= FxEngine.OutputLevel;
+
+            v *= ArpeggiateLevel;
 
             return v;
         }
@@ -254,7 +268,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        internal protected double ArpeggiateVolume
+        internal protected double ArpeggiateLevel
         {
             get
             {
@@ -277,7 +291,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private void updatePeriodicAction()
         {
-            if (ModulationEnabled || PortamentoEnabled || EnableADSR)
+            if (ModulationEnabled || PortamentoEnabled || EnableADSR || EnableFx)
             {
                 if (periodicAction == null)
                     periodicAction = new Action(OnPeriodicAction);
@@ -299,6 +313,65 @@ namespace zanac.MAmidiMEmo.Instruments
             if (IsDisposed)
                 return;
 
+            processModulation();
+
+            processPortamento();
+
+            processAdsr();
+
+            processFx();
+
+            if (ModulationEnabled || PortamentoEnabled || EnableFx)
+                UpdatePitch();
+
+            if (EnableADSR || EnableFx)
+                UpdateVolume();
+        }
+
+        private void processFx()
+        {
+            if (EnableFx)
+            {
+                FxEngine.Process(this, IsKeyOff, IsSoundOff);
+                EnableFx = FxEngine.Active;
+            }
+        }
+
+        private void processAdsr()
+        {
+            if (EnableADSR)
+            {
+                AdsrEngine.Process();
+                if (AdsrEngine.AdsrState == AdsrState.SoundOff)
+                {
+                    EnableADSR = false;
+                    SoundOff();
+                }
+            }
+        }
+
+        private void processPortamento()
+        {
+            if (PortamentoEnabled)
+            {
+                if (PortamentoDeltaNoteNumber != 0)
+                {
+                    double delta = -portStartNoteDeltSign * 12d / Math.Pow(((double)ParentModule.PortamentoTimes[NoteOnEvent.Channel] / 2d) + 1d, 1.25);
+                    PortamentoDeltaNoteNumber += delta;
+
+                    if (portStartNoteDeltSign < 0 && PortamentoDeltaNoteNumber >= 0)
+                        PortamentoDeltaNoteNumber = 0;
+                    else if (portStartNoteDeltSign > 0 && PortamentoDeltaNoteNumber <= 0)
+                        PortamentoDeltaNoteNumber = 0;
+
+                    if (PortamentoDeltaNoteNumber == 0)
+                        PortamentoEnabled = false;
+                }
+            }
+        }
+
+        private void processModulation()
+        {
             if (ModulationEnabled)
             {
                 double radian = 2 * Math.PI * (modulationStep / InstrumentManager.TIMER_HZ);
@@ -318,69 +391,33 @@ namespace zanac.MAmidiMEmo.Instruments
                     modultionLevel += (mv - modultionLevel) / 1.25;
 
                 double modHz = radian * ParentModule.GetModulationRateHz(NoteOnEvent.Channel);
-                ModultionTotalLevel = modultionLevel * Math.Sin(modHz);
-                ModultionTotalLevel *= ((double)ParentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
+                ModultionDeltaNoteNumber = modultionLevel * Math.Sin(modHz);
+                ModultionDeltaNoteNumber *= ((double)ParentModule.ModulationDepthRangesNote[NoteOnEvent.Channel] +
                     ((double)ParentModule.ModulationDepthRangesCent[NoteOnEvent.Channel] / 127d));
 
                 modulationStep += 1.0;
                 if (modHz > 2 * Math.PI)
                     modulationStep = 0;
             }
-
-            if (PortamentoEnabled)
-            {
-                if (PortamentoDeltaNoteNumber != 0)
-                {
-                    double delta = -portStartNoteDeltSign * 12d / Math.Pow(((double)ParentModule.PortamentoTimes[NoteOnEvent.Channel] / 2d) + 1d, 1.25);
-                    PortamentoDeltaNoteNumber += delta;
-
-                    if (portStartNoteDeltSign < 0 && PortamentoDeltaNoteNumber >= 0)
-                        PortamentoDeltaNoteNumber = 0;
-                    else if (portStartNoteDeltSign > 0 && PortamentoDeltaNoteNumber <= 0)
-                        PortamentoDeltaNoteNumber = 0;
-
-                    if (PortamentoDeltaNoteNumber == 0)
-                        PortamentoEnabled = false;
-                }
-            }
-
-            if (EnableADSR)
-            {
-                adsr.Process();
-                if (adsr.GetCurrentEnvelopeState() == EnvelopeState.Idle)
-                {
-                    EnableADSR = false;
-                    SoundOff();
-                }
-            }
-
-
-            if (ModulationEnabled || PortamentoEnabled)
-                UpdatePitch();
-
-            if (EnableADSR)
-                UpdateVolume();
         }
-
-
 
         /// <summary>
         /// 
         /// </summary>
-        public EnvelopeState CurrentDriverEnvelopeState
+        public AdsrState CurrentAdsrState
         {
             get
             {
-                if (adsr != null)
+                if (AdsrEngine != null)
                 {
-                    return adsr.GetCurrentEnvelopeState();
+                    return AdsrEngine.AdsrState;
                 }
                 else
                 {
                     if (!IsKeyOff)
-                        return EnvelopeState.Sustain;
+                        return AdsrState.Sustain;
                     else
-                        return EnvelopeState.Idle;
+                        return AdsrState.SoundOff;
                 }
             }
         }
@@ -400,7 +437,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// モジュレーションの効き具合(0-1.0)
         /// </summary>
-        public double ModultionTotalLevel
+        public double ModultionDeltaNoteNumber
         {
             get;
             private set;
@@ -476,10 +513,12 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        #endregion
+
         private bool f_AdsrEnabled;
 
         /// <summary>
-        /// サウンドドライバの有効無効
+        /// ADSRの有効無効
         /// </summary>
         public bool EnableADSR
         {
@@ -497,205 +536,30 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        #endregion
+        private bool f_FxEnabled;
 
-        #region envelope
-
-        private ADSR adsr;
-
-        //https://www.earlevel.com/main/2013/06/03/envelope-generators-adsr-code/
         /// <summary>
-        /// 
+        /// Fxの有効無効
         /// </summary>
-        private class ADSR
+        public bool EnableFx
         {
-            EnvelopeState state;
-            double output;
-            double attackRate;
-            double decayRate;
-            double releaseRate;
-            double attackCoef;
-            double decayCoef;
-            double releaseCoef;
-            double sustainLevel;
-            double targetRatioA;
-            double targetRatioDR;
-            double attackBase;
-            double decayBase;
-            double releaseBase;
-
-            public ADSR()
+            get
             {
-                Reset();
-                SetAttackRate(0);
-                SetDecayRate(0);
-                SetReleaseRate(30);
-                SetSustainLevel(1.0);
-                SetTargetRatioA(0.3);
-                SetTargetRatioDR(0.0001);
+                return f_FxEnabled;
             }
-
-            /// <summary>
-            /// set attack rate
-            /// </summary>
-            /// <param name="rate">[sec]</param>
-            public void SetAttackRate(double rate)
+            set
             {
-                attackRate = rate * InstrumentManager.TIMER_HZ;
-                attackCoef = calcCoef(rate, targetRatioA);
-                attackBase = (1.0 + targetRatioA) * (1.0 - attackCoef);
-            }
-
-            /// <summary>
-            /// set decay rate
-            /// </summary>
-            /// <param name="rate">[sec]</param>
-            public void SetDecayRate(double rate)
-            {
-                decayRate = rate * InstrumentManager.TIMER_HZ;
-                decayCoef = calcCoef(rate, targetRatioDR);
-                decayBase = (sustainLevel - targetRatioDR) * (1.0 - decayCoef);
-            }
-
-            /// <summary>
-            /// set release rate
-            /// </summary>
-            /// <param name="rate">[sec]</param>
-            public void SetReleaseRate(double rate)
-            {
-                releaseRate = rate * InstrumentManager.TIMER_HZ;
-                releaseCoef = calcCoef(rate, targetRatioDR);
-                releaseBase = -targetRatioDR * (1.0 - releaseCoef);
-            }
-
-            private double calcCoef(double rate, double targetRatio)
-            {
-                return (rate <= 0) ? 0.0 : Math.Exp(-Math.Log((1.0 + targetRatio) / targetRatio) / rate);
-            }
-
-            /// <summary>
-            /// set sustain level
-            /// </summary>
-            /// <param name="level"></param>
-            public void SetSustainLevel(double level)
-            {
-                sustainLevel = level;
-                decayBase = (sustainLevel - targetRatioDR) * (1.0 - decayCoef);
-            }
-
-            /// <summary>
-            /// Adjust the curves of the Attack, or Decay and Release segments,
-            /// from the initial default values (small number such as 0.0001 to 0.01 for mostly-exponential,
-            /// large numbers like 100 for virtually linear):
-            /// </summary>
-            /// <param name="targetRatio">0.0001 to 0.01</param>
-            public void SetTargetRatioA(double targetRatio)
-            {
-                if (targetRatio < 0.000000001)
-                    targetRatio = 0.000000001;  // -180 dB
-                targetRatioA = targetRatio;
-                attackCoef = calcCoef(attackRate, targetRatioA);
-                attackBase = (1.0 + targetRatioA) * (1.0 - attackCoef);
-            }
-
-            /// <summary>
-            /// Adjust the curves of the Attack, or Decay and Release segments,
-            /// from the initial default values (small number such as 0.0001 to 0.01 for mostly-exponential,
-            /// large numbers like 100 for virtually linear):
-            /// </summary>
-            /// <param name="targetRatio">0.0001 to 0.01</param>
-            public void SetTargetRatioDR(double targetRatio)
-            {
-                if (targetRatio < 0.000000001)
-                    targetRatio = 0.000000001;  // -180 dB
-                targetRatioDR = targetRatio;
-                decayCoef = calcCoef(decayRate, targetRatioDR);
-                releaseCoef = calcCoef(releaseRate, targetRatioDR);
-                decayBase = (sustainLevel - targetRatioDR) * (1.0 - decayCoef);
-                releaseBase = -targetRatioDR * (1.0 - releaseCoef);
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <returns></returns>
-            public double Process()
-            {
-                switch (state)
+                if (value != f_FxEnabled)
                 {
-                    case EnvelopeState.Idle:
-                        break;
-                    case EnvelopeState.Attack:
-                        output = attackBase + output * attackCoef;
-                        if (output >= 1.0)
-                        {
-                            output = 1.0;
-                            state = EnvelopeState.Decay;
-                        }
-                        break;
-                    case EnvelopeState.Decay:
-                        output = decayBase + output * decayCoef;
-                        if (output <= sustainLevel)
-                        {
-                            output = sustainLevel;
-                            state = EnvelopeState.Sustain;
-                        }
-                        break;
-                    case EnvelopeState.Sustain:
-                        break;
-                    case EnvelopeState.Release:
-                        output = releaseBase + output * releaseCoef;
-                        if (output <= 0.0)
-                        {
-                            output = 0.0;
-                            state = EnvelopeState.Idle;
-                        }
-                        break;
+                    f_FxEnabled = value;
+                    updatePeriodicAction();
                 }
-                return output;
             }
-
-
-            public void Gate(bool keyOn)
-            {
-                if (keyOn)
-                    state = EnvelopeState.Attack;
-                else if (state != EnvelopeState.Idle)
-                    state = EnvelopeState.Release;
-            }
-
-            public EnvelopeState GetCurrentEnvelopeState()
-            {
-                return state;
-            }
-
-            public void Reset()
-            {
-                state = EnvelopeState.Idle;
-                output = 0.0;
-            }
-
-            public double GetOutputLevel()
-            {
-                return output;
-            }
-
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public enum EnvelopeState
-        {
-            Idle = 0,
-            Attack,
-            Decay,
-            Sustain,
-            Release
-        };
+        protected AdsrEngine AdsrEngine { get; private set; }
 
-        #endregion
-
+        protected AbstractFxEngine FxEngine { get; private set; }
 
     }
 }

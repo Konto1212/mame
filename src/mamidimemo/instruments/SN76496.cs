@@ -298,7 +298,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         }
                     case SoundType.NOISE:
                         {
-                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, 3);
+                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, 1);
                             break;
                         }
                 }
@@ -489,6 +489,14 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     f_FB = (byte)(value & 1);
                 }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public SN76496Timbre()
+            {
+                this.SDS.FxS = new BasicFxSettings();
             }
 
             public override void RestoreFrom(string serializeData)

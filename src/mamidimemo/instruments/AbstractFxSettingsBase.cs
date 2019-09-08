@@ -1,5 +1,4 @@
-﻿// copyright-holders:K.Ito
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
 using System;
@@ -7,81 +6,59 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
-using System.Reflection.Emit;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using zanac.MAmidiMEmo.ComponentModel;
-using static zanac.MAmidiMEmo.Instruments.SoundBase;
 
 namespace zanac.MAmidiMEmo.Instruments
 {
-    /// <summary>
-    /// 
-    /// </summary>
+
+    [JsonConverter(typeof(NoTypeConverterJsonConverter<AbstractFxSettingsBase>))]
     [TypeConverter(typeof(CustomExpandableObjectConverter))]
-    [JsonConverter(typeof(NoTypeConverterJsonConverter<SoundDriverSettings>))]
     [DataContract]
     [MidiHook]
-    public class SoundDriverSettings : ContextBoundObject
+    public abstract class AbstractFxSettingsBase : ContextBoundObject
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public SoundDriverSettings()
-        {
-            ADSR = new AdsrSettings();
-            ARP = new ArpSettings();
-        }
+        private bool f_Enable;
 
-        #region ADSR 
-
-        /// <summary>
-        /// 
-        /// </summary>
         [DataMember]
-        [Description("ADSR Settings")]
-        public AdsrSettings ADSR
+        [Description("Whether enable Sound Driver Level Fx")]
+        public virtual bool Enable
         {
-            get;
-            private set;
+            get
+            {
+                return f_Enable;
+            }
+            set
+            {
+                if (f_Enable != value)
+                {
+                    f_Enable = value;
+                }
+            }
         }
 
-        #endregion
+        private uint f_Interval = 50;
 
-        #region Arp
-
-        /// <summary>
-        /// 
-        /// </summary>
         [DataMember]
-        [Description("ARP Settings")]
-        public ArpSettings ARP
+        [Description("Set interval of envelope changing [ms]")]
+        [DefaultValue((uint)50)]
+        public uint EnvelopeInterval
         {
-            get;
-            private set;
+            get
+            {
+                return f_Interval;
+            }
+            set
+            {
+                if (f_Interval != value && value >= InstrumentManager.TIMER_INTERVAL)
+                {
+                    f_Interval = value;
+                }
+            }
         }
-
-        #endregion
-
-
-        #region Fx
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [DataMember]
-        [Description("Fx Settings")]
-        [JsonConverter(typeof(NoTypeConverterJsonConverterObject<AbstractFxSettingsBase>))]
-        public AbstractFxSettingsBase FxS
-        {
-            get;
-            set;
-        }
-
-        #endregion
-
-        #region Etc
 
         [DataMember]
         [Description("Memo")]
@@ -108,11 +85,23 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        public void RestoreFrom(string serializeData)
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public AbstractFxSettingsBase()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public abstract AbstractFxEngine CreateEngine();
+
+        public virtual void RestoreFrom(string serializeData)
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject<SoundDriverSettings>(serializeData);
+                var obj = JsonConvert.DeserializeObject(serializeData, this.GetType());
                 this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
             }
             catch (Exception ex)
@@ -127,9 +116,5 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        #endregion
-
     }
-
 }
-

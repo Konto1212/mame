@@ -594,8 +594,19 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 base.SoundOff();
 
-                Ay8910WriteData(parentModule.UnitNumber, 0, (byte)(8 + Slot));
-                Ay8910WriteData(parentModule.UnitNumber, 1, 0);
+                Ay8910WriteData(parentModule.UnitNumber, 0, (byte)(7));
+                byte data = Ay8910ReadData(parentModule.UnitNumber);
+                switch (lastSoundType)
+                {
+                    case SoundType.PSG:
+                    case SoundType.ENVELOPE:
+                        data |= (byte)(1 << Slot);
+                        break;
+                    case SoundType.NOISE:
+                        data |= (byte)(8 << Slot);
+                        break;
+                }
+                Ay8910WriteData(parentModule.UnitNumber, 1, data);
             }
 
         }
@@ -614,6 +625,11 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 get;
                 set;
+            }
+
+            public AY8910Timbre()
+            {
+                this.SDS.FxS = new BasicFxSettings();
             }
 
             public override void RestoreFrom(string serializeData)

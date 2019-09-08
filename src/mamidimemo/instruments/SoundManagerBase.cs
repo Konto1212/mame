@@ -28,7 +28,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        protected Dictionary<int, Arpeggiator> ArpeggiatorsForKeyOn
+        protected Dictionary<int, ArpEngine> ArpeggiatorsForKeyOn
         {
             get;
             private set;
@@ -36,7 +36,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         /// 
         /// </summary>
-        protected Dictionary<int, Arpeggiator> ArpeggiatorsForPitch
+        protected Dictionary<int, ArpEngine> ArpeggiatorsForPitch
         {
             get;
             private set;
@@ -60,8 +60,8 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             this.parentModule = parentModule;
             AllSounds = new SoundList<SoundBase>(-1);
-            ArpeggiatorsForKeyOn = new Dictionary<int, Arpeggiator>();
-            ArpeggiatorsForPitch = new Dictionary<int, Arpeggiator>();
+            ArpeggiatorsForKeyOn = new Dictionary<int, ArpEngine>();
+            ArpeggiatorsForPitch = new Dictionary<int, ArpEngine>();
         }
 
         /// <summary>
@@ -231,6 +231,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     // on sound
                     arp.Counter -= arp.StepCounter;
+                    if (arp.Counter > 0)
+                        arp.Counter = 0;
                     arp.GateCounter = arp.Counter;
                     keyOnCore(arp.NextNote());
                 }
@@ -269,13 +271,14 @@ namespace zanac.MAmidiMEmo.Instruments
                 setupArp(sds, arp);
 
                 //Gate Time
+                var snd = arp.FirstSoundForPitch;
                 if (arp.GateCounter != double.MinValue)
                 {
                     arp.GateCounter += InstrumentManager.TIMER_INTERVAL;
                     if (arp.GateCounter >= arp.StepCounter * ((sds.GateTime + 1) / 128d))
                     {
                         arp.GateCounter = double.MinValue;
-                        arp.FirstSoundForPitch.ArpeggiateVolume = 0d;
+                        snd.ArpeggiateLevel = 0d;
                     }
                 }
                 arp.Counter += InstrumentManager.TIMER_INTERVAL;
@@ -283,11 +286,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     // on sound
                     arp.Counter -= arp.StepCounter;
+                    if (arp.Counter > 0)
+                        arp.Counter = 0;
                     arp.GateCounter = arp.Counter;
                     var note = arp.NextNote();
-                    var snd = arp.FirstSoundForPitch;
                     snd.ArpeggiateDeltaNoteNumber = note.NoteNumber - arp.FirstAddedNote.NoteNumber;
-                    snd.ArpeggiateVolume = 1d;
+                    snd.ArpeggiateLevel = 1d;
                 }
             }
 
@@ -379,7 +383,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private bool preProcessArrpegioForKeyOn(NoteOnEvent note)
         {
             FourBitNumber ch = note.Channel;
-            ARPSettings sds = parentModule.GetTimbre(ch).SDS.ARP;
+            ArpSettings sds = parentModule.GetTimbre(ch).SDS.ARP;
             if (sds.Enable)
             {
                 switch (sds.ArpMethod)
@@ -388,7 +392,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             //create Arpeggiator
                             if (!ArpeggiatorsForKeyOn.ContainsKey(ch))
-                                ArpeggiatorsForKeyOn.Add(ch, new Arpeggiator());
+                                ArpeggiatorsForKeyOn.Add(ch, new ArpEngine());
                             var arp = ArpeggiatorsForKeyOn[ch];
 
                             setupArp(sds, arp);
@@ -480,14 +484,14 @@ namespace zanac.MAmidiMEmo.Instruments
         private void postProcessArrpegioForKeyOn(NoteOnEvent note, SoundBase snd)
         {
             FourBitNumber ch = note.Channel;
-            ARPSettings sds = parentModule.GetTimbre(ch).SDS.ARP;
+            ArpSettings sds = parentModule.GetTimbre(ch).SDS.ARP;
             if (snd != null && sds.Enable)
             {
                 if (sds.ArpMethod == ArpMethod.PitchChange)
                 {
                     //create Arpeggiator
                     if (!ArpeggiatorsForPitch.ContainsKey(note.Channel))
-                        ArpeggiatorsForPitch.Add(note.Channel, new Arpeggiator());
+                        ArpeggiatorsForPitch.Add(note.Channel, new ArpEngine());
                     var arp = ArpeggiatorsForPitch[note.Channel];
                     setupArp(sds, arp);
                     arp.FirstSoundForPitch = snd;
@@ -525,7 +529,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 var timbre = parentModule.GetTimbre(ch);
                 var sds = timbre.SDS.ARP;
-                Arpeggiator arp = ArpeggiatorsForKeyOn[ch];
+                ArpEngine arp = ArpeggiatorsForKeyOn[ch];
 
                 if (sds.Enable)
                 {
@@ -554,7 +558,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 var timbre = parentModule.GetTimbre(ch);
                 var sds = timbre.SDS.ARP;
-                Arpeggiator arp = ArpeggiatorsForPitch[ch];
+                ArpEngine arp = ArpeggiatorsForPitch[ch];
 
                 if (sds.Enable)
                 {
@@ -592,7 +596,7 @@ namespace zanac.MAmidiMEmo.Instruments
         }
 
 
-        private static void setupArp(ARPSettings sds, Arpeggiator arp)
+        private static void setupArp(ArpSettings sds, ArpEngine arp)
         {
             arp.StepStyle = sds.ArpType == ArpType.Static ? ArpStepStyle.Order : sds.StepStyle;
             arp.Range = sds.OctaveRange;
@@ -666,13 +670,13 @@ namespace zanac.MAmidiMEmo.Instruments
             tryToDisableArpTimerForKeyOn();
         }
 
-        private void stopArpForPitch(Arpeggiator arp)
+        private void stopArpForPitch(ArpEngine arp)
         {
             keyOffCore(arp.FirstAddedNote);
             arp.ClearAddedNotes();
         }
 
-        private void stopArpForKeyOn(Arpeggiator arp)
+        private void stopArpForKeyOn(ArpEngine arp)
         {
             keyOffCore(arp.LastPassedNote);
             arp.ClearAddedNotes();

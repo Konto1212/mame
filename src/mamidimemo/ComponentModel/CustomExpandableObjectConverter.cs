@@ -27,6 +27,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
 
             if (destinationType == typeof(string))
                 return context.PropertyDescriptor.PropertyType.Name + context.PropertyDescriptor.DisplayName;
+
             return base.ConvertTo(context, culture, value, destinationType);
         }
 
@@ -43,6 +44,8 @@ namespace zanac.MAmidiMEmo.ComponentModel
             List<string> list = new List<string>();
             foreach (PropertyInfo propertyInfo in type.GetProperties())
             {
+                if (propertyInfo.Name.Equals("Enable"))
+                    list.Insert(0, propertyInfo.Name);
                 list.Add(propertyInfo.Name);
             }
             // リフレクションから取得した順でソート
