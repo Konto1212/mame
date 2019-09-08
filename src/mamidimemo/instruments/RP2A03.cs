@@ -977,7 +977,7 @@ namespace zanac.MAmidiMEmo.Instruments
             private string f_DutyEnvelopes;
 
             [DataMember]
-            [Description("Set duty/noise envelop by text. Input duty/noise value and split it with space.\r\n" +
+            [Description("Set duty/noise envelop by text. Input duty/noise value and split it with space like the Famitracker.\r\n" +
                        "0 ～ 3")]
             public string DutyEnvelopes
             {

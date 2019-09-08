@@ -483,7 +483,7 @@ namespace zanac.MAmidiMEmo.Instruments
                             uint reg = (uint)(Slot * 5);
 
                             if (lastSoundType == SoundType.SPSG)
-                                GbApuWriteData(parentModule.UnitNumber, reg, (byte)(timbre.SweepTime << 4 | timbre.SweepDir << 3 | timbre.SweepNumber));
+                                GbApuWriteData(parentModule.UnitNumber, reg, (byte)(timbre.SPSGSweep.Time << 4 | timbre.SPSGSweep.Dir << 3 | timbre.SPSGSweep.Speed));
                             else
                                 GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
 
@@ -798,58 +798,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 get;
                 set;
             }
-
-            private byte f_SweepTime;
-
-            [DataMember]
-            [Category("Sound(Sweep)")]
-            [Description("Sweep Time (0:OFF 1-7:N/128Hz)")]
-            public byte SweepTime
-            {
-                get
-                {
-                    return f_SweepTime;
-                }
-                set
-                {
-                    f_SweepTime = (byte)(value & 7);
-                }
-            }
-
-            private byte f_SweepDir;
-
-            [DataMember]
-            [Category("Sound(Sweep)")]
-            [Description("Sweep Increase/Decrease (0: Addition 1: Subtraction)")]
-            public byte SweepDir
-            {
-                get
-                {
-                    return f_SweepDir;
-                }
-                set
-                {
-                    f_SweepDir = (byte)(value & 1);
-                }
-            }
-
-            private byte f_SweepNumber;
-
-            [DataMember]
-            [Category("Sound(Sweep)")]
-            [Description("Number of sweep shift (0-7)")]
-            public byte SweepNumber
-            {
-                get
-                {
-                    return f_SweepNumber;
-                }
-                set
-                {
-                    f_SweepNumber = (byte)(value & 7);
-                }
-            }
-
+            
             private byte f_Duty = 2;
 
             [DataMember]
@@ -910,7 +859,6 @@ namespace zanac.MAmidiMEmo.Instruments
                     f_EnableLength = (byte)(value & 1);
                 }
             }
-
 
             private byte f_EnvInitialVolume = 15;
 
@@ -1088,9 +1036,24 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
 
+
+            /// <summary>
+            /// 
+            /// </summary>
+            [DataMember]
+            [Category("Sound(SQ)")]
+            [Description("SPSG Sweep Settings")]
+            public SPSGSweepSettings SPSGSweep
+            {
+                get;
+                private set;
+            }
+
+
             public GBAPUTimbre()
             {
-                this.SDS.FxS = new GbFxSettings();
+                SDS.FxS = new GbFxSettings();
+                SPSGSweep = new SPSGSweepSettings();
             }
 
 
@@ -1119,6 +1082,65 @@ namespace zanac.MAmidiMEmo.Instruments
         }
 
 
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<SPSGSweepSettings>))]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [DataContract]
+        [MidiHook]
+        public class SPSGSweepSettings : ContextBoundObject
+        {
+
+            private byte f_SweepTime;
+
+            [DataMember]
+            [Category("Sound(Sweep)")]
+            [Description("SPSG Sweep Time (0:OFF 1-7:N/128Hz)")]
+            public byte Time
+            {
+                get
+                {
+                    return f_SweepTime;
+                }
+                set
+                {
+                    f_SweepTime = (byte)(value & 7);
+                }
+            }
+
+            private byte f_SweepDir;
+
+            [DataMember]
+            [Category("Sound(Sweep)")]
+            [Description("SPSG Sweep Increase/Decrease (0: Addition 1: Subtraction)")]
+            public byte Dir
+            {
+                get
+                {
+                    return f_SweepDir;
+                }
+                set
+                {
+                    f_SweepDir = (byte)(value & 1);
+                }
+            }
+
+            private byte f_SweepNumber;
+
+            [DataMember]
+            [Category("Sound(Sweep)")]
+            [Description("SPSG Number of sweep shift (0-7)")]
+            public byte Speed
+            {
+                get
+                {
+                    return f_SweepNumber;
+                }
+                set
+                {
+                    f_SweepNumber = (byte)(value & 7);
+                }
+            }
+        }
+
         [JsonConverter(typeof(NoTypeConverterJsonConverter<BasicFxSettings>))]
         [TypeConverter(typeof(CustomExpandableObjectConverter))]
         [DataContract]
@@ -1128,7 +1150,7 @@ namespace zanac.MAmidiMEmo.Instruments
             private string f_DutyEnvelopes;
 
             [DataMember]
-            [Description("Set duty/noise envelop by text. Input duty/noise value and split it with space.\r\n" +
+            [Description("Set duty/noise envelop by text. Input duty/noise value and split it with space like the Famitracker.\r\n" +
                        "0 ～ 3")]
             public string DutyEnvelopes
             {

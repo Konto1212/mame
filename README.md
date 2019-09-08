@@ -1,4 +1,4 @@
-MAmidiMEmo V0.1.0.0 / Itoken (c)2019 / GPL-2.0
+MAmidiMEmo V0.6.0.0 / Itoken (c)2019 / GPL-2.0
 
 *** What is the MAmidiMEmo? ***
 
@@ -84,7 +84,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 	 http://f.rdw.se/AY-3-8910-datasheet.pdf
 
    *[Channels]
-    Select which MIDI ch messages the chip receive.
+    Select which MIDI ch messages the chip receives.
 
 5. Play MIDI file by youe favorite sequencer or player.
    Of course, you can connect your favrite keyboard to MAmidiMEmo for live performance.
@@ -99,7 +99,13 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 	Modulation, Modulation Depth, Modulation Range, Modulation Delay
 	Portamento, Portamento Time
 
-6. (TBD)
+6. Also, you can set the following sound driver settings from Timbre settings.
+
+   Arpeggio
+   ADSR
+   Effect(Pitch/Volue/Duty macro)
+
+7. (TBD)
    You can modify current environment and all timbre parameters via System Exclusive MIDI Message.
 
    SysEx format:
@@ -112,6 +118,12 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 	SN76489:(TBD)
 	:::
  
- 7. Donate for supporting the MAmidiMEmo
+8. Donate for supporting the MAmidiMEmo
 
    [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SNQ9JE3JAQMNQ)
+
+9. Changes
+
+0.6.0.0 Added sound driver effects and portamento feature
+0.5.0.0 Added several chips
+0.1.0.0 First release

@@ -229,7 +229,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public string f_StaticArpSteps;
 
         [DataMember]
-        [Description("Set static arp steps by text. Input note number and split it with space.\r\n" +
+        [Description("Set static arp steps by text. Input note number and split it with space like the Famitracker.\r\n" +
                     "Absolute/Relative -64～0～+63\r\n" +
                     "Fixed is 0～127")]
         public string StaticArpSteps
