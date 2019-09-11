@@ -92,9 +92,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public virtual void Dispose()
         {
-            if (periodicAction != null)
-                InstrumentManager.UnsetPeriodicCallback(periodicAction);
-
             if (!IsDisposed)
             {
                 KeyOff();
@@ -139,11 +136,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             var efs = Timbre.SDS.FxS;
             if (efs != null)
-            {
                 EnableFx = efs.Enable;
-                if (EnableFx)
-                    FxEngine = efs.CreateEngine();
-            }
         }
 
         /// <summary>
@@ -284,74 +277,51 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private Action periodicAction;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void updatePeriodicAction()
-        {
-            if (ModulationEnabled || PortamentoEnabled || EnableADSR || EnableFx)
-            {
-                if (periodicAction == null)
-                    periodicAction = new Action(OnPeriodicAction);
-                InstrumentManager.SetPeriodicCallback(periodicAction);
-            }
-            else
-            {
-                InstrumentManager.UnsetPeriodicCallback(periodicAction);
-                periodicAction = null;
-            }
-        }
-
-        /// <summary>
-        /// モジュレーション値を更新する
-        /// 10msごとに呼ばれる
-        /// </summary>
-        public virtual void OnPeriodicAction()
+        private double processFx(object state)
         {
             if (IsDisposed)
-                return;
+                return -1;
 
-            processModulation();
-
-            processPortamento();
-
-            processAdsr();
-
-            processFx();
-
-            if (ModulationEnabled || PortamentoEnabled || EnableFx)
-                UpdatePitch();
-
-            if (EnableADSR || EnableFx)
-                UpdateVolume();
-        }
-
-        private void processFx()
-        {
-            if (EnableFx)
+            if (EnableFx && FxEngine != null)
             {
                 FxEngine.Process(this, IsKeyOff, IsSoundOff);
+
+                UpdatePitch();
+                UpdateVolume();
+
                 EnableFx = FxEngine.Active;
+
+                if (EnableFx)
+                    return FxEngine.Settings.EnvelopeInterval;
             }
+            return -1;
         }
 
-        private void processAdsr()
+        private double processAdsr(object state)
         {
-            if (EnableADSR)
+            if (IsDisposed)
+                return -1;
+
+            if (EnableADSR && AdsrEngine != null)
             {
                 AdsrEngine.Process();
-                if (AdsrEngine.AdsrState == AdsrState.SoundOff)
-                {
-                    EnableADSR = false;
-                    SoundOff();
-                }
+
+                UpdateVolume();
+
+                if (AdsrEngine.AdsrState != AdsrState.SoundOff)
+                    return HighPrecisionTimer.TIMER_BASIC_INTERVAL;
+
+                EnableADSR = false;
+                SoundOff();
             }
+            return -1;
         }
 
-        private void processPortamento()
+        private double processPortamento(object state)
         {
+            if (IsDisposed)
+                return -1;
+
             if (PortamentoEnabled)
             {
                 if (PortamentoDeltaNoteNumber != 0)
@@ -364,25 +334,33 @@ namespace zanac.MAmidiMEmo.Instruments
                     else if (portStartNoteDeltSign > 0 && PortamentoDeltaNoteNumber <= 0)
                         PortamentoDeltaNoteNumber = 0;
 
-                    if (PortamentoDeltaNoteNumber == 0)
-                        PortamentoEnabled = false;
+                    UpdatePitch();
+
+                    if (PortamentoDeltaNoteNumber != 0)
+                        return HighPrecisionTimer.TIMER_BASIC_INTERVAL;
+
+                    PortamentoEnabled = false;
                 }
             }
+            return -1;
         }
 
-        private void processModulation()
+        private double processModulation(object state)
         {
+            if (IsDisposed)
+                return -1;
+
             if (ModulationEnabled)
             {
-                double radian = 2 * Math.PI * (modulationStep / InstrumentManager.TIMER_HZ);
+                double radian = 2 * Math.PI * (modulationStep / HighPrecisionTimer.TIMER_BASIC_HZ);
 
                 double mdepth = 0;
                 if (ParentModule.ModulationDepthes[NoteOnEvent.Channel] > 64)
                 {
-                    if (modulationStartCounter < 10d * InstrumentManager.TIMER_HZ)
+                    if (modulationStartCounter < 10d * HighPrecisionTimer.TIMER_BASIC_HZ)
                         modulationStartCounter += 1.0;
 
-                    if (modulationStartCounter > ParentModule.GetModulationDelaySec(NoteOnEvent.Channel) * InstrumentManager.TIMER_HZ)
+                    if (modulationStartCounter > ParentModule.GetModulationDelaySec(NoteOnEvent.Channel) * HighPrecisionTimer.TIMER_BASIC_HZ)
                         mdepth = (double)ParentModule.ModulationDepthes[NoteOnEvent.Channel] / 127d;
                 }
                 //急激な変化を抑制
@@ -398,7 +376,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 modulationStep += 1.0;
                 if (modHz > 2 * Math.PI)
                     modulationStep = 0;
+
+                UpdatePitch();
+
+                return HighPrecisionTimer.TIMER_BASIC_INTERVAL;
             }
+            return -1;
         }
 
         /// <summary>
@@ -466,7 +449,6 @@ namespace zanac.MAmidiMEmo.Instruments
                     if (value)
                     {
                         f_modulationEnabled = value;
-                        updatePeriodicAction();
                     }
                     else
                     {
@@ -474,8 +456,9 @@ namespace zanac.MAmidiMEmo.Instruments
                             return;
 
                         f_modulationEnabled = value;
-                        updatePeriodicAction();
                     }
+                    if (f_modulationEnabled)
+                        HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processModulation), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
                 }
             }
         }
@@ -508,7 +491,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (value != f_portamentoEnabled)
                 {
                     f_portamentoEnabled = value;
-                    updatePeriodicAction();
+
+                    if (f_portamentoEnabled)
+                        HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processPortamento), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
                 }
             }
         }
@@ -531,7 +516,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (value != f_AdsrEnabled)
                 {
                     f_AdsrEnabled = value;
-                    updatePeriodicAction();
+
+                    if (f_AdsrEnabled)
+                        HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processAdsr), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
                 }
             }
         }
@@ -552,7 +539,16 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (value != f_FxEnabled)
                 {
                     f_FxEnabled = value;
-                    updatePeriodicAction();
+
+                    if (f_FxEnabled)
+                    {
+                        var efs = Timbre.SDS.FxS;
+                        if (efs != null)
+                        {
+                            FxEngine = efs.CreateEngine();
+                            HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processFx), efs.EnvelopeInterval, null);
+                        }
+                    }
                 }
             }
         }

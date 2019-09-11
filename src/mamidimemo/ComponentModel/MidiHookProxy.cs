@@ -51,7 +51,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
             {
                 //以下、コンストラクタ以外のメソッドを実行する処理
 
-                lock (Instruments.InstrumentManager.LockObject)
+                lock (Program.ExclusiveLockObject)
                 {
                     res = RemotingServices.ExecuteMessage(this.f_Target, call);
                 }

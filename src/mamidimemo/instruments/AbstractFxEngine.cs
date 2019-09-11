@@ -12,6 +12,11 @@ namespace zanac.MAmidiMEmo.Instruments
     public abstract class AbstractFxEngine
     {
 
+        public abstract AbstractFxSettingsBase Settings
+        {
+            get;
+        }
+
         /// <summary>
         /// エフェクトが動作しているかどうか falseなら終了
         /// </summary>

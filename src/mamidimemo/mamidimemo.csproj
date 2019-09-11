@@ -37,7 +37,7 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release%28but Debug .NET%29|AnyCPU'">
-    <OutputPath>..\..\Output\Debug\</OutputPath>
+    <OutputPath>..\..\Output\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -91,6 +91,7 @@
     <Compile Include="Instruments\AY8910.cs" />
     <Compile Include="Instruments\BasicFxEngine.cs" />
     <Compile Include="Instruments\BasicFxSettings.cs" />
+    <Compile Include="Instruments\HighPrecisionTimer.cs" />
     <Compile Include="Instruments\SoundList.cs" />
     <Compile Include="ComponentModel\StandardValuesDoubleConverter.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverterForUIEditor.cs" />

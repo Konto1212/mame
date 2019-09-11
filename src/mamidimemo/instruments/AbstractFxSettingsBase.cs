@@ -53,7 +53,7 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             set
             {
-                if (f_Interval != value && value >= InstrumentManager.TIMER_INTERVAL)
+                if (f_Interval != value && value >= HighPrecisionTimer.TIMER_BASIC_INTERVAL)
                 {
                     f_Interval = value;
                 }

@@ -35,6 +35,24 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
+        public Func<object, double> ArpAction
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Channel
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public ArpStepStyle StepStyle
         {
             get
@@ -104,7 +122,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public double GateCounter
+        public int GateCounter
         {
             get;
             set;
@@ -113,7 +131,17 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public double Counter
+        public int StepCounter
+        {
+            get;
+            set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public double Step
         {
             get;
             set;
@@ -122,7 +150,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public double StepCounter
+        public int StepNum
         {
             get;
             set;
@@ -169,8 +197,9 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public ArpEngine()
+        public ArpEngine(int channel)
         {
+            this.Channel = channel;
         }
 
         /// <summary>

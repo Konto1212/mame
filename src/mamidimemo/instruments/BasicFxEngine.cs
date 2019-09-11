@@ -14,6 +14,14 @@ namespace zanac.MAmidiMEmo.Instruments
     {
         private BasicFxSettings settings;
 
+        public override AbstractFxSettingsBase Settings
+        {
+            get
+            {
+                return settings;
+            }
+        }
+
         private double f_OutputLevel;
 
         /// <summary>
@@ -61,12 +69,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             f_OutputLevel = 1d;
             f_DeltaNoteNumber = 0d;
-
-            counter = settings.EnvelopeInterval;
-            counter -= InstrumentManager.TIMER_INTERVAL;
         }
-
-        public uint counter;
 
         public uint volumeCounter;
 
@@ -156,15 +159,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 return;
             }
 
-            counter += InstrumentManager.TIMER_INTERVAL;
-            if (counter >= settings.EnvelopeInterval)
-            {
-                counter -= settings.EnvelopeInterval;
-                if (counter > 0)
-                    counter = 0;
-
-                ProcessCore(sound, isKeyOff, isSoundOff);
-            }
+            ProcessCore(sound, isKeyOff, isSoundOff);
         }
     }
 }

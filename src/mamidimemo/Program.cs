@@ -31,7 +31,7 @@ namespace zanac.MAmidiMEmo
         /// <summary>
         /// 
         /// </summary>
-        public const string FILE_VERSION = "0.6.0.0";
+        public const string FILE_VERSION = "0.6.1.0";
 
         public static readonly JsonSerializerSettings JsonAutoSettings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, DefaultValueHandling = DefaultValueHandling.Ignore };
 
@@ -46,6 +46,8 @@ namespace zanac.MAmidiMEmo
         }
 
         public static event EventHandler ShuttingDown;
+
+        public static object ExclusiveLockObject = new object();
 
 #pragma warning disable CS0414
         /// <summary>

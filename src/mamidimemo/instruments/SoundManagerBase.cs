@@ -42,10 +42,6 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
-        private Action processArpeggiatorKeyOnAction;
-
-        private Action processArpeggiatorPitchAction;
-
         /// <summary>
         /// ポルタメント用の最後に鳴ったキー番号
         /// </summary>
@@ -73,32 +69,25 @@ namespace zanac.MAmidiMEmo.Instruments
                 foreach (var ch in ArpeggiatorsForKeyOn.Keys)
                 {
                     var arp = ArpeggiatorsForKeyOn[ch];
+                    if (arp.ArpAction != null)
+                        arp.ArpAction = null;
                     var lnote = arp.LastPassedNote;
                     if (lnote != null)
                         keyOffCore(new NoteOffEvent(lnote.NoteNumber, (SevenBitNumber)0) { Channel = lnote.Channel });
                     arp.ClearAddedNotes();
                 }
                 ArpeggiatorsForKeyOn.Clear();
-                if (processArpeggiatorKeyOnAction != null)
-                {
-                    InstrumentManager.UnsetPeriodicCallback(processArpeggiatorKeyOnAction);
-                    processArpeggiatorKeyOnAction = null;
-                }
             }
             {
                 foreach (var ch in ArpeggiatorsForPitch.Keys)
                 {
                     var arp = ArpeggiatorsForPitch[ch];
+                    if (arp.ArpAction != null)
+                        arp.ArpAction = null;
                     var lnote = arp.FirstAddedNote;
                     if (lnote != null)
                         keyOffCore(new NoteOffEvent(lnote.NoteNumber, (SevenBitNumber)0) { Channel = lnote.Channel });
                     arp.ClearAddedNotes();
-                }
-                ArpeggiatorsForPitch.Clear();
-                if (processArpeggiatorPitchAction != null)
-                {
-                    InstrumentManager.UnsetPeriodicCallback(processArpeggiatorPitchAction);
-                    processArpeggiatorPitchAction = null;
                 }
             }
 
@@ -168,8 +157,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 123:   //All Note Off
                     {
                         //clear all arps
-                        stopArpForKeyOn();
-                        stopArpForPitch();
+                        stopAllArpForKeyOn();
+                        stopAllArpForPitch();
                         foreach (var snd in AllSounds)
                             KeyOff(new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0) { Channel = snd.NoteOnEvent.Channel });
                         break;
@@ -193,112 +182,101 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        private void ProcessArpeggiatorsForKeyOn()
+        private double processArpeggiatorsForKeyOn(object state)
         {
-            List<int> removeArps = new List<int>();
-            foreach (var ch in ArpeggiatorsForKeyOn.Keys)
+            var arp = (ArpEngine)state;
+            if (arp.ArpAction == null)
+                return -1;
+
+            int ch = (int)arp.Channel;
+            var timbre = parentModule.GetTimbre(ch);
+            var sds = timbre.SDS.ARP;
+
+            //end arp
+            if (!sds.Enable || arp.ArpType != sds.ArpType ||
+                sds.ArpMethod != ArpMethod.KeyOn ||
+                (!sds.Hold && arp.ResetNextNoteOn) ||
+                arp.AddedNotesCount == 0)
             {
-                var arp = ArpeggiatorsForKeyOn[ch];
-                var timbre = parentModule.GetTimbre(ch);
-                var sds = timbre.SDS.ARP;
+                stopArpForKeyOn(arp);
+                ArpeggiatorsForKeyOn.Remove(arp.Channel);
+                return -1; // continue;
+            }
 
-                //end arp
-                if (!sds.Enable || arp.ArpType != sds.ArpType ||
-                    sds.ArpMethod != ArpMethod.KeyOn ||
-                    (!sds.Hold && arp.ResetNextNoteOn) ||
-                    arp.AddedNotesCount == 0)
+            setupArp(sds, arp);
+
+            if (arp.GateCounter != -1)
+            {
+                arp.GateCounter += 1;
+                if (arp.GateCounter >= (arp.StepNum * (sds.GateTime + 1)) / 128d)
                 {
-                    stopArpForKeyOn(arp);
-                    removeArps.Add(ch);
-                    continue;
-                }
-
-                setupArp(sds, arp);
-
-                if (arp.GateCounter != double.MinValue)
-                {
-                    arp.GateCounter += InstrumentManager.TIMER_INTERVAL;
-                    if (arp.GateCounter >= arp.StepCounter * ((sds.GateTime + 1) / 128d))
-                    {
-                        //Gate Time
-                        arp.GateCounter = double.MinValue;
-                        keyOffCore(arp.LastPassedNote);
-                    }
-                }
-
-                arp.Counter += InstrumentManager.TIMER_INTERVAL;
-                if (arp.Counter >= arp.StepCounter)
-                {
-                    // on sound
-                    arp.Counter -= arp.StepCounter;
-                    if (arp.Counter > 0)
-                        arp.Counter = 0;
-                    arp.GateCounter = arp.Counter;
-                    keyOnCore(arp.NextNote());
+                    //Gate Time
+                    arp.GateCounter = -1;
+                    keyOffCore(arp.LastPassedNote);
                 }
             }
 
-            //clear finished arps
-            foreach (int ch in removeArps)
-                ArpeggiatorsForKeyOn.Remove(ch);
-            tryToDisableArpTimerForKeyOn();
+            arp.StepCounter += 1;
+            if (arp.StepCounter == arp.StepNum)
+            {
+                // on sound
+                arp.StepCounter = 0;
+                arp.GateCounter = 0;
+                keyOnCore(arp.NextNote());
+            }
+
+            return arp.Step;
         }
 
 
         /// <summary>
         /// 
         /// </summary>
-        private void ProcessArpeggiatorsForPitch()
+        private double processArpeggiatorsForPitch(object state)
         {
-            List<int> removeArps = new List<int>();
-            foreach (var ch in ArpeggiatorsForPitch.Keys)
+            var arp = (ArpEngine)state;
+            if (arp.ArpAction == null)
+                return -1;
+            int ch = (int)arp.Channel;
+            var timbre = parentModule.GetTimbre(ch);
+            var sds = timbre.SDS.ARP;
+            //end arp
+            if (!sds.Enable || arp.ArpType != sds.ArpType ||
+                sds.ArpMethod != ArpMethod.PitchChange ||
+                (!sds.Hold && arp.ResetNextNoteOn) ||
+                arp.AddedNotesCount == 0)
             {
-                var arp = ArpeggiatorsForPitch[ch];
-                var timbre = parentModule.GetTimbre(ch);
-                var sds = timbre.SDS.ARP;
-                //end arp
-                if (!sds.Enable || arp.ArpType != sds.ArpType ||
-                    sds.ArpMethod != ArpMethod.PitchChange ||
-                    (!sds.Hold && arp.ResetNextNoteOn) ||
-                    arp.AddedNotesCount == 0)
-                {
-                    //off sound
-                    stopArpForPitch(arp);
-                    removeArps.Add(ch);
-                    continue;
-                }
-
-                setupArp(sds, arp);
-
-                //Gate Time
-                var snd = arp.FirstSoundForPitch;
-                if (arp.GateCounter != double.MinValue)
-                {
-                    arp.GateCounter += InstrumentManager.TIMER_INTERVAL;
-                    if (arp.GateCounter >= arp.StepCounter * ((sds.GateTime + 1) / 128d))
-                    {
-                        arp.GateCounter = double.MinValue;
-                        snd.ArpeggiateLevel = 0d;
-                    }
-                }
-                arp.Counter += InstrumentManager.TIMER_INTERVAL;
-                if (arp.Counter >= arp.StepCounter)
-                {
-                    // on sound
-                    arp.Counter -= arp.StepCounter;
-                    if (arp.Counter > 0)
-                        arp.Counter = 0;
-                    arp.GateCounter = arp.Counter;
-                    var note = arp.NextNote();
-                    snd.ArpeggiateDeltaNoteNumber = note.NoteNumber - arp.FirstAddedNote.NoteNumber;
-                    snd.ArpeggiateLevel = 1d;
-                }
+                //off sound
+                stopArpForPitch(arp);
+                ArpeggiatorsForPitch.Remove(arp.Channel);
+                return -1; // continue;
             }
 
-            //clear finished arps
-            foreach (int ch in removeArps)
-                ArpeggiatorsForPitch.Remove(ch);
-            tryToDisableArpTimerForPitch();
+            setupArp(sds, arp);
+
+            //Gate Time
+            var snd = arp.FirstSoundForPitch;
+            if (arp.GateCounter != -1)
+            {
+                arp.GateCounter += 1;
+                if (arp.GateCounter >= (arp.StepNum * (sds.GateTime + 1)) / 128d)
+                {
+                    arp.GateCounter = -1;
+                    snd.ArpeggiateLevel = 0d;
+                }
+            }
+            arp.StepCounter += 1;
+            if (arp.StepCounter == arp.StepNum)
+            {
+                // on sound
+                arp.StepCounter = 0;
+                arp.GateCounter = 0;
+                var note = arp.NextNote();
+                snd.ArpeggiateDeltaNoteNumber = note.NoteNumber - arp.FirstAddedNote.NoteNumber;
+                snd.ArpeggiateLevel = 1d;
+            }
+
+            return arp.Step;
         }
 
         /// <summary>
@@ -392,7 +370,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             //create Arpeggiator
                             if (!ArpeggiatorsForKeyOn.ContainsKey(ch))
-                                ArpeggiatorsForKeyOn.Add(ch, new ArpEngine());
+                                ArpeggiatorsForKeyOn.Add(ch, new ArpEngine(ch));
                             var arp = ArpeggiatorsForKeyOn[ch];
 
                             setupArp(sds, arp);
@@ -411,19 +389,18 @@ namespace zanac.MAmidiMEmo.Instruments
                                         arp.AddNote(note);
                                         //即音を鳴らすためカウンターを進める
                                         if (arp.AddedNotesCount == 1)
-                                        {
-                                            arp.Counter = (60d * InstrumentManager.TIMER_HZ / sds.Beat) / (double)sds.ArpResolution;
-                                            arp.Counter -= InstrumentManager.TIMER_INTERVAL;
-                                        }
+                                            arp.StepCounter = arp.StepNum - 1;
                                         break;
                                     }
                                 case ArpType.Static:
                                     {
-                                        stopArpForKeyOn(arp);
+                                        //stopArpForKeyOn(arp);
+                                        keyOffCore(arp.LastPassedNote);
+                                        arp.ClearAddedNotes();
+
                                         arp.AddNote(note);
                                         //即音を鳴らすためカウンターを進める
-                                        arp.Counter = (60d * InstrumentManager.TIMER_HZ / sds.Beat) / (double)sds.ArpResolution;
-                                        arp.Counter -= InstrumentManager.TIMER_INTERVAL;
+                                        arp.StepCounter = arp.StepNum - 1;
                                         foreach (int i in sds.StaticArpStepKeyNums)
                                         {
                                             int n = i & 0x7f;
@@ -439,7 +416,11 @@ namespace zanac.MAmidiMEmo.Instruments
                                     }
                             }
 
-                            tryToEnableArpTimerForKeyOn();
+                            if (arp.ArpAction == null)
+                            {
+                                arp.ArpAction = new Func<object, double>(processArpeggiatorsForKeyOn);
+                                HighPrecisionTimer.SetPeriodicCallback(arp.ArpAction, arp.Step, arp);
+                            }
                             return true;
                         }
                     case ArpMethod.PitchChange:
@@ -490,9 +471,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (sds.ArpMethod == ArpMethod.PitchChange)
                 {
                     //create Arpeggiator
-                    if (!ArpeggiatorsForPitch.ContainsKey(note.Channel))
-                        ArpeggiatorsForPitch.Add(note.Channel, new ArpEngine());
-                    var arp = ArpeggiatorsForPitch[note.Channel];
+                    if (!ArpeggiatorsForPitch.ContainsKey(ch))
+                        ArpeggiatorsForPitch.Add(ch, new ArpEngine(ch));
+                    var arp = ArpeggiatorsForPitch[ch];
                     setupArp(sds, arp);
                     arp.FirstSoundForPitch = snd;
                     arp.AddNote(note);
@@ -517,7 +498,11 @@ namespace zanac.MAmidiMEmo.Instruments
                             }
                             break;
                     }
-                    tryToEnableArpTimerForPitch();
+                    if (arp.ArpAction == null)
+                    {
+                        arp.ArpAction = new Func<object, double>(processArpeggiatorsForPitch);
+                        HighPrecisionTimer.SetPeriodicCallback(arp.ArpAction, arp.Step, arp);
+                    }
                 }
             }
         }
@@ -542,15 +527,18 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
                 if (arp.RemoveNote(note))
                 {
-                    if (ArpeggiatorsForKeyOn[ch].LastPassedNote != null)
-                        keyOffCore(ArpeggiatorsForKeyOn[ch].LastPassedNote);
+                    if (arp.LastPassedNote != null)
+                        keyOffCore(arp.LastPassedNote);
                     if (arp.ArpType == ArpType.Static)
                         arp.ClearAddedNotes();
 
                     //全アルペジオ終了
                     if (arp.AddedNotesCount == 0)
+                    {
+                        if (arp.ArpAction != null)
+                            arp.ArpAction = null;
                         ArpeggiatorsForKeyOn.Remove(ch);
-                    tryToDisableArpTimerForKeyOn();
+                    }
                     return true;
                 }
             }
@@ -574,19 +562,21 @@ namespace zanac.MAmidiMEmo.Instruments
                     case ArpType.Static:
                         if (arp.FirstAddedNote.NoteNumber == note.NoteNumber)
                         {
+                            if (arp.ArpAction != null)
+                                arp.ArpAction = null;
+                            keyOffCore(arp.FirstAddedNote);
                             arp.ClearAddedNotes();
-                            keyOffCore(ArpeggiatorsForPitch[ch].FirstAddedNote);
                             ArpeggiatorsForPitch.Remove(ch);
-                            tryToDisableArpTimerForPitch();
                             return true;
                         }
                         break;
                     case ArpType.Dynamic:
                         if (arp.RemoveNote(note) && arp.AddedNotesCount == 0)
                         {
-                            keyOffCore(ArpeggiatorsForPitch[ch].FirstAddedNote);
+                            if (arp.ArpAction != null)
+                                arp.ArpAction = null;
+                            keyOffCore(arp.FirstAddedNote);
                             ArpeggiatorsForPitch.Remove(ch);
-                            tryToDisableArpTimerForPitch();
                             return true;
                         }
                         break;
@@ -601,83 +591,52 @@ namespace zanac.MAmidiMEmo.Instruments
             arp.StepStyle = sds.ArpType == ArpType.Static ? ArpStepStyle.Order : sds.StepStyle;
             arp.Range = sds.OctaveRange;
             arp.RetriggerType = sds.KeySync ? RetriggerType.Note : RetriggerType.Off;
-            arp.StepCounter = (60d * InstrumentManager.TIMER_HZ / sds.Beat) / (double)sds.ArpResolution;
+            var steps = (60d * 1000d / sds.Beat) / (double)sds.ArpResolution;
+            if (steps < 20)
+            {
+                arp.Step = steps / 2;
+                arp.StepNum = 2;
+            }
+            else if (arp.StepNum < 50)
+            {
+                arp.Step = steps / 5;
+                arp.StepNum = 5;
+            }
+            else
+            {
+                arp.Step = steps / 10;
+                arp.StepNum = 10;
+            }
             arp.ArpType = sds.ArpType;
             arp.StaticArpStepType = sds.StaticArpStepType;
         }
 
-        private void tryToEnableArpTimerForPitch()
+        private void stopAllArpForPitch()
         {
-            ProcessArpeggiatorsForPitch();
-            if (processArpeggiatorPitchAction == null)
-            {
-                processArpeggiatorPitchAction = new Action(ProcessArpeggiatorsForPitch);
-                InstrumentManager.SetPeriodicCallback(processArpeggiatorPitchAction);
-            }
-        }
-
-        private void tryToEnableArpTimerForKeyOn()
-        {
-            ProcessArpeggiatorsForKeyOn();
-            if (processArpeggiatorKeyOnAction == null)
-            {
-                processArpeggiatorKeyOnAction = new Action(ProcessArpeggiatorsForKeyOn);
-                InstrumentManager.SetPeriodicCallback(processArpeggiatorKeyOnAction);
-            }
-        }
-
-        private void tryToDisableArpTimerForPitch()
-        {
-            //全アルペジオ終了
-            if (ArpeggiatorsForPitch.Count != 0)
-                return;
-
-            if (processArpeggiatorPitchAction != null)
-                InstrumentManager.UnsetPeriodicCallback(processArpeggiatorPitchAction);
-            processArpeggiatorPitchAction = null;
-        }
-
-        private void tryToDisableArpTimerForKeyOn()
-        {
-            //全アルペジオ終了
-            if (ArpeggiatorsForKeyOn.Count != 0)
-                return;
-
-            if (processArpeggiatorKeyOnAction != null)
-                InstrumentManager.UnsetPeriodicCallback(processArpeggiatorKeyOnAction);
-            processArpeggiatorKeyOnAction = null;
-        }
-
-        private void stopArpForPitch()
-        {
-            foreach (var ch in ArpeggiatorsForPitch.Keys)
-            {
-                var arp = ArpeggiatorsForPitch[ch];
-                stopArpForPitch(arp);
-            }
+            foreach (var ch in ArpeggiatorsForPitch.Keys.ToArray())
+                stopArpForPitch(ArpeggiatorsForPitch[ch]);
             ArpeggiatorsForPitch.Clear();
-            tryToDisableArpTimerForPitch();
         }
 
-        private void stopArpForKeyOn()
+        private void stopAllArpForKeyOn()
         {
-            foreach (var ch in ArpeggiatorsForKeyOn.Keys)
-            {
-                var arp = ArpeggiatorsForKeyOn[ch];
-                stopArpForKeyOn(arp);
-            }
+            foreach (var ch in ArpeggiatorsForKeyOn.Keys.ToArray())
+                stopArpForKeyOn(ArpeggiatorsForKeyOn[ch]);
             ArpeggiatorsForKeyOn.Clear();
-            tryToDisableArpTimerForKeyOn();
         }
 
         private void stopArpForPitch(ArpEngine arp)
         {
+            if (arp.ArpAction != null)
+                arp.ArpAction = null;
             keyOffCore(arp.FirstAddedNote);
             arp.ClearAddedNotes();
         }
 
         private void stopArpForKeyOn(ArpEngine arp)
         {
+            if (arp.ArpAction != null)
+                arp.ArpAction = null;
             keyOffCore(arp.LastPassedNote);
             arp.ClearAddedNotes();
         }

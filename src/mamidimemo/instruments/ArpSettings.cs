@@ -155,11 +155,11 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private ArpResolution f_ArpResolution = ArpResolution.QuarterNote;
+        private ArpResolution f_ArpResolution = ArpResolution.SixteenthNote;
 
         [DataMember]
         [Description("Set arpeggio resolution")]
-        [DefaultValue(ArpResolution.QuarterNote)]
+        [DefaultValue(ArpResolution.SixteenthNote)]
         public ArpResolution ArpResolution
         {
             get
@@ -171,7 +171,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_ArpResolution != value)
                 {
                     f_ArpResolution = value;
-                    ArpStep = (60d * InstrumentManager.TIMER_HZ / Beat) / (double)ArpResolution;
+                    ArpStep = (60d * HighPrecisionTimer.TIMER_BASIC_HZ / Beat) / (double)ArpResolution;
                 }
             }
         }
@@ -202,7 +202,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_GateTime != value)
                 {
                     f_GateTime = value;
-                    ArpStep = (60d * InstrumentManager.TIMER_HZ / Beat) / (double)ArpResolution;
+                    ArpStep = (60d * HighPrecisionTimer.TIMER_BASIC_HZ / Beat) / (double)ArpResolution;
                 }
             }
         }
@@ -263,6 +263,16 @@ namespace zanac.MAmidiMEmo.Instruments
                         }
                     }
                     StaticArpStepKeyNums = vs.ToArray();
+
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < StaticArpStepKeyNums.Length; i++)
+                    {
+                        if (sb.Length != 0)
+                            sb.Append(' ');
+                        sb.Append(StaticArpStepKeyNums[i].ToString((IFormatProvider)null));
+                    }
+                    f_StaticArpSteps = sb.ToString();
+
                 }
             }
         }
@@ -297,7 +307,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public ArpSettings()
         {
-            ArpStep = (60d * InstrumentManager.TIMER_HZ / Beat) / (double)ArpResolution;
+            ArpStep = (60d * HighPrecisionTimer.TIMER_BASIC_HZ / Beat) / (double)ArpResolution;
         }
 
         #region Etc
