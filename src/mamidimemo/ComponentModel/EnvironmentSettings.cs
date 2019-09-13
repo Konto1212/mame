@@ -1,4 +1,5 @@
 ﻿// copyright-holders:K.Ito
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
     public class EnvironmentSettings
     {
 
+        [JsonConverter(typeof(NoTypeConverterJsonConverterObject<InstrumentBase>))]
         [DataMember]
         public List<List<InstrumentBase>> Instruments;
 

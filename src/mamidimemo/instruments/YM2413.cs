@@ -64,17 +64,6 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        [DataMember]
-        [Category("Chip")]
-        [Description("Timbres (0-127)")]
-        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(ExpandableCollectionConverter))]
-        public YM2413Timbre[] Timbres
-        {
-            get;
-            private set;
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -135,6 +124,16 @@ namespace zanac.MAmidiMEmo.Instruments
             set;
         }
 
+        [DataMember]
+        [Category("Chip")]
+        [Description("Timbres (0-127)")]
+        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
+        public YM2413Timbre[] Timbres
+        {
+            get;
+            private set;
+        }
 
         private byte lastDrumKeyOn;
         private byte lastDrumVolume37;

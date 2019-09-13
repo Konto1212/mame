@@ -504,7 +504,10 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void UpdateVolume()
             {
-                byte fv = (byte)((byte)Math.Round(15 * CalcCurrentVolume()) & 0xf);
+                double v = 1;
+                v *= ParentModule.Expressions[NoteOnEvent.Channel] / 127d;
+                v *= ParentModule.Volumes[NoteOnEvent.Channel] / 127d;
+                byte fv = (byte)Math.Round(15 * v);
 
                 MSM5232SetVolume(parentModule.UnitNumber, lastGroup, fv);
             }

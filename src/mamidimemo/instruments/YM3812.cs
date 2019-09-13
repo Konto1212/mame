@@ -62,27 +62,6 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        [DataMember]
-        [Category("Chip")]
-        [Description("Timbres (0-127)")]
-        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(ExpandableCollectionConverter))]
-        public YM3812Timbre[] Timbres
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public override TimbreBase GetTimbre(int channel)
-        {
-            var pn = (SevenBitNumber)ProgramNumbers[channel];
-            return Timbres[pn];
-        }
-
         private byte f_AMD;
 
         /// <summary>
@@ -132,6 +111,28 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
         }
+
+        [DataMember]
+        [Category("Chip")]
+        [Description("Timbres (0-127)")]
+        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
+        public YM3812Timbre[] Timbres
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override TimbreBase GetTimbre(int channel)
+        {
+            var pn = (SevenBitNumber)ProgramNumbers[channel];
+            return Timbres[pn];
+        }
+
 
         /// <summary>
         /// 
@@ -407,6 +408,15 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 base.KeyOn();
 
+                var gs = timbre.GlobalSettings;
+                if (gs.Enable)
+                {
+                    Program.SoundUpdating();
+                    parentModule.AMD = gs.AMD;
+                    parentModule.VIB = gs.VIB;
+                    Program.SoundUpdated();
+                }
+
                 //
                 SetTimbre();
                 //Volume
@@ -594,7 +604,6 @@ namespace zanac.MAmidiMEmo.Instruments
 
             #endregion
 
-
             /// <summary>
             /// 
             /// </summary>
@@ -609,6 +618,15 @@ namespace zanac.MAmidiMEmo.Instruments
                 private set;
             }
 
+            [DataMember]
+            [Category("Chip")]
+            [Description("Global Settings")]
+            public GlobalSettings GlobalSettings
+            {
+                get;
+                set;
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -617,6 +635,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 Ops = new YM3812Operator[] {
                     new YM3812Operator(),
                     new YM3812Operator() };
+                GlobalSettings = new GlobalSettings();
                 this.SDS.FxS = new BasicFxSettings();
             }
 
@@ -892,6 +911,71 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
+        }
+        
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<GlobalSettings>))]
+        [DataContract]
+        [MidiHook]
+        public class GlobalSettings : ContextBoundObject
+        {
+
+            [DataMember]
+            [Category("Chip")]
+            [Description("Enable global settings")]
+            public bool Enable
+            {
+                get;
+                set;
+            }
+
+            private byte f_AMD;
+
+            /// <summary>
+            /// AM Depth (0-1)
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("AM depth (0:1dB 1:4.8dB)")]
+            public byte AMD
+            {
+                get
+                {
+                    return f_AMD;
+                }
+                set
+                {
+                    var v = (byte)(value & 1);
+                    if (f_AMD != v)
+                    {
+                        f_AMD = v;
+                    }
+                }
+            }
+
+            private byte f_VIB;
+
+            /// <summary>
+            /// Vibrato depth (0:7 cent 1:14 cent)
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("Vibrato depth (0:7 cent 1:14 cent)")]
+            public byte VIB
+            {
+                get
+                {
+                    return f_VIB;
+                }
+                set
+                {
+                    var v = (byte)(value & 1);
+                    if (f_VIB != v)
+                    {
+                        f_VIB = v;
+                    }
+                }
+            }
         }
 
     }

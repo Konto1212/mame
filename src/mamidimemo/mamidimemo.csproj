@@ -75,6 +75,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\FlagsEnumConverter.cs" />
     <Compile Include="ComponentModel\MaskableExpandableCollectionConverter.cs" />
     <Compile Include="ComponentModel\MultiMediaTimerComponent.cs">
       <SubType>Component</SubType>
@@ -92,6 +93,7 @@
     <Compile Include="Instruments\BasicFxEngine.cs" />
     <Compile Include="Instruments\BasicFxSettings.cs" />
     <Compile Include="Instruments\HighPrecisionTimer.cs" />
+    <Compile Include="Instruments\MOS8580.cs" />
     <Compile Include="Instruments\SoundList.cs" />
     <Compile Include="ComponentModel\StandardValuesDoubleConverter.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverterForUIEditor.cs" />
@@ -102,7 +104,7 @@
     <Compile Include="ComponentModel\EnvironmentSettings.cs" />
     <Compile Include="ComponentModel\MidiHookAttribute.cs" />
     <Compile Include="ComponentModel\MidiHookProxy.cs" />
-    <Compile Include="ComponentModel\NoTypeConverter.cs" />
+    <Compile Include="ComponentModel\NoTypeConverterJsonConverter.cs" />
     <Compile Include="ComponentModel\ValueTypeTypeConverter.cs" />
     <Compile Include="Gui\FormAbout.cs">
       <SubType>Form</SubType>

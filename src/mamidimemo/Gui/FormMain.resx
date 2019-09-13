@@ -555,6 +555,12 @@
   <data name="extendAY38910ToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend A&amp;Y-3-8910</value>
   </data>
+  <data name="extendMOS8580ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>226, 22</value>
+  </data>
+  <data name="extendMOS8580ToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend M&amp;OS8580</value>
+  </data>
   <data name="toolStripDropDownButton1.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -2674,6 +2680,12 @@
   <data name="&gt;&gt;extendMSM5232ToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;extendAY38910ToolStripMenuItem.Name" xml:space="preserve">
+    <value>extendAY38910ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;extendAY38910ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;toolStripButton1.Name" xml:space="preserve">
     <value>toolStripButton1</value>
   </data>
@@ -2698,10 +2710,10 @@
   <data name="&gt;&gt;openFileDialog1.Type" xml:space="preserve">
     <value>System.Windows.Forms.OpenFileDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;extendAY38910ToolStripMenuItem.Name" xml:space="preserve">
-    <value>extendAY38910ToolStripMenuItem</value>
+  <data name="&gt;&gt;extendMOS8580ToolStripMenuItem.Name" xml:space="preserve">
+    <value>extendMOS8580ToolStripMenuItem</value>
   </data>
-  <data name="&gt;&gt;extendAY38910ToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;extendMOS8580ToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

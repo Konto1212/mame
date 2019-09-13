@@ -140,11 +140,7 @@ void k051649_device::device_clock_changed()
 void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	if (m_enable == 0)
-	{
-		std::fill(&outputs[0][0], &outputs[0][samples], 0);
-		std::fill(&outputs[1][0], &outputs[1][samples], 0);
 		return;
-	}
 
 	// zap the contents of the mixer buffer
 	std::fill(m_mixer_buffer.begin(), m_mixer_buffer.end(), 0);

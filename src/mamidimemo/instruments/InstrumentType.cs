@@ -12,16 +12,17 @@ namespace zanac.MAmidiMEmo.Instruments
     /// </summary>
     public enum InstrumentType
     {
-        YM2151,
-        YM2612,
-        SN76496,
-        NAMCO_CUS30,
-        GB_APU,
-        RP2A03,
-        SCC1,
-        YM3812,
-        YM2413,
-        MSM5232,
-        AY8910,
+        YM2151, //1
+        YM2612, //2
+        SN76496,    //3
+        NAMCO_CUS30,    //4
+        GB_APU, //5
+        RP2A03, //6
+        SCC1,   //7
+        YM3812, //8
+        YM2413, //9
+        MSM5232,    //10
+        AY8910, //11
+        MOS8580,    //12
     }
 }

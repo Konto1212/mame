@@ -1476,11 +1476,7 @@ void ym2413_device::write_reg(int r, int v)
 void ym2413_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	if (m_enable == 0)
-	{
-		std::fill(&outputs[0][0], &outputs[0][samples], 0);
-		std::fill(&outputs[1][0], &outputs[1][samples], 0);
 		return;
-	}
 
 	for(int i=0; i < samples ; i++ )
 	{

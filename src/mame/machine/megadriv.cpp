@@ -1001,6 +1001,10 @@ void md_base_state::md_ntsc(machine_config &config)
 		(*m_ay8910[i])->set_flags(AY8910_SINGLE_OUTPUT);
 		(*m_ay8910[i])->add_route(0, "lspeaker", 1.00);
 		(*m_ay8910[i])->add_route(1, "rspeaker", 1.00);
+
+		MOS8580(config, *m_sid[i], XTAL(14'318'181) / 14);
+		(*m_sid[i])->add_route(0, "lspeaker", 1.00);
+		(*m_sid[i])->add_route(1, "rspeaker", 1.00);
 	}
 
 

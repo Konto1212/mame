@@ -65,6 +65,26 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        private bool f_PartialReserveSPSG;
+
+        [DataMember]
+        [Category("Chip")]
+        [Description("SPSG partial reserve against with PSG.\r\n" +
+            "Sweep PSG shared 1ch with PSG." +
+            "So, you can choose whether to give priority to SPSG over PSG")]
+        public bool PartialReserveSPSG
+        {
+            get
+            {
+                return f_PartialReserveSPSG;
+            }
+            set
+            {
+                f_PartialReserveSPSG = value;
+            }
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -87,25 +107,6 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             var pn = (SevenBitNumber)ProgramNumbers[channel];
             return Timbres[pn];
-        }
-
-        private bool f_PartialReserveSPSG;
-
-        [DataMember]
-        [Category("Chip")]
-        [Description("SPSG partial reserve against with PSG.\r\n" +
-            "Sweep PSG shared 1ch with PSG." +
-            "So, you can choose whether to give priority to SPSG over PSG")]
-        public bool PartialReserveSPSG
-        {
-            get
-            {
-                return f_PartialReserveSPSG;
-            }
-            set
-            {
-                f_PartialReserveSPSG = value;
-            }
         }
 
         /// <summary>

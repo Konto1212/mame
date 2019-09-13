@@ -70,11 +70,12 @@
             this.extendNESAPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addSN76496ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendMSM5232ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendAY38910ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.extendAY38910ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendMOS8580ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -290,7 +291,8 @@
             this.extendNESAPUToolStripMenuItem,
             this.addSN76496ToolStripMenuItem,
             this.extendMSM5232ToolStripMenuItem,
-            this.extendAY38910ToolStripMenuItem});
+            this.extendAY38910ToolStripMenuItem,
+            this.extendMOS8580ToolStripMenuItem});
             resources.ApplyResources(this.toolStripDropDownButton1, "toolStripDropDownButton1");
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
             // 
@@ -354,6 +356,12 @@
             resources.ApplyResources(this.extendMSM5232ToolStripMenuItem, "extendMSM5232ToolStripMenuItem");
             this.extendMSM5232ToolStripMenuItem.Click += new System.EventHandler(this.extendMSM5232ToolStripMenuItem_Click);
             // 
+            // extendAY38910ToolStripMenuItem
+            // 
+            this.extendAY38910ToolStripMenuItem.Name = "extendAY38910ToolStripMenuItem";
+            resources.ApplyResources(this.extendAY38910ToolStripMenuItem, "extendAY38910ToolStripMenuItem");
+            this.extendAY38910ToolStripMenuItem.Click += new System.EventHandler(this.extendAY38910ToolStripMenuItem_Click);
+            // 
             // toolStripButton1
             // 
             this.toolStripButton1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -384,11 +392,11 @@
             resources.ApplyResources(this.openFileDialog1, "openFileDialog1");
             this.openFileDialog1.SupportMultiDottedExtensions = true;
             // 
-            // extendAY38910ToolStripMenuItem
+            // extendMOS8580ToolStripMenuItem
             // 
-            this.extendAY38910ToolStripMenuItem.Name = "extendAY38910ToolStripMenuItem";
-            resources.ApplyResources(this.extendAY38910ToolStripMenuItem, "extendAY38910ToolStripMenuItem");
-            this.extendAY38910ToolStripMenuItem.Click += new System.EventHandler(this.extendAY38910ToolStripMenuItem_Click);
+            this.extendMOS8580ToolStripMenuItem.Name = "extendMOS8580ToolStripMenuItem";
+            resources.ApplyResources(this.extendMOS8580ToolStripMenuItem, "extendMOS8580ToolStripMenuItem");
+            this.extendMOS8580ToolStripMenuItem.Click += new System.EventHandler(this.extendMOS8580ToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -461,6 +469,7 @@
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.ToolStripMenuItem extendAY38910ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendMOS8580ToolStripMenuItem;
     }
 }
 

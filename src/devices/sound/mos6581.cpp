@@ -80,7 +80,7 @@ void mos6581_device::device_start()
 	m_read_poty.resolve_safe(0xff);
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
 
 	// initialize SID engine
 	m_token->device = this;
@@ -111,7 +111,10 @@ void mos6581_device::device_reset()
 
 void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	m_token->fill_buffer(outputs[0], samples);
+	if (m_enable == 0)
+		return;
+
+	m_token->fill_buffer(outputs[0], outputs[1], samples);
 }
 
 

@@ -63,22 +63,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 return 11;
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [DataMember]
-        [Category("Chip")]
-        [Description("Timbres (0-127)")]
-        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(ExpandableCollectionConverter))]
-        public AY8910Timbre[] Timbres
-        {
-            get;
-            private set;
-        }
-
-
+        
         private byte f_EnvelopeFrequencyCoarse = 2;
 
         /// <summary>
@@ -147,12 +132,26 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_EnvelopeType != value)
                 {
                     f_EnvelopeType = value;
-
                     Ay8910WriteData(UnitNumber, 0, (byte)(13));
                     Ay8910WriteData(UnitNumber, 1, EnvelopeType);
                 }
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("Timbres (0-127)")]
+        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
+        public AY8910Timbre[] Timbres
+        {
+            get;
+            private set;
+        }
+
 
         /// <summary>
         /// 
@@ -467,6 +466,16 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 base.KeyOn();
 
+                var gs = timbre.GlobalSettings;
+                if (gs.Enable)
+                {
+                    Program.SoundUpdating();
+                    parentModule.EnvelopeType = gs.EnvelopeType;
+                    parentModule.EnvelopeFrequencyFine = gs.EnvelopeFrequencyFine;
+                    parentModule.EnvelopeFrequencyCoarse = gs.EnvelopeFrequencyCoarse;
+                    Program.SoundUpdated();
+                }
+
                 UpdatePitch();
                 UpdateVolume();
             }
@@ -627,8 +636,18 @@ namespace zanac.MAmidiMEmo.Instruments
                 set;
             }
 
+            [DataMember]
+            [Category("Chip")]
+            [Description("Global Settings")]
+            public GlobalSettings GlobalSettings
+            {
+                get;
+                set;
+            }
+
             public AY8910Timbre()
             {
+                GlobalSettings = new GlobalSettings();
                 this.SDS.FxS = new BasicFxSettings();
             }
 
@@ -651,6 +670,79 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
         }
+
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<GlobalSettings>))]
+        [DataContract]
+        [MidiHook]
+        public class GlobalSettings : ContextBoundObject
+        {
+
+            [DataMember]
+            [Category("Chip")]
+            [Description("Enable global settings")]
+            public bool Enable
+            {
+                get;
+                set;
+            }
+
+            private byte f_EnvelopeFrequencyCoarse = 2;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [DefaultValue((byte)2)]
+            [Description("Set Envelope Coarse Frequency")]
+            public byte EnvelopeFrequencyCoarse
+            {
+                get => f_EnvelopeFrequencyCoarse;
+                set
+                {
+                    if (f_EnvelopeFrequencyCoarse != value)
+                        f_EnvelopeFrequencyCoarse = value;
+                }
+            }
+
+            private byte f_EnvelopeFrequencyFine;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("Set Envelope Fine Frequency")]
+            public byte EnvelopeFrequencyFine
+            {
+                get => f_EnvelopeFrequencyFine;
+                set
+                {
+                    if (f_EnvelopeFrequencyFine != value)
+                        f_EnvelopeFrequencyFine = value;
+                }
+            }
+
+            private byte f_EnvelopeType;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("Set Envelope Type")]
+            public byte EnvelopeType
+            {
+                get => f_EnvelopeType;
+                set
+                {
+                    if (f_EnvelopeType != value)
+                        f_EnvelopeType = value;
+                }
+            }
+        }
+
 
         /// <summary>
         /// 

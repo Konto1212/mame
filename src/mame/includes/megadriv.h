@@ -19,6 +19,7 @@
 #include "sound/3812intf.h"
 #include "sound/msm5232.h"
 #include "sound/ay8910.h"
+#include "sound/mos6581.h"
 #include "video/315_5313.h"
 
 /* Megadrive Console Specific */
@@ -116,10 +117,14 @@ public:
 			strcpy(device_names[didx][i], (std::string("ay8910_") + num).c_str());
 			m_ay8910[i] = new optional_device<ay8910_device>(*this, device_names[didx][i]);
 			didx++;
+			//mos8580
+			strcpy(device_names[didx][i], (std::string("mos8580_") + num).c_str());
+			m_sid[i] = new optional_device<mos8580_device>(*this, device_names[didx][i]);
+			didx++;
 		}
 	}
 
-	char device_names[ 11 ][8][100];
+	char device_names[ 12 ][8][100];
 	optional_device<ym2151_device> *m_ym2151[8];	//1
 	optional_device<ym2612_device> *m_ym2612[8];	//2
 	optional_device<sn76496_device> *m_sn76496[8];	//3
@@ -131,6 +136,7 @@ public:
 	optional_device<ym2413_device> *m_ym2413[8];	//9
 	optional_device<msm5232_device> *m_msm5232[8];	//10
 	optional_device<ay8910_device> *m_ay8910[8];	//11
+	optional_device<mos8580_device> *m_sid[8];	//12
 
 	required_device<m68000_base_device> m_maincpu;
 	/*

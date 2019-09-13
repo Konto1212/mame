@@ -653,39 +653,72 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <returns></returns>
         protected virtual int SearchEmptySlotAndOff<T>(List<T> onSounds, NoteOnEvent newNote, int maxSlot) where T : SoundBase
         {
-            Dictionary<int, bool> usedTable = new Dictionary<int, bool>();
-            for (int i = 0; i < onSounds.Count; i++)
-                usedTable.Add(onSounds[i].Slot, true);
-            //使っていないスロットがあればそれを返す
-            for (int i = 0; i < maxSlot; i++)
-            {
-                if (!usedTable.ContainsKey(i))
-                    return i;
-            }
+            return SearchEmptySlotAndOff(onSounds, newNote, maxSlot, -1);
+        }
 
-            //一番古いキーオフされたスロットを探す
-            for (int i = 0; i < onSounds.Count; i++)
+        /// <summary>
+        /// 未使用のスロットを検索する
+        /// 空が無い場合は最初に鳴った音を消す
+        /// </summary>
+        /// <param name="onSounds"></param>
+        /// <param name="maxSlot"></param>
+        /// <param name="slot">強制的に割り当てるスロット。-1なら強制しない</param>
+        /// <returns></returns>
+        protected virtual int SearchEmptySlotAndOff<T>(List<T> onSounds, NoteOnEvent newNote, int maxSlot, int slot) where T : SoundBase
+        {
+            if (slot < 0)
             {
-                var snd = onSounds[i];
-                if (snd.Slot < maxSlot && snd.IsKeyOff)
+                Dictionary<int, bool> usedTable = new Dictionary<int, bool>();
+                for (int i = 0; i < onSounds.Count; i++)
+                    usedTable.Add(onSounds[i].Slot, true);
+
+                //使っていないスロットがあればそれを返す
+                for (int i = 0; i < maxSlot; i++)
                 {
-                    AllSounds.Remove(snd);
-                    onSounds.RemoveAt(i);
-                    snd.Dispose();
-                    return snd.Slot;
+                    if (!usedTable.ContainsKey(i))
+                        return i;
+                }
+
+                //一番古いキーオフされたスロットを探す
+                for (int i = 0; i < onSounds.Count; i++)
+                {
+                    var snd = onSounds[i];
+                    if (snd.Slot < maxSlot && snd.IsKeyOff)
+                    {
+                        AllSounds.Remove(snd);
+                        onSounds.RemoveAt(i);
+                        snd.Dispose();
+                        return snd.Slot;
+                    }
+                }
+                //一番古いキーオンされたスロットを探す
+                for (int i = 0; i < onSounds.Count; i++)
+                {
+                    var snd = onSounds[i];
+                    if (snd.Slot < maxSlot)
+                    {
+                        AllSounds.Remove(snd);
+                        onSounds.RemoveAt(i);
+                        snd.Dispose();
+                        return snd.Slot;
+                    }
                 }
             }
-            //一番古いキーオンされたスロットを探す
-            for (int i = 0; i < onSounds.Count; i++)
+            else
             {
-                var snd = onSounds[i];
-                if (snd.Slot < maxSlot)
+                //既存の音を消す
+                for (int i = 0; i < onSounds.Count; i++)
                 {
-                    AllSounds.Remove(snd);
-                    onSounds.RemoveAt(i);
-                    snd.Dispose();
-                    return snd.Slot;
+                    var snd = onSounds[i];
+                    if (snd.Slot == slot)
+                    {
+                        AllSounds.Remove(snd);
+                        onSounds.RemoveAt(i);
+                        snd.Dispose();
+                        break;
+                    }
                 }
+                return slot;
             }
 
             return -1;

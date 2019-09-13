@@ -63,17 +63,6 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        [DataMember]
-        [Category("Chip")]
-        [Description("Timbres (0-127)")]
-        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(ExpandableCollectionConverter))]
-        public YM2612Timbre[] Timbres
-        {
-            get;
-            private set;
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -140,6 +129,17 @@ namespace zanac.MAmidiMEmo.Instruments
                     Ym2612WriteData(UnitNumber, 0x22, 0, 0, (byte)(LFOEN << 3 | LFRQ));
                 }
             }
+        }
+
+        [DataMember]
+        [Category("Chip")]
+        [Description("Timbres (0-127)")]
+        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
+        public YM2612Timbre[] Timbres
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -555,6 +555,15 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 base.KeyOn();
 
+                var gs = timbre.GlobalSettings;
+                if (gs.Enable)
+                {
+                    Program.SoundUpdating();
+                    parentModule.LFOEN = gs.LFOEN;
+                    parentModule.LFRQ = gs.LFRQ;
+                    Program.SoundUpdated();
+                }
+
                 //
                 SetFmTimbre();
                 //Freq
@@ -854,6 +863,15 @@ namespace zanac.MAmidiMEmo.Instruments
                 private set;
             }
 
+            [DataMember]
+            [Category("Chip")]
+            [Description("Global Settings")]
+            public GlobalSettings GlobalSettings
+            {
+                get;
+                set;
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -864,6 +882,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     new YM2612Operator(),
                     new YM2612Operator(),
                     new YM2612Operator() };
+                GlobalSettings = new GlobalSettings();
                 this.SDS.FxS = new BasicFxSettings();
             }
 
@@ -1138,5 +1157,80 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<GlobalSettings>))]
+        [DataContract]
+        [MidiHook]
+        public class GlobalSettings : ContextBoundObject
+        {
+
+            [DataMember]
+            [Category("Chip")]
+            [Description("Enable global settings")]
+            public bool Enable
+            {
+                get;
+                set;
+            }
+
+
+            private byte f_LFOEN;
+
+            /// <summary>
+            /// LFRQ (0-255)
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("LFO Enable (0:Off 1:Enable)")]
+            public byte LFOEN
+            {
+                get
+                {
+                    return f_LFOEN;
+                }
+                set
+                {
+                    byte v = (byte)(value & 1);
+                    if (f_LFOEN != v)
+                    {
+                        f_LFOEN = v;
+                    }
+                }
+            }
+
+            private byte f_LFRQ;
+
+            /// <summary>
+            /// LFRQ (0-7)
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("LFO Freq (0-7)\r\n" +
+                "0:	3.82 Hz\r\n" +
+                "1: 5.33 Hz\r\n" +
+                "2: 5.77 Hz\r\n" +
+                "3: 6.11 Hz\r\n" +
+                "4: 6.60 Hz\r\n" +
+                "5: 9.23 Hz\r\n" +
+                "6: 46.11 Hz\r\n" +
+                "7: 69.22 Hz\r\n")]
+            public byte LFRQ
+            {
+                get
+                {
+                    return f_LFRQ;
+                }
+                set
+                {
+                    byte v = (byte)(value & 7);
+                    if (f_LFRQ != v)
+                    {
+                        f_LFRQ = v;
+                    }
+                }
+            }
+
+        }
+
+        }
     }
-}

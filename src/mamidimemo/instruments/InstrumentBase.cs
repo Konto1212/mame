@@ -16,6 +16,8 @@ using zanac.MAmidiMEmo.Mame;
 
 namespace zanac.MAmidiMEmo.Instruments
 {
+    [JsonConverter(typeof(NoTypeConverterJsonConverter<InstrumentBase>))]
+    [TypeConverter(typeof(CustomExpandableObjectConverter))]
     [MidiHook]
     [DataContract]
     public abstract class InstrumentBase : ContextBoundObject

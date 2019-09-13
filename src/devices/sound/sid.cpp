@@ -103,13 +103,13 @@ inline void SID6581_t::syncEm()
 }
 
 
-void SID6581_t::fill_buffer(stream_sample_t *buffer, uint32_t bufferLen)
+void SID6581_t::fill_buffer(stream_sample_t *buffer, stream_sample_t *buffer2, uint32_t bufferLen)
 {
 //void* SID6581_t::fill16bitMono(void* buffer, uint32_t numberOfSamples)
 
 	for ( ; bufferLen > 0; bufferLen-- )
 	{
-		*buffer++ = (int16_t) mix16mono[unsigned(mix16monoMiddleIndex
+		int16_t data = (int16_t) mix16mono[unsigned(mix16monoMiddleIndex
 								+(*optr1.outProc)(&optr1)
 								+(*optr2.outProc)(&optr2)
 								+(optr3.outProc(&optr3)&optr3_outputmask)
@@ -119,6 +119,9 @@ void SID6581_t::fill_buffer(stream_sample_t *buffer, uint32_t bufferLen)
 							+(masterVolume<<2)
 //                        +(*sampleEmuRout)()
 		)];
+		*buffer++ = data;
+		*buffer2++ = data;
+
 		syncEm();
 	}
 }

@@ -16,6 +16,7 @@
 #include "..\devices\sound\k051649.h"
 #include "..\devices\sound\msm5232.h"
 #include "..\devices\sound\ay8910.h"
+#include "..\devices\sound\mos6581.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -475,7 +476,24 @@ extern "C"
 		return ay8910->data_r();
 	}
 
-	
+
+	DllExport void mos8580_write(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		mos8580_device *mos8580 = dynamic_cast<mos8580_device*>(rm->device((std::string("mos8580_") + num).c_str()));
+		if (mos8580 == nullptr)
+			return;
+
+		mos8580->write(address, data);
+	}
+
 }
 
 

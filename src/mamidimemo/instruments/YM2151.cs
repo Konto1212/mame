@@ -58,17 +58,6 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        [DataMember]
-        [Category("Chip")]
-        [Description("Timbres (0-127)")]
-        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(ExpandableCollectionConverter))]
-        public YM2151Timbre[] Timbres
-        {
-            get;
-            set;
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -233,6 +222,17 @@ namespace zanac.MAmidiMEmo.Instruments
                     Ym2151WriteData(UnitNumber, 0x0f, 0, 0, (byte)(NE << 7 | NFRQ));
                 }
             }
+        }
+
+        [DataMember]
+        [Category("Chip")]
+        [Description("Timbres (0-127)")]
+        [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableCollectionConverter))]
+        public YM2151Timbre[] Timbres
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -541,6 +541,19 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 base.KeyOn();
 
+                var gs = timbre.GlobalSettings;
+                if (gs.Enable)
+                {
+                    Program.SoundUpdating();
+                    parentModule.LFOD = gs.LFOD;
+                    parentModule.LFOF = gs.LFOF;
+                    parentModule.LFOW = gs.LFOW;
+                    parentModule.LFRQ = gs.LFRQ;
+                    parentModule.NE = gs.NE;
+                    parentModule.NFRQ = gs.NFRQ;
+                    Program.SoundUpdated();
+                }
+
                 //
                 SetTimbre();
                 //Freq
@@ -843,6 +856,15 @@ namespace zanac.MAmidiMEmo.Instruments
                 private set;
             }
 
+            [DataMember]
+            [Category("Chip")]
+            [Description("Global Settings")]
+            public GlobalSettings GlobalSettings
+            {
+                get;
+                set;
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -853,6 +875,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     new YM2151Operator(),
                     new YM2151Operator(),
                     new YM2151Operator() };
+                GlobalSettings = new GlobalSettings();
                 this.SDS.FxS = new BasicFxSettings();
             }
 
@@ -1130,6 +1153,174 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<GlobalSettings>))]
+        [DataContract]
+        [MidiHook]
+        public class GlobalSettings : ContextBoundObject
+        {
+
+            [DataMember]
+            [Category("Chip")]
+            [Description("Enable global settings")]
+            public bool Enable
+            {
+                get;
+                set;
+            }
+
+
+            private byte f_LFRQ;
+
+            /// <summary>
+            /// LFRQ (0-255)
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("LFO Freq (0-255)")]
+            public byte LFRQ
+            {
+                get
+                {
+                    return f_LFRQ;
+                }
+                set
+                {
+                    if (f_LFRQ != value)
+                    {
+                        f_LFRQ = value;
+                    }
+                }
+            }
+
+
+            private byte f_LFOF;
+
+            /// <summary>
+            /// Select AMD or PMD(0:AMD 1:PMD)
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("Select AMD or PMD (0:AMD 1:PMD)")]
+            public byte LFOF
+            {
+                get
+                {
+                    return f_LFOF;
+                }
+                set
+                {
+                    byte v = (byte)(value & 1);
+                    if (f_LFOF != v)
+                    {
+                        f_LFOF = v;
+                    }
+                }
+            }
+
+            private byte f_LFOD;
+
+
+            /// <summary>
+            /// LFO Depth(0-127)
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("LFO Depth (0-127)")]
+            public byte LFOD
+            {
+                get
+                {
+                    return f_LFOD;
+                }
+                set
+                {
+                    byte v = (byte)(value & 127);
+                    if (f_LFOD != v)
+                    {
+                        f_LFOD = v;
+                    }
+                }
+            }
+
+
+            private byte f_LFOW;
+
+
+            /// <summary>
+            /// LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)")]
+            public byte LFOW
+            {
+                get
+                {
+                    return f_LFOW;
+                }
+                set
+                {
+                    byte v = (byte)(value & 3);
+                    if (f_LFOW != v)
+                    {
+                        f_LFOW = v;
+                    }
+                }
+            }
+
+            private byte f_NE;
+
+            /// <summary>
+            /// Noise Enable (0:Disable 1:Enable)
+            /// </summary>
+            [Browsable(false)]
+            [DataMember]
+            [Category("Chip")]
+            [Description("Noise Enable (0:Disable 1:Enable)")]
+            public byte NE
+            {
+                get
+                {
+                    return f_NE;
+                }
+                set
+                {
+                    byte v = (byte)(value & 1);
+                    if (f_NE != v)
+                    {
+                        f_NE = v;
+                    }
+                }
+            }
+
+            private byte f_NFRQ;
+
+            /// <summary>
+            /// Noise Feequency (0-31)
+            /// </summary>
+            [Browsable(false)]
+            [DataMember]
+            [Category("Chip")]
+            [Description(" Noise Feequency (0-31)\r\n" +
+                "3'579'545/(32*NFRQ)")]
+            public byte NFRQ
+            {
+                get
+                {
+                    return f_NFRQ;
+                }
+                set
+                {
+                    byte v = (byte)(value & 31);
+                    if (f_NFRQ != v)
+                    {
+                        f_NFRQ = v;
+                    }
+                }
+            }
+
+        }
     }
 
 
