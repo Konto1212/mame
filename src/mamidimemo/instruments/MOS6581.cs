@@ -9,24 +9,24 @@ namespace zanac.MAmidiMEmo.Instruments
     /// 
     /// </summary>
     [DataContract]
-    public class MOS8580 : SIDBase
+    public class MOS6581 : SIDBase
     {
 
-        public override string Name => "MOS8580";
+        public override string Name => "MOS6581";
 
-        public override InstrumentType InstrumentType => InstrumentType.MOS8580;
+        public override InstrumentType InstrumentType => InstrumentType.MOS6581;
 
         [Browsable(false)]
-        public override string ImageKey => "MOS8580";
+        public override string ImageKey => "MOS6581";
 
         /// <summary>
         /// 
         /// </summary>
         [Browsable(false)]
-        protected override string SoundInterfaceTagNamePrefix => "mos8580_";
+        protected override string SoundInterfaceTagNamePrefix => "mos6581_";
 
         [Browsable(false)]
-        protected override string WriteProcName => "mos8580_write";
+        protected override string WriteProcName => "mos6581_write";
 
         /// <summary>
         /// 
@@ -39,14 +39,14 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get
             {
-                return 12;
+                return 13;
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public MOS8580(uint unitNumber) : base(unitNumber)
+        public MOS6581(uint unitNumber) : base(unitNumber)
         {
             
         }

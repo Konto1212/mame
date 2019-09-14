@@ -75,7 +75,9 @@ namespace zanac.MAmidiMEmo.ComponentModel
 
                 FieldInfo myField = component.GetType().GetField("value__", BindingFlags.Instance | BindingFlags.Public);
                 myField.SetValue(component, myNewValue);
-                fContext.PropertyDescriptor.SetValue(fContext.Instance, component);
+
+                //Avoid set same value twice by this and propertygrid control.
+                //fContext.PropertyDescriptor.SetValue(fContext.Instance, component);
             }
 
             /// <summary>

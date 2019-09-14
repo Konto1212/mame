@@ -93,7 +93,8 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("YM2413", Resources.YM2413);
             imageList1.Images.Add("MSM5232", Resources.MSM5232);
             imageList1.Images.Add("AY-3-8910", Resources.AY_3_8910);
-            imageList1.Images.Add("MOS8580", Resources.AY_3_8910);
+            imageList1.Images.Add("MOS8580", Resources.MOS8580);
+            imageList1.Images.Add("MOS6581", Resources.MOS6581);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -301,6 +302,11 @@ namespace zanac.MAmidiMEmo.Gui
             InstrumentManager.AddInstrument(InstrumentType.MOS8580);
         }
 
+        private void extendMOS6581ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.MOS6581);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -457,6 +463,12 @@ namespace zanac.MAmidiMEmo.Gui
             else
                 Settings.Default.Reload();
         }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
 
     }
 }

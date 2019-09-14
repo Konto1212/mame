@@ -583,7 +583,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (FxEngine != null && FxEngine.Active)
                 {
                     var eng = (NesFxEngine)FxEngine;
-                    dc = eng.DutyValue;
+                    if(eng.DutyValue != null)
+                        dc = eng.DutyValue.Value;
                 }
 
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x00), (byte)(dc << 6 | ld << 5 | dd << 4 | fv));
@@ -968,9 +969,10 @@ namespace zanac.MAmidiMEmo.Instruments
 
         }
 
-        [JsonConverter(typeof(NoTypeConverterJsonConverter<BasicFxSettings>))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<NesFxSettings>))]
         [TypeConverter(typeof(CustomExpandableObjectConverter))]
         [DataContract]
+        [MidiHook]
         public class NesFxSettings : BasicFxSettings
         {
 
@@ -1083,7 +1085,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private uint f_dutyCounter;
 
-            public byte DutyValue
+            public byte? DutyValue
             {
                 get;
                 private set;
@@ -1093,6 +1095,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 base.ProcessCore(sound, isKeyOff, isSoundOff);
 
+                DutyValue = null;
                 if (settings.DutyEnvelopesNums.Length > 0)
                 {
                     if (!isKeyOff)

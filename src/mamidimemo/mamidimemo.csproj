@@ -93,6 +93,8 @@
     <Compile Include="Instruments\BasicFxEngine.cs" />
     <Compile Include="Instruments\BasicFxSettings.cs" />
     <Compile Include="Instruments\HighPrecisionTimer.cs" />
+    <Compile Include="Instruments\MOS6581.cs" />
+    <Compile Include="Instruments\SIDBase.cs" />
     <Compile Include="Instruments\MOS8580.cs" />
     <Compile Include="Instruments\SoundList.cs" />
     <Compile Include="ComponentModel\StandardValuesDoubleConverter.cs" />
@@ -222,6 +224,8 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\MOS8580.png" />
+    <None Include="Resources\MOS6581.png" />
     <None Include="Resources\AY-3-8910.png" />
     <None Include="Resources\Rst.png" />
     <None Include="Resources\Panic.png" />

@@ -563,7 +563,7 @@ void sidOperator::set2()
 	}
 	else
 	{
-		if (curSIDfreq != SIDfreq)
+		//if (curSIDfreq != SIDfreq)	//memodimemo To avoid sq wave forms changes while sounding when freq changed in 10ms by mamidimemo
 		{
 			curSIDfreq = SIDfreq;
 			// We keep the value cycleLen between 1 <= x <= 65535.

@@ -24,5 +24,6 @@ namespace zanac.MAmidiMEmo.Instruments
         MSM5232,    //10
         AY8910, //11
         MOS8580,    //12
+        MOS6581,    //13
     }
 }

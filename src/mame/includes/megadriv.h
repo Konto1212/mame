@@ -119,12 +119,16 @@ public:
 			didx++;
 			//mos8580
 			strcpy(device_names[didx][i], (std::string("mos8580_") + num).c_str());
-			m_sid[i] = new optional_device<mos8580_device>(*this, device_names[didx][i]);
+			m_sid8580[i] = new optional_device<mos8580_device>(*this, device_names[didx][i]);
+			didx++;
+			//mos6581
+			strcpy(device_names[didx][i], (std::string("mos6581_") + num).c_str());
+			m_sid6581[i] = new optional_device<mos6581_device>(*this, device_names[didx][i]);
 			didx++;
 		}
 	}
 
-	char device_names[ 12 ][8][100];
+	char device_names[ 13 ][8][100];
 	optional_device<ym2151_device> *m_ym2151[8];	//1
 	optional_device<ym2612_device> *m_ym2612[8];	//2
 	optional_device<sn76496_device> *m_sn76496[8];	//3
@@ -136,7 +140,8 @@ public:
 	optional_device<ym2413_device> *m_ym2413[8];	//9
 	optional_device<msm5232_device> *m_msm5232[8];	//10
 	optional_device<ay8910_device> *m_ay8910[8];	//11
-	optional_device<mos8580_device> *m_sid[8];	//12
+	optional_device<mos8580_device> *m_sid8580[8];	//12
+	optional_device<mos6581_device> *m_sid6581[8];	//13
 
 	required_device<m68000_base_device> m_maincpu;
 	/*

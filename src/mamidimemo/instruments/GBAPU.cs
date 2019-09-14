@@ -551,7 +551,8 @@ namespace zanac.MAmidiMEmo.Instruments
                             if (FxEngine != null && FxEngine.Active)
                             {
                                 var eng = (GbFxEngine)FxEngine;
-                                dt = eng.DutyValue;
+                                if(eng.DutyValue != null)
+                                    dt = eng.DutyValue.Value;
                             }
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, (byte)(dt << 6 | timbre.SoundLength));
@@ -1257,7 +1258,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             private uint f_dutyCounter;
 
-            public byte DutyValue
+            public byte? DutyValue
             {
                 get;
                 private set;
@@ -1267,6 +1268,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 base.ProcessCore(sound, isKeyOff, isSoundOff);
 
+                DutyValue = null;
                 if (settings.DutyEnvelopesNums.Length > 0)
                 {
                     if (!isKeyOff)

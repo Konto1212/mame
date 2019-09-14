@@ -33,7 +33,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -51,7 +51,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -69,7 +69,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -86,7 +86,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -99,15 +99,12 @@ extern "C"
 
 	DllExport void ym2612_write(unsigned int unitNumber, unsigned int address, unsigned char data)
 	{
-		//std::unique_ptr<debugger_cpu> &dcpu = mame_machine_manager::instance()->cheat().cpu();
-		//address_space &mem = dcpu->get_visible_cpu()->memory().space(AS_PROGRAM);
-		//dcpu->write_byte(mem, address, data, false);
-
+		
 		mame_machine_manager *mmm = mame_machine_manager::instance();
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -124,7 +121,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -141,7 +138,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -158,7 +155,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -175,7 +172,7 @@ extern "C"
 		if (mmm == nullptr)
 			return 0;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return 0;
 
 		std::string num = std::to_string(unitNumber);
@@ -192,7 +189,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -209,7 +206,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -226,7 +223,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -243,7 +240,7 @@ extern "C"
 		if (mmm == nullptr)
 			return 0;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return 0;
 
 		std::string num = std::to_string(unitNumber);
@@ -260,7 +257,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -277,7 +274,7 @@ extern "C"
 		if (mmm == nullptr)
 			return 0;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return 0;
 
 		std::string num = std::to_string(unitNumber);
@@ -294,7 +291,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -311,7 +308,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -329,7 +326,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -346,7 +343,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -363,7 +360,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -380,7 +377,7 @@ extern "C"
 		if (mmm == nullptr)
 			return 0;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return 0;
 
 		std::string num = std::to_string(unitNumber);
@@ -397,7 +394,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -414,7 +411,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -431,7 +428,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -448,7 +445,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -465,7 +462,7 @@ extern "C"
 		if (mmm == nullptr)
 			return 0;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return 0;
 
 		std::string num = std::to_string(unitNumber);
@@ -483,7 +480,7 @@ extern "C"
 		if (mmm == nullptr)
 			return;
 		running_machine *rm = mmm->machine();
-		if (rm == nullptr)
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return;
 
 		std::string num = std::to_string(unitNumber);
@@ -492,6 +489,23 @@ extern "C"
 			return;
 
 		mos8580->write(address, data);
+	}
+
+	DllExport void mos6581_write(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		mos6581_device *mos6581 = dynamic_cast<mos6581_device*>(rm->device((std::string("mos6581_") + num).c_str()));
+		if (mos6581 == nullptr)
+			return;
+
+		mos6581->write(address, data);
 	}
 
 }
