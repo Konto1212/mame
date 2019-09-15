@@ -72,6 +72,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Set Envelope Coarse Frequency")]
+        [SlideParametersAttribute(0, 255)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte EnvelopeFrequencyCoarse
         {
             get => f_EnvelopeFrequencyCoarse;
@@ -98,6 +100,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Set Envelope Fine Frequency")]
+        [SlideParametersAttribute(0, 255)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte EnvelopeFrequencyFine
         {
             get => f_EnvelopeFrequencyFine;

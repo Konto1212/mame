@@ -77,12 +77,13 @@
   <ItemGroup>
     <Compile Include="ComponentModel\FlagsEnumConverter.cs" />
     <Compile Include="ComponentModel\MaskableExpandableCollectionConverter.cs" />
-    <Compile Include="ComponentModel\MultiMediaTimerComponent.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="ComponentModel\CustomExpandableObjectConverter.cs" />
     <Compile Include="ComponentModel\IStandardValues.cs" />
+    <Compile Include="ComponentModel\DoubleSlideParametersAttribute.cs" />
+    <Compile Include="ComponentModel\SlideParametersAttribute.cs" />
     <Compile Include="ComponentModel\MaskAttribute.cs" />
+    <Compile Include="ComponentModel\DoubleSlideEditor.cs" />
+    <Compile Include="ComponentModel\SlideEditor.cs" />
     <Compile Include="Instruments\AbstractFxEngine.cs" />
     <Compile Include="Instruments\AbstractFxSettingsBase.cs" />
     <Compile Include="Instruments\AdsrEngine.cs" />

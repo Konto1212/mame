@@ -807,6 +807,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound")]
             [Description("Duty (0:12.5% 1:25% 2:50% 3:75%)")]
             [DefaultValue((byte)2)]
+            [SlideParametersAttribute(0, 3)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte Duty
             {
                 get
@@ -825,6 +827,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Sound Length (0-64,0-255)[(64-N)*(1/256) seconds]")]
+            [SlideParametersAttribute(0, 255)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte SoundLength
             {
                 get
@@ -850,6 +854,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Whether Sound Length is enable or not (0:Disable 1:Enable)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte EnableLength
             {
                 get
@@ -868,6 +874,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound")]
             [Description("Initial Volume of envelope (0-15(0:No Sound))")]
             [DefaultValue((byte)15)]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte EnvInitialVolume
             {
                 get
@@ -886,6 +894,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound")]
             [Description("Envelope Direction (0=Decrease, 1=Increase)")]
             [DefaultValue((byte)1)]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte EnvDirection
             {
                 get
@@ -904,6 +914,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound")]
             [Description("Envelope Length (0-7 (0:Stop)[1step = N*(1/64) sec]")]
             [DefaultValue((byte)7)]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte EnvLength
             {
                 get
@@ -922,6 +934,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(Noise)")]
             [Description("Shift Clock Frequency (0-15) This parameter is affected by Pitch Bend MIDI message")]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte NoiseShiftClockFrequency
             {
                 get
@@ -939,6 +953,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(Noise)")]
             [Description("Counter Step/Width (0=15 bits, 1=7 bits)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte NoiseCounter
             {
                 get
@@ -957,6 +973,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(Noise)")]
             [Description("Dividing Ratio of Frequencies(0-7)")]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte NoiseDivRatio
             {
                 get
@@ -1096,6 +1114,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(Sweep)")]
             [Description("SPSG Sweep Time (0:OFF 1-7:N/128Hz)")]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte Time
             {
                 get
@@ -1113,6 +1133,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(Sweep)")]
             [Description("SPSG Sweep Increase/Decrease (0: Addition 1: Subtraction)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte Dir
             {
                 get
@@ -1130,6 +1152,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(Sweep)")]
             [Description("SPSG Number of sweep shift (0-7)")]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte Speed
             {
                 get

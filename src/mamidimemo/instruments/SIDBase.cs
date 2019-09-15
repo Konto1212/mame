@@ -43,6 +43,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Resonance (0-15)")]
+        [SlideParametersAttribute(0,15)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte RES
         {
             get => f_RES;
@@ -64,6 +66,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Cutoff (or Center) Frequency (0-2047)(30Hz - 10KHz)")]
+        [SlideParametersAttribute(0, 2047)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public ushort FC
         {
             get => f_FC;
@@ -563,6 +567,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Attack (0-15)")]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte ATK
             {
                 get
@@ -582,6 +588,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound")]
             [DefaultValue((byte)15)]
             [Description("Decay (0-15)")]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte DCY
             {
                 get
@@ -600,6 +608,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound")]
             [DefaultValue((byte)15)]
             [Description("Sustain (0-15)")]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte STN
             {
                 get
@@ -618,6 +628,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Release Rate (0-15)")]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte RIS
             {
                 get
@@ -637,6 +649,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound")]
             [DefaultValue((ushort)2047)]
             [Description("Pulse Width (0-4095)(0% - 100%)")]
+            [SlideParametersAttribute(0, 4095)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public ushort PW
             {
                 get
@@ -654,6 +668,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Ring Modulation (0-1)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte RING
             {
                 get
@@ -671,6 +687,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Synchronize Oscillator (0-1)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte SYNC
             {
                 get
@@ -746,6 +764,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Chip")]
             [Description("Resonance (0-15)")]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte RES
             {
                 get => f_RES;
@@ -764,6 +784,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Chip")]
             [Description("Cutoff (or Center) Frequency (0-2047)(30Hz - 10KHz)")]
+            [SlideParametersAttribute(0, 2047)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public ushort FC
             {
                 get => f_FC;

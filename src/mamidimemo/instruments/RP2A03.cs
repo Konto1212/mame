@@ -745,6 +745,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound(SQ/Noise)")]
             [Description("Square/Noise Volume (0-15)")]
             [DefaultValue((byte)15)]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte Volume
             {
                 get
@@ -763,6 +765,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound(SQ)")]
             [Description("Square/Noise Envelope Decay Disable (0:Enable 1:Disable)")]
             [DefaultValue((byte)1)]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte DecayDisable
             {
                 get
@@ -783,6 +787,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound(SQ/Tri)")]
             [Description("Square/Tri Length Counter Clock Disable (0:Enable 1:Disable)")]
             [DefaultValue((byte)1)]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte LengthCounterDisable
             {
                 get
@@ -819,6 +825,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ)")]
             [Description("Square Duty Cycle (0:87.5% 1:75% 2:50% 3:25%)")]
+            [SlideParametersAttribute(0, 3)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte SQDutyCycle
             {
                 get
@@ -848,6 +856,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(Noise)")]
             [Description("Noise Type (0:32k bit 1:93bit)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte NoiseType
             {
                 get
@@ -867,6 +877,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Square/Tri Play Length (0-31)")]
+            [SlideParametersAttribute(0, 31)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte PlayLength
             {
                 get
@@ -887,6 +899,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound(Tri)")]
             [Description("Tri Linear Counter Length (0-127)")]
             [DefaultValue((byte)127)]
+            [SlideParametersAttribute(0, 127)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte TriCounterLength
             {
                 get
@@ -906,6 +920,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound(DPCM)")]
             [Description("DPCM Sample Bit Rate (0:4KHz-15:32KHz)")]
             [DefaultValue((byte)15)]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte DeltaPcmBitRate
             {
                 get
@@ -923,6 +939,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(DPCM)")]
             [Description("DPCM Loop Play (0:Off 1:On)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte DeltaPcmLoopEnable
             {
                 get
@@ -1159,6 +1177,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ)")]
             [Description("Square Sweep Update Rate (0-7)")]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte UpdateRate
             {
                 get
@@ -1176,6 +1196,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ)")]
             [Description("Wave Length (0:Decrease 1:Increse)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte Direction
             {
                 get
@@ -1193,6 +1215,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ)")]
             [Description("Wave Length (0-7)")]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte Range
             {
                 get

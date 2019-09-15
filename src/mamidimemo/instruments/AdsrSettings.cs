@@ -92,6 +92,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Sound")]
         [Description("Sound Driver Level Attack Rate (0(max)-127(0s))")]
         [DefaultValue((byte)110)]
+        [SlideParametersAttribute(0, 127)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte AR
         {
             get
@@ -113,6 +115,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Sound")]
         [Description("Sound Driver Level Decay Rate  (0(0s)-127(max))")]
         [DefaultValue((byte)64)]
+        [SlideParametersAttribute(0, 127)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte DR
         {
             get
@@ -134,6 +138,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Sound")]
         [Description("Sound Driver Level Sustain Level (0(none)-127(max))")]
         [DefaultValue((byte)16)]
+        [SlideParametersAttribute(0, 127)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte SL
         {
             get
@@ -155,6 +161,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Sound")]
         [Description("Sound Driver Level Release Rate (0(0s)-127(max))")]
         [DefaultValue((byte)48)]
+        [SlideParametersAttribute(0, 127)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte RR
         {
             get

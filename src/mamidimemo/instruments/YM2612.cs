@@ -81,6 +81,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("LFO Enable (0:Off 1:Enable)")]
+        [SlideParametersAttribute(0, 1)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte LFOEN
         {
             get
@@ -114,6 +116,8 @@ namespace zanac.MAmidiMEmo.Instruments
             "5: 9.23 Hz\r\n" +
             "6: 46.11 Hz\r\n" +
             "7: 69.22 Hz\r\n")]
+        [SlideParametersAttribute(0, 7)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte LFRQ
         {
             get
@@ -775,6 +779,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Feedback (0-7)")]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte FB
             {
                 get
@@ -800,6 +806,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 "5: (1->2)+(1->3)+(1->4) (for Brass, organ sound)\r\n" +
                 "6: (1->2)+3+4 (for Xylophone, tom-tom, organ, vibraphone, snare drum, base drum sound)\r\n" +
                 "7: 1+2+3+4 (for Pipe organ sound)")]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte ALG
             {
                 get
@@ -817,6 +825,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Amplitude Modulation Sensitivity (0-3)")]
+            [SlideParametersAttribute(0, 3)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte AMS
             {
                 get
@@ -834,6 +844,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Frequency Modulation Sensitivity (0-7)")]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte FMS
             {
                 get
@@ -1182,6 +1194,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Chip")]
             [Description("LFO Enable (0:Off 1:Enable)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte LFOEN
             {
                 get
@@ -1214,6 +1228,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 "5: 9.23 Hz\r\n" +
                 "6: 46.11 Hz\r\n" +
                 "7: 69.22 Hz\r\n")]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte LFRQ
             {
                 get

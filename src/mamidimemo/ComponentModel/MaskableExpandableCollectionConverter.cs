@@ -74,6 +74,14 @@ namespace zanac.MAmidiMEmo.ComponentModel
                 }
             }
 
+            public override object GetEditor(Type editorBaseType)
+            {
+                if (maskValue != 0)
+                    return new SlideEditor(0, (int)maskValue);
+
+                return base.GetEditor(editorBaseType);
+            }
+
             public CollectionPropertyDescriptor(ITypeDescriptorContext context, Type componentType, string name, Type elementType, int index)
                 : base(componentType, name, elementType)
             {
@@ -146,6 +154,8 @@ namespace zanac.MAmidiMEmo.ComponentModel
                     return context.PropertyDescriptor.Description;
                 }
             }
+
+
         }
     }
 }

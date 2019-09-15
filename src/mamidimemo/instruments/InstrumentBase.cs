@@ -48,6 +48,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("General")]
         [Description("Gain Left ch. (0.0-*) of this Instrument")]
+        [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
+        [DoubleSlideParameters(0d,10d,0.1d)]
         public float GainLeft
         {
             get
@@ -69,6 +71,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("General")]
         [Description("Gain Right ch. (0.0-*) of this Instrument")]
+        [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
+        [DoubleSlideParameters(0d, 10d, 0.1d)]
         public float GainRight
         {
             get
