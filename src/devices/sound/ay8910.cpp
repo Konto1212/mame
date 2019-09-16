@@ -1046,9 +1046,6 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 
 void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	if (m_enable == 0)
-		return;
-
 	stream_sample_t *buf[NUM_CHANNELS];
 	int chan;
 

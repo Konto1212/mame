@@ -76,7 +76,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("LFO Freq (0-255)")]
-        [SlideParametersAttribute(0, 255)]
+        [SlideParametersAttribute(0, 255, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte LFRQ
         {
@@ -103,7 +103,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Select AMD or PMD (0:AMD 1:PMD)")]
-        [SlideParametersAttribute(0, 1)]
+        [SlideParametersAttribute(0, 1, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte LFOF
         {
@@ -131,7 +131,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("LFO Depth (0-127)")]
-        [SlideParametersAttribute(0, 127)]
+        [SlideParametersAttribute(0, 127, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte LFOD
         {
@@ -160,7 +160,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)")]
-        [SlideParametersAttribute(0, 3)]
+        [SlideParametersAttribute(0, 3, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte LFOW
         {
@@ -188,7 +188,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Noise Enable (0:Disable 1:Enable)")]
-        [SlideParametersAttribute(0, 1)]
+        [SlideParametersAttribute(0, 1, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte NE
         {
@@ -217,7 +217,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("Chip")]
         [Description(" Noise Feequency (0-31)\r\n" +
             "3'579'545/(32*NFRQ)")]
-        [SlideParametersAttribute(0, 31)]
+        [SlideParametersAttribute(0, 31, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte NFRQ
         {
@@ -1206,7 +1206,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Category("Chip")]
-            [Description("Enable global settings")]
+            [Description("Override global settings")]
             public bool Enable
             {
                 get;

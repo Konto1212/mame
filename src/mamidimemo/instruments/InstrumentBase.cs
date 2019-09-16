@@ -49,7 +49,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("General")]
         [Description("Gain Left ch. (0.0-*) of this Instrument")]
         [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
-        [DoubleSlideParameters(0d,10d,0.1d)]
+        [DoubleSlideParameters(0d, 10d, 0.1d, true)]
         public float GainLeft
         {
             get
@@ -72,7 +72,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Category("General")]
         [Description("Gain Right ch. (0.0-*) of this Instrument")]
         [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
-        [DoubleSlideParameters(0d, 10d, 0.1d)]
+        [DoubleSlideParameters(0d, 10d, 0.1d, true)]
         public float GainRight
         {
             get
@@ -83,6 +83,87 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 f_GainRight = value;
                 set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 1, value);
+            }
+        }
+
+        private FilterMode f_FilterMode;
+
+        [DataMember]
+        [Category("Filter")]
+        [Description("Audio Filter Type")]
+        public FilterMode FilterMode
+        {
+            get => f_FilterMode;
+            set
+            {
+                if (f_FilterMode != value)
+                {
+                    f_FilterMode = value;
+                    set_filter(UnitNumber, SoundInterfaceTagNamePrefix, f_FilterMode, FilterCutoff, FilterResonance);
+                }
+            }
+        }
+
+        private double f_FilterCutOff = 0.99d;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Category("Filter")]
+        [Description("Audio Cutoff Filter (0.1-0.99) of this Instrument")]
+        [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
+        [DoubleSlideParameters(0.01d, 0.99d, 0.01d, true)]
+        public double FilterCutoff
+        {
+            get
+            {
+                return f_FilterCutOff;
+            }
+            set
+            {
+                double v = value;
+                if (v < 0.01d)
+                    v = 0.01d;
+                else if (v > 0.99d)
+                    v = 0.99d;
+                if (f_FilterCutOff != v)
+                {
+                    f_FilterCutOff = v;
+                    set_filter(UnitNumber, SoundInterfaceTagNamePrefix, FilterMode, f_FilterCutOff, FilterResonance);
+                }
+            }
+        }
+
+
+        private double f_FilterResonance = 0.01d;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Category("Filter")]
+        [Description("Audio Cutoff Filter (0.01-1.00) of this Instrument")]
+        [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
+        [DoubleSlideParameters(0.01d, 1.00d, 0.01d, true)]
+        public double FilterResonance
+        {
+            get
+            {
+                return f_FilterResonance;
+            }
+            set
+            {
+                double v = value;
+                if (v < 0.00d)
+                    v = 0.00d;
+                else if (v > 1.00d)
+                    v = 1.00d;
+                if (f_FilterResonance != v)
+                {
+                    f_FilterResonance = v;
+                    set_filter(UnitNumber, SoundInterfaceTagNamePrefix, FilterMode, FilterCutoff, f_FilterResonance);
+                }
             }
         }
 
@@ -412,7 +493,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public static delegate_device_reset device_reset;
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -430,6 +510,20 @@ namespace zanac.MAmidiMEmo.Instruments
             set;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void delegate_set_filter(uint unitNumber, string tagName, FilterMode filterMode, double cutoff, double resonance);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static delegate_set_filter set_filter;
+
+
         static InstrumentBase()
         {
             IntPtr funcPtr = MameIF.GetProcAddress("set_device_enable");
@@ -443,6 +537,10 @@ namespace zanac.MAmidiMEmo.Instruments
             funcPtr = MameIF.GetProcAddress("device_reset");
             if (funcPtr != IntPtr.Zero)
                 device_reset = Marshal.GetDelegateForFunctionPointer<delegate_device_reset>(funcPtr);
+
+            funcPtr = MameIF.GetProcAddress("set_filter");
+            if (funcPtr != IntPtr.Zero)
+                set_filter = Marshal.GetDelegateForFunctionPointer<delegate_set_filter>(funcPtr);
         }
 
         /// <summary>
@@ -451,12 +549,16 @@ namespace zanac.MAmidiMEmo.Instruments
         public InstrumentBase()
         {
             device_reset(UnitNumber, SoundInterfaceTagNamePrefix);
+
+            set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 0, GainLeft);
+            set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 1, GainRight);
+            set_filter(UnitNumber, SoundInterfaceTagNamePrefix, FilterMode, FilterCutoff, FilterResonance);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public InstrumentBase(uint unitNumber)
+        public InstrumentBase(uint unitNumber) : this()
         {
             UnitNumber = unitNumber;
 
@@ -813,4 +915,12 @@ namespace zanac.MAmidiMEmo.Instruments
             Pitchs[midiEvent.Channel] = midiEvent.PitchValue;
         }
     }
+
+    public enum FilterMode
+    {
+        None = 0,
+        LowPass,
+        HighPass,
+        BandPass,
+    };
 }

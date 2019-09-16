@@ -70,6 +70,8 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("AM depth (0:1dB 1:4.8dB)")]
+        [SlideParametersAttribute(0, 1, true)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte AMD
         {
             get
@@ -95,7 +97,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Vibrato depth (0:7 cent 1:14 cent)")]
-        [SlideParametersAttribute(0, 1)]
+        [SlideParametersAttribute(0, 1, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte VIB
         {
@@ -952,7 +954,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Category("Chip")]
-            [Description("Enable global settings")]
+            [Description("Override global settings")]
             public bool Enable
             {
                 get;

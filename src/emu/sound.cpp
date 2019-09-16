@@ -73,7 +73,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 		throw emu_fatalerror("Attempted to create a sound_stream with a non-sound device");
 
 	if(m_callback.isnull())
-		m_callback = stream_update_delegate(&device_sound_interface::sound_stream_update,(device_sound_interface *)sound);
+		m_callback = stream_update_delegate(&device_sound_interface::sound_stream_update_callback,(device_sound_interface *)sound);
 
 	// create a unique tag for saving
 	std::string state_tag = string_format("%d", m_device.machine().sound().m_stream_list.size());

@@ -46,6 +46,8 @@ namespace zanac.MAmidiMEmo.ComponentModel
                     track.Value = v;
                     break;
             }
+            if (att.SliderDynamicSetValue)
+                track.Tag = context;
             service.DropDownControl(track);
 
             switch (value)
@@ -61,6 +63,19 @@ namespace zanac.MAmidiMEmo.ComponentModel
         {
             DoubleTrackBar track = (DoubleTrackBar)sender;
             toolTip.SetToolTip(track, track.Value.ToString());
+            ITypeDescriptorContext ctx = (ITypeDescriptorContext)track.Tag;
+            if (ctx != null)
+            {
+                switch (ctx.PropertyDescriptor.GetValue(ctx.Instance))
+                {
+                    case double v:
+                        ctx.PropertyDescriptor.SetValue(ctx.Instance, track.Value);
+                        break;
+                    case float v:
+                        ctx.PropertyDescriptor.SetValue(ctx.Instance, (float)track.Value);
+                        break;
+                }
+            }
         }
 
 
@@ -78,15 +93,15 @@ namespace zanac.MAmidiMEmo.ComponentModel
                 }
             }
             public new double LargeChange
-            { get { return base.LargeChange * precision; } set { base.LargeChange = (int)(value / precision); } }
+            { get { return base.LargeChange * precision; } set { base.LargeChange = (int)Math.Round(value / precision); } }
             public new double Maximum
-            { get { return base.Maximum * precision; } set { base.Maximum = (int)(value / precision); } }
+            { get { return base.Maximum * precision; } set { base.Maximum = (int)Math.Round(value / precision); } }
             public new double Minimum
-            { get { return base.Minimum * precision; } set { base.Minimum = (int)(value / precision); } }
+            { get { return base.Minimum * precision; } set { base.Minimum = (int)Math.Round(value / precision); } }
             public new double SmallChange
-            { get { return base.SmallChange * precision; } set { base.SmallChange = (int)(value / precision); } }
+            { get { return base.SmallChange * precision; } set { base.SmallChange = (int)Math.Round(value / precision); } }
             public new double Value
-            { get { return base.Value * precision; } set { base.Value = (int)(value / precision); } }
+            { get { return base.Value * precision; } set { base.Value = (int)Math.Round(value / precision); } }
         }
     }
 

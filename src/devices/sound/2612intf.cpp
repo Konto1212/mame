@@ -61,9 +61,6 @@ void ym2612_device::timer_handler(int c,int count,int clock)
 
 void ym2612_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	if (m_enable == 0)
-		return;
-
 	ym2612_update_one(m_chip, outputs, samples);
 }
 

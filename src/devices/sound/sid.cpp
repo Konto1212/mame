@@ -116,7 +116,7 @@ void SID6581_t::fill_buffer(stream_sample_t *buffer, stream_sample_t *buffer2, u
 /* hack for digi sounds
    does n't seam to come from a tone operator
    ghostbusters and goldrunner everything except volume zeroed */
-//							+(masterVolume<<2)	//memidimemo To avoie low-freq noise
+							+(masterVolume<<2)	//memidimemo To avoie low-freq noise
 //                        +(*sampleEmuRout)()
 		)];
 		*buffer++ = data;

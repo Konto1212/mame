@@ -111,9 +111,6 @@ void mos6581_device::device_reset()
 
 void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	if (m_enable == 0)
-		return;
-
 	m_token->fill_buffer(outputs[0], outputs[1], samples);
 }
 

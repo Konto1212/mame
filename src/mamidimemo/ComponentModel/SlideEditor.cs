@@ -74,6 +74,8 @@ namespace zanac.MAmidiMEmo.ComponentModel
                     track.Value = v;
                     break;
             }
+            if(att.SliderDynamicSetValue)
+                track.Tag = context;
             service.DropDownControl(track);
 
             switch (value)
@@ -95,6 +97,29 @@ namespace zanac.MAmidiMEmo.ComponentModel
         {
             TrackBar track = (TrackBar)sender;
             toolTip.SetToolTip(track, track.Value.ToString());
+            ITypeDescriptorContext ctx = (ITypeDescriptorContext)track.Tag;
+            if (ctx != null)
+            {
+                switch (ctx.PropertyDescriptor.GetValue(ctx.Instance))
+                {
+                    case byte v:
+                        ctx.PropertyDescriptor.SetValue(ctx.Instance, (byte)track.Value);
+                        break;
+                    case sbyte v:
+                        ctx.PropertyDescriptor.SetValue(ctx.Instance, (sbyte)track.Value);
+                        break;
+                    case short v:
+                        ctx.PropertyDescriptor.SetValue(ctx.Instance, (short)track.Value);
+                        break;
+                    case ushort v:
+                        ctx.PropertyDescriptor.SetValue(ctx.Instance, (ushort)track.Value);
+                        break;
+                    default:
+                        ctx.PropertyDescriptor.SetValue(ctx.Instance, track.Value);
+                        break;
+                }
+            }
+
         }
     }
 }

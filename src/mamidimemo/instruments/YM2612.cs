@@ -81,7 +81,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("LFO Enable (0:Off 1:Enable)")]
-        [SlideParametersAttribute(0, 1)]
+        [SlideParametersAttribute(0, 1, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte LFOEN
         {
@@ -116,7 +116,7 @@ namespace zanac.MAmidiMEmo.Instruments
             "5: 9.23 Hz\r\n" +
             "6: 46.11 Hz\r\n" +
             "7: 69.22 Hz\r\n")]
-        [SlideParametersAttribute(0, 7)]
+        [SlideParametersAttribute(0, 7, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte LFRQ
         {
@@ -1178,7 +1178,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Category("Chip")]
-            [Description("Enable global settings")]
+            [Description("Override global settings")]
             public bool Enable
             {
                 get;

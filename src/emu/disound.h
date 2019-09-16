@@ -73,7 +73,7 @@ public:
 	device_sound_interface &reset_routes() { m_route_list.clear(); return *this; }
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
+	void sound_stream_update_callback(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// stream creation
 	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate);
@@ -90,7 +90,33 @@ public:
 	int inputnum_from_device(device_t &device, int outputnum = 0) const;
 	int m_enable;
 
+	//
+	//  Filter.h
+	//  Synthesis
+	//
+	//  Created by Martin on 08.04.14.
+	//
+	//
+	enum FilterMode {
+		FILTER_MODE_NONE = 0,
+		FILTER_MODE_LOWPASS,
+		FILTER_MODE_HIGHPASS,
+		FILTER_MODE_BANDPASS,
+		kNumFilterModes
+	};
+	double process(int ch, double inputValue);
+	inline void setCutoff(double newCutoff) { cutoff = newCutoff; calculateFeedbackAmount(); };
+	inline void setResonance(double newResonance) { resonance = newResonance; calculateFeedbackAmount(); };
+	inline void setFilterMode(FilterMode newMode) { mode = newMode; }
+
+	inline void setCutoffMod(double newCutoffMod) {
+		cutoffMod = newCutoffMod;
+		calculateFeedbackAmount();
+	}
+
 protected:
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
+
 	// configuration access
 	std::vector<sound_route> &routes() { return m_route_list; }
 	device_sound_interface &add_route(u32 output, device_t &base, const char *tag, double gain, u32 input, u32 mixoutput);
@@ -105,6 +131,28 @@ protected:
 	std::vector<sound_route> m_route_list;      // list of sound routes
 	int             m_outputs;                  // number of outputs from this instance
 	int             m_auto_allocated_inputs;    // number of auto-allocated inputs targeting us
+
+private:
+	double cutoff;
+	double resonance;
+	FilterMode mode;
+	double feedbackAmount;
+	inline void calculateFeedbackAmount() {
+		feedbackAmount = resonance + resonance / (1.0 - getCalculatedCutoff());
+	}
+	double buf0[2];
+	double buf1[2];
+	double buf2[2];
+	double buf3[2];
+	double lastIn[2];
+	double lastOut[2];
+
+	double cutoffMod;
+
+	inline double getCalculatedCutoff() const {
+		return fmax(fmin(cutoff + cutoffMod, 0.99), 0.01);
+	};
+
 };
 
 // iterator

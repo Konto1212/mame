@@ -379,9 +379,6 @@ void sn76496_base_device::countdown_cycles()
 
 void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	if (m_enable == 0)
-		return;
-
 	int i;
 	stream_sample_t *lbuffer = outputs[0];
 	stream_sample_t *rbuffer = (m_stereo)? outputs[1] : nullptr;

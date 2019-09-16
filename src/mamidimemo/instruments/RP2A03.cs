@@ -1160,6 +1160,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound(SQ)")]
             [Description("Square Sweep Enable (0:Disable 1:Enable)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte Enable
             {
                 get

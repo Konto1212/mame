@@ -745,9 +745,6 @@ void msm5232_device::set_volume(int ch, u8 data)
 
 void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	if (m_enable == 0)
-		return;
-
 	/*
 	stream_sample_t *buf1 = outputs[0];
 	stream_sample_t *buf2 = outputs[1];

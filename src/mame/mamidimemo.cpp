@@ -63,6 +63,26 @@ extern "C"
 	}
 
 
+	DllExport void set_filter(int unitNumber, char* name, device_sound_interface::FilterMode filterMode, double cutoff, double resonance)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+		if (sd == nullptr)
+			return;
+
+		sd->setFilterMode(filterMode);
+		sd->setCutoff(cutoff);
+		sd->setResonance(resonance);
+	}
+
+
 	DllExport void set_output_gain(unsigned int unitNumber, char* name, int channel, float gain)
 	{
 		mame_machine_manager *mmm = mame_machine_manager::instance();

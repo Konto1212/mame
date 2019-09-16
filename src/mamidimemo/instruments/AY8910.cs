@@ -72,7 +72,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Set Envelope Coarse Frequency")]
-        [SlideParametersAttribute(0, 255)]
+        [SlideParametersAttribute(0, 255, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte EnvelopeFrequencyCoarse
         {
@@ -100,7 +100,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Set Envelope Fine Frequency")]
-        [SlideParametersAttribute(0, 255)]
+        [SlideParametersAttribute(0, 255, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte EnvelopeFrequencyFine
         {
@@ -127,15 +127,18 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         [DataMember]
         [Category("Chip")]
-        [Description("Set Envelope Type")]
+        [Description("Set Envelope Type (0-15)")]
+        [SlideParametersAttribute(0, 15, true)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte EnvelopeType
         {
             get => f_EnvelopeType;
             set
             {
-                if (f_EnvelopeType != value)
+                byte v = (byte)(value & 15);
+                if (f_EnvelopeType != v)
                 {
-                    f_EnvelopeType = value;
+                    f_EnvelopeType = v;
                     Ay8910WriteData(UnitNumber, 0, (byte)(13));
                     Ay8910WriteData(UnitNumber, 1, EnvelopeType);
                 }
@@ -305,6 +308,9 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public AY8910(uint unitNumber) : base(unitNumber)
         {
+            GainLeft = 2.0f;
+            GainRight = 2.0f;
+
             Timbres = new AY8910Timbre[128];
             for (int i = 0; i < 128; i++)
                 Timbres[i] = new AY8910Timbre();
@@ -684,7 +690,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Category("Chip")]
-            [Description("Enable global settings")]
+            [Description("Override global settings")]
             public bool Enable
             {
                 get;
@@ -700,6 +706,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Chip")]
             [DefaultValue((byte)2)]
             [Description("Set Envelope Coarse Frequency")]
+            [SlideParametersAttribute(0, 255)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte EnvelopeFrequencyCoarse
             {
                 get => f_EnvelopeFrequencyCoarse;
@@ -718,6 +726,8 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Chip")]
             [Description("Set Envelope Fine Frequency")]
+            [SlideParametersAttribute(0, 255)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte EnvelopeFrequencyFine
             {
                 get => f_EnvelopeFrequencyFine;
@@ -736,13 +746,16 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Chip")]
             [Description("Set Envelope Type")]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte EnvelopeType
             {
                 get => f_EnvelopeType;
                 set
                 {
-                    if (f_EnvelopeType != value)
-                        f_EnvelopeType = value;
+                    byte v = (byte)(value & 15);
+                    if (f_EnvelopeType != v)
+                        f_EnvelopeType = v;
                 }
             }
         }

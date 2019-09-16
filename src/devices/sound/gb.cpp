@@ -1225,9 +1225,6 @@ void cgb04_apu_device::apu_power_off()
 
 void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	if (m_enable == 0)
-		return;
-
 	while (samples-- > 0)
 	{
 		stream_sample_t sample;

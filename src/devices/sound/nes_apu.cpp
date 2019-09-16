@@ -766,9 +766,6 @@ void nesapu_device::set_dpcm(u8 *dpcm_data, u32 length)
 
 void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	if (m_enable == 0)
-		return;
-
 	int accum;
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));

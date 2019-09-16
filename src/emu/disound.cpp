@@ -25,7 +25,18 @@ device_sound_interface::device_sound_interface(const machine_config &mconfig, de
 	: device_interface(device, "sound")
 	, m_outputs(0)
 	, m_auto_allocated_inputs(0)
+	, cutoff(0.99)
+	, resonance(0.0)
+	, cutoffMod(0.0)
+	, mode(FILTER_MODE_NONE)
+	, buf0{ 0.0, 0.0 }
+	, buf1{ 0.0, 0.0 }
+	, buf2{ 0.0, 0.0 }
+	, buf3{ 0.0, 0.0 }
+	, lastIn{ 0.0, 0.0 }
+	, lastOut{ 0.0, 0.0 }
 {
+	calculateFeedbackAmount();
 }
 
 
@@ -382,6 +393,7 @@ device_mixer_interface::device_mixer_interface(const machine_config &mconfig, de
 		m_outputs(outputs),
 		m_mixer_stream(nullptr)
 {
+	m_enable = 1;
 }
 
 
@@ -453,6 +465,27 @@ void device_mixer_interface::interface_post_load()
 }
 
 
+// sound stream update overrides
+void device_sound_interface::sound_stream_update_callback(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	if (m_enable == 0)
+		return;
+
+	stream_sample_t *buffer0 = outputs[0];
+	stream_sample_t *buffer1 = outputs[1];
+
+	sound_stream_update(stream, inputs, outputs, samples);
+
+	if(mode == FILTER_MODE_NONE)
+		return;
+
+	for (int i = 0; i < samples; i++)
+	{
+		*buffer0++ = process(0, *buffer0);
+		*buffer1++ = process(1, *buffer1);
+	}
+}
+
 //-------------------------------------------------
 //  mixer_update - mix all inputs to one output
 //-------------------------------------------------
@@ -471,4 +504,37 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 		for (int inp = 0; inp < m_auto_allocated_inputs; inp++)
 			outputs[outmap[inp]][pos] += inputs[inp][pos];
 	}
+}
+
+
+//-------------------------------------------------
+// By Paul Kellett
+// http://www.musicdsp.org/showone.php?id=29
+//-------------------------------------------------
+//http://www.martin-finke.de/blog/articles/audio-plugins-013-filter/
+
+double device_sound_interface::process(int ch, double inputValue) {
+	double calculatedCutoff = getCalculatedCutoff();
+	buf0[ch] += calculatedCutoff * (inputValue - buf0[ch] + feedbackAmount * (buf0[ch] - buf1[ch]));
+	buf1[ch] += calculatedCutoff * (buf0[ch] - buf1[ch]);
+	buf2[ch] += calculatedCutoff * (buf1[ch] - buf2[ch]);
+	buf3[ch] += calculatedCutoff * (buf2[ch] - buf3[ch]);
+	double in = 0.0;
+	switch (mode) {
+	case FILTER_MODE_LOWPASS:
+		in = buf3[ch];
+		break;
+	case FILTER_MODE_HIGHPASS:
+		in = inputValue - buf3[ch];
+		break;
+	case FILTER_MODE_BANDPASS:
+		in = buf0[ch] - buf3[ch];
+		break;
+	}
+
+	//DC Cut
+	double out = in - lastIn[ch] + 0.995 * lastOut[ch];
+	lastIn[ch] = in;
+	lastOut[ch] = out;
+	return out;
 }

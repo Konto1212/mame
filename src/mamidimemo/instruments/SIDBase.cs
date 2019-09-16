@@ -23,6 +23,7 @@ using zanac.MAmidiMEmo.Midi;
 
 //https://www.waitingforfriday.com/?p=661#6581_SID_Block_Diagram
 //http://www.bellesondes.fr/wiki/doku.php?id=mos6581#mos6581_sound_interface_device_sid
+//https://www.sfpgmr.net/blog/entry/mos-sid-6581を調べた.html
 
 namespace zanac.MAmidiMEmo.Instruments
 {
@@ -43,7 +44,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Resonance (0-15)")]
-        [SlideParametersAttribute(0,15)]
+        [SlideParametersAttribute(0,15, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public byte RES
         {
@@ -66,16 +67,17 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Chip")]
         [Description("Cutoff (or Center) Frequency (0-2047)(30Hz - 10KHz)")]
-        [SlideParametersAttribute(0, 2047)]
+        [SlideParametersAttribute(0, 2047, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public ushort FC
         {
             get => f_FC;
             set
             {
-                if (f_FC != value)
+                var v = (ushort)(value & 2047);
+                if (f_FC != v)
                 {
-                    f_FC = (ushort)(value & 2047);
+                    f_FC = v;
                     Program.SoundUpdating();
                     SidWriteData(UnitNumber, 21, (byte)(f_FC & 0x7));
                     SidWriteData(UnitNumber, 22, (byte)(f_FC >> 3));
@@ -103,7 +105,34 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_FILT != value)
                 {
                     f_FILT = value;
-                    SidWriteData(UnitNumber, 23, (byte)(RES << 4 | (int)f_FILT));
+                    SidWriteData(UnitNumber, 23, (byte)(OFF3 << 7 | RES << 4 | (int)f_FILT));
+                }
+            }
+        }
+
+
+        private byte f_Off3;
+
+        /// <summary>
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("Disable ch 3 sound (0:Enable 1:Disable)")]
+        [SlideParametersAttribute(0, 1, true)]
+        [EditorAttribute(typeof(SlideEditor), typeof(UITypeEditor))]
+        public byte OFF3
+        {
+            get
+            {
+                return f_Off3;
+            }
+            set
+            {
+                byte v = (byte)(value & 1);
+                if (f_Off3 != v)
+                {
+                    f_Off3 = v;
+                    SidWriteData(UnitNumber, 24, (byte)(f_Off3 << 7 | (int)FilterType << 4 | Volume));
                 }
             }
         }
@@ -126,7 +155,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_FilterType != value)
                 {
                     f_FilterType = value;
-                    SidWriteData(UnitNumber, 24, (byte)((int)f_FilterType << 4 | (int)Volume));
+                    SidWriteData(UnitNumber, 24, (byte)(OFF3 << 7 | (int)f_FilterType << 4 | Volume));
                 }
             }
         }
@@ -141,14 +170,14 @@ namespace zanac.MAmidiMEmo.Instruments
             get => f_Volume;
             set
             {
-                if (f_Volume != value)
+                byte v = (byte)(value & 15);
+                if (f_Volume != v)
                 {
-                    f_Volume = value;
+                    f_Volume = v;
                     SidWriteData(UnitNumber, 24, (byte)((int)FilterType << 4 | (int)f_Volume));
                 }
             }
         }
-
 
         /// <summary>
         /// 
@@ -425,6 +454,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     Program.SoundUpdating();
                     parentModule.FC = gs.FC;
                     parentModule.RES = gs.RES;
+                    parentModule.OFF3 = gs.OFF3;
                     parentModule.FILT = gs.FILT;
                     Program.SoundUpdated();
                 }
@@ -749,7 +779,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Category("Chip")]
-            [Description("Apply parameters as global settings")]
+            [Description("Override global settings")]
             public bool Enable
             {
                 get;
@@ -765,14 +795,13 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Chip")]
             [Description("Resonance (0-15)")]
             [SlideParametersAttribute(0, 15)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [EditorAttribute(typeof(SlideEditor), typeof(UITypeEditor))]
             public byte RES
             {
                 get => f_RES;
                 set
                 {
-                    if (f_RES != value)
-                        f_RES = (byte)(value & 15);
+                    f_RES = (byte)(value & 15);
                 }
             }
 
@@ -785,17 +814,33 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Chip")]
             [Description("Cutoff (or Center) Frequency (0-2047)(30Hz - 10KHz)")]
             [SlideParametersAttribute(0, 2047)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [EditorAttribute(typeof(SlideEditor), typeof(UITypeEditor))]
             public ushort FC
             {
                 get => f_FC;
                 set
                 {
-                    if (f_FC != value)
-                        f_FC = (ushort)(value & 2047);
+                    f_FC = (ushort)(value & 2047);
                 }
             }
 
+            private byte f_Off3;
+
+            /// <summary>
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("Disable ch 3 sound (0:Enable 1:Disable)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(UITypeEditor))]
+            public byte OFF3
+            {
+                get => f_Off3;
+                set
+                {
+                    f_Off3 = (byte)(value & 1);
+                }
+            }
 
             private FilterChannel f_FILT;
 
@@ -811,11 +856,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 get => f_FILT;
                 set
                 {
-                    if (f_FILT != value)
-                        f_FILT = value;
+                    f_FILT = value;
                 }
             }
-
 
         }
 

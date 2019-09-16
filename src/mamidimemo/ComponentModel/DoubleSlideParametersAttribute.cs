@@ -33,6 +33,15 @@ namespace zanac.MAmidiMEmo.ComponentModel
         /// <summary>
         /// 
         /// </summary>
+        public bool SliderDynamicSetValue
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public double Precision
         {
             get;
@@ -44,6 +53,14 @@ namespace zanac.MAmidiMEmo.ComponentModel
             SliderMax = max;
             SliderMin = min;
             Precision = precision;
+        }
+
+        public DoubleSlideParametersAttribute(double min, double max, double precision, bool dynamic)
+        {
+            SliderMax = max;
+            SliderMin = min;
+            Precision = precision;
+            SliderDynamicSetValue = dynamic;
         }
     }
 }
