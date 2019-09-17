@@ -469,7 +469,12 @@ void device_mixer_interface::interface_post_load()
 void device_sound_interface::sound_stream_update_callback(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	if (m_enable == 0)
+	{
+		// clear output buffers
+		for (int output = 0; output < 2; output++)
+			memset(outputs[output], 0, samples * sizeof(outputs[0][0]));
 		return;
+	}
 
 	stream_sample_t *buffer0 = outputs[0];
 	stream_sample_t *buffer1 = outputs[1];

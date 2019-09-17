@@ -50,6 +50,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Gain Left ch. (0.0-*) of this Instrument")]
         [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
         [DoubleSlideParameters(0d, 10d, 0.1d, true)]
+        [DefaultValue(1.0f)]
         public float GainLeft
         {
             get
@@ -73,6 +74,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Gain Right ch. (0.0-*) of this Instrument")]
         [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
         [DoubleSlideParameters(0d, 10d, 0.1d, true)]
+        [DefaultValue(1.0f)]
         public float GainRight
         {
             get
@@ -91,6 +93,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Filter")]
         [Description("Audio Filter Type")]
+        [DefaultValue(FilterMode.None)]
         public FilterMode FilterMode
         {
             get => f_FilterMode;
@@ -114,6 +117,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Audio Cutoff Filter (0.1-0.99) of this Instrument")]
         [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
         [DoubleSlideParameters(0.01d, 0.99d, 0.01d, true)]
+        [DefaultValue(0.99d)]
         public double FilterCutoff
         {
             get
@@ -146,6 +150,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Audio Cutoff Filter (0.01-1.00) of this Instrument")]
         [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
         [DoubleSlideParameters(0.01d, 1.00d, 0.01d, true)]
+        [DefaultValue(0.01d)]
         public double FilterResonance
         {
             get

@@ -282,6 +282,10 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public SIDBase(uint unitNumber) : base(unitNumber)
         {
+            FilterMode = FilterMode.LowPass;
+            FilterCutoff = 0.9d;
+            FilterResonance = 0.1d;
+
             Timbres = new SIDTimbre[128];
             for (int i = 0; i < 128; i++)
                 Timbres[i] = new SIDTimbre();
