@@ -371,6 +371,8 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             private void updatePsgVolume()
             {
+                if (IsSoundOff)
+                    return;
                 byte fv = (byte)((14 - (int)Math.Round(14 * CalcCurrentVolume())) & 0xf);
 
                 Sn76496WriteData(parentModule.UnitNumber, (byte)(0x80 | Slot << 5 | 0x10 | fv));
@@ -381,11 +383,16 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             private void updateNoiseVolume()
             {
-                var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
-                var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
-                var vel = NoteOnEvent.Velocity / 127d;
+                if (IsSoundOff)
+                    return;
 
-                byte fv = (byte)((14 - (int)Math.Round(14 * vol * vel * exp)) & 0xf);
+                byte fv = (byte)((14 - (int)Math.Round(14 * CalcCurrentVolume())) & 0xf);
+
+                //var exp = parentModule.Expressions[NoteOnEvent.Channel] / 127d;
+                //var vol = parentModule.Volumes[NoteOnEvent.Channel] / 127d;
+                //var vel = NoteOnEvent.Velocity / 127d;
+
+                //byte fv = (byte)((14 - (int)Math.Round(14 * vol * vel * exp)) & 0xf);
 
                 Sn76496WriteData(parentModule.UnitNumber, (byte)(0x80 | (Slot + 3) << 5 | 0x10 | fv));
             }
