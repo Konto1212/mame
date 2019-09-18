@@ -19,6 +19,7 @@ using Newtonsoft.Json;
 using System.IO;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Common;
+using System.Reflection;
 
 namespace zanac.MAmidiMEmo.Gui
 {
@@ -119,6 +120,21 @@ namespace zanac.MAmidiMEmo.Gui
             InstrumentManager.InstrumentChanged += InstrumentManager_InstrumentChanged;
             InstrumentManager.InstrumentAdded += InstrumentManager_InstrumentAdded;
             InstrumentManager.InstrumentRemoved += InstrumentManager_InstrumentRemoved;
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            EnableDoubleBuffering(tabPage1);
+
+            timer1.Start();
+        }
+
+        public static void EnableDoubleBuffering(Control control)
+        {
+            control.GetType().InvokeMember("DoubleBuffered",
+                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, control, new object[] { true });
         }
 
         /// <summary>
@@ -464,11 +480,57 @@ namespace zanac.MAmidiMEmo.Gui
                 Settings.Default.Reload();
         }
 
-        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        private void tabPage1_Paint(object sender, PaintEventArgs e)
         {
+            var fis = listViewIntruments.SelectedItems;
+            int[][] data;
+            if (fis != null && fis.Count != 0)
+                data = ((InstrumentBase)fis[0].Tag).GetLastOutputBuffer();
+            else
+                data = InstrumentManager.GetLastOutputBuffer();
 
+            e.Graphics.Clear(tabPage1.BackColor);
+
+            int w = tabPage1.ClientSize.Width;
+            int h = tabPage1.ClientSize.Height;
+            using (Pen p = new Pen(Color.DarkGreen))
+            {
+                int max = 0;
+                for (int ch = 0; ch < 2; ch++)
+                {
+                    for (int i = 0; i < data[ch].Length; i++)
+                        max = Math.Max(Math.Abs(data[ch][i]), max);
+                }
+                if (max < h / 2)
+                    max = h / 2;
+
+                draw(e, p, data[0], w, h, 0, max);
+                draw(e, p, data[1], w, h, w / 2, max);
+                e.Graphics.DrawLine(SystemPens.Control, w / 2, 0, w / 2, h);
+            }
         }
 
+        private static void draw(PaintEventArgs e, Pen p, int[] data, int w, int h, int ox, int max)
+        {
+            int ly = h / 2;
+            int len = data.Length;
+            for (int i = 0; i < w / 2; i++)
+            {
+                int y = data[(int)(((double)i / (w / 2)) * len)] / 3;
+                y = (int)((y / (double)max) * h);
+                y += h / 2;
+                int lx = i - 1;
+                if (lx < 0)
+                    lx = 0;
+                e.Graphics.DrawLine(p, ox + lx, ly, ox + i, y);
+                ly = y;
+            }
+        }
 
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if(tabControl1.SelectedTab == tabPage1)
+                tabPage1.Invalidate();
+        }
     }
 }

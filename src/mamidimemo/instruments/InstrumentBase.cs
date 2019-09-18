@@ -479,24 +479,18 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="address"></param>
         /// <param name="data"></param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void delegate_set_device_enable(uint unitNumber, string tagName, byte enable);
+        private delegate void delegate_set_device_enable(uint unitNumber, string tagName, byte enable);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public static delegate_set_device_enable set_device_enable;
+        private static delegate_set_device_enable set_device_enable;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="address"></param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void delegate_device_reset(uint unitNumber, string tagName);
+        private delegate void delegate_device_reset(uint unitNumber, string tagName);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public static delegate_device_reset device_reset;
+        private static delegate_device_reset device_reset;
 
         /// <summary>
         /// 
@@ -506,28 +500,34 @@ namespace zanac.MAmidiMEmo.Instruments
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void delegate_set_output_gain(uint unitNumber, string tagName, int channel, float gain);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private static delegate_set_output_gain set_output_gain
-        {
-            get;
-            set;
-        }
-
+        private static delegate_set_output_gain set_output_gain;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="address"></param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void delegate_set_filter(uint unitNumber, string tagName, FilterMode filterMode, double cutoff, double resonance);
+        private delegate void delegate_set_filter(uint unitNumber, string tagName, FilterMode filterMode, double cutoff, double resonance);
+
+        private static delegate_set_filter set_filter;
 
         /// <summary>
         /// 
         /// </summary>
-        public static delegate_set_filter set_filter;
+        /// <param name="address"></param>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate IntPtr delegate_getLastOutputBuffer(uint unitNumber, string tagName);
 
+        private static delegate_getLastOutputBuffer getLastOutputBuffer;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int delegate_getLastOutputBufferSamples(uint unitNumber, string tagName);
+
+        private static delegate_getLastOutputBufferSamples getLastOutputBufferSamples;
 
         static InstrumentBase()
         {
@@ -546,6 +546,14 @@ namespace zanac.MAmidiMEmo.Instruments
             funcPtr = MameIF.GetProcAddress("set_filter");
             if (funcPtr != IntPtr.Zero)
                 set_filter = Marshal.GetDelegateForFunctionPointer<delegate_set_filter>(funcPtr);
+
+            funcPtr = MameIF.GetProcAddress("getLastOutputBuffer");
+            if (funcPtr != IntPtr.Zero)
+                getLastOutputBuffer = Marshal.GetDelegateForFunctionPointer<delegate_getLastOutputBuffer>(funcPtr);
+
+            funcPtr = MameIF.GetProcAddress("getLastOutputBufferSamples");
+            if (funcPtr != IntPtr.Zero)
+                getLastOutputBufferSamples = Marshal.GetDelegateForFunctionPointer<delegate_getLastOutputBufferSamples>(funcPtr);
         }
 
         /// <summary>
@@ -918,6 +926,37 @@ namespace zanac.MAmidiMEmo.Instruments
         protected virtual void OnPitchBendEvent(PitchBendEvent midiEvent)
         {
             Pitchs[midiEvent.Channel] = midiEvent.PitchValue;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public int[][] GetLastOutputBuffer()
+        {
+            try
+            {
+                Program.SoundUpdating();
+
+                int num = getLastOutputBufferSamples(UnitNumber, SoundInterfaceTagNamePrefix);
+                if (num == 0)
+                    return null;
+                IntPtr pbuf = getLastOutputBuffer(UnitNumber, SoundInterfaceTagNamePrefix);
+                IntPtr[] ptbuf = new IntPtr[2];
+                Marshal.Copy(pbuf, ptbuf, 0, 2);
+
+                int[][] retbuf = new int[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    retbuf[i] = new int[num];
+                    Marshal.Copy(ptbuf[i], retbuf[i], 0, num);
+                }
+                return retbuf;
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
         }
     }
 

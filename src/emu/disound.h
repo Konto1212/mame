@@ -114,6 +114,9 @@ public:
 		calculateFeedbackAmount();
 	}
 
+	stream_sample_t *lastOutBuffer[2];
+	int lastOutBufferSamples;
+
 protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
 
@@ -152,7 +155,6 @@ private:
 	inline double getCalculatedCutoff() const {
 		return fmax(fmin(cutoff + cutoffMod, 0.99), 0.01);
 	};
-
 };
 
 // iterator

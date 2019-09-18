@@ -82,7 +82,6 @@ extern "C"
 		sd->setResonance(resonance);
 	}
 
-
 	DllExport void set_output_gain(unsigned int unitNumber, char* name, int channel, float gain)
 	{
 		mame_machine_manager *mmm = mame_machine_manager::instance();
@@ -99,6 +98,57 @@ extern "C"
 
 		sd->set_output_gain(channel, gain);
 	}
+
+	DllExport s32 **getLastOutputBuffer(unsigned int unitNumber, char* name)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return NULL;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return NULL;
+
+		if (unitNumber != UINT32_MAX) {
+			std::string num = std::to_string(unitNumber);
+			device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+			if (sd == nullptr)
+				return NULL;
+
+			return sd->lastOutBuffer;
+		}
+		else {
+			device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name)).c_str()));
+			if (sd == nullptr)
+				return NULL;
+
+			return sd->lastOutBuffer;
+		}
+	}
+
+	DllExport int getLastOutputBufferSamples(unsigned int unitNumber, char* name)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return 0;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return 0;
+
+		if (unitNumber != UINT32_MAX) {
+			std::string num = std::to_string(unitNumber);
+			device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+			if (sd == nullptr)
+				return 0;
+			return sd->lastOutBufferSamples;
+		}
+		else {
+			device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name)).c_str()));
+			if (sd == nullptr)
+				return 0;
+			return sd->lastOutBufferSamples;
+		}
+	}
+
 
 	DllExport void ym2151_write(unsigned int unitNumber, unsigned int address, unsigned char data)
 	{
@@ -119,7 +169,7 @@ extern "C"
 
 	DllExport void ym2612_write(unsigned int unitNumber, unsigned int address, unsigned char data)
 	{
-		
+
 		mame_machine_manager *mmm = mame_machine_manager::instance();
 		if (mmm == nullptr)
 			return;

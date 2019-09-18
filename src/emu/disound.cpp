@@ -35,6 +35,8 @@ device_sound_interface::device_sound_interface(const machine_config &mconfig, de
 	, buf3{ 0.0, 0.0 }
 	, lastIn{ 0.0, 0.0 }
 	, lastOut{ 0.0, 0.0 }
+	, lastOutBuffer{NULL, NULL}
+	, lastOutBufferSamples(0)
 {
 	calculateFeedbackAmount();
 }
@@ -476,18 +478,22 @@ void device_sound_interface::sound_stream_update_callback(sound_stream &stream, 
 		return;
 	}
 
+	lastOutBuffer[0] = outputs[0];
+	lastOutBuffer[1] = outputs[1];
+	lastOutBufferSamples = samples;
+
 	stream_sample_t *buffer0 = outputs[0];
 	stream_sample_t *buffer1 = outputs[1];
 
 	sound_stream_update(stream, inputs, outputs, samples);
 
-	if(mode == FILTER_MODE_NONE)
-		return;
-
-	for (int i = 0; i < samples; i++)
+	if (mode != FILTER_MODE_NONE)
 	{
-		*buffer0++ = process(0, *buffer0);
-		*buffer1++ = process(1, *buffer1);
+		for (int i = 0; i < samples; i++)
+		{
+			*buffer0++ = process(0, *buffer0);
+			*buffer1++ = process(1, *buffer1);
+		}
 	}
 }
 
@@ -500,6 +506,10 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 	// clear output buffers
 	for (int output = 0; output < m_outputs; output++)
 		memset(outputs[output], 0, samples * sizeof(outputs[0][0]));
+
+	lastOutBuffer[0] = outputs[0];
+	lastOutBuffer[1] = outputs[1];
+	lastOutBufferSamples = samples;
 
 	// loop over samples
 	const u8 *outmap = &m_outputmap[0];

@@ -13,6 +13,7 @@ using zanac.MAmidiMEmo.Properties;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.Threading;
+using zanac.MAmidiMEmo.Mame;
 
 namespace zanac.MAmidiMEmo.Instruments
 {
@@ -25,8 +26,34 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="address"></param>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate IntPtr delegate_getLastOutputBuffer(uint unitNumber, string tagName);
+
+        private static delegate_getLastOutputBuffer getLastOutputBuffer;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int delegate_getLastOutputBufferSamples(uint unitNumber, string tagName);
+
+        private static delegate_getLastOutputBufferSamples getLastOutputBufferSamples;
+
+        /// <summary>
+        /// 
+        /// </summary>
         static InstrumentManager()
         {
+            var funcPtr = MameIF.GetProcAddress("getLastOutputBuffer");
+            if (funcPtr != IntPtr.Zero)
+                getLastOutputBuffer = Marshal.GetDelegateForFunctionPointer<delegate_getLastOutputBuffer>(funcPtr);
+
+            funcPtr = MameIF.GetProcAddress("getLastOutputBufferSamples");
+            if (funcPtr != IntPtr.Zero)
+                getLastOutputBufferSamples = Marshal.GetDelegateForFunctionPointer<delegate_getLastOutputBufferSamples>(funcPtr);
+
             Midi.MidiManager.MidiEventReceived += MidiManager_MidiEventReceived;
 
             for (int i = 0; i < Enum.GetNames(typeof(InstrumentType)).Length; i++)
@@ -171,5 +198,38 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static int[][] GetLastOutputBuffer()
+        {
+            int[][] retbuf = new int[2][];
+            try
+            {
+                Program.SoundUpdating();
+
+                copyData(retbuf, "lspeaker", 0);
+                copyData(retbuf, "rspeaker", 1);
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
+            return retbuf;
+        }
+
+        private static void copyData(int[][] retbuf, string name, int ch)
+        {
+            int num = getLastOutputBufferSamples(uint.MaxValue, name);
+            if (num != 0)
+            {
+                var pbuf = getLastOutputBuffer(uint.MaxValue, name);
+                IntPtr[] ptbuf = new IntPtr[1];
+                Marshal.Copy(pbuf, ptbuf, 0, 1);
+                retbuf[ch] = new int[num];
+                Marshal.Copy(ptbuf[0], retbuf[ch], 0, num);
+            }
+        }
     }
 }
