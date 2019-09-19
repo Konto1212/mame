@@ -59,9 +59,10 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 using (SafeWaitHandle handle = CreateWaitableTimer(IntPtr.Zero, false, null))
                 {
+                    periodMs *= 1000 * 10;
                     while (true)
                     {
-                        nextTime += periodMs * 1000 * 10;
+                        nextTime += periodMs;
                         long dueTime = (long)Math.Round(nextTime);
                         SetWaitableTimer(handle, ref dueTime, 0, IntPtr.Zero, IntPtr.Zero, false);
                         WaitForSingleObject(handle, WAIT_TIMEOUT);
@@ -69,6 +70,11 @@ namespace zanac.MAmidiMEmo.Instruments
                             periodMs = action(data);
                         if (periodMs < 0 || shutDown)
                             break;
+                        periodMs *= 1000 * 10;
+                        // Next time is past time?
+                        GetSystemTimeAsFileTime(out lpSystemTimeAsFileTime);
+                        if(lpSystemTimeAsFileTime > nextTime + periodMs)
+                            nextTime = lpSystemTimeAsFileTime;  // adjust to current time
                     }
                 }
             });

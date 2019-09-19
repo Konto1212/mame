@@ -503,22 +503,25 @@ namespace zanac.MAmidiMEmo.Gui
                 }
                 if (max < h / 2)
                     max = h / 2;
+                max += max / 10;
 
-                draw(e, p, data[0], w, h, 0, max);
-                draw(e, p, data[1], w, h, w / 2, max);
-                e.Graphics.DrawLine(SystemPens.Control, w / 2, 0, w / 2, h);
+                draw(e, p, data[0], w / 2 - 1, h / 2, 0, max);
+                draw(e, p, data[1], w / 2 - 1, h / 2, w / 2 + 1, max);
+
+                e.Graphics.DrawLine(SystemPens.Control, w / 2 - 1, 0, w / 2 - 1, h);
+                e.Graphics.DrawLine(SystemPens.Control, w / 2 , 0, w / 2 , h);
             }
         }
 
         private static void draw(PaintEventArgs e, Pen p, int[] data, int w, int h, int ox, int max)
         {
-            int ly = h / 2;
+            int ly = h;
             int len = data.Length;
-            for (int i = 0; i < w / 2; i++)
+            for (int i = 0; i < w; i++)
             {
-                int y = data[(int)(((double)i / (w / 2)) * len)] / 3;
-                y = (int)((y / (double)max) * h);
-                y += h / 2;
+                int y = data[(int)(((double)i / w) * len)];
+                y = -(int)((y / (double)max) * h);
+                y += h;
                 int lx = i - 1;
                 if (lx < 0)
                     lx = 0;
@@ -529,7 +532,7 @@ namespace zanac.MAmidiMEmo.Gui
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if(tabControl1.SelectedTab == tabPage1)
+            if (tabControl1.SelectedTab == tabPage1)
                 tabPage1.Invalidate();
         }
     }

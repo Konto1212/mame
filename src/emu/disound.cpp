@@ -507,10 +507,6 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 	for (int output = 0; output < m_outputs; output++)
 		memset(outputs[output], 0, samples * sizeof(outputs[0][0]));
 
-	lastOutBuffer[0] = outputs[0];
-	lastOutBuffer[1] = outputs[1];
-	lastOutBufferSamples = samples;
-
 	// loop over samples
 	const u8 *outmap = &m_outputmap[0];
 	for (int pos = 0; pos < samples; pos++)
