@@ -941,6 +941,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 int num = getLastOutputBufferSamples(UnitNumber, SoundInterfaceTagNamePrefix);
                 if (num == 0)
                     return null;
+
                 IntPtr pbuf = getLastOutputBuffer(UnitNumber, SoundInterfaceTagNamePrefix);
                 IntPtr[] ptbuf = new IntPtr[2];
                 Marshal.Copy(pbuf, ptbuf, 0, 2);

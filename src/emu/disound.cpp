@@ -478,10 +478,6 @@ void device_sound_interface::sound_stream_update_callback(sound_stream &stream, 
 		return;
 	}
 
-	lastOutBuffer[0] = outputs[0];
-	lastOutBuffer[1] = outputs[1];
-	lastOutBufferSamples = samples;
-
 	stream_sample_t *buffer0 = outputs[0];
 	stream_sample_t *buffer1 = outputs[1];
 
@@ -495,6 +491,10 @@ void device_sound_interface::sound_stream_update_callback(sound_stream &stream, 
 			*buffer1++ = process(1, *buffer1);
 		}
 	}
+
+	lastOutBuffer[0] = outputs[0];
+	lastOutBuffer[1] = outputs[1];
+	lastOutBufferSamples = samples;
 }
 
 //-------------------------------------------------
