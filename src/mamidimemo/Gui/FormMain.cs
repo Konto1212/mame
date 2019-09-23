@@ -480,42 +480,58 @@ namespace zanac.MAmidiMEmo.Gui
         {
             var fis = listViewIntruments.SelectedItems;
             int[][] data;
+            InstrumentBase inst = null;
             if (fis != null && fis.Count != 0)
-                data = ((InstrumentBase)fis[0].Tag).GetLastOutputBuffer();
-            else
-                data = InstrumentManager.GetLastOutputBuffer();
+                inst = (InstrumentBase)fis[0].Tag;
+            data = InstrumentManager.GetLastOutputBuffer(inst);
 
             e.Graphics.Clear(tabPage1.BackColor);
 
             int w = tabPage1.ClientSize.Width;
             int h = tabPage1.ClientSize.Height;
-            using (Pen p = new Pen(Color.DarkGreen))
+            if (data != null)
             {
-                int max = 0;
-                for (int ch = 0; ch < 2; ch++)
+                using (Pen p = new Pen(Color.DarkGreen))
                 {
-                    for (int i = 0; i < data[ch].Length; i++)
-                        max = Math.Max(Math.Abs(data[ch][i]), max);
+                    int max = 0;
+                    //int? ldt = null;
+                    int zero = 0;
+                    for (int ch = 0; ch < 2; ch++)
+                    {
+                        if (data[ch] != null)
+                        {
+                            for (int i = 0; i < data[ch].Length; i++)
+                            {
+                                int dt = data[ch][i];
+                                //int sn = Math.Sign(dt);
+                                //if (zero == 0 && ldt != null && sn > 0 && sn != Math.Sign(ldt.Value))
+                                //    zero = i;
+                                max = Math.Max(Math.Abs(dt), max);
+                                //ldt = dt;
+                            }
+                        }
+                    }
+                    if (max < h / 2)
+                        max = h / 2;
+                    max += max / 10;
+
+                    if (data[0] != null)
+                        draw(e, p, data[0], zero, w / 2 - 1, h / 2, 0, max);
+                    if (data[1] != null)
+                        draw(e, p, data[1], zero, w / 2 - 1, h / 2, w / 2 + 1, max);
                 }
-                if (max < h / 2)
-                    max = h / 2;
-                max += max / 10;
-
-                draw(e, p, data[0], w / 2 - 1, h / 2, 0, max);
-                draw(e, p, data[1], w / 2 - 1, h / 2, w / 2 + 1, max);
-
-                e.Graphics.DrawLine(SystemPens.Control, w / 2 - 1, 0, w / 2 - 1, h);
-                e.Graphics.DrawLine(SystemPens.Control, w / 2 , 0, w / 2 , h);
             }
+            e.Graphics.DrawLine(SystemPens.Control, w / 2 - 1, 0, w / 2 - 1, h);
+            e.Graphics.DrawLine(SystemPens.Control, w / 2, 0, w / 2, h);
         }
 
-        private static void draw(PaintEventArgs e, Pen p, int[] data, int w, int h, int ox, int max)
+        private static void draw(PaintEventArgs e, Pen p, int[] data, int zero, int w, int h, int ox, int max)
         {
             int ly = h;
-            int len = data.Length;
+            int len = data.Length - zero;
             for (int i = 0; i < w; i++)
             {
-                int y = data[(int)(((double)i / w) * len)];
+                int y = data[zero + (int)(((double)i / w) * len)];
                 y = -(int)((y / (double)max) * h);
                 y += h;
                 int lx = i - 1;

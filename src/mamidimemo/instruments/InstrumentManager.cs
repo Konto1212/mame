@@ -28,7 +28,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         /// <param name="address"></param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr delegate_getLastOutputBuffer(uint unitNumber, string tagName);
+        private delegate IntPtr delegate_getLastOutputBuffer(string tagName, int insts, uint deviceID, uint unitNumber);
 
         private static delegate_getLastOutputBuffer getLastOutputBuffer;
 
@@ -37,7 +37,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         /// <param name="address"></param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate int delegate_getLastOutputBufferSamples(uint unitNumber, string tagName);
+        private delegate int delegate_getLastOutputBufferSamples(string tagName);
 
         private static delegate_getLastOutputBufferSamples getLastOutputBufferSamples;
 
@@ -202,33 +202,40 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         /// <returns></returns>
-        public static int[][] GetLastOutputBuffer()
+        public static int[][] GetLastOutputBuffer(InstrumentBase inst)
         {
             int[][] retbuf = new int[2][];
-            try
+            lock (Program.ExclusiveLockObject)
             {
-                Program.SoundUpdating();
+                try
+                {
+                    Program.SoundUpdating();
 
-                copyData(retbuf, "lspeaker", 0);
-                copyData(retbuf, "rspeaker", 1);
-            }
-            finally
-            {
-                Program.SoundUpdated();
+                    copyData(retbuf, "lspeaker", 0, inst);
+                    copyData(retbuf, "rspeaker", 1, inst);
+                }
+                finally
+                {
+                    Program.SoundUpdated();
+                }
             }
             return retbuf;
         }
 
-        private static void copyData(int[][] retbuf, string name, int ch)
+        private static void copyData(int[][] retbuf, string name, int ch, InstrumentBase inst)
         {
-            int num = getLastOutputBufferSamples(uint.MaxValue, name);
+            int num = getLastOutputBufferSamples(name);
             if (num != 0)
             {
-                var pbuf = getLastOutputBuffer(uint.MaxValue, name);
-                IntPtr[] ptbuf = new IntPtr[1];
-                Marshal.Copy(pbuf, ptbuf, 0, 1);
-                retbuf[ch] = new int[num];
-                Marshal.Copy(ptbuf[0], retbuf[ch], 0, num);
+                uint did = inst == null ? uint.MaxValue : inst.DeviceID;
+                uint un = inst == null ? uint.MaxValue : inst.UnitNumber;
+
+                var pbuf = getLastOutputBuffer(name, instruments.Count, did, un);
+                if (pbuf != IntPtr.Zero)
+                {
+                    retbuf[ch] = new int[num];
+                    Marshal.Copy(pbuf, retbuf[ch], 0, num);
+                }
             }
         }
     }

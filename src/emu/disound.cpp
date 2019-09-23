@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    disound.c
+	disound.c
 
-    Device sound interfaces.
+	Device sound interfaces.
 
 ***************************************************************************/
 
@@ -35,8 +35,9 @@ device_sound_interface::device_sound_interface(const machine_config &mconfig, de
 	, buf3{ 0.0, 0.0 }
 	, lastIn{ 0.0, 0.0 }
 	, lastOut{ 0.0, 0.0 }
-	, lastOutBuffer{NULL, NULL}
+	, lastOutBuffer(NULL)
 	, lastOutBufferSamples(0)
+	, lastOutBufferNumber(UINT32_MAX)
 {
 	calculateFeedbackAmount();
 }
@@ -392,8 +393,8 @@ void device_sound_interface::interface_pre_reset()
 
 device_mixer_interface::device_mixer_interface(const machine_config &mconfig, device_t &device, int outputs)
 	: device_sound_interface(mconfig, device),
-		m_outputs(outputs),
-		m_mixer_stream(nullptr)
+	m_outputs(outputs),
+	m_mixer_stream(nullptr)
 {
 	m_enable = 1;
 }
@@ -491,10 +492,6 @@ void device_sound_interface::sound_stream_update_callback(sound_stream &stream, 
 			*buffer1++ = process(1, *buffer1);
 		}
 	}
-
-	lastOutBuffer[0] = outputs[0];
-	lastOutBuffer[1] = outputs[1];
-	lastOutBufferSamples = samples;
 }
 
 //-------------------------------------------------
@@ -515,6 +512,11 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 		for (int inp = 0; inp < m_auto_allocated_inputs; inp++)
 			outputs[outmap[inp]][pos] += inputs[inp][pos];
 	}
+	if (lastOutBufferNumber == UINT32_MAX)
+		lastOutBuffer = outputs[0];
+	else
+		lastOutBuffer = inputs[lastOutBufferNumber];
+	lastOutBufferSamples = samples;
 }
 
 

@@ -114,8 +114,9 @@ public:
 		calculateFeedbackAmount();
 	}
 
-	stream_sample_t *lastOutBuffer[2];
-	int lastOutBufferSamples;
+	stream_sample_t *lastOutBuffer;
+	unsigned int lastOutBufferSamples;
+	unsigned int lastOutBufferNumber;
 
 protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;

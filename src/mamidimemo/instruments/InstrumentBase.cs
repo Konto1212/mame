@@ -511,24 +511,6 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private static delegate_set_filter set_filter;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="address"></param>
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr delegate_getLastOutputBuffer(uint unitNumber, string tagName);
-
-        private static delegate_getLastOutputBuffer getLastOutputBuffer;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="address"></param>
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate int delegate_getLastOutputBufferSamples(uint unitNumber, string tagName);
-
-        private static delegate_getLastOutputBufferSamples getLastOutputBufferSamples;
-
         static InstrumentBase()
         {
             IntPtr funcPtr = MameIF.GetProcAddress("set_device_enable");
@@ -546,14 +528,6 @@ namespace zanac.MAmidiMEmo.Instruments
             funcPtr = MameIF.GetProcAddress("set_filter");
             if (funcPtr != IntPtr.Zero)
                 set_filter = Marshal.GetDelegateForFunctionPointer<delegate_set_filter>(funcPtr);
-
-            funcPtr = MameIF.GetProcAddress("getLastOutputBuffer");
-            if (funcPtr != IntPtr.Zero)
-                getLastOutputBuffer = Marshal.GetDelegateForFunctionPointer<delegate_getLastOutputBuffer>(funcPtr);
-
-            funcPtr = MameIF.GetProcAddress("getLastOutputBufferSamples");
-            if (funcPtr != IntPtr.Zero)
-                getLastOutputBufferSamples = Marshal.GetDelegateForFunctionPointer<delegate_getLastOutputBufferSamples>(funcPtr);
         }
 
         /// <summary>
@@ -928,37 +902,6 @@ namespace zanac.MAmidiMEmo.Instruments
             Pitchs[midiEvent.Channel] = midiEvent.PitchValue;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public int[][] GetLastOutputBuffer()
-        {
-            try
-            {
-                Program.SoundUpdating();
-
-                int num = getLastOutputBufferSamples(UnitNumber, SoundInterfaceTagNamePrefix);
-                if (num == 0)
-                    return null;
-
-                IntPtr pbuf = getLastOutputBuffer(UnitNumber, SoundInterfaceTagNamePrefix);
-                IntPtr[] ptbuf = new IntPtr[2];
-                Marshal.Copy(pbuf, ptbuf, 0, 2);
-
-                int[][] retbuf = new int[2][];
-                for (int i = 0; i < 2; i++)
-                {
-                    retbuf[i] = new int[num];
-                    Marshal.Copy(ptbuf[i], retbuf[i], 0, num);
-                }
-                return retbuf;
-            }
-            finally
-            {
-                Program.SoundUpdated();
-            }
-        }
     }
 
     public enum FilterMode
