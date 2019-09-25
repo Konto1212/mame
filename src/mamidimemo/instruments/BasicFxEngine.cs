@@ -33,6 +33,8 @@ namespace zanac.MAmidiMEmo.Instruments
             get => f_OutputLevel;
         }
 
+        private int lastArpNoteNumber;
+
         private double f_DeltaNoteNumber;
 
         /// <summary>
@@ -76,6 +78,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
         public uint pitchCounter;
 
+        public uint arpCounter;
+
         /// <summary>
         /// 
         /// </summary>
@@ -106,7 +110,12 @@ namespace zanac.MAmidiMEmo.Instruments
                         volumeCounter = (uint)settings.VolumeEnvelopesNums.Length;
 
                     if (volumeCounter >= settings.VolumeEnvelopesNums.Length)
-                        volumeCounter = (uint)(settings.VolumeEnvelopesNums.Length - 1);
+                    {
+                        if (settings.VolumeEnvelopesRepeatPoint >= 0)
+                            volumeCounter = (uint)settings.VolumeEnvelopesRepeatPoint;
+                        else
+                            volumeCounter = (uint)(settings.VolumeEnvelopesNums.Length - 1);
+                    }
                 }
                 int vol = settings.VolumeEnvelopesNums[volumeCounter++];
 
@@ -138,12 +147,66 @@ namespace zanac.MAmidiMEmo.Instruments
                         pitchCounter = (uint)settings.PitchEnvelopesNums.Length;
 
                     if (pitchCounter >= settings.PitchEnvelopesNums.Length)
-                        pitchCounter = (uint)(settings.PitchEnvelopesNums.Length - 1);
+                    {
+                        if (settings.PitchEnvelopesRepeatPoint >= 0)
+                            pitchCounter = (uint)settings.PitchEnvelopesRepeatPoint;
+                        else
+                            pitchCounter = (uint)(settings.PitchEnvelopesNums.Length - 1);
+                    }
                 }
                 double pitch = settings.PitchEnvelopesNums[pitchCounter++];
                 double range = settings.PitchEnvelopeRange;
 
                 f_DeltaNoteNumber += ((double)pitch / 8192d) * range;
+            }
+
+            //arpeggio
+            if (settings.ArpEnvelopesNums.Length > 0)
+            {
+                if (!isKeyOff)
+                {
+                    var vm = settings.ArpEnvelopesNums.Length;
+                    if (settings.ArpEnvelopesReleasePoint >= 0)
+                        vm = settings.ArpEnvelopesReleasePoint;
+                    if (arpCounter >= vm)
+                    {
+                        if (settings.ArpEnvelopesRepeatPoint >= 0)
+                            arpCounter = (uint)settings.ArpEnvelopesRepeatPoint;
+                        else
+                            arpCounter = (uint)vm;
+
+                        if (arpCounter >= settings.ArpEnvelopesNums.Length)
+                            arpCounter = (uint)(settings.ArpEnvelopesNums.Length - 1);
+                    }
+                }
+                else
+                {
+                    if (settings.ArpEnvelopesRepeatPoint < 0)
+                        arpCounter = (uint)settings.ArpEnvelopesNums.Length;
+
+                    if (arpCounter >= settings.ArpEnvelopesNums.Length)
+                    {
+                        if (settings.ArpEnvelopesRepeatPoint >= 0)
+                            arpCounter = (uint)settings.ArpEnvelopesRepeatPoint;
+                        else
+                            arpCounter = (uint)(settings.ArpEnvelopesNums.Length - 1);
+                    }
+                }
+                int dnote = settings.ArpEnvelopesNums[arpCounter++];
+
+                switch (settings.ArpStepType)
+                {
+                    case ArpStepType.Absolute:
+                        f_DeltaNoteNumber += -lastArpNoteNumber + dnote;
+                        break;
+                    case ArpStepType.Relative:
+                        f_DeltaNoteNumber += dnote;
+                        break;
+                    case ArpStepType.Fixed:
+                        f_DeltaNoteNumber += -sound.NoteOnEvent.NoteNumber + dnote;
+                        break;
+                }
+                lastArpNoteNumber = dnote;
             }
         }
 

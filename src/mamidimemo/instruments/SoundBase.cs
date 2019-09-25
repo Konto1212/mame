@@ -72,7 +72,6 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
-
         /// <summary>
         /// 
         /// </summary>

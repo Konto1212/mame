@@ -58,25 +58,6 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private ArpType f_ArpType;
-
-        [DataMember]
-        [Description("Set arpeggio type (Dynamic or Static)")]
-        public ArpType ArpType
-        {
-            get
-            {
-                return f_ArpType;
-            }
-            set
-            {
-                if (f_ArpType != value)
-                {
-                    f_ArpType = value;
-                }
-            }
-        }
-
         private ArpMethod f_ArpMethod;
 
         [DataMember]
@@ -99,7 +80,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private ArpStepStyle f_StepStyle;
 
         [DataMember]
-        [Description("Set arpeggio step style *Dynamic Arp Only")]
+        [Description("Set arpeggio step style")]
         public ArpStepStyle StepStyle
         {
             get
@@ -118,7 +99,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private int f_OctaveRange = 1;
 
         [DataMember]
-        [Description("Set arpeggio octave range (1-4) *Dynamic Arp Only")]
+        [Description("Set arpeggio octave range (1-4)")]
         [DefaultValue(1)]
         [SlideParametersAttribute(1, 4, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
@@ -192,7 +173,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private int f_GateTime = 127;
 
         [DataMember]
-        [Description("Arpeggio Gate Time of NoteOn (0(0%)-127(100%))")]
+        [Description("Arpeggio Gate Time for NoteOn type (0(0%)-127(100%))")]
         [DefaultValue(127)]
         [SlideParametersAttribute(0, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
@@ -231,83 +212,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
         }
-
-        public string f_StaticArpSteps;
-
-        [DataMember]
-        [Description("Set static arp steps by text. Input note number and split it with space like the Famitracker.\r\n" +
-                    "Absolute/Relative -64～0～+63\r\n" +
-                    "Fixed is 0～127")]
-        public string StaticArpSteps
-        {
-            get
-            {
-                return f_StaticArpSteps;
-            }
-            set
-            {
-                if (f_StaticArpSteps != value)
-                {
-                    if (value == null)
-                    {
-                        StaticArpStepKeyNums = new int[] { };
-                        return;
-                    }
-
-                    string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    List<int> vs = new List<int>();
-                    foreach (var val in vals)
-                    {
-                        int v = 0;
-                        if (int.TryParse(val, out v))
-                        {
-                            if (v < -64)
-                                v = 64;
-                            else if (v > 63)
-                                v = 63;
-                            vs.Add(v);
-                        }
-                    }
-                    StaticArpStepKeyNums = vs.ToArray();
-
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < StaticArpStepKeyNums.Length; i++)
-                    {
-                        if (sb.Length != 0)
-                            sb.Append(' ');
-                        sb.Append(StaticArpStepKeyNums[i].ToString((IFormatProvider)null));
-                    }
-                    f_StaticArpSteps = sb.ToString();
-
-                }
-            }
-        }
-
-        [IgnoreDataMember]
-        [JsonIgnore]
-        [Browsable(false)]
-        public int[] StaticArpStepKeyNums { get; set; } = new int[] { };
-
-        private CustomArpStepType f_CustomArpStepType;
-
-
-        [DataMember]
-        [Description("Set static arp step type.")]
-        public CustomArpStepType StaticArpStepType
-        {
-            get
-            {
-                return f_CustomArpStepType;
-            }
-            set
-            {
-                if (f_CustomArpStepType != value)
-                {
-                    f_CustomArpStepType = value;
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Constructor
         /// </summary>

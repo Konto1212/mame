@@ -25,7 +25,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Set volume envelop by text. Input volume value and split it with space like the Famitracker.\r\n" +
-                    "0(0%)-128(100%) \"|\" is repeat point. \"/\" is release point. ")]
+                    "0(0%)-128(100%) \"|\" is repeat point. \"/\" is release point.")]
         public string VolumeEnvelopes
         {
             get
@@ -106,7 +106,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Set pitch envelop by text. Input pitch relative value and split it with space like the Famitracker.\r\n" +
-                   "-8193 ～ 0 ～ 8192")]
+                   "-8193 ～ 0 ～ 8192 \"|\" is repeat point. \"/\" is release point.")]
         public string PitchEnvelopes
         {
             get
@@ -201,6 +201,108 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        private string f_ArpEnvelopes;
+
+        [DataMember]
+        [Description("Set static arpeggio envelop by text. Input relative or absolute note number and split it with space like the Famitracker.\r\n" +
+                   "-128 ～ 0 ～ 127 \"|\" is repeat point. \"/\" is release point.")]
+        public string ArpEnvelopes
+        {
+            get
+            {
+                return f_ArpEnvelopes;
+            }
+            set
+            {
+                if (f_ArpEnvelopes != value)
+                {
+                    ArpEnvelopesRepeatPoint = -1;
+                    ArpEnvelopesReleasePoint = -1;
+                    if (value == null)
+                    {
+                        ArpEnvelopesNums = new int[] { };
+                        f_ArpEnvelopes = string.Empty;
+                        return;
+                    }
+                    f_ArpEnvelopes = value;
+                    string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    List<int> vs = new List<int>();
+                    for (int i = 0; i < vals.Length; i++)
+                    {
+                        string val = vals[i];
+                        if (val.Equals("|", StringComparison.Ordinal))
+                            ArpEnvelopesRepeatPoint = vs.Count;
+                        else if (val.Equals("/", StringComparison.Ordinal))
+                            ArpEnvelopesReleasePoint = vs.Count;
+                        else
+                        {
+                            int v;
+                            if (int.TryParse(val, out v))
+                            {
+                                if (v < -128)
+                                    v = -128;
+                                else if (v > 127)
+                                    v = 127;
+                                vs.Add(v);
+                            }
+                        }
+                    }
+                    ArpEnvelopesNums = vs.ToArray();
+
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < ArpEnvelopesNums.Length; i++)
+                    {
+                        if (sb.Length != 0)
+                            sb.Append(' ');
+                        if (ArpEnvelopesRepeatPoint == i)
+                            sb.Append("| ");
+                        if (ArpEnvelopesReleasePoint == i)
+                            sb.Append("/ ");
+                        sb.Append(ArpEnvelopesNums[i].ToString((IFormatProvider)null));
+                    }
+                    f_ArpEnvelopes = sb.ToString();
+                }
+            }
+        }
+
+        [Browsable(false)]
+        [JsonIgnore]
+        [IgnoreDataMember]
+        public int[] ArpEnvelopesNums { get; set; } = new int[] { };
+
+        [Browsable(false)]
+        [JsonIgnore]
+        [IgnoreDataMember]
+        [DefaultValue(-1)]
+        public int ArpEnvelopesRepeatPoint { get; set; } = -1;
+
+        [Browsable(false)]
+        [JsonIgnore]
+        [IgnoreDataMember]
+        [DefaultValue(-1)]
+        public int ArpEnvelopesReleasePoint { get; set; } = -1;
+
+
+        private ArpStepType f_ArpStepType;
+
+
+        [DataMember]
+        [Description("Set static arpeggio step type.")]
+        public ArpStepType ArpStepType
+        {
+            get
+            {
+                return f_ArpStepType;
+            }
+            set
+            {
+                if (f_ArpStepType != value)
+                {
+                    f_ArpStepType = value;
+                }
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -209,5 +311,13 @@ namespace zanac.MAmidiMEmo.Instruments
             return new BasicFxEngine(this);
         }
 
+    }
+
+
+    public enum ArpStepType
+    {
+        Absolute,
+        Relative,
+        Fixed,
     }
 }

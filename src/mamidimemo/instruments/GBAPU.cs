@@ -1177,7 +1177,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Description("Set duty/noise envelop by text. Input duty/noise value and split it with space like the Famitracker.\r\n" +
-                       "0 ～ 3")]
+                       "0 ～ 3 \"|\" is repeat point. \"/\" is release point.")]
             public string DutyEnvelopes
             {
                 get

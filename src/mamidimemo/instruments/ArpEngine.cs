@@ -69,27 +69,6 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public ArpType ArpType
-        {
-            get;
-            set;
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public CustomArpStepType StaticArpStepType
-        {
-            get;
-            set;
-        }
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -292,21 +271,7 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             if (arpStep >= arpNotes.Count)
-            {
-                if (ArpType != ArpType.Static)
-                {
-                    //ステップをループする
-                    arpStep = 0;
-                    arpOctaveCount++;
-                    if (arpOctaveCount >= Range)
-                        arpOctaveCount = 0;
-                }
-                else
-                {
-                    //相対指定の場合は1つ目の音は2回目以降はならなさない
-                    arpStep = StaticArpStepType == CustomArpStepType.Relative ? 1 : 0;
-                }
-            }
+                arpStep =  0;
 
             //次のノートを取得
             NoteOnEvent an = null;
@@ -326,22 +291,6 @@ namespace zanac.MAmidiMEmo.Instruments
                 oc *= 12;
                 if (nan.NoteNumber + oc < 128)
                     nan.NoteNumber += (SevenBitNumber)oc;
-            }
-
-            //相対指定の場合のノート番号を動的に計算
-            if (ArpType == ArpType.Static && StaticArpStepType == CustomArpStepType.Relative)
-            {
-                int no = nan.NoteNumber;
-                if (LastPassedNote != null)
-                {
-                    no -= (int)FirstAddedNote.NoteNumber;
-                    no = LastPassedNote.NoteNumber + no;
-                }
-                if (no < 0)
-                    no = 0;
-                else if (no > 127)
-                    no = 127;
-                nan.NoteNumber = (SevenBitNumber)no;
             }
 
             LastPassedNote = nan;
@@ -704,12 +653,6 @@ namespace zanac.MAmidiMEmo.Instruments
         //Cnt
     }
 
-    public enum ArpType
-    {
-        Dynamic,
-        Static
-    }
-
     public enum ArpMethod
     {
         KeyOn,
@@ -725,15 +668,7 @@ namespace zanac.MAmidiMEmo.Instruments
         SixteenthNote = 4,
         SixteenthTriplet = 12,
         ThirtySecondNote = 8,
+        SixtyFourthNote = 16,
     }
-
-
-    public enum CustomArpStepType
-    {
-        Absolute,
-        Relative,
-        Fixed,
-    }
-
 
 }

@@ -1103,7 +1103,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Description("Set duty envelop by text. Input duty value and split it with space like the Famitracker.\r\n" +
-                       "0 ～ 4095")]
+                       "0 ～ 4095 \"|\" is repeat point. \"/\" is release point.")]
             public string DutyEnvelopes
             {
                 get
@@ -1185,7 +1185,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Description("Set resonance envelop by text. Input resonance value and split it with space like the Famitracker.\r\n" +
-                       "0 ～ 15")]
+                       "0 ～ 15 \"|\" is repeat point. \"/\" is release point.")]
             public string ResonanceEnvelopes
             {
                 get
@@ -1267,7 +1267,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Description("Set resonance envelop by text. Input resonance value and split it with space like the Famitracker.\r\n" +
-                       "0 ～ 2047")]
+                       "0 ～ 2047 \"|\" is repeat point. \"/\" is release point.")]
             public string CutOffEnvelopes
             {
                 get
@@ -1348,7 +1348,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             [DataMember]
             [Description("Set resonance envelop by text. Input resonance value and split it with space like the Famitracker.\r\n" +
-                       "1 ～ 8(Tri:1 Saw:2 Pulse:4 Noise:8)")]
+                       "1 ～ 8(Tri:1 Saw:2 Pulse:4 Noise:8) \"|\" is repeat point. \"/\" is release point.")]
             public string WaveFormEnvelopes
             {
                 get

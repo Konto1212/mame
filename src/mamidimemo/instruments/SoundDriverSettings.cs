@@ -55,7 +55,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         [DataMember]
-        [Description("ARP Settings")]
+        [Description("Dynamic Arpeggio Settings")]
         public ArpSettings ARP
         {
             get;
