@@ -158,7 +158,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     Assembly asm = Assembly.GetAssembly(typeof(InstrumentType));
                     string name = Enum.GetName(typeof(InstrumentType), instrumentType);
-                    Type t = asm.GetType("zanac.MAmidiMEmo.Instruments." + name);
+                    Type t = asm.GetType("zanac.MAmidiMEmo.Instruments.Chips." + name);
 
                     var inst = (InstrumentBase)Activator.CreateInstance(t, (uint)instruments[(int)instrumentType].Count);
                     inst.PrepareSound();

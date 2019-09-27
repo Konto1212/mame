@@ -23,7 +23,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
     {
         protected static readonly IContractResolver Resolver = new NoTypeConverterContractResolver();
 
-        private static readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings { ContractResolver = Resolver, TypeNameHandling = TypeNameHandling.Auto, DefaultValueHandling = DefaultValueHandling.Ignore };
+        private static readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings { ContractResolver = Resolver, TypeNameHandling = TypeNameHandling.Auto, DefaultValueHandling = DefaultValueHandling.Ignore, SerializationBinder = Program.SerializationBinder };
 
         class NoTypeConverterContractResolver : DefaultContractResolver
         {
@@ -63,7 +63,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
     /// <typeparam name="T"></typeparam>
     public class NoTypeConverterJsonConverterObject<T> : NoTypeConverterJsonConverter<T>
     {
-        private static readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings { ContractResolver = Resolver, TypeNameHandling = TypeNameHandling.Objects, DefaultValueHandling = DefaultValueHandling.Ignore };
+        private static readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings { ContractResolver = Resolver, TypeNameHandling = TypeNameHandling.Objects, DefaultValueHandling = DefaultValueHandling.Ignore, SerializationBinder = Program.SerializationBinder };
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {

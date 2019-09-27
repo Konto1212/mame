@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace zanac.MAmidiMEmo.Instruments
+namespace zanac.MAmidiMEmo.Instruments.Envelopes
 {
     //https://cdn.korg.com/jp/support/download/files/6e1e2515cd8d82ff484b6ec38bc91906.pdf?response-content-disposition=inline%3Bfilename*%3DUTF-8''MS2000_OM_J3.pdf&response-content-type=application%2Fpdf%3B
     //https://github.com/wesen/mididuino/blob/develop/hardware/libraries/MidiTools/Arpeggiator.cpp
@@ -271,7 +271,13 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             if (arpStep >= arpNotes.Count)
-                arpStep =  0;
+            {
+                //ステップをループする
+                arpStep = 0;
+                arpOctaveCount++;
+                if (arpOctaveCount >= Range)
+                    arpOctaveCount = 0;
+            }
 
             //次のノートを取得
             NoteOnEvent an = null;

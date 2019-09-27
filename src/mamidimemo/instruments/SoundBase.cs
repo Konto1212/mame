@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Smf;
 using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
 
 namespace zanac.MAmidiMEmo.Instruments
 {

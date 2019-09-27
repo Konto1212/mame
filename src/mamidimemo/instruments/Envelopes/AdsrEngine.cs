@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace zanac.MAmidiMEmo.Instruments
+namespace zanac.MAmidiMEmo.Instruments.Envelopes
 {
 
     //https://www.earlevel.com/main/2013/06/03/envelope-generators-adsr-code/

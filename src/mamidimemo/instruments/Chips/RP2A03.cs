@@ -19,13 +19,14 @@ using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
 using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Gui;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
 //http://hp.vector.co.jp/authors/VA042397/nes/apu.html
 //https://wiki.nesdev.com/w/index.php/APU
 
-namespace zanac.MAmidiMEmo.Instruments
+namespace zanac.MAmidiMEmo.Instruments.Chips
 {
     /// <summary>
     /// 
@@ -733,6 +734,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Sound Type")]
+            [DefaultValue(ToneType.SQUARE)]
             public ToneType ToneType
             {
                 get;
@@ -827,6 +829,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Square Duty Cycle (0:87.5% 1:75% 2:50% 3:25%)")]
             [SlideParametersAttribute(0, 3)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte SQDutyCycle
             {
                 get
@@ -858,6 +861,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Noise Type (0:32k bit 1:93bit)")]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte NoiseType
             {
                 get
@@ -879,6 +883,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Square/Tri Play Length (0-31)")]
             [SlideParametersAttribute(0, 31)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte PlayLength
             {
                 get
@@ -941,6 +946,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("DPCM Loop Play (0:Off 1:On)")]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte DeltaPcmLoopEnable
             {
                 get

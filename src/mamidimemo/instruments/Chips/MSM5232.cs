@@ -18,13 +18,14 @@ using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
 using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Gui;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
 //http://www.citylan.it/wiki/images/3/3e/5232.pdf
 //http://sr4.sakura.ne.jp/acsound/taito/taito5232.html
 
-namespace zanac.MAmidiMEmo.Instruments
+namespace zanac.MAmidiMEmo.Instruments.Chips
 {
     /// <summary>
     /// 
@@ -560,6 +561,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Sound Group")]
+            [DefaultValue(SoundGroup.Group1)]
             public SoundGroup SoundGroup
             {
                 get;
@@ -573,6 +575,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Attack Time (0-7)")]
             [SlideParametersAttribute(0, 7)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte AT
             {
                 get
@@ -592,6 +595,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Decay Time (0-15)")]
             [SlideParametersAttribute(0, 15)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte DT
             {
                 get
@@ -613,6 +617,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Envelope Generator Mode (0:Off 1:On)")]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte EGE
             {
                 get
@@ -633,6 +638,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Attack Release Mode (0:Off 1:On)")]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)1)]
             public byte ARM
             {
                 get
@@ -652,6 +658,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Hormonics mode (b0:Normal b1:1 Octave b2:2 Octave b3:3 Octave)")]
             [SlideParametersAttribute(0, 15)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)15)]
             public byte Hormonics
             {
                 get
@@ -669,6 +676,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Noise Tone")]
+            [DefaultValue(false)]
             public bool NoiseTone
             {
                 get

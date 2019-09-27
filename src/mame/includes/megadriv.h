@@ -20,6 +20,7 @@
 #include "sound/msm5232.h"
 #include "sound/ay8910.h"
 #include "sound/mos6581.h"
+#include "sound/beep.h"
 #include "video/315_5313.h"
 
 /* Megadrive Console Specific */
@@ -125,10 +126,14 @@ public:
 			strcpy(device_names[didx][i], (std::string("mos6581_") + num).c_str());
 			m_sid6581[i] = new optional_device<mos6581_device>(*this, device_names[didx][i]);
 			didx++;
+			//mos6581
+			strcpy(device_names[didx][i], (std::string("beep_") + num).c_str());
+			m_beep[i] = new optional_device<beep_device>(*this, device_names[didx][i]);
+			didx++;
 		}
 	}
 
-	char device_names[ 13 ][8][100];
+	char device_names[ 14 ][8][100];
 	optional_device<ym2151_device> *m_ym2151[8];	//1
 	optional_device<ym2612_device> *m_ym2612[8];	//2
 	optional_device<sn76496_device> *m_sn76496[8];	//3
@@ -142,6 +147,7 @@ public:
 	optional_device<ay8910_device> *m_ay8910[8];	//11
 	optional_device<mos8580_device> *m_sid8580[8];	//12
 	optional_device<mos6581_device> *m_sid6581[8];	//13
+	optional_device<beep_device> *m_beep[8];	//14
 
 	required_device<m68000_base_device> m_maincpu;
 	/*

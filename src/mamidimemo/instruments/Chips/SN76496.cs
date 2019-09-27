@@ -18,13 +18,14 @@ using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
 using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Gui;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
 //http://www.smspower.org/Development/SN76489
 //http://www.st.rim.or.jp/~nkomatsu/peripheral/SN76489.html
 
-namespace zanac.MAmidiMEmo.Instruments
+namespace zanac.MAmidiMEmo.Instruments.Chips
 {
     /// <summary>
     /// 
@@ -475,6 +476,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Sound Type")]
+            [DefaultValue(SoundType.PSG)]
             public SoundType SoundType
             {
                 get;
@@ -488,6 +490,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Feedback (0-1)")]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte FB
             {
                 get

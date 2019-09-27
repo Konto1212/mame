@@ -38,10 +38,15 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.listViewIntruments = new System.Windows.Forms.ListView();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.contextMenuStripInst = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.decreaseThisKindOfChipToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.propertyGrid = new System.Windows.Forms.PropertyGrid();
+            this.contextMenuStripProp = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.resetToDefaultThisPropertyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -60,27 +65,28 @@
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBoxMidiIf = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.fMSynthesisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addYM2151ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addYM2612ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendYM3812ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendYM2413ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.wSGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendSCC1kToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addNAMCOCUS30ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendGBAPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pSGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.extendNESAPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addSN76496ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendMSM5232ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendAY38910ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendMOS8580ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendMOS6581ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.extendBeepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -89,12 +95,13 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
+            this.contextMenuStripInst.SuspendLayout();
+            this.contextMenuStripProp.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
-            this.tabControl1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -127,7 +134,7 @@
             // 
             // listViewIntruments
             // 
-            this.listViewIntruments.ContextMenuStrip = this.contextMenuStrip1;
+            this.listViewIntruments.ContextMenuStrip = this.contextMenuStripInst;
             resources.ApplyResources(this.listViewIntruments, "listViewIntruments");
             this.listViewIntruments.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
             ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups"))),
@@ -142,12 +149,12 @@
             this.listViewIntruments.UseCompatibleStateImageBehavior = false;
             this.listViewIntruments.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.listViewIntruments_ItemSelectionChanged);
             // 
-            // contextMenuStrip1
+            // contextMenuStripInst
             // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.contextMenuStripInst.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.decreaseThisKindOfChipToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            resources.ApplyResources(this.contextMenuStrip1, "contextMenuStrip1");
+            this.contextMenuStripInst.Name = "contextMenuStrip1";
+            resources.ApplyResources(this.contextMenuStripInst, "contextMenuStripInst");
             // 
             // decreaseThisKindOfChipToolStripMenuItem
             // 
@@ -163,8 +170,44 @@
             // 
             // propertyGrid
             // 
+            this.propertyGrid.ContextMenuStrip = this.contextMenuStripProp;
             resources.ApplyResources(this.propertyGrid, "propertyGrid");
             this.propertyGrid.Name = "propertyGrid";
+            // 
+            // contextMenuStripProp
+            // 
+            this.contextMenuStripProp.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.resetToDefaultThisPropertyToolStripMenuItem});
+            this.contextMenuStripProp.Name = "contextMenuStripProp";
+            resources.ApplyResources(this.contextMenuStripProp, "contextMenuStripProp");
+            // 
+            // resetToDefaultThisPropertyToolStripMenuItem
+            // 
+            this.resetToDefaultThisPropertyToolStripMenuItem.Name = "resetToDefaultThisPropertyToolStripMenuItem";
+            resources.ApplyResources(this.resetToDefaultThisPropertyToolStripMenuItem, "resetToDefaultThisPropertyToolStripMenuItem");
+            this.resetToDefaultThisPropertyToolStripMenuItem.Click += new System.EventHandler(this.resetToDefaultThisPropertyToolStripMenuItem_Click);
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            resources.ApplyResources(this.tabControl1, "tabControl1");
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.tabPage1, "tabPage1");
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.tabPage1_Paint);
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.listView1);
+            resources.ApplyResources(this.tabPage2, "tabPage2");
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // listView1
             // 
@@ -289,21 +332,21 @@
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fMSynthesisToolStripMenuItem,
+            this.wSGToolStripMenuItem,
+            this.pSGToolStripMenuItem});
+            resources.ApplyResources(this.toolStripDropDownButton1, "toolStripDropDownButton1");
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            // 
+            // fMSynthesisToolStripMenuItem
+            // 
+            this.fMSynthesisToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addYM2151ToolStripMenuItem,
             this.addYM2612ToolStripMenuItem,
             this.extendYM3812ToolStripMenuItem,
-            this.extendYM2413ToolStripMenuItem,
-            this.extendSCC1kToolStripMenuItem,
-            this.addNAMCOCUS30ToolStripMenuItem,
-            this.extendGBAPUToolStripMenuItem,
-            this.extendNESAPUToolStripMenuItem,
-            this.addSN76496ToolStripMenuItem,
-            this.extendMSM5232ToolStripMenuItem,
-            this.extendAY38910ToolStripMenuItem,
-            this.extendMOS8580ToolStripMenuItem,
-            this.extendMOS6581ToolStripMenuItem});
-            resources.ApplyResources(this.toolStripDropDownButton1, "toolStripDropDownButton1");
-            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.extendYM2413ToolStripMenuItem});
+            this.fMSynthesisToolStripMenuItem.Name = "fMSynthesisToolStripMenuItem";
+            resources.ApplyResources(this.fMSynthesisToolStripMenuItem, "fMSynthesisToolStripMenuItem");
             // 
             // addYM2151ToolStripMenuItem
             // 
@@ -329,23 +372,77 @@
             resources.ApplyResources(this.extendYM2413ToolStripMenuItem, "extendYM2413ToolStripMenuItem");
             this.extendYM2413ToolStripMenuItem.Click += new System.EventHandler(this.extendYM2413ToolStripMenuItem_Click);
             // 
+            // wSGToolStripMenuItem
+            // 
+            this.wSGToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.extendSCC1kToolStripMenuItem,
+            this.addNAMCOCUS30ToolStripMenuItem,
+            this.extendGBAPUToolStripMenuItem});
+            this.wSGToolStripMenuItem.Name = "wSGToolStripMenuItem";
+            resources.ApplyResources(this.wSGToolStripMenuItem, "wSGToolStripMenuItem");
+            // 
             // extendSCC1kToolStripMenuItem
             // 
             this.extendSCC1kToolStripMenuItem.Name = "extendSCC1kToolStripMenuItem";
             resources.ApplyResources(this.extendSCC1kToolStripMenuItem, "extendSCC1kToolStripMenuItem");
-            this.extendSCC1kToolStripMenuItem.Click += new System.EventHandler(this.extendSCC1kToolStripMenuItem_Click);
             // 
             // addNAMCOCUS30ToolStripMenuItem
             // 
             this.addNAMCOCUS30ToolStripMenuItem.Name = "addNAMCOCUS30ToolStripMenuItem";
             resources.ApplyResources(this.addNAMCOCUS30ToolStripMenuItem, "addNAMCOCUS30ToolStripMenuItem");
-            this.addNAMCOCUS30ToolStripMenuItem.Click += new System.EventHandler(this.addNAMCOCUS30ToolStripMenuItem_Click);
             // 
             // extendGBAPUToolStripMenuItem
             // 
             this.extendGBAPUToolStripMenuItem.Name = "extendGBAPUToolStripMenuItem";
             resources.ApplyResources(this.extendGBAPUToolStripMenuItem, "extendGBAPUToolStripMenuItem");
-            this.extendGBAPUToolStripMenuItem.Click += new System.EventHandler(this.extendGBAPUToolStripMenuItem_Click);
+            // 
+            // pSGToolStripMenuItem
+            // 
+            this.pSGToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.extendNESAPUToolStripMenuItem,
+            this.addSN76496ToolStripMenuItem,
+            this.extendAY38910ToolStripMenuItem,
+            this.extendMSM5232ToolStripMenuItem,
+            this.extendMOS8580ToolStripMenuItem,
+            this.extendMOS6581ToolStripMenuItem,
+            this.extendBeepToolStripMenuItem});
+            this.pSGToolStripMenuItem.Name = "pSGToolStripMenuItem";
+            resources.ApplyResources(this.pSGToolStripMenuItem, "pSGToolStripMenuItem");
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.toolStripButton1.Image = global::zanac.MAmidiMEmo.Properties.Resources.Panic;
+            resources.ApplyResources(this.toolStripButton1, "toolStripButton1");
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            // 
+            // toolStripButton2
+            // 
+            this.toolStripButton2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.toolStripButton2.Image = global::zanac.MAmidiMEmo.Properties.Resources.Rst;
+            resources.ApplyResources(this.toolStripButton2, "toolStripButton2");
+            this.toolStripButton2.Name = "toolStripButton2";
+            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
+            // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.DefaultExt = "MAmi";
+            this.saveFileDialog1.FileName = "MyEnvironment";
+            resources.ApplyResources(this.saveFileDialog1, "saveFileDialog1");
+            this.saveFileDialog1.SupportMultiDottedExtensions = true;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.DefaultExt = "*.MAmi";
+            this.openFileDialog1.FileName = "openFileDialog1";
+            resources.ApplyResources(this.openFileDialog1, "openFileDialog1");
+            this.openFileDialog1.SupportMultiDottedExtensions = true;
+            // 
+            // timer1
+            // 
+            this.timer1.Interval = 50;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // extendNESAPUToolStripMenuItem
             // 
@@ -383,62 +480,11 @@
             resources.ApplyResources(this.extendMOS6581ToolStripMenuItem, "extendMOS6581ToolStripMenuItem");
             this.extendMOS6581ToolStripMenuItem.Click += new System.EventHandler(this.extendMOS6581ToolStripMenuItem_Click);
             // 
-            // toolStripButton1
+            // extendBeepToolStripMenuItem
             // 
-            this.toolStripButton1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripButton1.Image = global::zanac.MAmidiMEmo.Properties.Resources.Panic;
-            resources.ApplyResources(this.toolStripButton1, "toolStripButton1");
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
-            // 
-            // toolStripButton2
-            // 
-            this.toolStripButton2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripButton2.Image = global::zanac.MAmidiMEmo.Properties.Resources.Rst;
-            resources.ApplyResources(this.toolStripButton2, "toolStripButton2");
-            this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
-            // 
-            // saveFileDialog1
-            // 
-            this.saveFileDialog1.DefaultExt = "MAmi";
-            this.saveFileDialog1.FileName = "MyEnvironment";
-            resources.ApplyResources(this.saveFileDialog1, "saveFileDialog1");
-            this.saveFileDialog1.SupportMultiDottedExtensions = true;
-            // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.DefaultExt = "*.MAmi";
-            this.openFileDialog1.FileName = "openFileDialog1";
-            resources.ApplyResources(this.openFileDialog1, "openFileDialog1");
-            this.openFileDialog1.SupportMultiDottedExtensions = true;
-            // 
-            // tabControl1
-            // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            resources.ApplyResources(this.tabControl1, "tabControl1");
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.tabPage1, "tabPage1");
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.tabPage1_Paint);
-            // 
-            // tabPage2
-            // 
-            this.tabPage2.Controls.Add(this.listView1);
-            resources.ApplyResources(this.tabPage2, "tabPage2");
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // timer1
-            // 
-            this.timer1.Interval = 50;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.extendBeepToolStripMenuItem.Name = "extendBeepToolStripMenuItem";
+            resources.ApplyResources(this.extendBeepToolStripMenuItem, "extendBeepToolStripMenuItem");
+            this.extendBeepToolStripMenuItem.Click += new System.EventHandler(this.extendBeepToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -458,15 +504,16 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            this.contextMenuStrip1.ResumeLayout(false);
+            this.contextMenuStripInst.ResumeLayout(false);
+            this.contextMenuStripProp.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.tabControl1.ResumeLayout(false);
-            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -489,36 +536,42 @@
         private System.Windows.Forms.ToolStripComboBox toolStripComboBoxMidiIf;
         private System.Windows.Forms.PropertyGrid propertyGrid;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
-        private System.Windows.Forms.ToolStripMenuItem addYM2612ToolStripMenuItem;
         private System.Windows.Forms.ImageList imageList1;
-        private System.Windows.Forms.ToolStripMenuItem addSN76496ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem addNAMCOCUS30ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem addYM2151ToolStripMenuItem;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripInst;
         private System.Windows.Forms.ToolStripMenuItem decreaseThisKindOfChipToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem extendGBAPUToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.ToolStripMenuItem extendNESAPUToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private System.Windows.Forms.ToolStripMenuItem extendSCC1kToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem extendYM3812ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem extendYM2413ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem extendMSM5232ToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripMenuItem toolToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private System.Windows.Forms.ToolStripMenuItem extendAY38910ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem extendMOS8580ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem extendMOS6581ToolStripMenuItem;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripProp;
+        private System.Windows.Forms.ToolStripMenuItem resetToDefaultThisPropertyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fMSynthesisToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addYM2151ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addYM2612ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendYM3812ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendYM2413ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem wSGToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendSCC1kToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addNAMCOCUS30ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendGBAPUToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem pSGToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendNESAPUToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addSN76496ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendMSM5232ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendAY38910ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendMOS8580ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendMOS6581ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendBeepToolStripMenuItem;
     }
 }
 

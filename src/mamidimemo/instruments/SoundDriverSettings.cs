@@ -12,6 +12,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
 using static zanac.MAmidiMEmo.Instruments.SoundBase;
 
 namespace zanac.MAmidiMEmo.Instruments

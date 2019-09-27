@@ -18,6 +18,7 @@ using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
 using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Gui;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
@@ -25,7 +26,7 @@ using zanac.MAmidiMEmo.Midi;
 //http://www.bellesondes.fr/wiki/doku.php?id=mos6581#mos6581_sound_interface_device_sid
 //https://www.sfpgmr.net/blog/entry/mos-sid-6581を調べた.html
 
-namespace zanac.MAmidiMEmo.Instruments
+namespace zanac.MAmidiMEmo.Instruments.Chips
 {
     /// <summary>
     /// 
@@ -46,6 +47,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Resonance (0-15)")]
         [SlideParametersAttribute(0,15, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [DefaultValue((byte)0)]
         public byte RES
         {
             get => f_RES;
@@ -69,6 +71,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Cutoff (or Center) Frequency (0-2047)(30Hz - 10KHz)")]
         [SlideParametersAttribute(0, 2047, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [DefaultValue((byte)0)]
         public ushort FC
         {
             get => f_FC;
@@ -120,6 +123,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Disable ch 3 sound (0:Enable 1:Disable)")]
         [SlideParametersAttribute(0, 1, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(UITypeEditor))]
+        [DefaultValue((byte)0)]
         public byte OFF3
         {
             get

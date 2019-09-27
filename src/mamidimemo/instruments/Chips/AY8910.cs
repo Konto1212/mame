@@ -18,6 +18,7 @@ using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
 using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Gui;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
@@ -25,7 +26,7 @@ using zanac.MAmidiMEmo.Midi;
 //https://w.atwiki.jp/msx-sdcc/pages/45.html
 //http://f.rdw.se/AY-3-8910-datasheet.pdf
 
-namespace zanac.MAmidiMEmo.Instruments
+namespace zanac.MAmidiMEmo.Instruments.Chips
 {
     /// <summary>
     /// 
@@ -74,6 +75,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Set Envelope Coarse Frequency")]
         [SlideParametersAttribute(0, 255, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [DefaultValue((byte)2)]
         public byte EnvelopeFrequencyCoarse
         {
             get => f_EnvelopeFrequencyCoarse;
@@ -92,7 +94,7 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-        private byte f_EnvelopeFrequencyFine = 0;
+        private byte f_EnvelopeFrequencyFine;
 
         /// <summary>
         /// 
@@ -102,6 +104,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Set Envelope Fine Frequency")]
         [SlideParametersAttribute(0, 255, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [DefaultValue((byte)2)]
         public byte EnvelopeFrequencyFine
         {
             get => f_EnvelopeFrequencyFine;
@@ -130,6 +133,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Set Envelope Type (0-15)")]
         [SlideParametersAttribute(0, 15, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [DefaultValue((byte)0)]
         public byte EnvelopeType
         {
             get => f_EnvelopeType;
@@ -691,6 +695,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Chip")]
             [Description("Override global settings")]
+            [DefaultValue(false)]
             public bool Enable
             {
                 get;
@@ -728,6 +733,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Set Envelope Fine Frequency")]
             [SlideParametersAttribute(0, 255)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte EnvelopeFrequencyFine
             {
                 get => f_EnvelopeFrequencyFine;
@@ -748,6 +754,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Set Envelope Type")]
             [SlideParametersAttribute(0, 15)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte EnvelopeType
             {
                 get => f_EnvelopeType;

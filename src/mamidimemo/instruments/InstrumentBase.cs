@@ -264,6 +264,22 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        public bool ShouldSerializeChannels()
+        {
+            foreach (var dt in Channels)
+            {
+                if (dt != true)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetChannels()
+        {
+            for (int i = 0; i < Channels.Length; i++)
+                Channels[i] = false;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -278,6 +294,22 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        public bool ShouldSerializePitchs()
+        {
+            foreach (var dt in Pitchs)
+            {
+                if (dt != 8192)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetPitchs()
+        {
+            for (int i = 0; i < Pitchs.Length; i++)
+                Pitchs[i] = 8192;
+        }
+
         [DataMember]
         [Category("MIDI")]
         [Description("Pitch bend sensitivity [half note] <MIDI 16ch>")]
@@ -289,6 +321,22 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        public bool ShouldSerializePitchBendRanges()
+        {
+            foreach (var dt in PitchBendRanges)
+            {
+                if (dt != 2)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetPitchBendRanges()
+        {
+            for (int i = 0; i < PitchBendRanges.Length; i++)
+                Pitchs[i] = 2;
+        }
+
         [DataMember]
         [Category("MIDI")]
         [Description("Program number (0-127) <MIDI 16ch>")]
@@ -298,6 +346,22 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get;
             private set;
+        }
+
+        public bool ShouldSerializeProgramNumbers()
+        {
+            foreach (var dt in ProgramNumbers)
+            {
+                if (dt != 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetProgramNumbers()
+        {
+            for (int i = 0; i < ProgramNumbers.Length; i++)
+                Pitchs[i] = 0;
         }
 
         /// <summary>
@@ -318,6 +382,22 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        public bool ShouldSerializeVolumes()
+        {
+            foreach (var dt in Volumes)
+            {
+                if (dt != 127)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetVolumes()
+        {
+            for (int i = 0; i < Volumes.Length; i++)
+                Volumes[i] = 127;
+        }
+
         [DataMember]
         [Category("MIDI")]
         [Description("Volume (0-127) <MIDI 16ch>")]
@@ -327,6 +407,23 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get;
             private set;
+        }
+
+
+        public bool ShouldSerializeExpressions()
+        {
+            foreach (var dt in Expressions)
+            {
+                if (dt != 127)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetExpressions()
+        {
+            for (int i = 0; i < Expressions.Length; i++)
+                Expressions[i] = 127;
         }
 
         [DataMember]
@@ -340,6 +437,21 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        public bool ShouldSerializePanpots()
+        {
+            foreach (var dt in Panpots)
+            {
+                if (dt != 64)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetPanpots()
+        {
+            for (int i = 0; i < Panpots.Length; i++)
+                Panpots[i] = 64;
+        }
 
         [DataMember]
         [Category("MIDI")]
@@ -352,6 +464,23 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        public bool ShouldSerializeModulations()
+        {
+            foreach (var dt in Modulations)
+            {
+                if (dt != 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetModulations()
+        {
+            for (int i = 0; i < Modulations.Length; i++)
+                Modulations[i] = 0;
+        }
+
+
         [DataMember]
         [Category("MIDI")]
         [Description("Modulation Rate (0-64-127) <MIDI 16ch>")]
@@ -361,6 +490,22 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get;
             private set;
+        }
+
+        public bool ShouldSerializeModulationRates()
+        {
+            foreach (var dt in ModulationRates)
+            {
+                if (dt != 64)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetModulationRates()
+        {
+            for (int i = 0; i < ModulationRates.Length; i++)
+                ModulationRates[i] = 64;
         }
 
         /// <summary>
@@ -388,6 +533,22 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        public bool ShouldSerializeModulationDepthes()
+        {
+            foreach (var dt in ModulationDepthes)
+            {
+                if (dt != 64)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetModulationDepthes()
+        {
+            for (int i = 0; i < ModulationDepthes.Length; i++)
+                ModulationDepthes[i] = 64;
+        }
+
         [DataMember]
         [Category("MIDI")]
         [Description("Modulation Delay (0-64-127) <MIDI 16ch>")]
@@ -399,7 +560,23 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
-        /// <summary>
+        public bool ShouldSerializeModulationDelays()
+        {
+            foreach (var dt in ModulationDelays)
+            {
+                if (dt != 64)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetModulationDelays()
+        {
+            for (int i = 0; i < ModulationDelays.Length; i++)
+                ModulationDelays[i] = 64;
+        }
+
+                /// <summary>
         /// Hz
         /// </summary>
         /// <param name="channel"></param>
@@ -427,6 +604,23 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+        public bool ShouldSerializeModulationDepthRangesNote()
+        {
+            foreach (var dt in ModulationDepthRangesNote)
+            {
+                if (dt != 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetModulationDepthRangesNote()
+        {
+            for (int i = 0; i < ModulationDepthRangesNote.Length; i++)
+                ModulationDepthRangesNote[i] = 64;
+        }
+
+
         [DataMember]
         [Category("MIDI")]
         [Description("Modulation Depth Range[Cent] (0-127) <MIDI 16ch>")]
@@ -437,6 +631,24 @@ namespace zanac.MAmidiMEmo.Instruments
             get;
             private set;
         }
+
+
+        public bool ShouldSerializeModulationDepthRangesCent()
+        {
+            foreach (var dt in ModulationDepthRangesCent)
+            {
+                if (dt != 0x40)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetModulationDepthRangesCent()
+        {
+            for (int i = 0; i < ModulationDepthRangesCent.Length; i++)
+                ModulationDepthRangesCent[i] = 64;
+        }
+
 
         [DataMember]
         [Category("MIDI")]
@@ -449,6 +661,24 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+
+        public bool ShouldSerializePortamentos()
+        {
+            foreach (var dt in Portamentos)
+            {
+                if (dt != 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetPortamentos()
+        {
+            for (int i = 0; i < Portamentos.Length; i++)
+                Portamentos[i] = 0;
+        }
+
+
         [DataMember]
         [Category("MIDI")]
         [Description("Portamento Time (0-127) <MIDI 16ch>")]
@@ -459,6 +689,24 @@ namespace zanac.MAmidiMEmo.Instruments
             get;
             private set;
         }
+
+
+        public bool ShouldSerializePortamentoTimes()
+        {
+            foreach (var dt in PortamentoTimes)
+            {
+                if (dt != 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetPortamentoTimes()
+        {
+            for (int i = 0; i < PortamentoTimes.Length; i++)
+                PortamentoTimes[i] = 0;
+        }
+
 
         [Browsable(false)]
         public byte[] RpnLsb

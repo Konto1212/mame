@@ -1,11 +1,15 @@
 ﻿// copyright-holders:K.Ito
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.MusicTheory;
 using Melanchall.DryWetMidi.Smf;
@@ -14,34 +18,36 @@ using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
 using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Gui;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
 using zanac.MAmidiMEmo.Mame;
+using zanac.MAmidiMEmo.Midi;
 
-//https://www16.atwiki.jp/mxdrv/pages/24.html
-//http://map.grauw.nl/resources/sound/yamaha_ym2151_synthesis.pdf
+//https://www.plutiedev.com/ym2612-registers
+//http://www.smspower.org/maxim/Documents/YM2612#regb4
 
-namespace zanac.MAmidiMEmo.Instruments
+namespace zanac.MAmidiMEmo.Instruments.Chips
 {
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    public class YM2151 : InstrumentBase
+    public class YM2612 : InstrumentBase
     {
 
-        public override string Name => "YM2151";
+        public override string Name => "YM2612";
 
         public override string Group => "FM";
 
-        public override InstrumentType InstrumentType => InstrumentType.YM2151;
+        public override InstrumentType InstrumentType => InstrumentType.YM2612;
 
         [Browsable(false)]
-        public override string ImageKey => "YM2151";
+        public override string ImageKey => "YM2612";
 
         /// <summary>
         /// 
         /// </summary>
         [Browsable(false)]
-        protected override string SoundInterfaceTagNamePrefix => "ym2151_";
+        protected override string SoundInterfaceTagNamePrefix => "ym2612_";
 
         /// <summary>
         /// 
@@ -54,7 +60,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get
             {
-                return 1;
+                return 2;
             }
         }
 
@@ -68,16 +74,53 @@ namespace zanac.MAmidiMEmo.Instruments
             return Timbres[pn];
         }
 
-        private byte f_LFRQ;
+        private byte f_LFOEN;
 
         /// <summary>
         /// LFRQ (0-255)
         /// </summary>
         [DataMember]
         [Category("Chip")]
-        [Description("LFO Freq (0-255)")]
-        [SlideParametersAttribute(0, 255, true)]
+        [Description("LFO Enable (0:Off 1:Enable)")]
+        [SlideParametersAttribute(0, 1, true)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [DefaultValue((byte)0)]
+        public byte LFOEN
+        {
+            get
+            {
+                return f_LFOEN;
+            }
+            set
+            {
+                byte v = (byte)(value & 1);
+                if (f_LFOEN != v)
+                {
+                    f_LFOEN = v;
+                    Ym2612WriteData(UnitNumber, 0x22, 0, 0, (byte)(LFOEN << 3 | LFRQ));
+                }
+            }
+        }
+
+        private byte f_LFRQ;
+
+        /// <summary>
+        /// LFRQ (0-7)
+        /// </summary>
+        [DataMember]
+        [Category("Chip")]
+        [Description("LFO Freq (0-7)\r\n" +
+            "0:	3.82 Hz\r\n" +
+            "1: 5.33 Hz\r\n" +
+            "2: 5.77 Hz\r\n" +
+            "3: 6.11 Hz\r\n" +
+            "4: 6.60 Hz\r\n" +
+            "5: 9.23 Hz\r\n" +
+            "6: 46.11 Hz\r\n" +
+            "7: 69.22 Hz\r\n")]
+        [SlideParametersAttribute(0, 7, true)]
+        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [DefaultValue((byte)0)]
         public byte LFRQ
         {
             get
@@ -86,152 +129,11 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             set
             {
-                if (f_LFRQ != value)
+                byte v = (byte)(value & 7);
+                if (f_LFRQ != v)
                 {
-                    f_LFRQ = value;
-                    Ym2151WriteData(UnitNumber, 0x18, 0, 0, LFRQ);
-                }
-            }
-        }
-
-
-        private byte f_LFOF;
-
-        /// <summary>
-        /// Select AMD or PMD(0:AMD 1:PMD)
-        /// </summary>
-        [DataMember]
-        [Category("Chip")]
-        [Description("Select AMD or PMD (0:AMD 1:PMD)")]
-        [SlideParametersAttribute(0, 1, true)]
-        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        public byte LFOF
-        {
-            get
-            {
-                return f_LFOF;
-            }
-            set
-            {
-                byte v = (byte)(value & 1);
-                if (f_LFOF != v)
-                {
-                    f_LFOF = v;
-                    Ym2151WriteData(UnitNumber, 0x19, 0, 0, (byte)(LFOF << 7 | LFOD));
-                }
-            }
-        }
-
-        private byte f_LFOD;
-
-
-        /// <summary>
-        /// LFO Depth(0-127)
-        /// </summary>
-        [DataMember]
-        [Category("Chip")]
-        [Description("LFO Depth (0-127)")]
-        [SlideParametersAttribute(0, 127, true)]
-        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        public byte LFOD
-        {
-            get
-            {
-                return f_LFOD;
-            }
-            set
-            {
-                byte v = (byte)(value & 127);
-                if (f_LFOD != v)
-                {
-                    f_LFOD = v;
-                    Ym2151WriteData(UnitNumber, 0x19, 0, 0, (byte)(LFOF << 7 | LFOD));
-                }
-            }
-        }
-
-
-        private byte f_LFOW;
-
-
-        /// <summary>
-        /// LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)
-        /// </summary>
-        [DataMember]
-        [Category("Chip")]
-        [Description("LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)")]
-        [SlideParametersAttribute(0, 3, true)]
-        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        public byte LFOW
-        {
-            get
-            {
-                return f_LFOW;
-            }
-            set
-            {
-                byte v = (byte)(value & 3);
-                if (f_LFOW != v)
-                {
-                    f_LFOW = v;
-                    Ym2151WriteData(UnitNumber, 0x1B, 0, 0, (byte)LFOW);
-                }
-            }
-        }
-
-        private byte f_NE;
-
-        /// <summary>
-        /// Noise Enable (0:Disable 1:Enable)
-        /// </summary>
-        [Browsable(false)]
-        [DataMember]
-        [Category("Chip")]
-        [Description("Noise Enable (0:Disable 1:Enable)")]
-        [SlideParametersAttribute(0, 1, true)]
-        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        public byte NE
-        {
-            get
-            {
-                return f_NE;
-            }
-            set
-            {
-                byte v = (byte)(value & 1);
-                if (f_NE != v)
-                {
-                    f_NE = v;
-                    Ym2151WriteData(UnitNumber, 0x0f, 0, 0, (byte)(NE << 7 | NFRQ));
-                }
-            }
-        }
-
-        private byte f_NFRQ;
-
-        /// <summary>
-        /// Noise Feequency (0-31)
-        /// </summary>
-        [Browsable(false)]
-        [DataMember]
-        [Category("Chip")]
-        [Description(" Noise Feequency (0-31)\r\n" +
-            "3'579'545/(32*NFRQ)")]
-        [SlideParametersAttribute(0, 31, true)]
-        [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        public byte NFRQ
-        {
-            get
-            {
-                return f_NFRQ;
-            }
-            set
-            {
-                byte v = (byte)(value & 31);
-                if (f_NFRQ != v)
-                {
-                    f_NFRQ = v;
-                    Ym2151WriteData(UnitNumber, 0x0f, 0, 0, (byte)(NE << 7 | NFRQ));
+                    f_LFRQ = v;
+                    Ym2612WriteData(UnitNumber, 0x22, 0, 0, (byte)(LFOEN << 3 | LFRQ));
                 }
             }
         }
@@ -241,10 +143,10 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Timbres (0-127)")]
         [EditorAttribute(typeof(DummyEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableCollectionConverter))]
-        public YM2151Timbre[] Timbres
+        public YM2612Timbre[] Timbres
         {
             get;
-            set;
+            private set;
         }
 
         /// <summary>
@@ -255,7 +157,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject<YM2151>(serializeData);
+                var obj = JsonConvert.DeserializeObject<YM2612>(serializeData);
                 this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
             }
             catch (Exception ex)
@@ -277,13 +179,13 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="data"></param>
         /// <returns></returns>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void delegate_ym2151_write(uint unitNumber, uint address, byte data);
+        private delegate void delegate_ym2612_write(uint unitNumber, uint address, byte data);
 
 
         /// <summary>
         /// 
         /// </summary>
-        private static delegate_ym2151_write Ym2151_write
+        private static delegate_ym2612_write Ym2612_write
         {
             get;
             set;
@@ -293,29 +195,14 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        private static void Ym2151WriteData(uint unitNumber, byte address, int op, int slot, byte data)
+        private static void Ym2612WriteData(uint unitNumber, byte address, int op, int slot, byte data)
         {
+            uint reg = (uint)(slot / 3) * 2;
             try
             {
                 Program.SoundUpdating();
-
-                switch (op)
-                {
-                    case 0:
-                        op = 0;
-                        break;
-                    case 1:
-                        op = 2;
-                        break;
-                    case 2:
-                        op = 1;
-                        break;
-                    case 3:
-                        op = 3;
-                        break;
-                }
-                Ym2151_write(unitNumber, 0, (byte)(address + (op * 8) + slot));
-                Ym2151_write(unitNumber, 1, data);
+                Ym2612_write(unitNumber, reg + 0, (byte)(address + (op * 4) + (slot % 3)));
+                Ym2612_write(unitNumber, reg + 1, data);
             }
             finally
             {
@@ -326,32 +213,31 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        static YM2151()
+        static YM2612()
         {
-            IntPtr funcPtr = MameIF.GetProcAddress("ym2151_write");
+            IntPtr funcPtr = MameIF.GetProcAddress("ym2612_write");
             if (funcPtr != IntPtr.Zero)
             {
-                Ym2151_write = (delegate_ym2151_write)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_ym2151_write));
+                Ym2612_write = (delegate_ym2612_write)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_ym2612_write));
             }
         }
 
-        private YM2151SoundManager soundManager;
+        private YM2612SoundManager soundManager;
 
         /// <summary>
         /// 
         /// </summary>
-        public YM2151(uint unitNumber) : base(unitNumber)
+        public YM2612(uint unitNumber) : base(unitNumber)
         {
             GainLeft = 2.5f;
             GainRight = 2.5f;
 
-            Timbres = new YM2151Timbre[128];
+            Timbres = new YM2612Timbre[128];
             for (int i = 0; i < 128; i++)
-                Timbres[i] = new YM2151Timbre();
-
+                Timbres[i] = new YM2612Timbre();
             setPresetInstruments();
 
-            this.soundManager = new YM2151SoundManager(this);
+            this.soundManager = new YM2612SoundManager(this);
         }
 
         /// <summary>
@@ -368,67 +254,183 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         private void setPresetInstruments()
         {
-            //Dist Gt
-            Timbres[0].PMS = 0;
+            //Brass Section.dmp
+            Timbres[0].FMS = 1;
             Timbres[0].AMS = 0;
-            Timbres[0].FB = 0;
+            Timbres[0].FB = 7;
             Timbres[0].ALG = 3;
 
             Timbres[0].Ops[0].Enable = 1;
             Timbres[0].Ops[0].AR = 31;
-            Timbres[0].Ops[0].D1R = 0;
-            Timbres[0].Ops[0].SL = 0;
+            Timbres[0].Ops[0].D1R = 6;
+            Timbres[0].Ops[0].SL = 15;
             Timbres[0].Ops[0].D2R = 0;
-            Timbres[0].Ops[0].RR = 6;
+            Timbres[0].Ops[0].RR = 7;
 
-            Timbres[0].Ops[0].MUL = 8;
+            Timbres[0].Ops[0].MUL = 1;
             Timbres[0].Ops[0].RS = 0;
             Timbres[0].Ops[0].DT1 = 7;
             Timbres[0].Ops[0].AM = 0;
-            Timbres[0].Ops[0].DT2 = 0;
-            Timbres[0].Ops[0].TL = 56;
+            Timbres[0].Ops[0].SSG_EG = 0;
+            Timbres[0].Ops[0].TL = 20;
 
             Timbres[0].Ops[1].Enable = 1;
             Timbres[0].Ops[1].AR = 31;
-            Timbres[0].Ops[1].D1R = 18;
-            Timbres[0].Ops[1].SL = 0;
+            Timbres[0].Ops[1].D1R = 7;
+            Timbres[0].Ops[1].SL = 4;
             Timbres[0].Ops[1].D2R = 0;
-            Timbres[0].Ops[1].RR = 6;
+            Timbres[0].Ops[1].RR = 15;
 
-            Timbres[0].Ops[1].MUL = 3;
+            Timbres[0].Ops[1].MUL = 2;
             Timbres[0].Ops[1].RS = 0;
-            Timbres[0].Ops[1].DT1 = 7;
+            Timbres[0].Ops[1].DT1 = 6;
             Timbres[0].Ops[1].AM = 0;
-            Timbres[0].Ops[1].DT2 = 0;
-            Timbres[0].Ops[1].TL = 19;
+            Timbres[0].Ops[1].SSG_EG = 0;
+            Timbres[0].Ops[1].TL = 21;
 
             Timbres[0].Ops[2].Enable = 1;
             Timbres[0].Ops[2].AR = 31;
-            Timbres[0].Ops[2].D1R = 0;
-            Timbres[0].Ops[2].SL = 0;
+            Timbres[0].Ops[2].D1R = 7;
+            Timbres[0].Ops[2].SL = 4;
             Timbres[0].Ops[2].D2R = 0;
-            Timbres[0].Ops[2].RR = 6;
+            Timbres[0].Ops[2].RR = 15;
 
-            Timbres[0].Ops[2].MUL = 3;
+            Timbres[0].Ops[2].MUL = 1;
             Timbres[0].Ops[2].RS = 0;
-            Timbres[0].Ops[2].DT1 = 4;
+            Timbres[0].Ops[2].DT1 = 2;
             Timbres[0].Ops[2].AM = 0;
-            Timbres[0].Ops[2].DT2 = 0;
-            Timbres[0].Ops[2].TL = 8;
+            Timbres[0].Ops[2].SSG_EG = 0;
+            Timbres[0].Ops[2].TL = 12;
 
             Timbres[0].Ops[3].Enable = 1;
-            Timbres[0].Ops[3].AR = 20;
-            Timbres[0].Ops[3].D1R = 17;
+            Timbres[0].Ops[3].AR = 31;
+            Timbres[0].Ops[3].D1R = 0;
             Timbres[0].Ops[3].SL = 0;
             Timbres[0].Ops[3].D2R = 0;
-            Timbres[0].Ops[3].RR = 5;
+            Timbres[0].Ops[3].RR = 15;
 
-            Timbres[0].Ops[3].MUL = 2;
+            Timbres[0].Ops[3].MUL = 1;
             Timbres[0].Ops[3].RS = 0;
             Timbres[0].Ops[3].DT1 = 4;
             Timbres[0].Ops[3].AM = 0;
-            Timbres[0].Ops[3].DT2 = 0;
-            Timbres[0].Ops[3].TL = 24;
+            Timbres[0].Ops[3].SSG_EG = 0;
+            Timbres[0].Ops[3].TL = 12;
+
+            //Additive Chimes A.dmp
+            Timbres[2].FMS = 0;
+            Timbres[2].AMS = 0;
+            Timbres[2].FB = 0;
+            Timbres[2].ALG = 7;
+
+            Timbres[2].Ops[0].AR = 31;
+            Timbres[2].Ops[0].D1R = 4;
+            Timbres[2].Ops[0].SL = 15;
+            Timbres[2].Ops[0].D2R = 0;
+            Timbres[2].Ops[0].RR = 4;
+
+            Timbres[2].Ops[0].MUL = 1;
+            Timbres[2].Ops[0].RS = 0;
+            Timbres[2].Ops[0].DT1 = 4;
+            Timbres[2].Ops[0].AM = 0;
+            Timbres[2].Ops[0].SSG_EG = 0;
+            Timbres[2].Ops[0].TL = 20;
+
+            Timbres[2].Ops[1].AR = 31;
+            Timbres[2].Ops[1].D1R = 7;
+            Timbres[2].Ops[1].SL = 15;
+            Timbres[2].Ops[1].D2R = 0;
+            Timbres[2].Ops[1].RR = 5;
+
+            Timbres[2].Ops[1].MUL = 4;
+            Timbres[2].Ops[1].RS = 0;
+            Timbres[2].Ops[1].DT1 = 4;
+            Timbres[2].Ops[1].AM = 0;
+            Timbres[2].Ops[1].SSG_EG = 0;
+            Timbres[2].Ops[1].TL = 20;
+
+            Timbres[2].Ops[2].AR = 31;
+            Timbres[2].Ops[2].D1R = 10;
+            Timbres[2].Ops[2].SL = 15;
+            Timbres[2].Ops[2].D2R = 0;
+            Timbres[2].Ops[2].RR = 6;
+
+            Timbres[2].Ops[2].MUL = 7;
+            Timbres[2].Ops[2].RS = 0;
+            Timbres[2].Ops[2].DT1 = 4;
+            Timbres[2].Ops[2].AM = 0;
+            Timbres[2].Ops[2].SSG_EG = 0;
+            Timbres[2].Ops[2].TL = 20;
+
+            Timbres[2].Ops[3].AR = 31;
+            Timbres[2].Ops[3].D1R = 13;
+            Timbres[2].Ops[3].SL = 15;
+            Timbres[2].Ops[3].D2R = 0;
+            Timbres[2].Ops[3].RR = 7;
+
+            Timbres[2].Ops[3].MUL = 10;
+            Timbres[2].Ops[3].RS = 0;
+            Timbres[2].Ops[3].DT1 = 0;
+            Timbres[2].Ops[3].AM = 0;
+            Timbres[2].Ops[3].SSG_EG = 0;
+            Timbres[2].Ops[3].TL = 20;
+
+            //DX Piano1
+            Timbres[1].FMS = 0;
+            Timbres[1].AMS = 0;
+            Timbres[1].FB = 0;
+            Timbres[1].ALG = 1;
+
+            Timbres[1].Ops[0].AR = 31;
+            Timbres[1].Ops[0].D1R = 9;
+            Timbres[1].Ops[0].SL = 15;
+            Timbres[1].Ops[0].D2R = 0;
+            Timbres[1].Ops[0].RR = 5;
+
+            Timbres[1].Ops[0].MUL = 9;
+            Timbres[1].Ops[0].RS = 2;
+            Timbres[1].Ops[0].DT1 = 7;
+            Timbres[1].Ops[0].AM = 0;
+            Timbres[1].Ops[0].SSG_EG = 0;
+            Timbres[1].Ops[0].TL = 60;
+
+            Timbres[1].Ops[1].AR = 31;
+            Timbres[1].Ops[1].D1R = 9;
+            Timbres[1].Ops[1].SL = 15;
+            Timbres[1].Ops[1].D2R = 0;
+            Timbres[1].Ops[1].RR = 5;
+
+            Timbres[1].Ops[1].MUL = 9;
+            Timbres[1].Ops[1].RS = 2;
+            Timbres[1].Ops[1].DT1 = 1;
+            Timbres[1].Ops[1].AM = 0;
+            Timbres[1].Ops[1].SSG_EG = 0;
+            Timbres[1].Ops[1].TL = 60;
+
+            Timbres[1].Ops[2].AR = 31;
+            Timbres[1].Ops[2].D1R = 7;
+            Timbres[1].Ops[2].SL = 15;
+            Timbres[1].Ops[2].D2R = 0;
+            Timbres[1].Ops[2].RR = 5;
+
+            Timbres[1].Ops[2].MUL = 0;
+            Timbres[1].Ops[2].RS = 2;
+            Timbres[1].Ops[2].DT1 = 4;
+            Timbres[1].Ops[2].AM = 0;
+            Timbres[1].Ops[2].SSG_EG = 0;
+            Timbres[1].Ops[2].TL = 28;
+
+            Timbres[1].Ops[3].AR = 31;
+            Timbres[1].Ops[3].D1R = 3;
+            Timbres[1].Ops[3].SL = 15;
+            Timbres[1].Ops[3].D2R = 0;
+            Timbres[1].Ops[3].RR = 5;
+
+            Timbres[1].Ops[3].MUL = 0;
+            Timbres[1].Ops[3].RS = 2;
+            Timbres[1].Ops[3].DT1 = 4;
+            Timbres[1].Ops[3].AM = 0;
+            Timbres[1].Ops[3].SSG_EG = 0;
+            Timbres[1].Ops[3].TL = 10;
         }
 
         /// <summary>
@@ -474,18 +476,17 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        private class YM2151SoundManager : SoundManagerBase
+        private class YM2612SoundManager : SoundManagerBase
         {
+            private SoundList<YM2612Sound> fmOnSounds = new SoundList<YM2612Sound>(6);
 
-            private SoundList<YM2151Sound> fmOnSounds = new SoundList<YM2151Sound>(8);
-
-            private YM2151 parentModule;
+            private YM2612 parentModule;
 
             /// <summary>
             /// 
             /// </summary>
             /// <param name="parent"></param>
-            public YM2151SoundManager(YM2151 parent) : base(parent)
+            public YM2612SoundManager(YM2612 parent) : base(parent)
             {
                 this.parentModule = parent;
             }
@@ -502,10 +503,11 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 var pn = parentModule.ProgramNumbers[note.Channel];
                 var timbre = parentModule.Timbres[pn];
-                YM2151Sound snd = new YM2151Sound(parentModule, this, timbre, note, emptySlot);
+                YM2612Sound snd = new YM2612Sound(parentModule, this, timbre, note, emptySlot);
                 fmOnSounds.Add(snd);
                 FormMain.OutputDebugLog("KeyOn FM ch" + emptySlot + " " + note.ToString());
                 snd.KeyOn();
+
                 return snd;
             }
 
@@ -515,7 +517,13 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <returns></returns>
             private int searchEmptySlot(NoteOnEvent note)
             {
-                return SearchEmptySlotAndOff(fmOnSounds, note, 8);
+                int emptySlot = -1;
+
+                var pn = parentModule.ProgramNumbers[note.Channel];
+
+                var timbre = parentModule.Timbres[pn];
+                emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, 6);
+                return emptySlot;
             }
 
         }
@@ -524,13 +532,14 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        private class YM2151Sound : SoundBase
+        private class YM2612Sound : SoundBase
         {
-            private YM2151 parentModule;
+
+            private YM2612 parentModule;
 
             private SevenBitNumber programNumber;
 
-            private YM2151Timbre timbre;
+            private YM2612Timbre timbre;
 
             /// <summary>
             /// 
@@ -539,7 +548,7 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public YM2151Sound(YM2151 parentModule, YM2151SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
+            public YM2612Sound(YM2612 parentModule, YM2612SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
@@ -557,26 +566,21 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (gs.Enable)
                 {
                     Program.SoundUpdating();
-                    parentModule.LFOD = gs.LFOD;
-                    parentModule.LFOF = gs.LFOF;
-                    parentModule.LFOW = gs.LFOW;
+                    parentModule.LFOEN = gs.LFOEN;
                     parentModule.LFRQ = gs.LFRQ;
-                    parentModule.NE = gs.NE;
-                    parentModule.NFRQ = gs.NFRQ;
                     Program.SoundUpdated();
                 }
 
                 //
-                SetTimbre();
+                SetFmTimbre();
                 //Freq
                 UpdatePitch();
                 //Volume
                 UpdateVolume();
                 //On
-                byte op = (byte)(timbre.Ops[0].Enable << 3 | timbre.Ops[2].Enable << 4 | timbre.Ops[1].Enable << 5 | timbre.Ops[3].Enable << 6);
-                Ym2151WriteData(parentModule.UnitNumber, 0x01, 0, 0, (byte)0x2);
-                Ym2151WriteData(parentModule.UnitNumber, 0x01, 0, 0, (byte)0x0);
-                Ym2151WriteData(parentModule.UnitNumber, 0x08, 0, 0, (byte)(op | Slot));
+                uint reg = (uint)(Slot / 3) * 2;
+                byte op = (byte)(timbre.Ops[0].Enable << 4 | timbre.Ops[1].Enable << 5 | timbre.Ops[2].Enable << 6 | timbre.Ops[3].Enable << 7);
+                Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(op | (reg << 1) | (byte)(Slot % 3)));
             }
 
             /// <summary>
@@ -623,8 +627,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 var v = CalcCurrentVolume();
                 foreach (int op in ops)
                 {
-                    //$60+: total level
-                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)(127 - Math.Round((127 - timbre.Ops[op].TL) * v)));
+                    //$40+: total level
+                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)(127 - Math.Round((127 - timbre.Ops[op].TL) * v)));
                 }
             }
 
@@ -634,92 +638,35 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <param name="slot"></param>
             public override void UpdatePitch()
             {
-                double d = CalcCurrentPitch() * 63d;
+                double d = CalcCurrentPitch();
 
-                int kf = 0;
-                if (d > 0)
-                    kf = (int)d % 63;
-                else if (d < 0)
-                    kf = 63 + ((int)d % 63);
-
-                int noted = (int)d / 63;
-                if (d < 0)
-                    noted -= 1;
-
-                int noteNum = NoteOnEvent.NoteNumber + noted;
+                int noteNum = NoteOnEvent.NoteNumber + (int)d;
                 if (noteNum > 127)
                     noteNum = 127;
                 else if (noteNum < 0)
                     noteNum = 0;
-
                 var nnOn = new NoteOnEvent((SevenBitNumber)noteNum, (SevenBitNumber)127);
-
-                byte nn = getNoteNum(nnOn.GetNoteName());
+                ushort freq = convertFmFrequency(nnOn);
                 var octave = nnOn.GetNoteOctave();
-                if (nn == 14)
-                {
-                    octave -= 1;
-                }
                 if (octave < 0)
                 {
                     octave = 0;
-                    nn = 0;
+                    freq = freqTable[0];
                 }
                 if (octave > 7)
                 {
                     octave = 7;
-                    nn = 14;
+                    freq = freqTable[13];
                 }
+                octave = octave << 3;
+
+                if (d != 0)
+                    freq += (ushort)(((double)(convertFmFrequency(nnOn, (d < 0) ? false : true) - freq)) * Math.Abs(d - Math.Truncate(d)));
+
                 Program.SoundUpdating();
-                Ym2151WriteData(parentModule.UnitNumber, 0x28, 0, Slot, (byte)((octave << 4) | nn));
-                Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)(kf << 2));
+                Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | ((freq >> 8) & 7)));
+                Ym2612WriteData(parentModule.UnitNumber, 0xa0, 0, Slot, (byte)(0xff & freq));
                 Program.SoundUpdated();
-            }
-
-            private byte getNoteNum(NoteName noteName)
-            {
-                byte nn = 0;
-                switch (noteName)
-                {
-                    case NoteName.C:
-                        nn = 14;
-                        break;
-                    case NoteName.CSharp:
-                        nn = 0;
-                        break;
-                    case NoteName.D:
-                        nn = 1;
-                        break;
-                    case NoteName.DSharp:
-                        nn = 2;
-                        break;
-                    case NoteName.E:
-                        nn = 4;
-                        break;
-                    case NoteName.F:
-                        nn = 5;
-                        break;
-                    case NoteName.FSharp:
-                        nn = 6;
-                        break;
-                    case NoteName.G:
-                        nn = 8;
-                        break;
-                    case NoteName.GSharp:
-                        nn = 9;
-                        break;
-                    case NoteName.A:
-                        nn = 10;
-                        break;
-                    case NoteName.ASharp:
-                        nn = 12;
-                        break;
-                    case NoteName.B:
-                        nn = 13;
-                        break;
-                }
-
-                return nn;
             }
 
             /// <summary>
@@ -727,31 +674,42 @@ namespace zanac.MAmidiMEmo.Instruments
             /// </summary>
             public override void UpdatePanpot()
             {
+                //$B4+: panning, FMS, AMS
                 byte pan = parentModule.Panpots[NoteOnEvent.Channel];
                 if (pan < 32)
-                    pan = 0x1;
-                else if (pan > 96)
                     pan = 0x2;
+                else if (pan > 96)
+                    pan = 0x1;
                 else
                     pan = 0x3;
-                Ym2151WriteData(parentModule.UnitNumber, 0x20, 0, Slot, (byte)(pan << 6 | (timbre.FB << 3) | timbre.ALG));
+                Ym2612WriteData(parentModule.UnitNumber, 0xB4, 0, Slot, (byte)(pan << 6 | (timbre.AMS << 4) | timbre.FMS));
             }
 
             /// <summary>
             /// 
             /// </summary>
-            public void SetTimbre()
+            public void SetFmTimbre()
             {
-                Ym2151WriteData(parentModule.UnitNumber, 0x38, 0, Slot, (byte)((timbre.PMS << 4 | timbre.AMS)));
                 for (int op = 0; op < 4; op++)
                 {
-                    Ym2151WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)((timbre.Ops[op].DT1 << 4 | timbre.Ops[op].MUL)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)timbre.Ops[op].TL);
-                    Ym2151WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.Ops[op].RS << 6 | timbre.Ops[op].AR)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0xa0, op, Slot, (byte)((timbre.Ops[op].AM << 7 | timbre.Ops[op].D1R)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0xc0, op, Slot, (byte)((timbre.Ops[op].DT2 << 7 | timbre.Ops[op].D2R)));
-                    Ym2151WriteData(parentModule.UnitNumber, 0xe0, op, Slot, (byte)((timbre.Ops[op].SL << 7 | timbre.Ops[op].RR)));
+                    //$30+: multiply and detune
+                    Ym2612WriteData(parentModule.UnitNumber, 0x30, op, Slot, (byte)((timbre.Ops[op].DT1 << 4 | timbre.Ops[op].MUL)));
+                    //$40+: total level
+                    Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)timbre.Ops[op].TL);
+                    //$50+: attack rate and rate scaling
+                    Ym2612WriteData(parentModule.UnitNumber, 0x50, op, Slot, (byte)((timbre.Ops[op].RS << 6 | timbre.Ops[op].AR)));
+                    //$60+: 1st decay rate and AM enable
+                    Ym2612WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)((timbre.Ops[op].AM << 7 | timbre.Ops[op].D1R)));
+                    //$70+: 2nd decay rate
+                    Ym2612WriteData(parentModule.UnitNumber, 0x70, op, Slot, (byte)timbre.Ops[op].D2R);
+                    //$80+: release rate and sustain level
+                    Ym2612WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.Ops[op].SL << 4 | timbre.Ops[op].RR)));
+                    //$90+: SSG-EG
+                    Ym2612WriteData(parentModule.UnitNumber, 0x90, op, Slot, (byte)timbre.Ops[op].SSG_EG);
                 }
+
+                //$B0+: algorithm and feedback
+                Ym2612WriteData(parentModule.UnitNumber, 0xB0, 0, Slot, (byte)(timbre.FB << 3 | timbre.ALG));
 
                 UpdatePanpot();
             }
@@ -763,18 +721,59 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 base.SoundOff();
 
-                Ym2151WriteData(parentModule.UnitNumber, 0x08, 0, 0, (byte)(0x00 | Slot));
+                uint reg = (uint)(Slot / 3) * 2;
+                Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(0x00 | (reg << 1) | (byte)(Slot % 3)));
             }
 
-        }
+            private ushort[] freqTable = new ushort[] {
+                1214/2,
+                644,
+                681,
+                722,
+                765,
+                810,
+                858,
+                910,
+                964,
+                1021,
+                1081,
+                1146,
+                1214,
+                644*2,
+            };
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="note"></param>
+            /// <param name="freq"></param>
+            /// <returns></returns>
+            private ushort convertFmFrequency(NoteOnEvent note)
+            {
+                return freqTable[(int)note.GetNoteName() + 1];
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="note"></param>
+            /// <param name="freq"></param>
+            /// <returns></returns>
+            private ushort convertFmFrequency(NoteOnEvent note, bool plus)
+            {
+                if (plus)
+                    return freqTable[(int)note.GetNoteName() + 2];
+                else
+                    return freqTable[(int)note.GetNoteName()];
+            }
+        }
 
         /// <summary>
         /// 
         /// </summary>
-        [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2151Timbre>))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2612Timbre>))]
         [DataContract]
-        public class YM2151Timbre : TimbreBase
+        public class YM2612Timbre : TimbreBase
         {
             #region FM Symth
 
@@ -843,24 +842,27 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            private byte f_PMS;
+            private byte f_FMS;
 
             [DataMember]
             [Category("Sound")]
-            [Description("Phase Modulation Sensitivity (0-7)")]
+            [Description("Frequency Modulation Sensitivity (0-7)")]
             [SlideParametersAttribute(0, 7)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte PMS
+            public byte FMS
             {
                 get
                 {
-                    return f_PMS;
+                    return f_FMS;
                 }
                 set
                 {
-                    f_PMS = (byte)(value & 7);
+                    f_FMS = (byte)(value & 7);
                 }
             }
+
+            #endregion
+
 
             /// <summary>
             /// 
@@ -870,7 +872,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Operators")]
             [TypeConverter(typeof(ExpandableCollectionConverter))]
             [DisplayName("Operators")]
-            public YM2151Operator[] Ops
+            public YM2612Operator[] Ops
             {
                 get;
                 private set;
@@ -888,24 +890,22 @@ namespace zanac.MAmidiMEmo.Instruments
             /// <summary>
             /// 
             /// </summary>
-            public YM2151Timbre()
+            public YM2612Timbre()
             {
-                Ops = new YM2151Operator[] {
-                    new YM2151Operator(),
-                    new YM2151Operator(),
-                    new YM2151Operator(),
-                    new YM2151Operator() };
+                Ops = new YM2612Operator[] {
+                    new YM2612Operator(),
+                    new YM2612Operator(),
+                    new YM2612Operator(),
+                    new YM2612Operator() };
                 GlobalSettings = new GlobalSettings();
                 this.SDS.FxS = new BasicFxSettings();
             }
-
-            #endregion
 
             public override void RestoreFrom(string serializeData)
             {
                 try
                 {
-                    var obj = JsonConvert.DeserializeObject<YM2151Timbre>(serializeData);
+                    var obj = JsonConvert.DeserializeObject<YM2612Timbre>(serializeData);
                     this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
                 }
                 catch (Exception ex)
@@ -919,17 +919,16 @@ namespace zanac.MAmidiMEmo.Instruments
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
             }
-
         }
 
         /// <summary>
         /// 
         /// </summary>
-        [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2151Operator>))]
         [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2612Operator>))]
         [DataContract]
         [MidiHook]
-        public class YM2151Operator : ContextBoundObject
+        public class YM2612Operator : ContextBoundObject
         {
             private byte f_Enable = 1;
 
@@ -940,8 +939,6 @@ namespace zanac.MAmidiMEmo.Instruments
             [Category("Sound")]
             [Description("Whether this operator enable or not")]
             [DefaultValue((byte)1)]
-            [SlideParametersAttribute(0, 1)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte Enable
             {
                 get
@@ -962,8 +959,6 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("DeTune 1 (1-4-7)")]
-            [SlideParametersAttribute(1, 7)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte DT1
             {
                 get
@@ -984,8 +979,6 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Multiply (0-15)")]
-            [SlideParametersAttribute(0, 15)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte MUL
             {
                 get
@@ -1006,8 +999,6 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Total Level (0-127)")]
-            [SlideParametersAttribute(0, 127)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte TL
             {
                 get
@@ -1028,8 +1019,6 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Rate Scaling (0-3)")]
-            [SlideParametersAttribute(0, 3)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte RS
             {
                 get
@@ -1050,8 +1039,6 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Attack Rate (0-31)")]
-            [SlideParametersAttribute(0, 31)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte AR
             {
                 get
@@ -1067,13 +1054,11 @@ namespace zanac.MAmidiMEmo.Instruments
             private byte f_AM;
 
             /// <summary>
-            /// AMS Enable (0:Disable 1:Enable)
+            /// amplitude modulation sensivity(0-1)
             /// </summary>
             [DataMember]
             [Category("Sound")]
             [Description("Amplitude Modulation Sensivity (0-1)")]
-            [SlideParametersAttribute(0, 1)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte AM
             {
                 get
@@ -1094,8 +1079,6 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("1st Decay Rate (0-31)")]
-            [SlideParametersAttribute(0, 31)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte D1R
             {
                 get
@@ -1116,8 +1099,6 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("2nd Decay Rate (0-31)")]
-            [SlideParametersAttribute(0, 31)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte D2R
             {
                 get
@@ -1138,8 +1119,6 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Sustain Level(0-15)")]
-            [SlideParametersAttribute(0, 15)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte SL
             {
                 get
@@ -1160,8 +1139,6 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Release Rate (0-15)")]
-            [SlideParametersAttribute(0, 15)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte RR
             {
                 get
@@ -1174,25 +1151,23 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            private byte f_DT2;
+            private byte f_SSG_EG;
 
             /// <summary>
-            /// DT2(0-3)
+            /// SSG-EG(0-15)
             /// </summary>
             [DataMember]
             [Category("Sound")]
-            [Description("Detune 2 (0-3)")]
-            [SlideParametersAttribute(0, 3)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte DT2
+            [Description("SSG-EG (0-15)")]
+            public byte SSG_EG
             {
                 get
                 {
-                    return f_DT2;
+                    return f_SSG_EG;
                 }
                 set
                 {
-                    f_DT2 = (byte)(value & 3);
+                    f_SSG_EG = (byte)(value & 15);
                 }
             }
         }
@@ -1214,15 +1189,49 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
 
-            private byte f_LFRQ;
+            private byte f_LFOEN;
 
             /// <summary>
             /// LFRQ (0-255)
             /// </summary>
             [DataMember]
             [Category("Chip")]
-            [Description("LFO Freq (0-255)")]
-            [SlideParametersAttribute(0, 255)]
+            [Description("LFO Enable (0:Off 1:Enable)")]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public byte LFOEN
+            {
+                get
+                {
+                    return f_LFOEN;
+                }
+                set
+                {
+                    byte v = (byte)(value & 1);
+                    if (f_LFOEN != v)
+                    {
+                        f_LFOEN = v;
+                    }
+                }
+            }
+
+            private byte f_LFRQ;
+
+            /// <summary>
+            /// LFRQ (0-7)
+            /// </summary>
+            [DataMember]
+            [Category("Chip")]
+            [Description("LFO Freq (0-7)\r\n" +
+                "0:	3.82 Hz\r\n" +
+                "1: 5.33 Hz\r\n" +
+                "2: 5.77 Hz\r\n" +
+                "3: 6.11 Hz\r\n" +
+                "4: 6.60 Hz\r\n" +
+                "5: 9.23 Hz\r\n" +
+                "6: 46.11 Hz\r\n" +
+                "7: 69.22 Hz\r\n")]
+            [SlideParametersAttribute(0, 7)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte LFRQ
             {
@@ -1232,152 +1241,15 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
                 set
                 {
-                    if (f_LFRQ != value)
+                    byte v = (byte)(value & 7);
+                    if (f_LFRQ != v)
                     {
-                        f_LFRQ = value;
-                    }
-                }
-            }
-
-
-            private byte f_LFOF;
-
-            /// <summary>
-            /// Select AMD or PMD(0:AMD 1:PMD)
-            /// </summary>
-            [DataMember]
-            [Category("Chip")]
-            [Description("Select AMD or PMD (0:AMD 1:PMD)")]
-            [SlideParametersAttribute(0, 1)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte LFOF
-            {
-                get
-                {
-                    return f_LFOF;
-                }
-                set
-                {
-                    byte v = (byte)(value & 1);
-                    if (f_LFOF != v)
-                    {
-                        f_LFOF = v;
-                    }
-                }
-            }
-
-            private byte f_LFOD;
-
-
-            /// <summary>
-            /// LFO Depth(0-127)
-            /// </summary>
-            [DataMember]
-            [Category("Chip")]
-            [Description("LFO Depth (0-127)")]
-            [SlideParametersAttribute(0, 127)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte LFOD
-            {
-                get
-                {
-                    return f_LFOD;
-                }
-                set
-                {
-                    byte v = (byte)(value & 127);
-                    if (f_LFOD != v)
-                    {
-                        f_LFOD = v;
-                    }
-                }
-            }
-
-
-            private byte f_LFOW;
-
-
-            /// <summary>
-            /// LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)
-            /// </summary>
-            [DataMember]
-            [Category("Chip")]
-            [Description("LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)")]
-            [SlideParametersAttribute(0, 3)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte LFOW
-            {
-                get
-                {
-                    return f_LFOW;
-                }
-                set
-                {
-                    byte v = (byte)(value & 3);
-                    if (f_LFOW != v)
-                    {
-                        f_LFOW = v;
-                    }
-                }
-            }
-
-            private byte f_NE;
-
-            /// <summary>
-            /// Noise Enable (0:Disable 1:Enable)
-            /// </summary>
-            [Browsable(false)]
-            [DataMember]
-            [Category("Chip")]
-            [Description("Noise Enable (0:Disable 1:Enable)")]
-            [SlideParametersAttribute(0, 1)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte NE
-            {
-                get
-                {
-                    return f_NE;
-                }
-                set
-                {
-                    byte v = (byte)(value & 1);
-                    if (f_NE != v)
-                    {
-                        f_NE = v;
-                    }
-                }
-            }
-
-            private byte f_NFRQ;
-
-            /// <summary>
-            /// Noise Feequency (0-31)
-            /// </summary>
-            [Browsable(false)]
-            [DataMember]
-            [Category("Chip")]
-            [Description(" Noise Feequency (0-31)\r\n" +
-                "3'579'545/(32*NFRQ)")]
-            [SlideParametersAttribute(0, 31)]
-            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte NFRQ
-            {
-                get
-                {
-                    return f_NFRQ;
-                }
-                set
-                {
-                    byte v = (byte)(value & 31);
-                    if (f_NFRQ != v)
-                    {
-                        f_NFRQ = v;
+                        f_LFRQ = v;
                     }
                 }
             }
 
         }
+
+        }
     }
-
-
-}

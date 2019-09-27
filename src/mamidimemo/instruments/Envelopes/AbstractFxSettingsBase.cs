@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using zanac.MAmidiMEmo.ComponentModel;
 
-namespace zanac.MAmidiMEmo.Instruments
+namespace zanac.MAmidiMEmo.Instruments.Envelopes
 {
 
     [JsonConverter(typeof(NoTypeConverterJsonConverter<AbstractFxSettingsBase>))]

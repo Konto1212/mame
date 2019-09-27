@@ -3,6 +3,7 @@ using Accessibility;
 using Melanchall.DryWetMidi.Devices;
 using Melanchall.DryWetMidi.Smf;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -33,7 +34,9 @@ namespace zanac.MAmidiMEmo
         /// </summary>
         public const string FILE_VERSION = "0.6.1.0";
 
-        public static readonly JsonSerializerSettings JsonAutoSettings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, DefaultValueHandling = DefaultValueHandling.Ignore };
+        public static ISerializationBinder SerializationBinder = new KnownTypesBinder();
+
+        public static readonly JsonSerializerSettings JsonAutoSettings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, DefaultValueHandling = DefaultValueHandling.Ignore, SerializationBinder = SerializationBinder };
 
         private static Thread mainThread;
 
@@ -60,6 +63,38 @@ namespace zanac.MAmidiMEmo
         /// </summary>
         private static AnnoScope dummyAnnoScope = AnnoScope.ANNO_CONTAINER;
 #pragma warning restore  CS0414
+
+        private static Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+        private static Dictionary<string, Type> assemblieTypes;
+
+        private static Dictionary<string, Type> AssemblieTypes
+        {
+            get
+            {
+                if (assemblieTypes == null)
+                {
+                    assemblieTypes = new Dictionary<string, Type>();
+                    var ts = AppDomain.CurrentDomain.GetAssemblies()
+                                .Where(a => a.FullName.StartsWith("MAmidiMEmo,"))
+                                .SelectMany(a => a.GetTypes()).ToArray();
+                    foreach (var t in ts)
+                    {
+                        if (assemblieTypes.ContainsKey(t.Name))
+                            continue;
+                        assemblieTypes.Add(t.Name, t);
+                        foreach (var nt in GetAllNestedTypes(t))
+                        {
+                            string n = nt.FullName;
+                            if (n.Contains("."))
+                                n = n.Substring(n.LastIndexOf(".") + 1);
+                            assemblieTypes.Add(n, nt);
+                        }
+                    }
+                }
+                return assemblieTypes;
+            }
+        }
 
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
@@ -178,6 +213,54 @@ namespace zanac.MAmidiMEmo
             lockSlim.ExitWriteLock();
         }
 
+
+        private class KnownTypesBinder : ISerializationBinder
+        {
+            public Type BindToType(string assemblyName, string typeName)
+            {
+                Type t = Type.GetType(typeName);
+                if (t != null)
+                    return t;
+
+                if (typeName.Contains("."))
+                    typeName = typeName.Substring(typeName.LastIndexOf(".") + 1);
+                if (AssemblieTypes.ContainsKey(typeName))
+                    return AssemblieTypes[typeName];
+
+                return null;
+            }
+
+            public void BindToName(Type serializedType, out string assemblyName, out string typeName)
+            {
+                if (serializedType.Assembly == Assembly.GetExecutingAssembly())
+                {
+                    assemblyName = null;
+                    typeName = serializedType.Name;
+                }
+                else
+                {
+                    typeName = serializedType.FullName;
+                    assemblyName = serializedType.Assembly.FullName;
+                }
+            }
+        }
+
+        private static Type[] GetAllNestedTypes(Type type)
+        {
+            List<Type> types = new List<Type>();
+            AddNestedTypesRecursively(types, type);
+            return types.ToArray();
+        }
+
+        private static void AddNestedTypesRecursively(List<Type> types, Type type)
+        {
+            Type[] nestedTypes = type.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public);
+            foreach (Type nestedType in nestedTypes)
+            {
+                types.Add(nestedType);
+                AddNestedTypesRecursively(types, nestedType);
+            }
+        }
 
     }
 }

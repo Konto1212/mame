@@ -47,7 +47,7 @@ beep_device::beep_device(const machine_config &mconfig, const char *tag, device_
 
 void beep_device::device_start()
 {
-	m_stream = stream_alloc(0, 1, BEEP_RATE);
+	m_stream = stream_alloc(0, 2, BEEP_RATE);
 	m_enable = 0;
 	m_signal = 0x07fff;
 
@@ -66,6 +66,7 @@ void beep_device::device_start()
 void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
+	stream_sample_t *buffer1 = outputs[1];
 	int16_t signal = m_signal;
 	int clock = 0, rate = BEEP_RATE / 2;
 
@@ -79,6 +80,7 @@ void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	if ( !m_enable || clock == 0 )
 	{
 		memset( buffer, 0, samples * sizeof(*buffer) );
+		memset(buffer1, 0, samples * sizeof(*buffer));
 		return;
 	}
 
@@ -86,6 +88,7 @@ void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	while( samples-- > 0 )
 	{
 		*buffer++ = signal;
+		*buffer1++ = signal;
 		incr -= clock;
 		while( incr < 0 )
 		{
@@ -131,6 +134,8 @@ void beep_device::set_clock(uint32_t frequency)
 
 	m_stream->update();
 	m_frequency = frequency;
+	/* mamidimemo
 	m_signal = 0x07fff;
 	m_incr = 0;
+	*/
 }

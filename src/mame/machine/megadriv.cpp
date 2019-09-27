@@ -1009,6 +1009,10 @@ void md_base_state::md_ntsc(machine_config &config)
 		MOS6581(config, *m_sid6581[i], XTAL(14'318'181) / 14);
 		(*m_sid6581[i])->add_route(0, "lspeaker", 1.00);
 		(*m_sid6581[i])->add_route(1, "rspeaker", 1.00);
+
+		BEEP(config, *m_beep[i], 2400);
+		(*m_beep[i])->add_route(0, "lspeaker", 1.00);
+		(*m_beep[i])->add_route(1, "rspeaker", 1.00);
 	}
 
 }

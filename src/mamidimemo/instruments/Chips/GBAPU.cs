@@ -17,6 +17,7 @@ using Omu.ValueInjecter;
 using Omu.ValueInjecter.Injections;
 using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Gui;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
@@ -27,7 +28,7 @@ using zanac.MAmidiMEmo.Midi;
 //http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
 //http://www.devrs.com/gb/files/hosted/GBSOUND.txt
 
-namespace zanac.MAmidiMEmo.Instruments
+namespace zanac.MAmidiMEmo.Instruments.Chips
 {
     /// <summary>
     /// 
@@ -795,6 +796,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [DataMember]
             [Category("Sound")]
             [Description("Sound Type (SPSG:Sweep PSG:PSG(2ch) WAV:WAV NOISE:NOISE)")]
+            [DefaultValue(SoundType.SPSG)]
             public SoundType SoundType
             {
                 get;
@@ -955,6 +957,7 @@ namespace zanac.MAmidiMEmo.Instruments
             [Description("Counter Step/Width (0=15 bits, 1=7 bits)")]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
             public byte NoiseCounter
             {
                 get
@@ -1020,6 +1023,20 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
+            public bool ShouldSerializeWsgData()
+            {
+                foreach (var dt in WsgData)
+                {
+                    if (dt != 0)
+                        return true;
+                }
+                return false;
+            }
+
+            public void ResetWsgData()
+            {
+                f_wavedata = new byte[32];
+            }
 
             [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
             typeof(UITypeEditor)), Localizable(false)]
@@ -1054,8 +1071,6 @@ namespace zanac.MAmidiMEmo.Instruments
                         WsgData[i] = vs[i] > 15 ? (byte)15 : vs[i];
                 }
             }
-
-
 
             /// <summary>
             /// 

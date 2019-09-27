@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
 
 namespace zanac.MAmidiMEmo.Instruments
 {

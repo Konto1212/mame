@@ -17,6 +17,7 @@
 #include "..\devices\sound\msm5232.h"
 #include "..\devices\sound\ay8910.h"
 #include "..\devices\sound\mos6581.h"
+#include "..\devices\sound\beep.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -563,6 +564,25 @@ extern "C"
 			return;
 
 		mos6581->write(address, data);
+	}
+
+	DllExport void beep_set_clock(unsigned int unitNumber, int state, unsigned int frequency)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		beep_device *beep = dynamic_cast<beep_device *>(rm->root_device().subdevice((std::string("beep_") + num).c_str()));
+		if (beep == nullptr)
+			return;
+
+		if(frequency != 0)
+			beep->set_clock(frequency);
+		beep->set_state(state);
 	}
 
 }

@@ -53,6 +53,7 @@ namespace zanac.MAmidiMEmo.Instruments
         public static void SetPeriodicCallback(Func<object, double> action, double periodMs, object state)
         {
             long lpSystemTimeAsFileTime;
+            periodMs = action(state);
             GetSystemTimeAsFileTime(out lpSystemTimeAsFileTime);
             double nextTime = lpSystemTimeAsFileTime;
             Thread th = new Thread((object data) =>
