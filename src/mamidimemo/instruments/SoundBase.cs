@@ -458,7 +458,8 @@ namespace zanac.MAmidiMEmo.Instruments
                         f_modulationEnabled = value;
                     }
                     if (f_modulationEnabled)
-                        HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processModulation), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
+                        HighPrecisionTimer.SetFixedPeriodicCallback(new Func<object, double>(processModulation), null);
+                    //HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processModulation), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
                 }
             }
         }
@@ -493,7 +494,8 @@ namespace zanac.MAmidiMEmo.Instruments
                     f_portamentoEnabled = value;
 
                     if (f_portamentoEnabled)
-                        HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processPortamento), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
+                        HighPrecisionTimer.SetFixedPeriodicCallback(new Func<object, double>(processPortamento), null);
+                    //HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processPortamento), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
                 }
             }
         }
@@ -518,7 +520,8 @@ namespace zanac.MAmidiMEmo.Instruments
                     f_AdsrEnabled = value;
 
                     if (f_AdsrEnabled)
-                        HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processAdsr), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
+                        HighPrecisionTimer.SetFixedPeriodicCallback(new Func<object, double>(processAdsr), null);
+                        //HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processAdsr), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
                 }
             }
         }

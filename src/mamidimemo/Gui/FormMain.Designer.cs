@@ -73,20 +73,22 @@
             this.wSGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendSCC1kToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addNAMCOCUS30ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.extendGBAPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pSGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendMOS8580ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendMOS6581ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendNESAPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendGBAPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addSN76496ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendAY38910ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendMSM5232ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendBeepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.extendNESAPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addSN76496ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.extendMSM5232ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.extendAY38910ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.extendMOS8580ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.extendMOS6581ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.extendBeepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pCMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendC140ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -332,6 +334,7 @@
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.pCMToolStripMenuItem,
             this.fMSynthesisToolStripMenuItem,
             this.wSGToolStripMenuItem,
             this.pSGToolStripMenuItem});
@@ -376,8 +379,7 @@
             // 
             this.wSGToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.extendSCC1kToolStripMenuItem,
-            this.addNAMCOCUS30ToolStripMenuItem,
-            this.extendGBAPUToolStripMenuItem});
+            this.addNAMCOCUS30ToolStripMenuItem});
             this.wSGToolStripMenuItem.Name = "wSGToolStripMenuItem";
             resources.ApplyResources(this.wSGToolStripMenuItem, "wSGToolStripMenuItem");
             // 
@@ -385,29 +387,75 @@
             // 
             this.extendSCC1kToolStripMenuItem.Name = "extendSCC1kToolStripMenuItem";
             resources.ApplyResources(this.extendSCC1kToolStripMenuItem, "extendSCC1kToolStripMenuItem");
+            this.extendSCC1kToolStripMenuItem.Click += new System.EventHandler(this.extendSCC1kToolStripMenuItem_Click);
             // 
             // addNAMCOCUS30ToolStripMenuItem
             // 
             this.addNAMCOCUS30ToolStripMenuItem.Name = "addNAMCOCUS30ToolStripMenuItem";
             resources.ApplyResources(this.addNAMCOCUS30ToolStripMenuItem, "addNAMCOCUS30ToolStripMenuItem");
+            this.addNAMCOCUS30ToolStripMenuItem.Click += new System.EventHandler(this.addNAMCOCUS30ToolStripMenuItem_Click);
+            // 
+            // pSGToolStripMenuItem
+            // 
+            this.pSGToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.extendMOS8580ToolStripMenuItem,
+            this.extendMOS6581ToolStripMenuItem,
+            this.extendNESAPUToolStripMenuItem,
+            this.extendGBAPUToolStripMenuItem,
+            this.addSN76496ToolStripMenuItem,
+            this.extendAY38910ToolStripMenuItem,
+            this.extendMSM5232ToolStripMenuItem,
+            this.extendBeepToolStripMenuItem});
+            this.pSGToolStripMenuItem.Name = "pSGToolStripMenuItem";
+            resources.ApplyResources(this.pSGToolStripMenuItem, "pSGToolStripMenuItem");
+            // 
+            // extendMOS8580ToolStripMenuItem
+            // 
+            this.extendMOS8580ToolStripMenuItem.Name = "extendMOS8580ToolStripMenuItem";
+            resources.ApplyResources(this.extendMOS8580ToolStripMenuItem, "extendMOS8580ToolStripMenuItem");
+            this.extendMOS8580ToolStripMenuItem.Click += new System.EventHandler(this.extendMOS8580ToolStripMenuItem_Click);
+            // 
+            // extendMOS6581ToolStripMenuItem
+            // 
+            this.extendMOS6581ToolStripMenuItem.Name = "extendMOS6581ToolStripMenuItem";
+            resources.ApplyResources(this.extendMOS6581ToolStripMenuItem, "extendMOS6581ToolStripMenuItem");
+            this.extendMOS6581ToolStripMenuItem.Click += new System.EventHandler(this.extendMOS6581ToolStripMenuItem_Click);
+            // 
+            // extendNESAPUToolStripMenuItem
+            // 
+            this.extendNESAPUToolStripMenuItem.Name = "extendNESAPUToolStripMenuItem";
+            resources.ApplyResources(this.extendNESAPUToolStripMenuItem, "extendNESAPUToolStripMenuItem");
+            this.extendNESAPUToolStripMenuItem.Click += new System.EventHandler(this.extendNESAPUToolStripMenuItem_Click);
             // 
             // extendGBAPUToolStripMenuItem
             // 
             this.extendGBAPUToolStripMenuItem.Name = "extendGBAPUToolStripMenuItem";
             resources.ApplyResources(this.extendGBAPUToolStripMenuItem, "extendGBAPUToolStripMenuItem");
+            this.extendGBAPUToolStripMenuItem.Click += new System.EventHandler(this.extendGBAPUToolStripMenuItem_Click);
             // 
-            // pSGToolStripMenuItem
+            // addSN76496ToolStripMenuItem
             // 
-            this.pSGToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.extendNESAPUToolStripMenuItem,
-            this.addSN76496ToolStripMenuItem,
-            this.extendAY38910ToolStripMenuItem,
-            this.extendMSM5232ToolStripMenuItem,
-            this.extendMOS8580ToolStripMenuItem,
-            this.extendMOS6581ToolStripMenuItem,
-            this.extendBeepToolStripMenuItem});
-            this.pSGToolStripMenuItem.Name = "pSGToolStripMenuItem";
-            resources.ApplyResources(this.pSGToolStripMenuItem, "pSGToolStripMenuItem");
+            this.addSN76496ToolStripMenuItem.Name = "addSN76496ToolStripMenuItem";
+            resources.ApplyResources(this.addSN76496ToolStripMenuItem, "addSN76496ToolStripMenuItem");
+            this.addSN76496ToolStripMenuItem.Click += new System.EventHandler(this.addSN76496ToolStripMenuItem_Click);
+            // 
+            // extendAY38910ToolStripMenuItem
+            // 
+            this.extendAY38910ToolStripMenuItem.Name = "extendAY38910ToolStripMenuItem";
+            resources.ApplyResources(this.extendAY38910ToolStripMenuItem, "extendAY38910ToolStripMenuItem");
+            this.extendAY38910ToolStripMenuItem.Click += new System.EventHandler(this.extendAY38910ToolStripMenuItem_Click);
+            // 
+            // extendMSM5232ToolStripMenuItem
+            // 
+            this.extendMSM5232ToolStripMenuItem.Name = "extendMSM5232ToolStripMenuItem";
+            resources.ApplyResources(this.extendMSM5232ToolStripMenuItem, "extendMSM5232ToolStripMenuItem");
+            this.extendMSM5232ToolStripMenuItem.Click += new System.EventHandler(this.extendMSM5232ToolStripMenuItem_Click);
+            // 
+            // extendBeepToolStripMenuItem
+            // 
+            this.extendBeepToolStripMenuItem.Name = "extendBeepToolStripMenuItem";
+            resources.ApplyResources(this.extendBeepToolStripMenuItem, "extendBeepToolStripMenuItem");
+            this.extendBeepToolStripMenuItem.Click += new System.EventHandler(this.extendBeepToolStripMenuItem_Click);
             // 
             // toolStripButton1
             // 
@@ -444,47 +492,18 @@
             this.timer1.Interval = 50;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // extendNESAPUToolStripMenuItem
+            // pCMToolStripMenuItem
             // 
-            this.extendNESAPUToolStripMenuItem.Name = "extendNESAPUToolStripMenuItem";
-            resources.ApplyResources(this.extendNESAPUToolStripMenuItem, "extendNESAPUToolStripMenuItem");
-            this.extendNESAPUToolStripMenuItem.Click += new System.EventHandler(this.extendNESAPUToolStripMenuItem_Click);
+            this.pCMToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.extendC140ToolStripMenuItem});
+            this.pCMToolStripMenuItem.Name = "pCMToolStripMenuItem";
+            resources.ApplyResources(this.pCMToolStripMenuItem, "pCMToolStripMenuItem");
             // 
-            // addSN76496ToolStripMenuItem
+            // extendC140ToolStripMenuItem
             // 
-            this.addSN76496ToolStripMenuItem.Name = "addSN76496ToolStripMenuItem";
-            resources.ApplyResources(this.addSN76496ToolStripMenuItem, "addSN76496ToolStripMenuItem");
-            this.addSN76496ToolStripMenuItem.Click += new System.EventHandler(this.addSN76496ToolStripMenuItem_Click);
-            // 
-            // extendMSM5232ToolStripMenuItem
-            // 
-            this.extendMSM5232ToolStripMenuItem.Name = "extendMSM5232ToolStripMenuItem";
-            resources.ApplyResources(this.extendMSM5232ToolStripMenuItem, "extendMSM5232ToolStripMenuItem");
-            this.extendMSM5232ToolStripMenuItem.Click += new System.EventHandler(this.extendMSM5232ToolStripMenuItem_Click);
-            // 
-            // extendAY38910ToolStripMenuItem
-            // 
-            this.extendAY38910ToolStripMenuItem.Name = "extendAY38910ToolStripMenuItem";
-            resources.ApplyResources(this.extendAY38910ToolStripMenuItem, "extendAY38910ToolStripMenuItem");
-            this.extendAY38910ToolStripMenuItem.Click += new System.EventHandler(this.extendAY38910ToolStripMenuItem_Click);
-            // 
-            // extendMOS8580ToolStripMenuItem
-            // 
-            this.extendMOS8580ToolStripMenuItem.Name = "extendMOS8580ToolStripMenuItem";
-            resources.ApplyResources(this.extendMOS8580ToolStripMenuItem, "extendMOS8580ToolStripMenuItem");
-            this.extendMOS8580ToolStripMenuItem.Click += new System.EventHandler(this.extendMOS8580ToolStripMenuItem_Click);
-            // 
-            // extendMOS6581ToolStripMenuItem
-            // 
-            this.extendMOS6581ToolStripMenuItem.Name = "extendMOS6581ToolStripMenuItem";
-            resources.ApplyResources(this.extendMOS6581ToolStripMenuItem, "extendMOS6581ToolStripMenuItem");
-            this.extendMOS6581ToolStripMenuItem.Click += new System.EventHandler(this.extendMOS6581ToolStripMenuItem_Click);
-            // 
-            // extendBeepToolStripMenuItem
-            // 
-            this.extendBeepToolStripMenuItem.Name = "extendBeepToolStripMenuItem";
-            resources.ApplyResources(this.extendBeepToolStripMenuItem, "extendBeepToolStripMenuItem");
-            this.extendBeepToolStripMenuItem.Click += new System.EventHandler(this.extendBeepToolStripMenuItem_Click);
+            this.extendC140ToolStripMenuItem.Name = "extendC140ToolStripMenuItem";
+            resources.ApplyResources(this.extendC140ToolStripMenuItem, "extendC140ToolStripMenuItem");
+            this.extendC140ToolStripMenuItem.Click += new System.EventHandler(this.extendC140ToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -563,7 +582,6 @@
         private System.Windows.Forms.ToolStripMenuItem wSGToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem extendSCC1kToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addNAMCOCUS30ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem extendGBAPUToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pSGToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem extendNESAPUToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addSN76496ToolStripMenuItem;
@@ -572,6 +590,9 @@
         private System.Windows.Forms.ToolStripMenuItem extendMOS8580ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem extendMOS6581ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem extendBeepToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendGBAPUToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem pCMToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendC140ToolStripMenuItem;
     }
 }
 

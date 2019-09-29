@@ -504,14 +504,19 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 	for (int output = 0; output < m_outputs; output++)
 		memset(outputs[output], 0, samples * sizeof(outputs[0][0]));
 
-	// loop over samples
 	const u8 *outmap = &m_outputmap[0];
-	for (int pos = 0; pos < samples; pos++)
+	// for each input, add it to the appropriate output
+	for (int inp = 0; inp < m_auto_allocated_inputs; inp++)
 	{
-		// for each input, add it to the appropriate output
-		for (int inp = 0; inp < m_auto_allocated_inputs; inp++)
+		device_t *dev = stream.input_source_device(inp);
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(dev);
+		if (!sd->m_enable)
+			continue;
+		// loop over samples
+		for (int pos = 0; pos < samples; pos++)
 			outputs[outmap[inp]][pos] += inputs[inp][pos];
 	}
+
 	if (lastOutBufferNumber == UINT32_MAX)
 		lastOutBuffer = outputs[0];
 	else

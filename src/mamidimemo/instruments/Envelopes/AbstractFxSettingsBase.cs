@@ -25,6 +25,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
 
         [DataMember]
         [Description("Whether enable Sound Driver Level Fx")]
+        [DefaultValue(false)]
         public virtual bool Enable
         {
             get

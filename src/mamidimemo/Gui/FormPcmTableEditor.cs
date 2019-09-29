@@ -14,7 +14,7 @@ using zanac.MAmidiMEmo.Instruments;
 
 namespace zanac.MAmidiMEmo.Gui
 {
-    public partial class FormPcmEditor : Form
+    public partial class FormPcmTableEditor : Form
     {
         public PcmTimbreBase[] f_PcmData;
 
@@ -87,7 +87,7 @@ namespace zanac.MAmidiMEmo.Gui
         /// <summary>
         /// 
         /// </summary>
-        public FormPcmEditor()
+        public FormPcmTableEditor()
         {
             InitializeComponent();
 

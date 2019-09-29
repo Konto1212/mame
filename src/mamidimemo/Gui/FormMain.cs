@@ -96,7 +96,8 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("AY-3-8910", Resources.AY_3_8910);
             imageList1.Images.Add("MOS8580", Resources.MOS8580);
             imageList1.Images.Add("MOS6581", Resources.MOS6581);
-            imageList1.Images.Add("BEEP", Resources.MOS6581);
+            imageList1.Images.Add("Beep", Resources.Beep);
+            imageList1.Images.Add("C140", Resources.C140);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -326,6 +327,12 @@ namespace zanac.MAmidiMEmo.Gui
             InstrumentManager.AddInstrument(InstrumentType.Beep);
         }
 
+
+        private void extendC140ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.C140);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -500,7 +507,7 @@ namespace zanac.MAmidiMEmo.Gui
             {
                 using (Pen p = new Pen(Color.DarkGreen))
                 {
-                    int max = 0;
+                    int max = h * 4;
                     //int? ldt = null;
                     int zero = 0;
                     for (int ch = 0; ch < 2; ch++)
@@ -518,8 +525,6 @@ namespace zanac.MAmidiMEmo.Gui
                             }
                         }
                     }
-                    if (max < h / 2)
-                        max = h / 2;
                     max += max / 10;
 
                     if (data[0] != null)

@@ -18,6 +18,7 @@
 #include "..\devices\sound\ay8910.h"
 #include "..\devices\sound\mos6581.h"
 #include "..\devices\sound\beep.h"
+#include "..\devices\sound\c140.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -585,6 +586,41 @@ extern "C"
 		beep->set_state(state);
 	}
 
+
+	DllExport void c140_w(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		c140_device *c140 = dynamic_cast<c140_device *>(rm->root_device().subdevice((std::string("c140_") + num).c_str()));
+		if (c140 == nullptr)
+			return;
+
+		c140->c140_w(address, data);
+	}
+
+
+	DllExport void c140_set_callback(unsigned int unitNumber, C140_CALLBACK callback)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		c140_device *c140 = dynamic_cast<c140_device *>(rm->root_device().subdevice((std::string("c140_") + num).c_str()));
+		if (c140 == nullptr)
+			return;
+
+		c140->set_callback(callback);
+	}
 }
 
 

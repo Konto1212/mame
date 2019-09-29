@@ -1013,8 +1013,11 @@ void md_base_state::md_ntsc(machine_config &config)
 		BEEP(config, *m_beep[i], 2400);
 		(*m_beep[i])->add_route(0, "lspeaker", 1.00);
 		(*m_beep[i])->add_route(1, "rspeaker", 1.00);
-	}
 
+		C140(config, *m_c140[i], 22050);	// XTAL(49'152'000) / 384 / 6); /* 21.333kHz */
+		(*m_c140[i])->add_route(0, "lspeaker", 1.00);
+		(*m_c140[i])->add_route(1, "rspeaker", 1.00);
+	}
 }
 
 void md_cons_state::dcat16_megadriv_base(machine_config &config)

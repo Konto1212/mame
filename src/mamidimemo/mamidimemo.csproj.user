@@ -19,6 +19,6 @@
     <StartArguments>megadrij -window -cart "E:\mame_src\Sonic the Hedgehog%28Japan%29.md"</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
-    <ProjectView>ProjectFiles</ProjectView>
+    <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
 </Project>

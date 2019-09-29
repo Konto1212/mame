@@ -6,24 +6,13 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using zanac.MAmidiMEmo.ComponentModel;
 
 namespace zanac.MAmidiMEmo.Instruments
 {
     public static class HighPrecisionTimer
     {
-
-        [DllImport("kernel32.dll")]
-        public static extern SafeWaitHandle CreateWaitableTimer(IntPtr lpTimerAttributes, bool bManualReset, string lpTimerName);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SetWaitableTimer(SafeWaitHandle hTimer,
-            [In] ref long pDueTime, int lPeriod,
-            IntPtr pfnCompletionRoutine, IntPtr lpArgToCompletionRoutine, bool fResume);
-
-        [DllImport("kernel32.dll")]
-        internal static extern uint WaitForSingleObject(SafeWaitHandle hHandle, uint dwMilliseconds);
-
+       
         private const int WAIT_TIMEOUT = 120 * 1000;
 
         /// <summary>
@@ -36,13 +25,20 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public const double TIMER_BASIC_HZ = 1000d / (double)TIMER_BASIC_INTERVAL;
 
+        private static MultiMediaTimerComponent multiMediaTimerComponent;
+
+        private static Dictionary<Func<object, double>, object> fixedTimerSounds = new Dictionary<Func<object, double>, object>();
+
         static HighPrecisionTimer()
         {
             Program.ShuttingDown += Program_ShuttingDown;
-        }
 
-        [DllImport("kernel32.dll")]
-        public static extern void GetSystemTimeAsFileTime(out long lpSystemTimeAsFileTime);
+            multiMediaTimerComponent = new MultiMediaTimerComponent();
+            multiMediaTimerComponent.Interval = TIMER_BASIC_INTERVAL;
+            multiMediaTimerComponent.Resolution = 1;
+            multiMediaTimerComponent.OnTimer += MultiMediaTimerComponent_OnTimer;
+            multiMediaTimerComponent.Enabled = true;
+        }
 
         /// <summary>
         /// 
@@ -87,7 +83,58 @@ namespace zanac.MAmidiMEmo.Instruments
         private static void Program_ShuttingDown(object sender, EventArgs e)
         {
             shutDown = true;
+            multiMediaTimerComponent?.Dispose();
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="instance"></param>
+        public static void SetFixedPeriodicCallback(Func<object, double> action, object state)
+        {
+            lock (Program.ExclusiveLockObject)
+            {
+                if (!fixedTimerSounds.ContainsKey(action))
+                    fixedTimerSounds.Add(action, state);
+            }
+        }
+
+        /// <s
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        private static void MultiMediaTimerComponent_OnTimer(object sender)
+        {
+            lock (Program.ExclusiveLockObject)
+            {
+                var list = fixedTimerSounds.Keys.ToList();
+
+                Parallel.ForEach(list, snd =>
+                {
+                    var ret = snd(fixedTimerSounds[snd]);
+                    if (ret < 0)
+                        fixedTimerSounds.Remove(snd);
+                });
+            }
+        }
+
+
+        [DllImport("kernel32.dll")]
+        public static extern SafeWaitHandle CreateWaitableTimer(IntPtr lpTimerAttributes, bool bManualReset, string lpTimerName);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetWaitableTimer(SafeWaitHandle hTimer,
+            [In] ref long pDueTime, int lPeriod,
+            IntPtr pfnCompletionRoutine, IntPtr lpArgToCompletionRoutine, bool fResume);
+
+        [DllImport("kernel32.dll")]
+        internal static extern uint WaitForSingleObject(SafeWaitHandle hHandle, uint dwMilliseconds);
+
+        [DllImport("kernel32.dll")]
+        public static extern void GetSystemTimeAsFileTime(out long lpSystemTimeAsFileTime);
 
     }
 }

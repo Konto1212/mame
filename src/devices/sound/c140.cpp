@@ -96,6 +96,7 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 	, m_mixer_buffer_left(nullptr)
 	, m_mixer_buffer_right(nullptr)
 	, m_baserate(0)
+	, m_callback(NULL)
 {
 	memset(m_REG, 0, sizeof(uint8_t)*0x200);
 	memset(m_pcmtbl, 0, sizeof(int16_t)*8);
@@ -184,7 +185,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	int32_t   sdt;
 	int32_t   st,ed,sz;
 
-	long      sampleData;
+	//long      sampleData;
 	int32_t   frequency,delta,offset,pos;
 	int32_t   cnt, voicecnt;
 	int32_t   lastdt,prevdt,dltdt;
@@ -210,6 +211,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 		if( v->key )
 		{
 			frequency= vreg->frequency_msb*256 + vreg->frequency_lsb;
+			frequency += vreg->reserved[0] << 16; //HACK mamidimemo
 
 			/* Abort voice if no frequency value set */
 			if(frequency==0) continue;
@@ -231,7 +233,9 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			sz=ed-st;
 
 			/* Retrieve base pointer to the sample data */
+			/* mamidimemo
 			sampleData = find_sample(st, v->bank, i);
+			*/
 
 			/* Fetch back previous data pointers */
 			offset=v->ptoffset;
@@ -247,6 +251,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				/* Loop for enough to fill sample buffer as requested */
 				for(j=0;j<samples;j++)
 				{
+					dt = 0;
 					offset += delta;
 					cnt = (offset>>16)&0x7fff;
 					offset &= 0xffff;
@@ -269,7 +274,11 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 						}
 
 						/* Read the chosen sample byte */
+						/* mamidimemo
 						dt = (int8_t) read_byte(sampleData + pos);
+						*/
+						if(m_callback != NULL)
+							dt = m_callback(v->bank, pos);
 
 						/* decompress to 13bit range */     //2000.06.26 CAB
 						sdt=dt>>3;              //signed
@@ -294,6 +303,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				/* linear 8bit signed PCM */
 				for(j=0;j<samples;j++)
 				{
+					dt = 0;
 					offset += delta;
 					cnt = (offset>>16)&0x7fff;
 					offset &= 0xffff;
@@ -319,7 +329,11 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 						if (m_banking_type == C140_TYPE::ASIC219)
 						{
+							/* mamidimemo
 							lastdt = (int8_t) read_byte(sampleData + BYTE_XOR_BE(pos));
+							*/
+							if (m_callback != NULL)
+								lastdt = m_callback(v->bank, pos);
 
 							// Sign + magnitude format
 							if ((v->mode & 0x01) && (lastdt & 0x80))
@@ -331,7 +345,11 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 						}
 						else
 						{
+							/* mamidimemo
 							lastdt = (int8_t) read_byte(sampleData + pos);
+							*/
+							if (m_callback != NULL)
+								lastdt = m_callback(v->bank, pos);
 						}
 
 						dltdt = (lastdt - prevdt);

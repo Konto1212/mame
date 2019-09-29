@@ -98,8 +98,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("Delta PCM Data (Max 4081 bytes)")]
-        [Editor(typeof(PcmUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        [PcmEditor("DMC File|*.dmc")]
+        [Editor(typeof(PcmTableUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [PcmTableEditor("DMC File(*.dmc)|*.dmc")]
         public DPcmSoundTable DeltaPcmSoundTable
         {
             get;
@@ -1262,7 +1262,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             public DPcmSoundTable()
             {
                 for (int i = 0; i < 128; i++)
-                    PcmTimbres[i] = new DeltaPcmSound(i);
+                    PcmTimbres[i] = new DeltaPcmTimbre(i);
             }
         }
 
@@ -1270,7 +1270,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// 
         /// </summary>
         [DataContract]
-        public class DeltaPcmSound : PcmTimbreBase
+        public class DeltaPcmTimbre : PcmTimbreBase
         {
 
             private byte[] f_DeltaPcmData;
@@ -1313,7 +1313,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// 
             /// </summary>
             /// <param name="noteNumber"></param>
-            public DeltaPcmSound(int noteNumber) : base(noteNumber)
+            public DeltaPcmTimbre(int noteNumber) : base(noteNumber)
             {
             }
         }

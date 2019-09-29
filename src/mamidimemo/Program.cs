@@ -213,6 +213,14 @@ namespace zanac.MAmidiMEmo
             lockSlim.ExitWriteLock();
         }
 
+        /// <summary>
+        /// MAMEとMAmiの排他制御
+        /// MAmiがMAMEのレジスタを書き換えるときに呼び出す必要がある
+        /// </summary>
+        public static bool TryEnterWriteLock()
+        {
+            return lockSlim.TryEnterWriteLock(-1);
+        }
 
         private class KnownTypesBinder : ISerializationBinder
         {

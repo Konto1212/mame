@@ -80,11 +80,18 @@
     <Compile Include="ComponentModel\CustomExpandableObjectConverter.cs" />
     <Compile Include="ComponentModel\IStandardValues.cs" />
     <Compile Include="ComponentModel\DoubleSlideParametersAttribute.cs" />
+    <Compile Include="ComponentModel\MultiMediaTimerComponent.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ComponentModel\SlideParametersAttribute.cs" />
     <Compile Include="ComponentModel\MaskAttribute.cs" />
     <Compile Include="ComponentModel\DoubleSlideEditor.cs" />
     <Compile Include="ComponentModel\SlideEditor.cs" />
+    <Compile Include="ComponentModel\WaveFileReader.cs" />
+    <Compile Include="Gui\PcmFileLoaderUITypeEditor.cs" />
+    <Compile Include="Gui\PcmFileLoaderEditorAttribute.cs" />
     <Compile Include="Instruments\Chips\AY8910.cs" />
+    <Compile Include="Instruments\Chips\C140.cs" />
     <Compile Include="Instruments\Chips\GBAPU.cs" />
     <Compile Include="Instruments\Chips\MOS6581.cs" />
     <Compile Include="Instruments\Chips\MOS8580.cs" />
@@ -132,11 +139,11 @@
     <Compile Include="Gui\FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="Gui\FormPcmEditor.cs">
+    <Compile Include="Gui\FormPcmTableEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Gui\FormPcmEditor.Designer.cs">
-      <DependentUpon>FormPcmEditor.cs</DependentUpon>
+    <Compile Include="Gui\FormPcmTableEditor.Designer.cs">
+      <DependentUpon>FormPcmTableEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Gui\FormSettings.cs">
       <SubType>Form</SubType>
@@ -145,9 +152,9 @@
       <DependentUpon>FormSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="Gui\IWsgEditorSbyteCapable.cs" />
-    <Compile Include="Gui\PcmEditorAttribute.cs" />
+    <Compile Include="Gui\PcmTableEditorAttribute.cs" />
     <Compile Include="Gui\WsgITypeEditor.cs" />
-    <Compile Include="Gui\PcmUITypeEditor.cs" />
+    <Compile Include="Gui\PcmTableUITypeEditor.cs" />
     <Compile Include="Gui\FormWsgEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -174,8 +181,8 @@
     <EmbeddedResource Include="Gui\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Gui\FormPcmEditor.resx">
-      <DependentUpon>FormPcmEditor.cs</DependentUpon>
+    <EmbeddedResource Include="Gui\FormPcmTableEditor.resx">
+      <DependentUpon>FormPcmTableEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormSettings.resx">
       <DependentUpon>FormSettings.cs</DependentUpon>
@@ -226,6 +233,8 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\C140.png" />
+    <None Include="Resources\Beep.png" />
     <None Include="Resources\MOS8580.png" />
     <None Include="Resources\MOS6581.png" />
     <None Include="Resources\AY-3-8910.png" />

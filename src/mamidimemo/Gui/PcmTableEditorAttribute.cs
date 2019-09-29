@@ -10,7 +10,7 @@ namespace zanac.MAmidiMEmo.Gui
     /// <summary>
     /// 
     /// </summary>
-    public class PcmEditorAttribute : Attribute
+    public class PcmTableEditorAttribute : Attribute
     {
         /// <summary>
         /// 
@@ -26,7 +26,7 @@ namespace zanac.MAmidiMEmo.Gui
         /// </summary>
         /// <param name="fileDialogFilter"></param>
         /// <param name="maxSize"></param>
-        public PcmEditorAttribute(string fileDialogFilter)
+        public PcmTableEditorAttribute(string fileDialogFilter)
         {
             Exts = fileDialogFilter;
         }

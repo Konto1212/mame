@@ -17,13 +17,13 @@ namespace zanac.MAmidiMEmo.Gui
     /// <summary>
     /// 
     /// </summary>
-    public class PcmUITypeEditor : ArrayEditor
+    public class PcmTableUITypeEditor : ArrayEditor
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="type"></param>
-        public PcmUITypeEditor(Type type) : base(type)
+        public PcmTableUITypeEditor(Type type) : base(type)
         {
         }
 
@@ -54,12 +54,13 @@ namespace zanac.MAmidiMEmo.Gui
             if (editorService == null)
                 return value;
 
-            PcmEditorAttribute att = (PcmEditorAttribute)context.PropertyDescriptor.Attributes[typeof(PcmEditorAttribute)];
+            PcmTableEditorAttribute att = (PcmTableEditorAttribute)context.PropertyDescriptor.Attributes[typeof(PcmTableEditorAttribute)];
 
             // CurrencyValueEditorForm を使用したプロパティエディタの表示
-            using (FormPcmEditor frm = new FormPcmEditor())
+            using (FormPcmTableEditor frm = new FormPcmTableEditor())
             {
-                frm.PcmData = JsonConvert.DeserializeObject<PcmTimbreBase[]>(JsonConvert.SerializeObject(((PcmTimbreTableBase)value).PcmTimbres));
+                var s = JsonConvert.SerializeObject(((PcmTimbreTableBase)value).PcmTimbres, Program.JsonAutoSettings);
+                frm.PcmData = JsonConvert.DeserializeObject<PcmTimbreBase[]>(s, Program.JsonAutoSettings);
                 if (att != null)
                     frm.FileDialogFilter = att.Exts;
                 else

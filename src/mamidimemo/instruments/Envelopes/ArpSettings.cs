@@ -24,6 +24,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
 
         [DataMember]
         [Description("Whether enable Sound Driver Level Arpeggio")]
+        [DefaultValue(false)]
         public bool Enable
         {
             get
@@ -43,6 +44,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
 
         [DataMember]
         [Description("Select whether Arpeggio key hold or no")]
+        [DefaultValue(false)]
         public bool Hold
         {
             get
@@ -62,6 +64,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
 
         [DataMember]
         [Description("Set arpeggio method (Note On or Pitch Change)")]
+        [DefaultValue(ArpMethod.KeyOn)]
         public ArpMethod ArpMethod
         {
             get
@@ -81,6 +84,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
 
         [DataMember]
         [Description("Set arpeggio step style")]
+        [DefaultValue(ArpStepStyle.Up)]
         public ArpStepStyle StepStyle
         {
             get
@@ -198,6 +202,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
 
         [DataMember]
         [Description("When you press a key, arpeggio restart from first. ")]
+        [DefaultValue(false)]
         public bool KeySync
         {
             get

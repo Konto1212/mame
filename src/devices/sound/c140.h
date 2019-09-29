@@ -15,6 +15,8 @@
 
 // ======================> c140_device
 
+typedef int8_t (*C140_CALLBACK)(u8 pn, int32_t pos);
+
 class c140_device : public device_t,
 	public device_sound_interface,
 	public device_rom_interface
@@ -35,6 +37,8 @@ public:
 	u8 c140_r(offs_t offset);
 	void c140_w(offs_t offset, u8 data);
 
+	void set_callback(C140_CALLBACK callback) { m_callback = callback; };
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -47,6 +51,8 @@ protected:
 
 private:
 	static constexpr unsigned MAX_VOICE = 24;
+
+	C140_CALLBACK m_callback;
 
 	struct C140_VOICE
 	{

@@ -21,8 +21,6 @@ namespace zanac.MAmidiMEmo.Instruments
     {
         private static List<List<InstrumentBase>> instruments = new List<List<InstrumentBase>>();
 
-        private static Dictionary<Func<object, long>, object> timerSounds = new Dictionary<Func<object, long>, object>();
-
         /// <summary>
         /// 
         /// </summary>
@@ -58,6 +56,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             for (int i = 0; i < Enum.GetNames(typeof(InstrumentType)).Length; i++)
                 instruments.Add(new List<InstrumentBase>());
+
         }
 
         /// <summary>

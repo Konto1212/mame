@@ -26,6 +26,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
 
         [DataMember]
         [Description("Whether enable Sound Driver Level ADSR")]
+        [DefaultValue(false)]
         public bool Enable
         {
             get
