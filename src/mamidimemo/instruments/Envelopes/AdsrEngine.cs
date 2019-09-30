@@ -50,7 +50,6 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
 
         public AdsrEngine()
         {
-            Reset();
             SetAttackRate(0);
             SetDecayRate(0);
             SetReleaseRate(30);

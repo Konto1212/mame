@@ -55,3 +55,4 @@ regtests/jedutil/output
 /src/wrapper/wrapper.vcxproj.filters
 Release(but Debug .NET)
 Release(but Debug .NET)
+/src/mamidimemo/mamidimemo.csproj.user

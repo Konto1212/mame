@@ -71,6 +71,18 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+        [DataMember]
+        [Category("Chip")]
+        [Description("Delta PCM Data (Max 4081 bytes)")]
+        [Editor(typeof(PcmTableUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [PcmTableEditor("DMC File(*.dmc)|*.dmc")]
+        [TypeConverter(typeof(CustomObjectTypeConverter))]
+        public DPcmSoundTable DeltaPcmSoundTable
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -93,17 +105,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         {
             var pn = (SevenBitNumber)ProgramNumbers[channel];
             return Timbres[pn];
-        }
-
-        [DataMember]
-        [Category("Chip")]
-        [Description("Delta PCM Data (Max 4081 bytes)")]
-        [Editor(typeof(PcmTableUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        [PcmTableEditor("DMC File(*.dmc)|*.dmc")]
-        public DPcmSoundTable DeltaPcmSoundTable
-        {
-            get;
-            private set;
         }
 
         /// <summary>

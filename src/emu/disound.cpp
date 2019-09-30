@@ -517,11 +517,14 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 			outputs[outmap[inp]][pos] += inputs[inp][pos];
 	}
 
-	if (lastOutBufferNumber == UINT32_MAX)
-		lastOutBuffer = outputs[0];
-	else
-		lastOutBuffer = inputs[lastOutBufferNumber];
+	if (lastOutBuffer != NULL)
+		delete[] lastOutBuffer;
 	lastOutBufferSamples = samples;
+	lastOutBuffer = new stream_sample_t[samples];
+	if (lastOutBufferNumber == UINT32_MAX)
+		memcpy(lastOutBuffer, outputs[0], sizeof(stream_sample_t)*samples);
+	else
+		memcpy(lastOutBuffer, inputs[lastOutBufferNumber], sizeof(stream_sample_t)*samples);
 }
 
 

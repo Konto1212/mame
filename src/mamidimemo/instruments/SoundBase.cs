@@ -1,6 +1,7 @@
 ﻿// copyright-holders:K.Ito
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -131,7 +132,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 AdsrEngine.SetDecayRate(Math.Pow(10d * (adsrs.DR / 127d), 2));
                 AdsrEngine.SetReleaseRate(Math.Pow(60d * (adsrs.RR / 127d), 2));
                 AdsrEngine.SetSustainLevel((127d - adsrs.SL) / 127d);
-                AdsrEngine?.Gate(true);
+                AdsrEngine.Gate(true);
             }
 
             var efs = Timbre.SDS.FxS;
@@ -144,6 +145,9 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public virtual void KeyOff()
         {
+            if (IsKeyOff)
+                return;
+
             IsKeyOff = true;
             AdsrEngine?.Gate(false);
 
@@ -157,7 +161,6 @@ namespace zanac.MAmidiMEmo.Instruments
         public virtual void SoundOff()
         {
             IsSoundOff = true;
-            AdsrEngine?.Reset();
         }
 
         /// <summary>
@@ -279,10 +282,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private double processFx(object state)
         {
-            if (IsDisposed)
-                return -1;
-
-            if (EnableFx && FxEngine != null)
+            if (!IsDisposed && !IsSoundOff && EnableFx && FxEngine != null)
             {
                 FxEngine.Process(this, IsKeyOff, IsSoundOff);
 
@@ -299,10 +299,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private double processAdsr(object state)
         {
-            if (IsDisposed)
-                return -1;
-
-            if (EnableADSR && AdsrEngine != null)
+            if (!IsDisposed && !IsSoundOff && EnableADSR && AdsrEngine != null)
             {
                 AdsrEngine.Process();
 
@@ -319,38 +316,29 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private double processPortamento(object state)
         {
-            if (IsDisposed)
-                return -1;
-
-            if (PortamentoEnabled)
+            if (!IsDisposed && !IsSoundOff && PortamentoEnabled && PortamentoDeltaNoteNumber != 0)
             {
+                double delta = -portStartNoteDeltSign * 12d / Math.Pow(((double)ParentModule.PortamentoTimes[NoteOnEvent.Channel] / 2d) + 1d, 1.25);
+                PortamentoDeltaNoteNumber += delta;
+
+                if (portStartNoteDeltSign < 0 && PortamentoDeltaNoteNumber >= 0)
+                    PortamentoDeltaNoteNumber = 0;
+                else if (portStartNoteDeltSign > 0 && PortamentoDeltaNoteNumber <= 0)
+                    PortamentoDeltaNoteNumber = 0;
+
+                UpdatePitch();
+
                 if (PortamentoDeltaNoteNumber != 0)
-                {
-                    double delta = -portStartNoteDeltSign * 12d / Math.Pow(((double)ParentModule.PortamentoTimes[NoteOnEvent.Channel] / 2d) + 1d, 1.25);
-                    PortamentoDeltaNoteNumber += delta;
+                    return HighPrecisionTimer.TIMER_BASIC_INTERVAL;
 
-                    if (portStartNoteDeltSign < 0 && PortamentoDeltaNoteNumber >= 0)
-                        PortamentoDeltaNoteNumber = 0;
-                    else if (portStartNoteDeltSign > 0 && PortamentoDeltaNoteNumber <= 0)
-                        PortamentoDeltaNoteNumber = 0;
-
-                    UpdatePitch();
-
-                    if (PortamentoDeltaNoteNumber != 0)
-                        return HighPrecisionTimer.TIMER_BASIC_INTERVAL;
-
-                    PortamentoEnabled = false;
-                }
+                PortamentoEnabled = false;
             }
             return -1;
         }
 
         private double processModulation(object state)
         {
-            if (IsDisposed)
-                return -1;
-
-            if (ModulationEnabled)
+            if (!IsDisposed && !IsSoundOff && ModulationEnabled)
             {
                 double radian = 2 * Math.PI * (modulationStep / HighPrecisionTimer.TIMER_BASIC_HZ);
 
@@ -521,7 +509,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
                     if (f_AdsrEnabled)
                         HighPrecisionTimer.SetFixedPeriodicCallback(new Func<object, double>(processAdsr), null);
-                        //HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processAdsr), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
+                    //HighPrecisionTimer.SetPeriodicCallback(new Func<object, double>(processAdsr), HighPrecisionTimer.TIMER_BASIC_INTERVAL, null);
                 }
             }
         }

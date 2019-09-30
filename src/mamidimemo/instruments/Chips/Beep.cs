@@ -238,7 +238,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// </summary>
         private class BeepSoundManager : SoundManagerBase
         {
-            private SoundList<BeepSound> psgOnSounds = new SoundList<BeepSound>(3);
+            private SoundList<BeepSound> psgOnSounds = new SoundList<BeepSound>(1);
 
             private Beep parentModule;
 

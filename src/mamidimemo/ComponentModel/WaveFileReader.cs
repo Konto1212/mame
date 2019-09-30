@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace zanac.MAmidiMEmo.ComponentModel
 {
-    public class WaveReader
+    public class WaveFileReader
     {
 
-        public static WaveHeader ReadWaveFile(string waveFilePath)
+        public static WaveFileHeader ReadWaveFile(string waveFilePath)
         {
             // ファイルの存在を確認する
             if (!File.Exists(waveFilePath))
                 return null;
 
-            WaveHeader waveHeader = new WaveHeader();
+            WaveFileHeader waveHeader = new WaveFileHeader();
 
             using (FileStream fs = new FileStream(waveFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
@@ -28,9 +28,9 @@ namespace zanac.MAmidiMEmo.ComponentModel
         }
 
 
-        public static WaveHeader ReadWaveData(byte[] waveData)
+        public static WaveFileHeader ReadWaveData(byte[] waveData)
         {
-            WaveHeader waveHeader = new WaveHeader();
+            WaveFileHeader waveHeader = new WaveFileHeader();
 
             using (MemoryStream fs = new MemoryStream(waveData))
             {
@@ -40,7 +40,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
             return waveHeader;
         }
 
-        private static void waveReaderCore(WaveHeader waveHeader, Stream fs)
+        private static void waveReaderCore(WaveFileHeader waveHeader, Stream fs)
         {
             BinaryReader br = new BinaryReader(fs);
             waveHeader.RiffHeader = Encoding.GetEncoding(20127).GetString(br.ReadBytes(4));
@@ -93,7 +93,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
 
     }
 
-    public class WaveHeader
+    public class WaveFileHeader
     {
         public string RiffHeader { get; internal set; }
         public string WaveHeaderData { get; internal set; }

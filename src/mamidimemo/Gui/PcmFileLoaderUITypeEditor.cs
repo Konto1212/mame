@@ -91,11 +91,11 @@ namespace zanac.MAmidiMEmo.Gui
                         }
                         else
                         {
-                            var data = WaveReader.ReadWaveFile(fn);
+                            var data = WaveFileReader.ReadWaveFile(fn);
 
-                            if (att.Bits != data.BitPerSample ||
-                                att.Rate != data.SampleRate ||
-                                att.Channels != data.Channel)
+                            if (att.Bits != 0 && att.Bits != data.BitPerSample ||
+                                att.Rate != 0 && att.Rate != data.SampleRate ||
+                                att.Channels != 0 && att.Channels != data.Channel)
                             {
                                 throw new FileLoadException(
                                     string.Format($"Incorrect wave format(Expected Ch={att.Channels} Bit={att.Bits}, Rate={att.Rate},{2})"));

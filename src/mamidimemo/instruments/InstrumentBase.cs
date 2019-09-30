@@ -59,8 +59,13 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             set
             {
-                f_GainLeft = value;
-                set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 0, value);
+                if (f_GainLeft != value)
+                {
+                    f_GainLeft = value;
+                    Program.SoundUpdating();
+                    set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 0, value);
+                    Program.SoundUpdated();
+                }
             }
         }
 
@@ -83,8 +88,13 @@ namespace zanac.MAmidiMEmo.Instruments
             }
             set
             {
-                f_GainRight = value;
-                set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 1, value);
+                if (f_GainRight != value)
+                {
+                    f_GainRight = value;
+                    Program.SoundUpdating();
+                    set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 1, value);
+                    Program.SoundUpdated();
+                }
             }
         }
 
@@ -102,7 +112,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_FilterMode != value)
                 {
                     f_FilterMode = value;
+                    Program.SoundUpdating();
                     set_filter(UnitNumber, SoundInterfaceTagNamePrefix, f_FilterMode, FilterCutoff, FilterResonance);
+                    Program.SoundUpdated();
                 }
             }
         }
@@ -134,7 +146,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_FilterCutOff != v)
                 {
                     f_FilterCutOff = v;
+                    Program.SoundUpdating();
                     set_filter(UnitNumber, SoundInterfaceTagNamePrefix, FilterMode, f_FilterCutOff, FilterResonance);
+                    Program.SoundUpdated();
                 }
             }
         }
@@ -167,7 +181,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_FilterResonance != v)
                 {
                     f_FilterResonance = v;
+                    Program.SoundUpdating();
                     set_filter(UnitNumber, SoundInterfaceTagNamePrefix, FilterMode, FilterCutoff, f_FilterResonance);
+                    Program.SoundUpdated();
                 }
             }
         }
@@ -759,6 +775,41 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private static delegate_set_filter set_filter;
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_set_clock(uint unitNumber, string tagName, uint clock);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_set_clock set_clock;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="unitNumber"></param>
+        /// <param name="tagName"></param>
+        /// <param name="clock"></param>
+        protected void SetClock(uint unitNumber, string tagName, uint clock)
+        {
+            try
+            {
+                Program.SoundUpdating();
+                set_clock(unitNumber, tagName, clock);
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
+        }
+
+
         static InstrumentBase()
         {
             IntPtr funcPtr = MameIF.GetProcAddress("set_device_enable");
@@ -776,6 +827,10 @@ namespace zanac.MAmidiMEmo.Instruments
             funcPtr = MameIF.GetProcAddress("set_filter");
             if (funcPtr != IntPtr.Zero)
                 set_filter = Marshal.GetDelegateForFunctionPointer<delegate_set_filter>(funcPtr);
+
+            funcPtr = MameIF.GetProcAddress("set_clock");
+            if (funcPtr != IntPtr.Zero)
+                set_clock= Marshal.GetDelegateForFunctionPointer<delegate_set_clock>(funcPtr);
         }
 
         /// <summary>

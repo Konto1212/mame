@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -12,13 +13,13 @@ namespace zanac.MAmidiMEmo.Instruments
 {
     public static class HighPrecisionTimer
     {
-       
+
         private const int WAIT_TIMEOUT = 120 * 1000;
 
         /// <summary>
         /// Periodic Action Timer Interval
         /// </summary>
-        public const uint TIMER_BASIC_INTERVAL = 10;
+        public const uint TIMER_BASIC_INTERVAL = 5;
 
         /// <summary>
         /// Periodic Action Timer Hz
@@ -70,7 +71,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         periodMs *= 1000 * 10;
                         // Next time is past time?
                         GetSystemTimeAsFileTime(out lpSystemTimeAsFileTime);
-                        if(lpSystemTimeAsFileTime > nextTime + periodMs)
+                        if (lpSystemTimeAsFileTime > nextTime + periodMs)
                             nextTime = lpSystemTimeAsFileTime;  // adjust to current time
                     }
                 }
@@ -93,11 +94,8 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="instance"></param>
         public static void SetFixedPeriodicCallback(Func<object, double> action, object state)
         {
-            lock (Program.ExclusiveLockObject)
-            {
-                if (!fixedTimerSounds.ContainsKey(action))
-                    fixedTimerSounds.Add(action, state);
-            }
+            lock (fixedTimerSounds)
+                fixedTimerSounds.Add(action, state);
         }
 
         /// <s
@@ -107,16 +105,18 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="sender"></param>
         private static void MultiMediaTimerComponent_OnTimer(object sender)
         {
-            lock (Program.ExclusiveLockObject)
+            List<KeyValuePair<Func<object, double>, object>> list = null;
+            lock (fixedTimerSounds)
+                list = fixedTimerSounds.ToList();
+            foreach (var snd in list)
             {
-                var list = fixedTimerSounds.Keys.ToList();
-
-                Parallel.ForEach(list, snd =>
-                {
-                    var ret = snd(fixedTimerSounds[snd]);
-                    if (ret < 0)
-                        fixedTimerSounds.Remove(snd);
-                });
+                double ret = -1;
+                lock (Program.ExclusiveLockObject)
+                    ret = snd.Key(snd.Value);
+                if (ret >= 0)
+                    continue;
+                lock (fixedTimerSounds)
+                    fixedTimerSounds.Remove(snd.Key);
             }
         }
 

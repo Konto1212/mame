@@ -56,12 +56,17 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get
             {
-                return JsonConvert.SerializeObject(this, Formatting.Indented);
+                return SerializeObject();
             }
             set
             {
                 RestoreFrom(value);
             }
+        }
+
+        protected virtual string SerializeObject()
+        {
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
         public abstract void RestoreFrom(string serializeData);

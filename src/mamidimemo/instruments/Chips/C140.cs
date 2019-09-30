@@ -59,11 +59,36 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+        private C140Clock f_Clock = C140Clock.Clk_22050Hz;
+
+
+        [DataMember]
+        [Category("Chip")]
+        [Description("Set PCM clock. 21.333KHz is original clock.")]
+        [DefaultValue(C140Clock.Clk_22050Hz)]
+        public C140Clock Clock
+        {
+            get
+            {
+                return f_Clock;
+            }
+            set
+            {
+                if (f_Clock != value)
+                {
+                    f_Clock = value;
+
+                    SetClock(UnitNumber, SoundInterfaceTagNamePrefix, (uint)f_Clock);
+                }
+            }
+        }
+
         [DataMember]
         [Category("Chip")]
         [Description("Signed 8bit PCM Data(MAX 64KB, Rate 22.1KHz)")]
         [Editor(typeof(PcmTableUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [PcmTableEditor("Audio File(*.raw, *.wav)|*.raw;*.wav")]
+        [TypeConverter(typeof(CustomObjectTypeConverter))]
         public C140PcmSoundTable DrumSoundTable
         {
             get;
@@ -330,7 +355,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// </summary>
         private class C140SoundManager : SoundManagerBase
         {
-            private SoundList<C140Sound> instOnSounds = new SoundList<C140Sound>(2);
+            private SoundList<C140Sound> instOnSounds = new SoundList<C140Sound>(24);
 
             private C140 parentModule;
 
@@ -445,46 +470,44 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 UpdatePanpot();
                 UpdatePitch();
 
-                Program.SoundUpdating();
                 if (lastSoundType == SoundType.INST)
                 {
                     //bankno = prognum
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 4), programNumber);
+                    C140WriteData(parentModule.UnitNumber, (reg + 4), programNumber);
                     //pcm start
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 6), 0);
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 7), 0);
+                    C140WriteData(parentModule.UnitNumber, (reg + 6), 0);
+                    C140WriteData(parentModule.UnitNumber, (reg + 7), 0);
                     //pcm end
                     ushort len = (ushort)(timbre.PcmData.Length & 0xffff);
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 8), (byte)(len >> 8));
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 9), (byte)(len & 0xff));
+                    C140WriteData(parentModule.UnitNumber, (reg + 8), (byte)(len >> 8));
+                    C140WriteData(parentModule.UnitNumber, (reg + 9), (byte)(len & 0xff));
                     //loop
                     ushort lpos = len;
                     if (timbre.LoopEnable)
                         lpos = (ushort)(timbre.LoopPoint & 0xffff);
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 10), (byte)(lpos >> 8));
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 11), (byte)(lpos & 0xff));
+                    C140WriteData(parentModule.UnitNumber, (reg + 10), (byte)(lpos >> 8));
+                    C140WriteData(parentModule.UnitNumber, (reg + 11), (byte)(lpos & 0xff));
                     //mode keyon(0x80)
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 5), (byte)(0x80 + (timbre.LoopEnable ? 0x10 : 0)));
+                    C140WriteData(parentModule.UnitNumber, (reg + 5), (byte)(0x80 + (timbre.LoopEnable ? 0x10 : 0)));
                 }
                 else if (lastSoundType == SoundType.DRUM)
                 {
                     //bankno = prognum
                     int nn = NoteOnEvent.NoteNumber;
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 4), (byte)(nn + 128));
+                    C140WriteData(parentModule.UnitNumber, (reg + 4), (byte)(nn + 128));
                     //pcm start
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 6), 0);
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 7), 0);
+                    C140WriteData(parentModule.UnitNumber, (reg + 6), 0);
+                    C140WriteData(parentModule.UnitNumber, (reg + 7), 0);
                     //pcm end
                     var pd = parentModule.DrumSoundTable.PcmTimbres[nn].PcmData;
                     ushort len = 0;
                     if (pd != null)
                         len = (ushort)(pd.Length & 0xffff);
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 8), (byte)(len >> 8));
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 9), (byte)(len & 0xff));
+                    C140WriteData(parentModule.UnitNumber, (reg + 8), (byte)(len >> 8));
+                    C140WriteData(parentModule.UnitNumber, (reg + 9), (byte)(len & 0xff));
                     //mode keyon(0x80)
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 5), (byte)(0x80));
+                    C140WriteData(parentModule.UnitNumber, (reg + 5), (byte)(0x80));
                 }
-                Program.SoundUpdated();
             }
 
             /// <summary>
@@ -497,11 +520,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 byte pan = parentModule.Panpots[NoteOnEvent.Channel];
 
                 byte right = (byte)Math.Round(127d * vol * (pan / 127d));
+                C140WriteData(parentModule.UnitNumber, (reg + 0), right);
                 byte left = (byte)Math.Round(127d * vol * ((127d - pan) / 127d));
-                Program.SoundUpdating();
-                C140WriteData(parentModule.UnitNumber, (byte)(reg + 0), right);
-                C140WriteData(parentModule.UnitNumber, (byte)(reg + 1), left);
-                Program.SoundUpdated();
+                C140WriteData(parentModule.UnitNumber, (reg + 1), left);
             }
 
             /// <summary>
@@ -510,35 +531,20 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <param name="slot"></param>
             public override void UpdatePitch()
             {
-                if (IsSoundOff)
-                    return;
-
                 uint reg = (uint)(Slot * 16);
 
+                uint freq = 0;
                 if (lastSoundType == SoundType.INST)
-                {
-                    uint freq = ((uint)Math.Round((CalcCurrentFrequency() / 440d) * 32768));
-                    if (freq > 0xffffff)
-                        freq = 0xffffff;
-
-                    Program.SoundUpdating();
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 12), (byte)((freq >> 16) & 0xff));  //HACK
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 2), (byte)((freq >> 8) & 0xff));
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 3), (byte)(freq & 0xff));
-                    Program.SoundUpdated();
-                }
+                    freq = (uint)Math.Round((CalcCurrentFrequency() / 440d) * 32768);
                 else if (lastSoundType == SoundType.DRUM)
-                {
-                    uint freq = ((uint)Math.Round(((440.0 + CalcCurrentPitch()) / 440d) * 32768));
-                    if (freq > 0xffffff)
-                        freq = 0xffffff;
+                    freq = (uint)Math.Round((1d + CalcCurrentPitch()) * 32768);
 
-                    Program.SoundUpdating();
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 12), (byte)((freq >> 16) & 0xff));  //HACK
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 2), (byte)((freq >> 8) & 0xff));
-                    C140WriteData(parentModule.UnitNumber, (byte)(reg + 3), (byte)(freq & 0xff));
-                    Program.SoundUpdated();
-                }
+                if (freq > 0xffffff)
+                    freq = 0xffffff;
+
+                C140WriteData(parentModule.UnitNumber, (reg + 12), (byte)((freq >> 16) & 0xff));  //HACK
+                C140WriteData(parentModule.UnitNumber, (reg + 2), (byte)((freq >> 8) & 0xff));
+                C140WriteData(parentModule.UnitNumber, (reg + 3), (byte)(freq & 0xff));
             }
 
             /// <summary>
@@ -546,11 +552,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// </summary>
             public override void SoundOff()
             {
+                if (IsSoundOff)
+                    return;
+
                 base.SoundOff();
 
                 uint reg = (uint)(Slot * 16);
                 //mode keyoff(0x00)
-                C140WriteData(parentModule.UnitNumber, (byte)(reg + 5), 0x00);
+                C140WriteData(parentModule.UnitNumber, (reg + 5), 0x00);
             }
 
         }
@@ -604,14 +613,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 set;
             }
 
-            public sbyte[] f_PcmData = new sbyte[0];
+            private sbyte[] f_PcmData = new sbyte[0];
 
             [TypeConverter(typeof(TypeConverter))]
             [Editor(typeof(PcmFileLoaderUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
             [DataMember]
             [Category("Sound")]
-            [Description("Signed 8bit PCM Data(MAX 64KB, Rate 22.1KHz, Base Freq 440Hz)")]
-            [PcmFileLoaderEditor("Audio File(*.raw, *.wav)|*.raw;*.wav", 22050, 8, 1, 65535)]
+            [Description("Signed 8bit PCM Data(MAX 64KB, Base Freq 440Hz)")]
+            [PcmFileLoaderEditor("Audio File(*.raw, *.wav)|*.raw;*.wav", 0, 8, 1, 65535)]
             public sbyte[] PcmData
             {
                 get
@@ -723,14 +732,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     {
                         if (value[0] == 'R' && value[1] == 'I' && value[2] == 'F' && value[3] == 'F')
                         {
-                            var head = WaveReader.ReadWaveData(value);
+                            var head = WaveFileReader.ReadWaveData(value);
 
-                            if (8 != head.BitPerSample ||
-                                22050 != head.SampleRate ||
-                                1 != head.Channel)
+                            if (8 != head.BitPerSample || 1 != head.Channel)
                             {
                                 throw new ArgumentOutOfRangeException(
-                                    string.Format($"Incorrect wave format(Expected Ch=1 Bit=8, Rate=22050)"));
+                                    string.Format($"Incorrect wave format(Expected Ch=1 Bit=8)"));
                             }
 
                             List<byte> al = new List<byte>(head.Data);
@@ -749,7 +756,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         {
                             f_PcmData = value;
                             sbyte[] sbuf = new sbyte[f_PcmData.Length];
-                            Buffer.BlockCopy(f_PcmData, 0, sbuf, 0, f_PcmData.Length);
+                            for (int i = 0; i < f_PcmData.Length; i++)
+                                sbuf[i] = (sbyte)(f_PcmData[i] - 0x80);
                             f_C140PcmData = sbuf;
                         }
                     }
@@ -775,7 +783,13 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
             }
         }
+    }
 
 
+    public enum C140Clock
+    {
+        Clk_21333Hz = 21333, //49152000 / 384 / 6,
+        Clk_22050Hz = 22050,
+        Clk_44100Hz = 44100,
     }
 }

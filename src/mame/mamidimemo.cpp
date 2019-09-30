@@ -40,7 +40,8 @@ extern "C"
 
 		std::string num = std::to_string(unitNumber);
 
-		device_t *dev = dynamic_cast<device_t  *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
+		device_t *dev = dynamic_cast<device_t  *>(rm->device((std::string(name) + num).c_str()));
+		//device_t *dev = dynamic_cast<device_t  *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
 		if (dev == nullptr)
 			return;
 
@@ -57,13 +58,32 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+		//device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
 		if (sd == nullptr)
 			return;
 
 		sd->m_enable = enable;
 	}
 
+
+	DllExport void set_clock(unsigned int unitNumber, char* name, unsigned int clock)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		device_t *dev = dynamic_cast<device_t  *>(rm->device((std::string(name) + num).c_str()));
+		//device_t *dev = dynamic_cast<device_t  *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
+		if (dev == nullptr)
+			return;
+
+		dev->set_clock(clock);
+	}
 
 	DllExport void set_filter(int unitNumber, char* name, device_sound_interface::FilterMode filterMode, double cutoff, double resonance)
 	{
@@ -75,7 +95,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+		//device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
 		if (sd == nullptr)
 			return;
 
@@ -94,7 +115,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+		//device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
 		if (sd == nullptr)
 			return;
 
@@ -110,7 +132,8 @@ extern "C"
 		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return NULL;
 
-		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name)).c_str()));
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name)).c_str()));
+		//device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name)).c_str()));
 		if (sd == nullptr)
 			return NULL;
 
@@ -132,7 +155,8 @@ extern "C"
 		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
 			return 0;
 
-		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name)).c_str()));
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name)).c_str()));
+		//device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name)).c_str()));
 		if (sd == nullptr)
 			return 0;
 		return sd->lastOutBufferSamples;
@@ -149,7 +173,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		ym2151_device *ym2151 = dynamic_cast<ym2151_device *>(rm->root_device().subdevice((std::string("ym2151_") + num).c_str()));
+		ym2151_device *ym2151 = dynamic_cast<ym2151_device *>(rm->device((std::string("ym2151_") + num).c_str()));
+		//ym2151_device *ym2151 = dynamic_cast<ym2151_device *>(rm->root_device().subdevice((std::string("ym2151_") + num).c_str()));
 		if (ym2151 == nullptr)
 			return;
 
@@ -167,7 +192,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		ym2612_device *ym2612 = dynamic_cast<ym2612_device *>(rm->root_device().subdevice((std::string("ym2612_") + num).c_str()));
+		ym2612_device *ym2612 = dynamic_cast<ym2612_device *>(rm->device((std::string("ym2612_") + num).c_str()));
+		//ym2612_device *ym2612 = dynamic_cast<ym2612_device *>(rm->root_device().subdevice((std::string("ym2612_") + num).c_str()));
 		if (ym2612 == nullptr)
 			return;
 
@@ -184,7 +210,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		ym3812_device *ym3812 = dynamic_cast<ym3812_device *>(rm->root_device().subdevice((std::string("ym3812_") + num).c_str()));
+		ym3812_device *ym3812 = dynamic_cast<ym3812_device *>(rm->device((std::string("ym3812_") + num).c_str()));
+		//ym3812_device *ym3812 = dynamic_cast<ym3812_device *>(rm->root_device().subdevice((std::string("ym3812_") + num).c_str()));
 		if (ym3812 == nullptr)
 			return;
 
@@ -201,7 +228,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		ym2413_device *ym2413 = dynamic_cast<ym2413_device *>(rm->root_device().subdevice((std::string("ym2413_") + num).c_str()));
+		ym2413_device *ym2413 = dynamic_cast<ym2413_device *>(rm->device((std::string("ym2413_") + num).c_str()));
+		//ym2413_device *ym2413 = dynamic_cast<ym2413_device *>(rm->root_device().subdevice((std::string("ym2413_") + num).c_str()));
 		if (ym2413 == nullptr)
 			return;
 
@@ -218,7 +246,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->root_device().subdevice((std::string("gbsnd_") + num).c_str()));
+		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->device((std::string("gbsnd_") + num).c_str()));
+		//dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->root_device().subdevice((std::string("gbsnd_") + num).c_str()));
 		if (gb_apu == nullptr)
 			return;
 
@@ -235,7 +264,8 @@ extern "C"
 			return 0;
 
 		std::string num = std::to_string(unitNumber);
-		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->root_device().subdevice((std::string("gbsnd_") + num).c_str()));
+		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->device((std::string("gbsnd_") + num).c_str()));
+		//dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->root_device().subdevice((std::string("gbsnd_") + num).c_str()));
 		if (gb_apu == nullptr)
 			return 0;
 
@@ -252,7 +282,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->root_device().subdevice((std::string("gbsnd_") + num).c_str()));
+		dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->device((std::string("gbsnd_") + num).c_str()));
+		//dmg_apu_device *gb_apu = dynamic_cast<dmg_apu_device *>(rm->root_device().subdevice((std::string("gbsnd_") + num).c_str()));
 		if (gb_apu == nullptr)
 			return;
 
@@ -269,7 +300,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		sn76496_base_device *sn76496 = dynamic_cast<sn76496_base_device *>(rm->root_device().subdevice((std::string("sn76496_") + num).c_str()));
+		sn76496_base_device *sn76496 = dynamic_cast<sn76496_base_device *>(rm->device((std::string("sn76496_") + num).c_str()));
+		//sn76496_base_device *sn76496 = dynamic_cast<sn76496_base_device *>(rm->root_device().subdevice((std::string("sn76496_") + num).c_str()));
 		if (sn76496 == nullptr)
 			return;
 
@@ -286,7 +318,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		namco_cus30_device *cus30 = dynamic_cast<namco_cus30_device *>(rm->root_device().subdevice((std::string("namco_cus30_") + num).c_str()));
+		namco_cus30_device *cus30 = dynamic_cast<namco_cus30_device *>(rm->device((std::string("namco_cus30_") + num).c_str()));
+		//namco_cus30_device *cus30 = dynamic_cast<namco_cus30_device *>(rm->root_device().subdevice((std::string("namco_cus30_") + num).c_str()));
 		if (cus30 == nullptr)
 			return;
 
@@ -303,7 +336,8 @@ extern "C"
 			return 0;
 
 		std::string num = std::to_string(unitNumber);
-		namco_cus30_device *cus30 = dynamic_cast<namco_cus30_device *>(rm->root_device().subdevice((std::string("namco_cus30_") + num).c_str()));
+		namco_cus30_device *cus30 = dynamic_cast<namco_cus30_device *>(rm->device((std::string("namco_cus30_") + num).c_str()));
+		//namco_cus30_device *cus30 = dynamic_cast<namco_cus30_device *>(rm->root_device().subdevice((std::string("namco_cus30_") + num).c_str()));
 		if (cus30 == nullptr)
 			return 0;
 
@@ -320,7 +354,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->root_device().subdevice((std::string("nes_apu_") + num).c_str()));
+		nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->device((std::string("nes_apu_") + num).c_str()));
+		//nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->root_device().subdevice((std::string("nes_apu_") + num).c_str()));
 		if (nesapu == nullptr)
 			return;
 
@@ -337,7 +372,8 @@ extern "C"
 			return 0;
 
 		std::string num = std::to_string(unitNumber);
-		nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->root_device().subdevice((std::string("nes_apu_") + num).c_str()));
+		nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->device((std::string("nes_apu_") + num).c_str()));
+		//nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->root_device().subdevice((std::string("nes_apu_") + num).c_str()));
 		if (nesapu == nullptr)
 			return 0;
 
@@ -354,7 +390,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->root_device().subdevice((std::string("nes_apu_") + num).c_str()));
+		nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->device((std::string("nes_apu_") + num).c_str()));
+		//nesapu_device *nesapu = dynamic_cast<nesapu_device *>(rm->root_device().subdevice((std::string("nes_apu_") + num).c_str()));
 		if (nesapu == nullptr)
 			return;
 
@@ -371,7 +408,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->root_device().subdevice((std::string("scc1_") + num).c_str()));
+		k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->device((std::string("scc1_") + num).c_str()));
+		//k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->root_device().subdevice((std::string("scc1_") + num).c_str()));
 		if (scc1 == nullptr)
 			return;
 
@@ -389,7 +427,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->root_device().subdevice((std::string("scc1_") + num).c_str()));
+		k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->device((std::string("scc1_") + num).c_str()));
+		//k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->root_device().subdevice((std::string("scc1_") + num).c_str()));
 		if (scc1 == nullptr)
 			return;
 
@@ -406,7 +445,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->root_device().subdevice((std::string("scc1_") + num).c_str()));
+		k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->device((std::string("scc1_") + num).c_str()));
+		//k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->root_device().subdevice((std::string("scc1_") + num).c_str()));
 		if (scc1 == nullptr)
 			return;
 
@@ -423,7 +463,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->root_device().subdevice((std::string("scc1_") + num).c_str()));
+		k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->device((std::string("scc1_") + num).c_str()));
+		//k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->root_device().subdevice((std::string("scc1_") + num).c_str()));
 		if (scc1 == nullptr)
 			return;
 
@@ -440,7 +481,8 @@ extern "C"
 			return 0;
 
 		std::string num = std::to_string(unitNumber);
-		k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->root_device().subdevice((std::string("scc1_") + num).c_str()));
+		k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->device((std::string("scc1_") + num).c_str()));
+		//k051649_device *scc1 = dynamic_cast<k051649_device *>(rm->root_device().subdevice((std::string("scc1_") + num).c_str()));
 		if (scc1 == nullptr)
 			return 0;
 
@@ -457,7 +499,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->root_device().subdevice((std::string("msm5232_") + num).c_str()));
+		msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->device((std::string("msm5232_") + num).c_str()));
+		//msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->root_device().subdevice((std::string("msm5232_") + num).c_str()));
 		if (msm5232 == nullptr)
 			return;
 
@@ -474,7 +517,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->root_device().subdevice((std::string("msm5232_") + num).c_str()));
+		msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->device((std::string("msm5232_") + num).c_str()));
+		//msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->root_device().subdevice((std::string("msm5232_") + num).c_str()));
 		if (msm5232 == nullptr)
 			return;
 
@@ -491,7 +535,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->root_device().subdevice((std::string("msm5232_") + num).c_str()));
+		msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->device((std::string("msm5232_") + num).c_str()));
+		//msm5232_device *msm5232 = dynamic_cast<msm5232_device *>(rm->root_device().subdevice((std::string("msm5232_") + num).c_str()));
 		if (msm5232 == nullptr)
 			return;
 
@@ -508,7 +553,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		ay8910_device *ay8910 = dynamic_cast<ay8910_device*>(rm->root_device().subdevice((std::string("ay8910_") + num).c_str()));
+		ay8910_device *ay8910 = dynamic_cast<ay8910_device*>(rm->device((std::string("ay8910_") + num).c_str()));
+		//ay8910_device *ay8910 = dynamic_cast<ay8910_device*>(rm->root_device().subdevice((std::string("ay8910_") + num).c_str()));
 		if (ay8910 == nullptr)
 			return;
 
@@ -525,7 +571,8 @@ extern "C"
 			return 0;
 
 		std::string num = std::to_string(unitNumber);
-		ay8910_device *ay8910 = dynamic_cast<ay8910_device*>(rm->root_device().subdevice((std::string("ay8910_") + num).c_str()));
+		ay8910_device *ay8910 = dynamic_cast<ay8910_device*>(rm->device((std::string("ay8910_") + num).c_str()));
+		//ay8910_device *ay8910 = dynamic_cast<ay8910_device*>(rm->root_device().subdevice((std::string("ay8910_") + num).c_str()));
 		if (ay8910 == nullptr)
 			return 0;
 
@@ -543,7 +590,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		mos8580_device *mos8580 = dynamic_cast<mos8580_device*>(rm->root_device().subdevice((std::string("mos8580_") + num).c_str()));
+		mos8580_device *mos8580 = dynamic_cast<mos8580_device*>(rm->device((std::string("mos8580_") + num).c_str()));
+		//mos8580_device *mos8580 = dynamic_cast<mos8580_device*>(rm->root_device().subdevice((std::string("mos8580_") + num).c_str()));
 		if (mos8580 == nullptr)
 			return;
 
@@ -560,7 +608,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		mos6581_device *mos6581 = dynamic_cast<mos6581_device*>(rm->root_device().subdevice((std::string("mos6581_") + num).c_str()));
+		mos6581_device *mos6581 = dynamic_cast<mos6581_device*>(rm->device((std::string("mos6581_") + num).c_str()));
+		//mos6581_device *mos6581 = dynamic_cast<mos6581_device*>(rm->root_device().subdevice((std::string("mos6581_") + num).c_str()));
 		if (mos6581 == nullptr)
 			return;
 
@@ -577,11 +626,12 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		beep_device *beep = dynamic_cast<beep_device *>(rm->root_device().subdevice((std::string("beep_") + num).c_str()));
+		beep_device *beep = dynamic_cast<beep_device *>(rm->device((std::string("beep_") + num).c_str()));
+		//beep_device *beep = dynamic_cast<beep_device *>(rm->root_device().subdevice((std::string("beep_") + num).c_str()));
 		if (beep == nullptr)
 			return;
 
-		if(frequency != 0)
+		if (frequency != 0)
 			beep->set_clock(frequency);
 		beep->set_state(state);
 	}
@@ -597,7 +647,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		c140_device *c140 = dynamic_cast<c140_device *>(rm->root_device().subdevice((std::string("c140_") + num).c_str()));
+		c140_device *c140 = dynamic_cast<c140_device *>(rm->device((std::string("c140_") + num).c_str()));
+		//c140_device *c140 = dynamic_cast<c140_device *>(rm->root_device().subdevice((std::string("c140_") + num).c_str()));
 		if (c140 == nullptr)
 			return;
 
@@ -615,7 +666,8 @@ extern "C"
 			return;
 
 		std::string num = std::to_string(unitNumber);
-		c140_device *c140 = dynamic_cast<c140_device *>(rm->root_device().subdevice((std::string("c140_") + num).c_str()));
+		c140_device *c140 = dynamic_cast<c140_device *>(rm->device((std::string("c140_") + num).c_str()));
+		//c140_device *c140 = dynamic_cast<c140_device *>(rm->root_device().subdevice((std::string("c140_") + num).c_str()));
 		if (c140 == nullptr)
 			return;
 
