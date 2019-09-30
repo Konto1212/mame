@@ -85,7 +85,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
         [DataMember]
         [Category("Chip")]
-        [Description("Signed 8bit PCM Data(MAX 64KB, Rate 22.1KHz)")]
+        [Description("Signed 8bit PCM Raw Data or WAV Data. Base Freq 440Hz (MAX 64KB, 1ch)")]
         [Editor(typeof(PcmTableUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [PcmTableEditor("Audio File(*.raw, *.wav)|*.raw;*.wav")]
         [TypeConverter(typeof(CustomObjectTypeConverter))]
@@ -619,7 +619,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [Editor(typeof(PcmFileLoaderUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
             [DataMember]
             [Category("Sound")]
-            [Description("Signed 8bit PCM Data(MAX 64KB, Base Freq 440Hz)")]
+            [Description("Signed 8bit PCM Raw Data or WAV Data. Base Freq 440Hz (MAX 64KB, 1ch)")]
             [PcmFileLoaderEditor("Audio File(*.raw, *.wav)|*.raw;*.wav", 0, 8, 1, 65535)]
             public sbyte[] PcmData
             {
@@ -791,5 +791,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         Clk_21333Hz = 21333, //49152000 / 384 / 6,
         Clk_22050Hz = 22050,
         Clk_44100Hz = 44100,
+        Clk_48000Hz = 48000,
     }
 }
