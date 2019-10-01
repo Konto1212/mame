@@ -539,8 +539,8 @@ namespace zanac.MAmidiMEmo.Gui
 
         private static void draw(PaintEventArgs e, Pen p, int[] data, int zero, int w, int h, int ox, int max)
         {
-            int ly = h;
             int len = data.Length - zero;
+            List<Point> pts = new List<Point>();
             for (int i = 0; i < w; i++)
             {
                 int y = data[zero + (int)(((double)i / w) * len)];
@@ -549,9 +549,9 @@ namespace zanac.MAmidiMEmo.Gui
                 int lx = i - 1;
                 if (lx < 0)
                     lx = 0;
-                e.Graphics.DrawLine(p, ox + lx, ly, ox + i, y);
-                ly = y;
+                pts.Add(new Point(ox + i, y));
             }
+            e.Graphics.DrawLines(p, pts.ToArray());
         }
 
         private void timer1_Tick(object sender, EventArgs e)

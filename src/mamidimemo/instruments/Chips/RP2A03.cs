@@ -1065,6 +1065,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
             }
 
+            public bool ShouldSerializeDutyEnvelopes()
+            {
+                return !string.IsNullOrEmpty(DutyEnvelopes);
+            }
+
+            public void ResetDutyEnvelopes()
+            {
+                DutyEnvelopes = null;
+            }
+
             [Browsable(false)]
             [JsonIgnore]
             [IgnoreDataMember]

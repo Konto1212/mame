@@ -163,6 +163,27 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             private set;
         }
 
+        private const float DEFAULT_GAIN = 2.0f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
 
         /// <summary>
         /// 
@@ -312,8 +333,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// </summary>
         public AY8910(uint unitNumber) : base(unitNumber)
         {
-            GainLeft = 2.0f;
-            GainRight = 2.0f;
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
 
             Timbres = new AY8910Timbre[128];
             for (int i = 0; i < 128; i++)

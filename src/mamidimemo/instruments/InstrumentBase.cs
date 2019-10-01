@@ -50,7 +50,6 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Gain Left ch. (0.0-*) of this Instrument")]
         [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
         [DoubleSlideParameters(0d, 10d, 0.1d, true)]
-        [DefaultValue(1.0f)]
         public float GainLeft
         {
             get
@@ -69,6 +68,16 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        public virtual bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != 1.0f;
+        }
+
+        public virtual void ResetGainLeft()
+        {
+            GainLeft = 1.0f;
+        }
+
         private float f_GainRight = 1.0f;
 
         /// <summary>
@@ -79,7 +88,6 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Gain Right ch. (0.0-*) of this Instrument")]
         [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
         [DoubleSlideParameters(0d, 10d, 0.1d, true)]
-        [DefaultValue(1.0f)]
         public float GainRight
         {
             get
@@ -96,6 +104,16 @@ namespace zanac.MAmidiMEmo.Instruments
                     Program.SoundUpdated();
                 }
             }
+        }
+
+        public virtual bool ShouldSerializeGainRight()
+        {
+            return GainRight != 1.0f;
+        }
+
+        public virtual void ResetGainRight()
+        {
+            GainRight = 1.0f;
         }
 
         private FilterMode f_FilterMode;

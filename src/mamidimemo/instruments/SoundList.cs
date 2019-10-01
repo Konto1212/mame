@@ -27,5 +27,29 @@ namespace zanac.MAmidiMEmo.Instruments
             this.maxSlot = maxSlot;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        public new void Remove(T item)
+        {
+            item.Disposed -= Item_Disposed;
+            base.Remove(item);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        public new void Add(T item)
+        {
+            item.Disposed += Item_Disposed;
+            base.Add(item);
+        }
+
+        private void Item_Disposed(object sender, EventArgs e)
+        {
+            Remove((T)sender);
+        }
     }
 }

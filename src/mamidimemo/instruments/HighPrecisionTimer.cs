@@ -94,6 +94,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="instance"></param>
         public static void SetFixedPeriodicCallback(Func<object, double> action, object state)
         {
+            action(state);
             lock (fixedTimerSounds)
                 fixedTimerSounds.Add(action, state);
         }

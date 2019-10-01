@@ -205,6 +205,29 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+
+        private const float DEFAULT_GAIN = 2.0f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -222,8 +245,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// </summary>
         public YM3812(uint unitNumber) : base(unitNumber)
         {
-            GainLeft = 2.0f;
-            GainRight = 2.0f;
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
 
             Timbres = new YM3812Timbre[128];
             for (int i = 0; i < 128; i++)

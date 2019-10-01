@@ -1167,6 +1167,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
             }
 
+            public bool ShouldSerializeDutyEnvelopes()
+            {
+                return !string.IsNullOrEmpty(DutyEnvelopes);
+            }
+
+            public void ResetDutyEnvelopes()
+            {
+                DutyEnvelopes = null;
+            }
+
             [Browsable(false)]
             [JsonIgnore]
             [IgnoreDataMember]
@@ -1247,6 +1257,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         f_ResonanceEnvelopes = sb.ToString();
                     }
                 }
+            }
+
+            public bool ShouldSerializeResonanceEnvelopes()
+            {
+                return !string.IsNullOrEmpty(ResonanceEnvelopes);
+            }
+
+            public void ResetResonanceEnvelopes()
+            {
+                ResonanceEnvelopes = null;
             }
 
             [Browsable(false)]
@@ -1331,6 +1351,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
             }
 
+            public bool ShouldSerializeCutOffEnvelopes()
+            {
+                return !string.IsNullOrEmpty(CutOffEnvelopes);
+            }
+
+            public void ResetCutOffEnvelopes()
+            {
+                CutOffEnvelopes = null;
+            }
+
             [Browsable(false)]
             [JsonIgnore]
             [IgnoreDataMember]
@@ -1410,6 +1440,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         f_WaveFormEnvelopes = sb.ToString();
                     }
                 }
+            }
+
+            public bool ShouldSerializeWaveFormEnvelopes()
+            {
+                return !string.IsNullOrEmpty(WaveFormEnvelopes);
+            }
+
+            public void ResetWaveFormEnvelopes()
+            {
+                WaveFormEnvelopes = null;
             }
 
             [Browsable(false)]

@@ -12,8 +12,6 @@ namespace zanac.MAmidiMEmo.ComponentModel
     /// </summary>
     public class CustomObjectTypeConverter : TypeConverter
     {
-        private int bitMask;
-
         /// <summary>
         /// 
         /// </summary>

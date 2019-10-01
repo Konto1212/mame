@@ -85,6 +85,16 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
             }
         }
 
+        public bool ShouldSerializeVolumeEnvelopes()
+        {
+            return !string.IsNullOrEmpty(VolumeEnvelopes);
+        }
+
+        public void ResetVolumeEnvelopes()
+        {
+            VolumeEnvelopes = null;
+        }
+
         [Browsable(false)]
         [JsonIgnore]
         [IgnoreDataMember]
@@ -164,6 +174,16 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
                     f_PitchEnvelopes = sb.ToString();
                 }
             }
+        }
+
+        public bool ShouldSerializePitchEnvelopes()
+        {
+            return !string.IsNullOrEmpty(PitchEnvelopes);
+        }
+
+        public void ResetPitchEnvelopes()
+        {
+            PitchEnvelopes = null;
         }
 
         [Browsable(false)]
@@ -265,6 +285,16 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
             }
         }
 
+        public bool ShouldSerializeArpEnvelopes()
+        {
+            return !string.IsNullOrEmpty(ArpEnvelopes);
+        }
+
+        public void ResetArpEnvelopes()
+        {
+            ArpEnvelopes = null;
+        }
+
         [Browsable(false)]
         [JsonIgnore]
         [IgnoreDataMember]
@@ -288,6 +318,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
 
         [DataMember]
         [Description("Set static arpeggio step type.")]
+        [DefaultValue(ArpStepType.Absolute)]
         public ArpStepType ArpStepType
         {
             get

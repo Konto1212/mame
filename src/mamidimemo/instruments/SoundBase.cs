@@ -87,6 +87,7 @@ namespace zanac.MAmidiMEmo.Instruments
             Timbre = timbre;
         }
 
+        public event EventHandler Disposed;
 
         /// <summary>
         /// 
@@ -100,6 +101,8 @@ namespace zanac.MAmidiMEmo.Instruments
             }
 
             IsDisposed = true;
+
+            Disposed?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>

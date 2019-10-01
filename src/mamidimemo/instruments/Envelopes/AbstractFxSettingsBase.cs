@@ -45,7 +45,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
 
         [DataMember]
         [Description("Set interval of envelope changing [ms]")]
-        [DefaultValue((uint)50)]
+        [DefaultValue(typeof(uint), "50")]
         [SlideParametersAttribute((int)HighPrecisionTimer.TIMER_BASIC_INTERVAL, 10000)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public uint EnvelopeInterval
@@ -73,9 +73,20 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
             set;
         }
 
+        public bool ShouldSerializeMemo()
+        {
+            return !string.IsNullOrEmpty(Memo);
+        }
+
+        public void ResetMemo()
+        {
+            Memo = null;
+        }
+
         [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
             typeof(UITypeEditor)), Localizable(false)]
         [IgnoreDataMember]
+        [DefaultValue("{}")]
         [JsonIgnore]
         [Description("You can copy and paste this text data to other same type timber.")]
         public string SerializeData

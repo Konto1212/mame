@@ -65,6 +65,8 @@
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBoxMidiIf = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.pCMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendC140ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fMSynthesisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addYM2151ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addYM2612ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -87,8 +89,6 @@
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.pCMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.extendC140ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -141,7 +141,8 @@
             this.listViewIntruments.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
             ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups"))),
             ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups1"))),
-            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups2")))});
+            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups2"))),
+            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups3")))});
             this.listViewIntruments.HideSelection = false;
             this.listViewIntruments.LargeImageList = this.imageList1;
             this.listViewIntruments.Name = "listViewIntruments";
@@ -341,6 +342,19 @@
             resources.ApplyResources(this.toolStripDropDownButton1, "toolStripDropDownButton1");
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
             // 
+            // pCMToolStripMenuItem
+            // 
+            this.pCMToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.extendC140ToolStripMenuItem});
+            this.pCMToolStripMenuItem.Name = "pCMToolStripMenuItem";
+            resources.ApplyResources(this.pCMToolStripMenuItem, "pCMToolStripMenuItem");
+            // 
+            // extendC140ToolStripMenuItem
+            // 
+            this.extendC140ToolStripMenuItem.Name = "extendC140ToolStripMenuItem";
+            resources.ApplyResources(this.extendC140ToolStripMenuItem, "extendC140ToolStripMenuItem");
+            this.extendC140ToolStripMenuItem.Click += new System.EventHandler(this.extendC140ToolStripMenuItem_Click);
+            // 
             // fMSynthesisToolStripMenuItem
             // 
             this.fMSynthesisToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -491,19 +505,6 @@
             // 
             this.timer1.Interval = 50;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // pCMToolStripMenuItem
-            // 
-            this.pCMToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.extendC140ToolStripMenuItem});
-            this.pCMToolStripMenuItem.Name = "pCMToolStripMenuItem";
-            resources.ApplyResources(this.pCMToolStripMenuItem, "pCMToolStripMenuItem");
-            // 
-            // extendC140ToolStripMenuItem
-            // 
-            this.extendC140ToolStripMenuItem.Name = "extendC140ToolStripMenuItem";
-            resources.ApplyResources(this.extendC140ToolStripMenuItem, "extendC140ToolStripMenuItem");
-            this.extendC140ToolStripMenuItem.Click += new System.EventHandler(this.extendC140ToolStripMenuItem_Click);
             // 
             // FormMain
             // 

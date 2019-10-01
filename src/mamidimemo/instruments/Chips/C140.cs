@@ -117,6 +117,28 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+        private const float DEFAULT_GAIN = 2.5f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -267,8 +289,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             C140SetCallback(UnitNumber, f_read_byte_callback);
 
-            GainLeft = 2.5f;
-            GainRight = 2.5f;
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
         }
 
         /// <summary>
@@ -604,7 +626,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Set loop point (0 - 65535")]
-            [DefaultValue((ushort)0)]
+            [DefaultValue(typeof(ushort), "0")]
             [SlideParametersAttribute(0, 65535)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public ushort LoopPoint

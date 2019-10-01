@@ -83,7 +83,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
         private ArpStepStyle f_StepStyle;
 
         [DataMember]
-        [Description("Set arpeggio step style")]
+        [Description("Set arpeggio step type.")]
         [DefaultValue(ArpStepStyle.Up)]
         public ArpStepStyle StepStyle
         {
@@ -241,6 +241,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
         [IgnoreDataMember]
         [JsonIgnore]
         [Description("You can copy and paste this text data to other same type timber.")]
+        [DefaultValue("{}")]
         public string SerializeData
         {
             get

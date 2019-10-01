@@ -193,6 +193,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
         [IgnoreDataMember]
         [JsonIgnore]
         [Description("You can copy and paste this text data to other same type timber.")]
+        [DefaultValue("{}")]
         public string SerializeData
         {
             get

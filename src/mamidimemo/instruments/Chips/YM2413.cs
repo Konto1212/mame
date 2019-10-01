@@ -140,6 +140,28 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             private set;
         }
 
+        private const float DEFAULT_GAIN = 4.0f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
+
         private byte lastDrumKeyOn;
         private byte lastDrumVolume37;
         private byte lastDrumVolume38;
@@ -222,7 +244,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
-        /// <summary>
+
         /// 
         /// </summary>
         static YM2413()
@@ -243,8 +265,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// </summary>
         public YM2413(uint unitNumber) : base(unitNumber)
         {
-            GainLeft = 4.0f;
-            GainRight = 4.0f;
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
 
             Timbres = new YM2413Timbre[128];
             for (int i = 0; i < 128; i++)
