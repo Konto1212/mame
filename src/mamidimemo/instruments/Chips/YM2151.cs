@@ -910,7 +910,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("Global Settings")]
-            public GlobalSettings GlobalSettings
+            public YM2151GlobalSettings GlobalSettings
             {
                 get;
                 set;
@@ -926,7 +926,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     new YM2151Operator(),
                     new YM2151Operator(),
                     new YM2151Operator() };
-                GlobalSettings = new GlobalSettings();
+                GlobalSettings = new YM2151GlobalSettings();
                 this.SDS.FxS = new BasicFxSettings();
             }
 
@@ -1229,10 +1229,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         }
 
         [TypeConverter(typeof(CustomExpandableObjectConverter))]
-        [JsonConverter(typeof(NoTypeConverterJsonConverter<GlobalSettings>))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<YM2151GlobalSettings>))]
         [DataContract]
         [MidiHook]
-        public class GlobalSettings : ContextBoundObject
+        public class YM2151GlobalSettings : ContextBoundObject
         {
 
             [DataMember]

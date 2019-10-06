@@ -742,7 +742,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("Global Settings")]
-            public GlobalSettings GlobalSettings
+            public SIDGlobalSettings GlobalSettings
             {
                 get;
                 set;
@@ -753,7 +753,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// </summary>
             public SIDTimbre()
             {
-                GlobalSettings = new GlobalSettings();
+                GlobalSettings = new SIDGlobalSettings();
                 this.SDS.FxS = new SidFxSettings();
             }
 
@@ -779,10 +779,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
 
         [TypeConverter(typeof(CustomExpandableObjectConverter))]
-        [JsonConverter(typeof(NoTypeConverterJsonConverter<GlobalSettings>))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<SIDGlobalSettings>))]
         [DataContract]
         [MidiHook]
-        public class GlobalSettings : ContextBoundObject
+        public class SIDGlobalSettings : ContextBoundObject
         {
 
             [DataMember]

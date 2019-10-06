@@ -64,6 +64,9 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBoxMidiIf = new System.Windows.Forms.ToolStripComboBox();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.pCMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendC140ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -86,9 +89,6 @@
             this.extendBeepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -332,6 +332,25 @@
             this.toolStripComboBoxMidiIf.DropDown += new System.EventHandler(this.toolStripComboBox1_DropDown);
             this.toolStripComboBoxMidiIf.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.DefaultExt = "MAmi";
+            this.saveFileDialog1.FileName = "MyEnvironment";
+            resources.ApplyResources(this.saveFileDialog1, "saveFileDialog1");
+            this.saveFileDialog1.SupportMultiDottedExtensions = true;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.DefaultExt = "*.MAmi";
+            this.openFileDialog1.FileName = "openFileDialog1";
+            resources.ApplyResources(this.openFileDialog1, "openFileDialog1");
+            this.openFileDialog1.SupportMultiDottedExtensions = true;
+            // 
+            // timer1
+            // 
+            this.timer1.Interval = 50;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -486,25 +505,6 @@
             resources.ApplyResources(this.toolStripButton2, "toolStripButton2");
             this.toolStripButton2.Name = "toolStripButton2";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
-            // 
-            // saveFileDialog1
-            // 
-            this.saveFileDialog1.DefaultExt = "MAmi";
-            this.saveFileDialog1.FileName = "MyEnvironment";
-            resources.ApplyResources(this.saveFileDialog1, "saveFileDialog1");
-            this.saveFileDialog1.SupportMultiDottedExtensions = true;
-            // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.DefaultExt = "*.MAmi";
-            this.openFileDialog1.FileName = "openFileDialog1";
-            resources.ApplyResources(this.openFileDialog1, "openFileDialog1");
-            this.openFileDialog1.SupportMultiDottedExtensions = true;
-            // 
-            // timer1
-            // 
-            this.timer1.Interval = 50;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // FormMain
             // 

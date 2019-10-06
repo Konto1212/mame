@@ -674,7 +674,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("Global Settings")]
-            public GlobalSettings GlobalSettings
+            public AY8910GlobalSettings GlobalSettings
             {
                 get;
                 set;
@@ -682,7 +682,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             public AY8910Timbre()
             {
-                GlobalSettings = new GlobalSettings();
+                GlobalSettings = new AY8910GlobalSettings();
                 this.SDS.FxS = new BasicFxSettings();
             }
 
@@ -707,10 +707,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         }
 
         [TypeConverter(typeof(CustomExpandableObjectConverter))]
-        [JsonConverter(typeof(NoTypeConverterJsonConverter<GlobalSettings>))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<AY8910GlobalSettings>))]
         [DataContract]
         [MidiHook]
-        public class GlobalSettings : ContextBoundObject
+        public class AY8910GlobalSettings : ContextBoundObject
         {
 
             [DataMember]

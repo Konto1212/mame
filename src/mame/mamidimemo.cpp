@@ -177,6 +177,24 @@ extern "C"
 		return speakerSoundInterface[key]->lastOutBufferSamples;
 	}
 
+	DllExport void set_vst_fx_callback(unsigned int unitNumber, char* name, VST_FX_CALLBACK callback)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+		//device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
+		if (sd == nullptr)
+			return;
+
+		sd->set_vst_fx_callback(callback);
+	}
+
 	ym2151_device *ym2151_devices[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 	DllExport void ym2151_write(unsigned int unitNumber, unsigned int address, unsigned char data)

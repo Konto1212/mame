@@ -1,4 +1,6 @@
 ﻿// copyright-holders:K.Ito
+using Jacobi.Vst.Core;
+using Jacobi.Vst.Interop.Host;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Smf;
 using Newtonsoft.Json;
@@ -6,13 +8,19 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Forms.Design;
 using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Instruments.Vst;
 using zanac.MAmidiMEmo.Mame;
+using zanac.MAmidiMEmo.Properties;
 
 namespace zanac.MAmidiMEmo.Instruments
 {
@@ -206,6 +214,333 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        private VstPluginContext f_Vst1PluginContext;
+
+        [Browsable(false)]
+        public VstPluginContext Vst1PluginContext
+        {
+            get
+            {
+                return f_Vst1PluginContext;
+            }
+        }
+
+        private Dictionary<string, int> vst1ParameterIndexes;
+
+        private string f_vst1PluginPath;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Category("VST")]
+        [Description("Set VST Plugin 1 DLL Path\r\n" +
+            "***WARNING***\r\n" +
+            "Remember, These settings are private to developer or player and should not be shared between others for privacy.")]
+        [EditorAttribute(typeof(FileNameEditor), typeof(UITypeEditor))]
+        [RefreshProperties(RefreshProperties.All)]
+        public string Vst1PluginPath
+        {
+            get
+            {
+                return f_vst1PluginPath;
+            }
+            set
+            {
+                if (f_vst1PluginPath != value)
+                {
+                    f_vst1PluginPath = value;
+
+                    lock (InstrumentBase.VstPluginContextLockObject)
+                    {
+                        var octx = f_Vst1PluginContext;
+                        if (octx != null)
+                        {
+                            octx.Dispose();
+                            f_Vst1PluginContext = null;
+                            f_Vst1EffectPresetName = null;
+                            f_Vst1Settings = null;
+                        }
+                    }
+                    var ctx = OpenPlugin(f_vst1PluginPath);
+                    if (ctx != null)
+                    {
+                        lock (InstrumentBase.VstPluginContextLockObject)
+                        {
+                            f_Vst1PluginContext = ctx;
+                            Vst1EffectPresetName = ctx.PluginCommandStub.GetProgramNameIndexed(0);
+
+                            vst1ParameterIndexes = new Dictionary<string, int>();
+                            var vst = new VstSettings();
+                            for (int i = 0; i < ctx.PluginInfo.ParameterCount; i++)
+                            {
+                                string name = ctx.PluginCommandStub.GetParameterName(i);
+                                float val = ctx.PluginCommandStub.GetParameter(i);
+                                vst.SetPropertyValue(name, val);
+                                vst1ParameterIndexes.Add(name, i);
+                            }
+                            Vst1Settings = vst;
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool ShouldSerializeVst1PluginPath()
+        {
+            return !string.IsNullOrEmpty(Vst1PluginPath);
+        }
+
+        public void ResetVst1PluginPath()
+        {
+            Vst1PluginPath = null;
+        }
+
+        private string f_Vst1EffectPresetName;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        [Category("VST")]
+        [Description("Set VST Plugin 1 Preset")]
+        [Editor(typeof(UITypeEditorVst1PresetDropDown), typeof(UITypeEditor))]
+        public string Vst1EffectPresetName
+        {
+            get
+            {
+                return f_Vst1EffectPresetName;
+            }
+            set
+            {
+                if (f_Vst1EffectPresetName != value)
+                {
+                    f_Vst1EffectPresetName = value;
+                    var ctx = f_Vst1PluginContext;
+                    if (ctx != null)
+                    {
+                        for (int i = 0; i < ctx.PluginInfo.ProgramCount; i++)
+                        {
+                            if (value == null || // set to default( No.1 )
+                                value.Equals(ctx.PluginCommandStub.GetProgramNameIndexed(i), StringComparison.Ordinal))
+                            {
+                                ctx.PluginCommandStub.SetProgram(i);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool ShouldSerializeVst1EffectPresetName()
+        {
+            return !string.IsNullOrEmpty(Vst1PluginPath);
+        }
+
+        public void ResetVst1EffectPresetName()
+        {
+            Vst1PluginPath = null;
+        }
+
+        private class UITypeEditorVst1PresetDropDown : UITypeEditorVstPresetDropDown
+        {
+            protected override VstPluginContext GetTargetVstPluginContext(ITypeDescriptorContext context)
+            {
+                InstrumentBase inst = (InstrumentBase)context.Instance;
+                var ctx = inst.Vst1PluginContext;
+                if (ctx != null)
+                    return ctx;
+
+                return null;
+            }
+        }
+
+        private VstPluginContext OpenPlugin(string pluginPath)
+        {
+            try
+            {
+                if (File.Exists(pluginPath))
+                {
+                    HostCommandStub hostCmdStub = new HostCommandStub();
+                    hostCmdStub.PluginCalled += new EventHandler<PluginCalledEventArgs>(HostCmdStub_PluginCalled);
+
+                    VstPluginContext ctx = VstPluginContext.Create(pluginPath, hostCmdStub);
+
+                    if (ctx.PluginInfo.AudioInputCount != 2)
+                        return null;
+                    if (ctx.PluginInfo.AudioOutputCount != 2)
+                        return null;
+                    if ((ctx.PluginInfo.Flags & VstPluginFlags.CanReplacing) == 0)
+                        return null;
+                    //if (ctx.PluginCommandStub.GetCategory() != VstPluginCategory.Effect)
+                    //    return null;
+
+                    // add custom data to the context
+                    ctx.Set("PluginPath", pluginPath);
+                    ctx.Set("HostCmdStub", hostCmdStub);
+
+                    // actually open the plugin itself
+                    ctx.PluginCommandStub.Open();
+                    float sr = 44100;
+                    float.TryParse(Settings.Default.SampleRate, out sr);
+                    ctx.PluginCommandStub.SetSampleRate(sr);
+                    ctx.PluginCommandStub.MainsChanged(true);
+                    ctx.PluginCommandStub.StartProcess();
+                    return ctx;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.GetType() == typeof(Exception))
+                    throw;
+                else if (ex.GetType() == typeof(SystemException))
+                    throw;
+
+                //ignore
+            }
+
+            return null;
+        }
+
+        private void HostCmdStub_PluginCalled(object sender, PluginCalledEventArgs e)
+        {
+            HostCommandStub hostCmdStub = (HostCommandStub)sender;
+
+            // can be null when called from inside the plugin main entry point.
+            if (hostCmdStub.PluginContext.PluginInfo != null)
+            {
+                //Debug.WriteLine("Plugin " + hostCmdStub.PluginContext.PluginInfo.PluginID + " called:" + e.Message);
+            }
+            else
+            {
+                //Debug.WriteLine("The loading Plugin called:" + e.Message);
+            }
+        }
+
+        private VstSettings f_Vst1Settings;
+
+        [Category("VST")]
+        [DataMember]
+        [Description("Set VST Plugin 1 parameters")]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        public VstSettings Vst1Settings
+        {
+            get
+            {
+                return f_Vst1Settings;
+            }
+            set
+            {
+                f_Vst1Settings = value;
+                f_Vst1Settings.SetVstParameterAction = SetVst1Prameter;
+                f_Vst1Settings.GetVstParameterFunc = GetVst1Prameter;
+
+                lock (InstrumentBase.VstPluginContextLockObject)
+                {
+                    var ctx = Vst1PluginContext;
+                    if (ctx != null)
+                    {
+                        f_Vst1Settings.VstPluginContext = ctx;
+                        foreach (var kvp in vst1ParameterIndexes)
+                        {
+                            float val = (float)f_Vst1Settings.GetPropertyValue(kvp.Key);
+                            ctx.PluginCommandStub.SetParameter(kvp.Value, val);
+                        }
+                    }
+                }
+            }
+        }
+
+        public static object VstPluginContextLockObject = new object();
+
+
+        public float GetVst1Prameter(string propertyName)
+        {
+            lock (InstrumentBase.VstPluginContextLockObject)
+            {
+                var ctx = Vst1PluginContext;
+                if (ctx != null)
+                {
+                    if (vst1ParameterIndexes.ContainsKey(propertyName))
+                    {
+                        int idx = vst1ParameterIndexes[propertyName];
+                        return ctx.PluginCommandStub.GetParameter(idx);
+                    }
+                }
+            }
+            return 0.0f;
+        }
+
+        public void SetVst1Prameter(string propertyName, float value)
+        {
+            lock (InstrumentBase.VstPluginContextLockObject)
+            {
+                var ctx = Vst1PluginContext;
+                if (ctx != null)
+                {
+                    if (vst1ParameterIndexes.ContainsKey(propertyName))
+                    {
+                        int idx = vst1ParameterIndexes[propertyName];
+                        ctx.PluginCommandStub.SetParameter(idx, value);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pn"></param>
+        /// <param name="pos"></param>
+        private void vst_fx_callback(IntPtr buffer, int samples)
+        {
+            int[][] buf = new int[2][] { new int[samples], new int[samples] };
+            IntPtr[] pt = new IntPtr[] { Marshal.ReadIntPtr(buffer), Marshal.ReadIntPtr(buffer + IntPtr.Size) };
+            Marshal.Copy(pt[0], buf[0], 0, samples);
+            Marshal.Copy(pt[1], buf[1], 0, samples);
+
+            lock (InstrumentBase.VstPluginContextLockObject)
+            {
+                VstPluginContext ctx1 = f_Vst1PluginContext;
+                if (ctx1 != null)
+                {
+                    ctx1.PluginCommandStub.SetBlockSize(samples);
+
+                    using (VstAudioBufferManager inputMgr = new VstAudioBufferManager(2, samples))
+                    {
+                        using (VstAudioBufferManager outputMgr = new VstAudioBufferManager(2, samples))
+                        {
+                            {
+                                int idx = 0;
+                                foreach (VstAudioBuffer vab in inputMgr)
+                                {
+                                    for (int i = 0; i < samples; i++)
+                                        vab[i] = (float)buf[idx][i] / (float)int.MaxValue;
+                                    idx++;
+                                }
+                            }
+
+                            ctx1.PluginCommandStub.ProcessReplacing(inputMgr.ToArray<VstAudioBuffer>(), outputMgr.ToArray<VstAudioBuffer>());
+
+                            {
+                                int idx = 0;
+                                foreach (VstAudioBuffer vab in outputMgr)
+                                {
+                                    for (int i = 0; i < samples; i++)
+                                        buf[idx][i] = (int)(vab[i] * int.MaxValue);
+                                    idx++;
+                                }
+                                Marshal.Copy(buf[0], 0, pt[0], samples);
+                                Marshal.Copy(buf[1], 0, pt[1], samples);
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -249,7 +584,6 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         [Browsable(false)]
-        [Category("General")]
         public abstract InstrumentType InstrumentType
         {
             get;
@@ -610,7 +944,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 ModulationDelays[i] = 64;
         }
 
-                /// <summary>
+        /// <summary>
         /// Hz
         /// </summary>
         /// <param name="channel"></param>
@@ -828,6 +1162,54 @@ namespace zanac.MAmidiMEmo.Instruments
         }
 
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delg_vst_fx_callback(
+            IntPtr buffer,
+            int samples);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_set_vst_fx_callback(uint unitNumber, string name, delg_vst_fx_callback callback);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static void SetVstFxCallback(uint unitNumber, string name, delg_vst_fx_callback callback)
+        {
+            try
+            {
+                Program.SoundUpdating();
+                set_vst_fx_callback(unitNumber, name, callback);
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_set_vst_fx_callback set_vst_fx_callback
+        {
+            get;
+            set;
+        }
+
+        private delg_vst_fx_callback f_vst_fx_callback;
+
         static InstrumentBase()
         {
             IntPtr funcPtr = MameIF.GetProcAddress("set_device_enable");
@@ -848,7 +1230,11 @@ namespace zanac.MAmidiMEmo.Instruments
 
             funcPtr = MameIF.GetProcAddress("set_clock");
             if (funcPtr != IntPtr.Zero)
-                set_clock= Marshal.GetDelegateForFunctionPointer<delegate_set_clock>(funcPtr);
+                set_clock = Marshal.GetDelegateForFunctionPointer<delegate_set_clock>(funcPtr);
+
+            funcPtr = MameIF.GetProcAddress("set_vst_fx_callback");
+            if (funcPtr != IntPtr.Zero)
+                set_vst_fx_callback = Marshal.GetDelegateForFunctionPointer<delegate_set_vst_fx_callback>(funcPtr);
         }
 
         /// <summary>
@@ -861,6 +1247,9 @@ namespace zanac.MAmidiMEmo.Instruments
             set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 0, GainLeft);
             set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 1, GainRight);
             set_filter(UnitNumber, SoundInterfaceTagNamePrefix, FilterMode, FilterCutoff, FilterResonance);
+
+            f_vst_fx_callback = new delg_vst_fx_callback(vst_fx_callback);
+            SetVstFxCallback(UnitNumber, SoundInterfaceTagNamePrefix, f_vst_fx_callback);
         }
 
         /// <summary>
@@ -981,6 +1370,14 @@ namespace zanac.MAmidiMEmo.Instruments
         public virtual void Dispose()
         {
             set_device_enable(UnitNumber, SoundInterfaceTagNamePrefix, 0);
+
+            SetVstFxCallback(UnitNumber, SoundInterfaceTagNamePrefix, null);
+            lock (InstrumentBase.VstPluginContextLockObject)
+            {
+                var ctx = f_Vst1PluginContext;
+                if (ctx != null)
+                    ctx.Dispose();
+            }
         }
 
         /// <summary>

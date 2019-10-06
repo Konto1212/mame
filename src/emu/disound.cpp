@@ -492,6 +492,8 @@ void device_sound_interface::sound_stream_update_callback(sound_stream &stream, 
 			*buffer1++ = process(1, *buffer1);
 		}
 	}
+	if (m_vst_fx_callback != NULL)
+		m_vst_fx_callback(outputs, samples);
 }
 
 //-------------------------------------------------

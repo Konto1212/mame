@@ -34,6 +34,7 @@ constexpr int AUTO_ALLOC_INPUT  = 65535;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+typedef void(*VST_FX_CALLBACK)(stream_sample_t **buffer, int samples);
 
 // ======================> device_sound_interface
 
@@ -74,6 +75,8 @@ public:
 
 	// sound stream update overrides
 	void sound_stream_update_callback(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	void set_vst_fx_callback(VST_FX_CALLBACK callback) { m_vst_fx_callback = callback; };
 
 	// stream creation
 	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate);
@@ -156,6 +159,8 @@ private:
 	inline double getCalculatedCutoff() const {
 		return fmax(fmin(cutoff + cutoffMod, 0.99), 0.01);
 	};
+
+	VST_FX_CALLBACK m_vst_fx_callback;
 };
 
 // iterator

@@ -14,6 +14,7 @@ using System.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
@@ -80,11 +81,15 @@ namespace zanac.MAmidiMEmo
                                 .SelectMany(a => a.GetTypes()).ToArray();
                     foreach (var t in ts)
                     {
-                        if (assemblieTypes.ContainsKey(t.Name))
-                            continue;
-                        assemblieTypes.Add(t.Name, t);
+                        var attr = t.GetCustomAttributes(typeof(DataContractAttribute), true).FirstOrDefault() as DataContractAttribute;
+                        if(attr != null)
+                            assemblieTypes.Add(t.Name, t);
                         foreach (var nt in GetAllNestedTypes(t))
                         {
+                            attr = nt.GetCustomAttributes(typeof(DataContractAttribute), true).FirstOrDefault() as DataContractAttribute;
+                            if (attr == null)
+                                continue;
+
                             string n = nt.FullName;
                             if (n.Contains("."))
                                 n = n.Substring(n.LastIndexOf(".") + 1);

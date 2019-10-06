@@ -53,6 +53,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="Jacobi.Vst.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=fa678e13c1efc859, processorArchitecture=x86">
+      <HintPath>..\..\build\projects\windows\mame\vs2017\packages\VST.NET.x86.1.1\lib\net40\Jacobi.Vst.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Jacobi.Vst.Framework, Version=1.1.0.0, Culture=neutral, PublicKeyToken=fa678e13c1efc859, processorArchitecture=x86">
+      <HintPath>..\..\build\projects\windows\mame\vs2017\packages\VST.NET.x86.1.1\lib\net40\Jacobi.Vst.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Jacobi.Vst.Interop, Version=1.1.0.0, Culture=neutral, PublicKeyToken=fa678e13c1efc859, processorArchitecture=x86">
+      <HintPath>..\..\build\projects\windows\mame\vs2017\packages\VST.NET.x86.1.1\lib\net40\Jacobi.Vst.Interop.dll</HintPath>
+    </Reference>
     <Reference Include="Melanchall.DryWetMidi, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\build\projects\windows\mame\vs2017\packages\Melanchall.DryWetMidi.4.1.1\lib\net45\Melanchall.DryWetMidi.dll</HintPath>
     </Reference>
@@ -66,6 +75,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -90,9 +100,17 @@
     <Compile Include="ComponentModel\MaskAttribute.cs" />
     <Compile Include="ComponentModel\DoubleSlideEditor.cs" />
     <Compile Include="ComponentModel\SlideEditor.cs" />
+    <Compile Include="ComponentModel\UITypeEditorVstPresetDropDown.cs" />
     <Compile Include="ComponentModel\WaveFileReader.cs" />
+    <Compile Include="Gui\FormVstEditorFrame.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gui\FormVstEditorFrame.Designer.cs">
+      <DependentUpon>FormVstEditorFrame.cs</DependentUpon>
+    </Compile>
     <Compile Include="Gui\PcmFileLoaderUITypeEditor.cs" />
     <Compile Include="Gui\PcmFileLoaderEditorAttribute.cs" />
+    <Compile Include="Gui\VstUITypeEditor.cs" />
     <Compile Include="Instruments\Chips\AY8910.cs" />
     <Compile Include="Instruments\Chips\C140.cs" />
     <Compile Include="Instruments\Chips\GBAPU.cs" />
@@ -174,10 +192,16 @@
     <Compile Include="Instruments\SoundManagerBase.cs" />
     <Compile Include="Instruments\SoundDriverSettings.cs" />
     <Compile Include="Instruments\TimbreBase.cs" />
+    <Compile Include="Instruments\Vst\HostCommandStub.cs" />
+    <Compile Include="Instruments\Vst\PluginCalledEventArgs.cs" />
+    <Compile Include="Instruments\Vst\VstSettings.cs" />
     <Compile Include="Mame\MameIf.cs" />
     <Compile Include="Midi\MidiManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Gui\FormVstEditorFrame.resx">
+      <DependentUpon>FormVstEditorFrame.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormAbout.resx">
       <DependentUpon>FormAbout.cs</DependentUpon>
     </EmbeddedResource>
