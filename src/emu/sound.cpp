@@ -300,6 +300,33 @@ void sound_stream::update()
 	m_output_sampindex = update_sampindex;
 }
 
+void sound_stream::pre_update(std::vector<device_sound_interface *> &sis, std::vector<stream_sample_t *> &outs, int &numsamples)
+{
+	if (!m_attoseconds_per_sample)
+		return;
+
+	// determine the number of samples since the start of this second
+	attotime time = m_device.machine().time();
+	s32 update_sampindex = s32(time.attoseconds() / m_attoseconds_per_sample);
+
+	// if we're ahead of the last update, then adjust upwards
+	attotime last_update = m_device.machine().sound().last_update();
+	if (time.seconds() > last_update.seconds())
+		update_sampindex += m_sample_rate;
+
+	// if we're behind the last update, then adjust downwards
+	if (time.seconds() < last_update.seconds())
+		update_sampindex -= m_sample_rate;
+
+	if (update_sampindex <= m_output_sampindex)
+		return;
+
+	// generate samples to get us up to the appropriate time
+	pre_generate_samples(sis, outs, update_sampindex - m_output_sampindex);
+
+	numsamples = update_sampindex - m_output_sampindex;
+}
+
 
 void sound_stream::sync_update(void *, s32)
 {
@@ -324,6 +351,12 @@ const stream_sample_t *sound_stream::output_since_last_update(int outputnum, int
 	// compute the number of samples and a pointer to the output buffer
 	numsamples = m_output_sampindex - m_output_update_sampindex;
 	return &m_output[outputnum].m_buffer[m_output_update_sampindex - m_output_base_sampindex];
+}
+
+const void sound_stream::pre_output_since_last_update(std::vector<device_sound_interface *> &sis, std::vector<stream_sample_t *> &outs, int outputnum, int &numsamples)
+{
+	// force an update on the stream
+	pre_update(sis, outs, numsamples);
 }
 
 
@@ -636,10 +669,16 @@ void sound_stream::generate_samples(int samples)
 
 	VPRINTF(("generate_samples(%p, %d)\n", (void *) this, samples));
 	assert(samples > 0);
-
+	/*
 	// ensure all inputs are up to date and generate resampled data
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
 	{
+		//memidimemo
+		device_t *dev = sound_stream::input_source_device(inputnum);
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(dev);
+		if (!sd->m_enable)
+			continue;
+
 		// update the stream to the current time
 		stream_input &input = m_input[inputnum];
 		if (input.m_source != nullptr)
@@ -648,7 +687,7 @@ void sound_stream::generate_samples(int samples)
 		// generate the resampled data
 		m_input_array[inputnum] = generate_resampled_data(input, samples);
 	}
-
+	*/
 	if (!m_input.empty())
 	{
 		inputs = &m_input_array[0];
@@ -670,6 +709,29 @@ void sound_stream::generate_samples(int samples)
 	VPRINTF(("  callback(%p, %d)\n", (void *)this, samples));
 	m_callback(*this, inputs, outputs, samples);
 	VPRINTF(("  callback done\n"));
+}
+
+void sound_stream::pre_generate_samples(std::vector<device_sound_interface *> &sis, std::vector<stream_sample_t *> &outs, int samples)
+{
+	// ensure all inputs are up to date and generate resampled data
+	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
+	{
+		//memidimemo
+		device_t *dev = sound_stream::input_source_device(inputnum);
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(dev);
+		if (!sd->m_enable)
+			continue;
+
+		// update the stream to the current time
+		stream_input &input = m_input[inputnum];
+		if (input.m_source != nullptr)
+			input.m_source->m_stream->update();
+
+		// generate the resampled data
+		m_input_array[inputnum] = generate_resampled_data(input, samples);
+		sis.push_back(sd);
+		outs.push_back(m_input_array[inputnum]);
+	}
 }
 
 
@@ -1096,6 +1158,22 @@ void sound_manager::update(void *ptr, int param)
 
 	// force all the speaker streams to generate the proper number of samples
 	int samples_this_update = 0;
+	std::vector<std::vector<device_sound_interface *>> sis;
+	std::vector<std::vector<stream_sample_t *>> outs;
+	int idx = 0;
+	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+	{
+		sis.emplace_back();
+		outs.emplace_back();
+		speaker.pre_mix(sis[idx], outs[idx], &m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
+		idx++;
+	}
+	for (int i = 0; i < sis[0].size(); i++)
+	{
+		stream_sample_t* sss[] = { outs[0][i] , outs[1][i] };
+		sis[0][i]->apply_filter(sss, samples_this_update);
+	}
+	samples_this_update = 0;
 	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
 		speaker.mix(&m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 

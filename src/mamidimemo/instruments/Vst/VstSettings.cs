@@ -26,32 +26,7 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
     [Editor(typeof(VstUITypeEditor), typeof(UITypeEditor))]
     public class VstSettings : DynamicObject, INotifyPropertyChanged, ICustomTypeDescriptor
     {
-        public VstPluginContext VstPluginContext
-        {
-            get;
-            set;
-        }
-
-        private Action<string, float> f_setVstParameterAction;
-
-        public Action<string, float> SetVstParameterAction
-        {
-            get
-            {
-                return f_setVstParameterAction;
-            }
-            set
-            {
-                f_setVstParameterAction = value;
-                if (value != null)
-                {
-                    foreach (var kvp in dynamicProperties)
-                        value(kvp.Key, (float)kvp.Value);
-                }
-            }
-        }
-
-        public Func<string, float> GetVstParameterFunc
+        public VstPluginContextWrapper VstPluginContext
         {
             get;
             set;
@@ -68,9 +43,20 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
         public override bool TryGetMember(System.Dynamic.GetMemberBinder binder, out object result)
         {
             var memberName = binder.Name;
-            if (GetVstParameterFunc != null && dynamicProperties.ContainsKey(memberName))
+            if (VstPluginContext != null && dynamicProperties.ContainsKey(memberName))
             {
-                result = GetVstParameterFunc(memberName);
+                result = 0.0f;
+                lock (InstrumentBase.VstPluginContextLockObject)
+                {
+                    if (VstPluginContext != null)
+                    {
+                        if (VstPluginContext.VstParameterIndexes.ContainsKey(memberName))
+                        {
+                            int idx = VstPluginContext.VstParameterIndexes[memberName];
+                            result = VstPluginContext.VstPluginContext.PluginCommandStub.GetParameter(idx);
+                        }
+                    }
+                }
                 return true;
             }
             return dynamicProperties.TryGetValue(memberName, out result);
@@ -80,9 +66,19 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
         {
             var memberName = binder.Name;
             dynamicProperties[memberName] = value;
-            if (SetVstParameterAction != null)
+            if (VstPluginContext != null)
             {
-                SetVstParameterAction(memberName, (float)value);
+                lock (InstrumentBase.VstPluginContextLockObject)
+                {
+                    if (VstPluginContext != null)
+                    {
+                        if (VstPluginContext.VstParameterIndexes.ContainsKey(memberName))
+                        {
+                            int idx = VstPluginContext.VstParameterIndexes[memberName];
+                            VstPluginContext.VstPluginContext.PluginCommandStub.SetParameter(idx, (float)value);
+                        }
+                    }
+                }
                 return true;
             }
             NotifyToRefreshAllProperties();

@@ -483,6 +483,24 @@ void device_sound_interface::sound_stream_update_callback(sound_stream &stream, 
 	stream_sample_t *buffer1 = outputs[1];
 
 	sound_stream_update(stream, inputs, outputs, samples);
+	/*
+	if (mode != FILTER_MODE_NONE)
+	{
+		for (int i = 0; i < samples; i++)
+		{
+			*buffer0++ = process(0, *buffer0);
+			*buffer1++ = process(1, *buffer1);
+		}
+	}
+	if (m_vst_fx_callback != NULL)
+		m_vst_fx_callback(outputs, samples);
+	*/
+}
+
+void device_sound_interface::apply_filter(stream_sample_t **outputs, int samples)
+{
+	stream_sample_t *buffer0 = outputs[0];
+	stream_sample_t *buffer1 = outputs[1];
 
 	if (mode != FILTER_MODE_NONE)
 	{
@@ -510,10 +528,12 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 	// for each input, add it to the appropriate output
 	for (int inp = 0; inp < m_auto_allocated_inputs; inp++)
 	{
+		//memidimemo
 		device_t *dev = stream.input_source_device(inp);
 		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(dev);
 		if (!sd->m_enable)
 			continue;
+
 		// loop over samples
 		for (int pos = 0; pos < samples; pos++)
 			outputs[outmap[inp]][pos] += inputs[inp][pos];

@@ -66,6 +66,8 @@ public:
 	// internally for use by the sound system
 	void mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress);
 
+	void pre_mix(std::vector<device_sound_interface *> &sis, std::vector<stream_sample_t *> &outs, s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

@@ -114,6 +114,9 @@ public:
 	void update();
 	const stream_sample_t *output_since_last_update(int outputnum, int &numsamples);
 
+	void pre_update(std::vector<device_sound_interface *> &sis, std::vector<stream_sample_t *> &outs, int &numsamples);
+	const void pre_output_since_last_update(std::vector<device_sound_interface *> &sis, std::vector<stream_sample_t *> &outs, int outputnum, int &numsamples);
+
 	// timing
 	void set_sample_rate(int sample_rate);
 	void set_user_gain(int inputnum, float gain);
@@ -131,6 +134,7 @@ private:
 	void allocate_output_buffers();
 	void postload();
 	void generate_samples(int samples);
+	void pre_generate_samples(std::vector<device_sound_interface *> &sis, std::vector<stream_sample_t *> &outs, int samples);
 	stream_sample_t *generate_resampled_data(stream_input &input, u32 numsamples);
 	void sync_update(void *, s32);
 

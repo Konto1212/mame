@@ -77,6 +77,7 @@ public:
 	void sound_stream_update_callback(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	void set_vst_fx_callback(VST_FX_CALLBACK callback) { m_vst_fx_callback = callback; };
+	void apply_filter(stream_sample_t **inputs, int samples);
 
 	// stream creation
 	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate);

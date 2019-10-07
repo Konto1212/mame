@@ -38,6 +38,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
    Note: Currently supported chip is the following.
          YM2151, YM2612, YM3812, YM2413, SN76496, NES APU, MSM5232(+TA7630), NAMCO CUS30, GB APU, SCC, AY-3-8910
+		 Beep, SID, C140
    Note: You can add the chip up to 8 per same chip type and MAmidiMEmo eats more CPU power.
 
 4. Select the chip from the left pane and configure the chip on the right pane.
@@ -124,6 +125,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 9. Changes
 
+0.7.0.0 Added SID, Beep, C140 chips, Displays Oscilloscope, Supports VST Effect plugin(preliminary)
 0.6.1.0 Changed to new sound timer engine for perfect sound timing
 0.6.0.0 Added sound driver effects and portamento feature
 0.5.0.0 Added several chips

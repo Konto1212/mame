@@ -53,7 +53,7 @@ namespace zanac.MAmidiMEmo.Gui
                 {
                     var ctx = vs.VstPluginContext;
                     if (ctx != null)
-                        dlg.PluginCommandStub = ctx.PluginCommandStub;
+                        dlg.PluginCommandStub = ctx.VstPluginContext.PluginCommandStub;
                 }
                 dlg.ShowDialog(null);
             }

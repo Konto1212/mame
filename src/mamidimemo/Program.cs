@@ -101,6 +101,23 @@ namespace zanac.MAmidiMEmo
             }
         }
 
+        private static int f_CurrentSamplingRate;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static int CurrentSamplingRate
+        {
+            get
+            {
+                return f_CurrentSamplingRate;
+            }
+            set
+            {
+                f_CurrentSamplingRate = value;
+            }
+        }
+
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
         /// </summary>
@@ -117,6 +134,9 @@ namespace zanac.MAmidiMEmo
             {
                 threadStart.Set();
                 Settings.Default.Reload();
+
+                f_CurrentSamplingRate = 48000;
+                int.TryParse(Settings.Default.SampleRate, out f_CurrentSamplingRate);
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
@@ -237,6 +257,13 @@ namespace zanac.MAmidiMEmo
 
                 if (typeName.Contains("."))
                     typeName = typeName.Substring(typeName.LastIndexOf(".") + 1);
+
+                switch (typeName)
+                {
+                    case "DeltaPcmSound":
+                        typeName = "DeltaPcmTimbre";
+                        break;
+                }
                 if (AssemblieTypes.ContainsKey(typeName))
                     return AssemblieTypes[typeName];
 

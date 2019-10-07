@@ -194,6 +194,7 @@
     <Compile Include="Instruments\TimbreBase.cs" />
     <Compile Include="Instruments\Vst\HostCommandStub.cs" />
     <Compile Include="Instruments\Vst\PluginCalledEventArgs.cs" />
+    <Compile Include="Instruments\Vst\VstPluginContextWrapper.cs" />
     <Compile Include="Instruments\Vst\VstSettings.cs" />
     <Compile Include="Mame\MameIf.cs" />
     <Compile Include="Midi\MidiManager.cs" />

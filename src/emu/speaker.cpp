@@ -121,6 +121,15 @@ void speaker_device::mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, 
 	}
 }
 
+void speaker_device::pre_mix(std::vector<device_sound_interface *> &sis, std::vector<stream_sample_t *> &outs, s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress)
+{
+	// skip if no stream
+	if (m_mixer_stream == nullptr)
+		return;
+
+	// update the stream, getting the start/end pointers around the operation
+	m_mixer_stream->pre_output_since_last_update(sis, outs, 0, samples_this_update);
+}
 
 //-------------------------------------------------
 //  device_start - handle device startup
