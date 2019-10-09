@@ -600,9 +600,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 //
                 SetTimbre();
                 //Freq
-                UpdatePitch();
+                OnPitchUpdated();
                 //Volume
-                UpdateVolume();
+                OnVolumeUpdated();
                 //On
                 byte op = (byte)(timbre.Ops[0].Enable << 3 | timbre.Ops[2].Enable << 4 | timbre.Ops[1].Enable << 5 | timbre.Ops[3].Enable << 6);
                 Ym2151WriteData(parentModule.UnitNumber, 0x01, 0, 0, (byte)0x2);
@@ -613,7 +613,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 List<int> ops = new List<int>();
                 switch (timbre.ALG)
@@ -663,7 +663,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 double d = CalcCurrentPitch() * 63d;
 
@@ -705,6 +705,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Ym2151WriteData(parentModule.UnitNumber, 0x28, 0, Slot, (byte)((octave << 4) | nn));
                 Ym2151WriteData(parentModule.UnitNumber, 0x30, 0, Slot, (byte)(kf << 2));
                 Program.SoundUpdated();
+
+                base.OnPitchUpdated();
             }
 
             private byte getNoteNum(NoteName noteName)
@@ -756,7 +758,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdatePanpot()
+            public override void OnPanpotUpdated()
             {
                 byte pan = parentModule.Panpots[NoteOnEvent.Channel];
                 if (pan < 32)
@@ -784,7 +786,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     Ym2151WriteData(parentModule.UnitNumber, 0xe0, op, Slot, (byte)((timbre.Ops[op].SL << 7 | timbre.Ops[op].RR)));
                 }
 
-                UpdatePanpot();
+                OnPanpotUpdated();
             }
 
             /// <summary>

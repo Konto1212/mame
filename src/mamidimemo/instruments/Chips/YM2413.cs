@@ -453,16 +453,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 //
                 SetTimbre();
                 //Volume
-                UpdateVolume();
+                OnVolumeUpdated();
                 //Freq & kon
-                UpdatePitch();
+                OnPitchUpdated();
             }
 
 
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 byte tl = (byte)(15 - (byte)Math.Round(15 * CalcCurrentVolume()));
                 if (timbre.ToneType != ToneType.DrumSet)
@@ -501,7 +501,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 if (timbre.ToneType != ToneType.DrumSet)
                 {
@@ -561,6 +561,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         Program.SoundUpdated();
                     }
                 }
+
+                base.OnPitchUpdated();
             }
 
             /// <summary>

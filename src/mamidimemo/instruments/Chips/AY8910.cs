@@ -511,14 +511,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     Program.SoundUpdated();
                 }
 
-                UpdatePitch();
-                UpdateVolume();
+                OnPitchUpdated();
+                OnVolumeUpdated();
             }
 
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 switch (lastSoundType)
                 {
@@ -582,7 +582,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 switch (lastSoundType)
                 {
@@ -594,6 +594,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         updateNoisePitch();
                         break;
                 }
+                base.OnPitchUpdated();
             }
 
             /// <summary>

@@ -450,16 +450,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 //
                 SetTimbre();
                 //Volume
-                UpdateVolume();
+                OnVolumeUpdated();
                 //Freq
-                UpdatePitch();
+                OnPitchUpdated();
             }
 
 
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 var v = CalcCurrentVolume();
                 for (int op = 0; op < 2; op++)
@@ -477,7 +477,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 double d = CalcCurrentPitch();
 
@@ -510,6 +510,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 YM3812WriteData(parentModule.UnitNumber, (byte)(0xa0 + Slot), 0, 0, (byte)(0xff & freq));
                 YM3812WriteData(parentModule.UnitNumber, (byte)(0xb0 + Slot), 0, 0, lastFreqData);
                 Program.SoundUpdated();
+
+                base.OnPitchUpdated();
             }
 
             /// <summary>

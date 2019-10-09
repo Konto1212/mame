@@ -558,6 +558,8 @@ namespace zanac.MAmidiMEmo.Gui
         {
             if (tabControl1.SelectedTab == tabPage1)
                 tabPage1.Invalidate();
+            //else if (tabControl1.SelectedTab == tabPage3)
+            //    tabPage3.Invalidate();
         }
 
         private void resetToDefaultThisPropertyToolStripMenuItem_Click(object sender, EventArgs e)

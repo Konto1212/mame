@@ -350,9 +350,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                 SetTimbre();
                 //Freq
-                UpdatePitch();
+                OnPitchUpdated();
                 //Volume
-                UpdateVolume();
+                OnVolumeUpdated();
             }
 
             /// <summary>
@@ -371,7 +371,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 byte fv_l = (byte)((int)Math.Round(15 * CalcCurrentVolume()) & 0xf);
                 byte fv_r = fv_l;
@@ -401,7 +401,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 double d = CalcCurrentPitch();
                 double noteNum = Math.Pow(2.0, ((double)NoteOnEvent.NoteNumber + d - 69.0) / 12.0);
@@ -422,6 +422,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x02, (byte)((n >> 8) & 0xff));
                 NamcoCus30WriteData(parentModule.UnitNumber, 0x100 + (uint)Slot * 8 + 0x03, (byte)(n & 0xff));
                 Program.SoundUpdated();
+
+                base.OnPitchUpdated();
             }
 
             /// <summary>

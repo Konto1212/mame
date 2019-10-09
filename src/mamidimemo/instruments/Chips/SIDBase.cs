@@ -468,8 +468,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
 
                 SetTimbre();
-                UpdateVolume();
-                UpdatePitch();
+                OnVolumeUpdated();
+                OnPitchUpdated();
             }
 
 
@@ -489,7 +489,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 double v = 1;
                 v *= ParentModule.Expressions[NoteOnEvent.Channel] / 127d;
@@ -504,7 +504,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 double freq = CalcCurrentFrequency();
                 int f = (int)Math.Round(16777216d * freq / (14318181d / 14d));
@@ -542,6 +542,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 parentModule.SidWriteData(un, Slot * 7 + 1, (byte)(f >> 8));
                 parentModule.SidWriteData(un, Slot * 7 + 0, (byte)(f & 0xff));
                 Program.SoundUpdated();
+
+                base.OnPitchUpdated();
             }
 
             /// <summary>

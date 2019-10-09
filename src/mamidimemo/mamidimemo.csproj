@@ -110,6 +110,12 @@
     </Compile>
     <Compile Include="Gui\PcmFileLoaderUITypeEditor.cs" />
     <Compile Include="Gui\PcmFileLoaderEditorAttribute.cs" />
+    <Compile Include="Gui\PianoControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Gui\PianoControl.Designer.cs">
+      <DependentUpon>PianoControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Gui\VstUITypeEditor.cs" />
     <Compile Include="Instruments\Chips\AY8910.cs" />
     <Compile Include="Instruments\Chips\C140.cs" />
@@ -217,6 +223,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormWsgEditor.resx">
       <DependentUpon>FormWsgEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Gui\PianoControl.resx">
+      <DependentUpon>PianoControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

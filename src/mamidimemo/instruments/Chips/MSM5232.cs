@@ -482,9 +482,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                 SetTimbre();
                 //Volume
-                UpdateVolume();
+                OnVolumeUpdated();
                 //Freq
-                UpdatePitch();
+                OnPitchUpdated();
             }
 
             /// <summary>
@@ -503,7 +503,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 double v = 1;
                 v *= ParentModule.Expressions[NoteOnEvent.Channel] / 127d;
@@ -517,7 +517,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 if (IsSoundOff)
                     return;
@@ -537,6 +537,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 {
                     MSM5232WriteData(parentModule.UnitNumber, (uint)(Slot + (lastGroup * 4)), (byte)(0xff));
                 }
+
+                base.OnPitchUpdated();
             }
 
             /// <summary>

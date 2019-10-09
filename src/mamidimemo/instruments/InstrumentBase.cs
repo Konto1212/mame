@@ -1047,6 +1047,9 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private delg_vst_fx_callback f_vst_fx_callback;
 
+        /// <summary>
+        /// 
+        /// </summary>
         static InstrumentBase()
         {
             IntPtr funcPtr = MameIF.GetProcAddress("set_device_enable");

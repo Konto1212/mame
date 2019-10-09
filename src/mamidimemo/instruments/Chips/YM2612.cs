@@ -596,9 +596,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 //
                 SetFmTimbre();
                 //Freq
-                UpdatePitch();
+                OnPitchUpdated();
                 //Volume
-                UpdateVolume();
+                OnVolumeUpdated();
                 //On
                 uint reg = (uint)(Slot / 3) * 2;
                 byte op = (byte)(timbre.Ops[0].Enable << 4 | timbre.Ops[1].Enable << 5 | timbre.Ops[2].Enable << 6 | timbre.Ops[3].Enable << 7);
@@ -608,7 +608,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 List<int> ops = new List<int>();
                 switch (timbre.ALG)
@@ -658,7 +658,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 double d = CalcCurrentPitch();
 
@@ -689,12 +689,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Ym2612WriteData(parentModule.UnitNumber, 0xa4, 0, Slot, (byte)(octave | ((freq >> 8) & 7)));
                 Ym2612WriteData(parentModule.UnitNumber, 0xa0, 0, Slot, (byte)(0xff & freq));
                 Program.SoundUpdated();
+
+                base.OnPitchUpdated();
             }
 
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdatePanpot()
+            public override void OnPanpotUpdated()
             {
                 //$B4+: panning, FMS, AMS
                 byte pan = parentModule.Panpots[NoteOnEvent.Channel];
@@ -733,7 +735,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 //$B0+: algorithm and feedback
                 Ym2612WriteData(parentModule.UnitNumber, 0xB0, 0, Slot, (byte)(timbre.FB << 3 | timbre.ALG));
 
-                UpdatePanpot();
+                OnPanpotUpdated();
             }
 
             /// <summary>

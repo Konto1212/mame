@@ -474,9 +474,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdatePanpot()
+            public override void OnPanpotUpdated()
             {
-                UpdateVolume();
+                OnVolumeUpdated();
             }
 
             /// <summary>
@@ -488,9 +488,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                 uint reg = (uint)(Slot * 16);
 
-                UpdateVolume();
-                UpdatePanpot();
-                UpdatePitch();
+                OnVolumeUpdated();
+                OnPanpotUpdated();
+                OnPitchUpdated();
 
                 if (lastSoundType == SoundType.INST)
                 {
@@ -535,7 +535,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 uint reg = (uint)(Slot * 16);
                 var vol = CalcCurrentVolume();
@@ -551,7 +551,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 uint reg = (uint)(Slot * 16);
 
@@ -567,6 +567,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 C140WriteData(parentModule.UnitNumber, (reg + 12), (byte)((freq >> 16) & 0xff));  //HACK
                 C140WriteData(parentModule.UnitNumber, (reg + 2), (byte)((freq >> 8) & 0xff));
                 C140WriteData(parentModule.UnitNumber, (reg + 3), (byte)(freq & 0xff));
+
+                base.OnPitchUpdated();
             }
 
             /// <summary>

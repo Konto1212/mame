@@ -141,7 +141,11 @@ namespace zanac.MAmidiMEmo.Instruments
             var efs = Timbre.SDS.FxS;
             if (efs != null)
                 EnableFx = efs.Enable;
+
+            SoundKeyOn?.Invoke(this, new SoundUpdatedEventArgs(NoteOnEvent.NoteNumber, lastPitch));
         }
+
+        public static event EventHandler<SoundUpdatedEventArgs> SoundKeyOn;
 
         /// <summary>
         ///キーオフ
@@ -156,7 +160,11 @@ namespace zanac.MAmidiMEmo.Instruments
 
             if (CurrentAdsrState == AdsrState.SoundOff)
                 SoundOff();
+
+            SoundKeyOff?.Invoke(this, new SoundUpdatedEventArgs(NoteOnEvent.NoteNumber, lastPitch));
         }
+
+        public static event EventHandler<SoundUpdatedEventArgs> SoundKeyOff;
 
         /// <summary>
         ///キーオフ
@@ -164,27 +172,34 @@ namespace zanac.MAmidiMEmo.Instruments
         public virtual void SoundOff()
         {
             IsSoundOff = true;
+
+            SoundSoundOff?.Invoke(this, EventArgs.Empty);
         }
+
+        public static event EventHandler SoundSoundOff;
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual void UpdateVolume()
+        public virtual void OnVolumeUpdated()
         {
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual void UpdatePanpot()
+        public virtual void OnPanpotUpdated()
         {
         }
+
+        public static event EventHandler<SoundUpdatedEventArgs> SoundPitchUpdated;
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual void UpdatePitch()
+        public virtual void OnPitchUpdated()
         {
+            SoundPitchUpdated?.Invoke(this, new SoundUpdatedEventArgs(NoteOnEvent.NoteNumber, lastPitch));
         }
 
         /// <summary>
@@ -215,8 +230,11 @@ namespace zanac.MAmidiMEmo.Instruments
             if (FxEngine != null)
                 d += FxEngine.DeltaNoteNumber;
 
+            lastPitch = d;
             return d;
         }
+
+        private double lastPitch;
 
         /// <summary>
         /// 
@@ -257,7 +275,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_ArpeggiateDeltaNoteNumber != value)
                 {
                     f_ArpeggiateDeltaNoteNumber = value;
-                    UpdatePitch();
+                    OnPitchUpdated();
                 }
             }
         }
@@ -278,7 +296,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (f_ArpeggiateVolume != value)
                 {
                     f_ArpeggiateVolume = value;
-                    UpdateVolume();
+                    OnVolumeUpdated();
                 }
             }
         }
@@ -289,8 +307,8 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 FxEngine.Process(this, IsKeyOff, IsSoundOff);
 
-                UpdatePitch();
-                UpdateVolume();
+                OnPitchUpdated();
+                OnVolumeUpdated();
 
                 EnableFx = FxEngine.Active;
 
@@ -306,7 +324,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 AdsrEngine.Process();
 
-                UpdateVolume();
+                OnVolumeUpdated();
 
                 if (AdsrEngine.AdsrState != AdsrState.SoundOff)
                     return HighPrecisionTimer.TIMER_BASIC_INTERVAL;
@@ -329,7 +347,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 else if (portStartNoteDeltSign > 0 && PortamentoDeltaNoteNumber <= 0)
                     PortamentoDeltaNoteNumber = 0;
 
-                UpdatePitch();
+                OnPitchUpdated();
 
                 if (PortamentoDeltaNoteNumber != 0)
                     return HighPrecisionTimer.TIMER_BASIC_INTERVAL;
@@ -368,7 +386,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (modHz > 2 * Math.PI)
                     modulationStep = 0;
 
-                UpdatePitch();
+                OnPitchUpdated();
 
                 return HighPrecisionTimer.TIMER_BASIC_INTERVAL;
             }
@@ -550,6 +568,31 @@ namespace zanac.MAmidiMEmo.Instruments
         protected AdsrEngine AdsrEngine { get; private set; }
 
         protected AbstractFxEngine FxEngine { get; private set; }
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class SoundUpdatedEventArgs : EventArgs
+    {
+        public int NoteNumber
+        {
+            get;
+            private set;
+        }
+
+        public double Pitch
+        {
+            get;
+            private set;
+        }
+
+        public SoundUpdatedEventArgs(int noteNumber, double pitch)
+        {
+            NoteNumber = noteNumber;
+            Pitch = pitch;
+        }
 
     }
 }

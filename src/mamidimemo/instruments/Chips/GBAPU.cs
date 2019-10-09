@@ -490,9 +490,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                                 GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
 
 
-                            UpdateVolume();
+                            OnVolumeUpdated();
 
-                            UpdatePanpot();
+                            OnPanpotUpdated();
 
                             UpdatePitch(0x80);
 
@@ -505,9 +505,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             GbApuWriteData(parentModule.UnitNumber, reg, 0x00);
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, timbre.SoundLength);
 
-                            UpdateVolume();
+                            OnVolumeUpdated();
 
-                            UpdatePanpot();
+                            OnPanpotUpdated();
 
                             //Wave
                             for (int i = 0; i < 16; i++)
@@ -525,9 +525,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 1, timbre.SoundLength);
 
-                            UpdateVolume();
+                            OnVolumeUpdated();
 
-                            UpdatePanpot();
+                            OnPanpotUpdated();
 
                             UpdatePitch(0x80);
 
@@ -539,7 +539,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 switch (lastSoundType)
                 {
@@ -604,9 +604,11 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 UpdatePitch(0x00);
+
+                base.OnPitchUpdated();
             }
 
             /// <summary>
@@ -675,7 +677,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdatePanpot()
+            public override void OnPanpotUpdated()
             {
                 //Pan
                 byte? cpan = GbApuReadData(parentModule.UnitNumber, 0x15);

@@ -110,7 +110,7 @@ namespace zanac.MAmidiMEmo.Instruments
             foreach (var t in AllSounds)
             {
                 if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                    t.UpdatePitch();
+                    t.OnPitchUpdated();
             }
         }
 
@@ -137,21 +137,21 @@ namespace zanac.MAmidiMEmo.Instruments
                     foreach (var t in AllSounds)
                     {
                         if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            t.UpdateVolume();
+                            t.OnVolumeUpdated();
                     }
                     break;
                 case 10:    //Panpot
                     foreach (var t in AllSounds)
                     {
                         if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            t.UpdatePanpot();
+                            t.OnPanpotUpdated();
                     }
                     break;
                 case 11:    //Expression
                     foreach (var t in AllSounds)
                     {
                         if (t.NoteOnEvent.Channel == midiEvent.Channel)
-                            t.UpdateVolume();
+                            t.OnVolumeUpdated();
                     }
                     break;
                 case 120:   //All Sounds Off

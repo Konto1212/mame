@@ -342,17 +342,19 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 base.KeyOn();
 
-                UpdatePitch();
+                OnPitchUpdated();
             }
 
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 double freq = CalcCurrentFrequency();
 
                 BeepSetClock(parentModule.UnitNumber, IsSoundOff ? 0 : 1, (uint)freq);
+
+                base.OnPitchUpdated();
             }
 
             /// <summary>

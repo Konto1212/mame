@@ -374,9 +374,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                 SetTimbre();
                 //Freq
-                UpdatePitch();
+                OnPitchUpdated();
                 //Volume
-                UpdateVolume();
+                OnVolumeUpdated();
 
                 byte data = Scc1KeyOnOffReadData(parentModule.UnitNumber);
                 data |= (byte)(1 << Slot);
@@ -394,7 +394,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <summary>
             /// 
             /// </summary>
-            public override void UpdateVolume()
+            public override void OnVolumeUpdated()
             {
                 byte fv = (byte)((int)Math.Round(15 * CalcCurrentVolume()) & 0xf);
 
@@ -405,7 +405,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// 
             /// </summary>
             /// <param name="slot"></param>
-            public override void UpdatePitch()
+            public override void OnPitchUpdated()
             {
                 double freq = CalcCurrentFrequency();
 
@@ -423,6 +423,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 uint n = (uint)freq;
                 Scc1FrequencyWriteData(parentModule.UnitNumber, (uint)((Slot << 1)) + 0, (byte)(n & 0xff));
                 Scc1FrequencyWriteData(parentModule.UnitNumber, (uint)((Slot << 1)) + 1, (byte)((n >> 8) & 0xf));
+
+                base.OnPitchUpdated();
             }
 
             public override void SoundOff()
