@@ -9,13 +9,13 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
 {
     public class VstPluginContextWrapper : IDisposable
     {
-        private VstPluginContext f_VstPluginContext;
+        private VstPluginContext f_Context;
 
-        public VstPluginContext VstPluginContext
+        public VstPluginContext Context
         {
             get
             {
-                return f_VstPluginContext;
+                return f_Context;
             }
         }
 
@@ -37,10 +37,12 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
         /// <param name="vstPluginContext"></param>
         public VstPluginContextWrapper(VstPluginContext vstPluginContext)
         {
-            f_VstPluginContext = vstPluginContext;
+            f_Context = vstPluginContext;
 
             VstParameterIndexes = new Dictionary<string, int>();
             var vst = new VstSettings();
+            vst.VstPluginContext = this;
+
             for (int i = 0; i < vstPluginContext.PluginInfo.ParameterCount; i++)
             {
                 string name = vstPluginContext.PluginCommandStub.GetParameterName(i);
@@ -65,8 +67,8 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
                     // TODO: マネージ状態を破棄します (マネージ オブジェクト)。
                     lock (InstrumentBase.VstPluginContextLockObject)
                     {
-                        f_VstPluginContext?.Dispose();
-                        f_VstPluginContext = null;
+                        f_Context?.Dispose();
+                        f_Context = null;
                     }
                 }
 

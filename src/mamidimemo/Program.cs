@@ -82,7 +82,7 @@ namespace zanac.MAmidiMEmo
                     foreach (var t in ts)
                     {
                         var attr = t.GetCustomAttributes(typeof(DataContractAttribute), true).FirstOrDefault() as DataContractAttribute;
-                        if(attr != null)
+                        if (attr != null)
                             assemblieTypes.Add(t.Name, t);
                         foreach (var nt in GetAllNestedTypes(t))
                         {

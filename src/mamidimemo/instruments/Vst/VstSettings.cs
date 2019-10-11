@@ -53,7 +53,7 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
                         if (VstPluginContext.VstParameterIndexes.ContainsKey(memberName))
                         {
                             int idx = VstPluginContext.VstParameterIndexes[memberName];
-                            result = VstPluginContext.VstPluginContext.PluginCommandStub.GetParameter(idx);
+                            result = VstPluginContext.Context.PluginCommandStub.GetParameter(idx);
                         }
                     }
                 }
@@ -75,7 +75,12 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
                         if (VstPluginContext.VstParameterIndexes.ContainsKey(memberName))
                         {
                             int idx = VstPluginContext.VstParameterIndexes[memberName];
-                            VstPluginContext.VstPluginContext.PluginCommandStub.SetParameter(idx, (float)value);
+                            float val = (float)value;
+                            if (val < 0)
+                                val = 0;
+                            else if (val > 1)
+                                val = 1;
+                            VstPluginContext.Context.PluginCommandStub.SetParameter(idx, val);
                         }
                     }
                 }

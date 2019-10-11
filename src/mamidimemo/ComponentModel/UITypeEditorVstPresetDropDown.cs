@@ -14,10 +14,8 @@ using zanac.MAmidiMEmo.Instruments.Vst;
 namespace zanac.MAmidiMEmo.ComponentModel
 {
 
-    public abstract class UITypeEditorVstPresetDropDown : UITypeEditor
+    public class UITypeEditorVstPresetDropDown : UITypeEditor
     {
-        protected abstract VstPluginContextWrapper GetTargetVstPluginContext(ITypeDescriptorContext context);
-
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
         {
             return UITypeEditorEditStyle.DropDown;
@@ -34,7 +32,8 @@ namespace zanac.MAmidiMEmo.ComponentModel
             list.Click += List_Click;
             lock (InstrumentBase.VstPluginContextLockObject)
             {
-                var ctx = GetTargetVstPluginContext(context)?.VstPluginContext;
+                VSTPlugin inst = (VSTPlugin)context.Instance;
+                var ctx = inst.PluginContext.Context;
                 if (ctx != null)
                 {
                     for (int i = 0; i < ctx.PluginInfo.ProgramCount; i++)

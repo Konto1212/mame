@@ -20,14 +20,11 @@ namespace zanac.MAmidiMEmo.ComponentModel
 
         public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
         {
-            if (context == null)
-                throw new ArgumentNullException("context");
-            if (destinationType == null)
-                throw new ArgumentNullException("destinationType");
-
-            if (destinationType == typeof(string))
-                return context.PropertyDescriptor.DisplayName;
-
+            if (context != null)
+            {
+                if (destinationType == typeof(string))
+                    return context.PropertyDescriptor.DisplayName;
+            }
             return base.ConvertTo(context, culture, value, destinationType);
         }
 
