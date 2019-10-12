@@ -56,3 +56,11 @@ regtests/jedutil/output
 Release(but Debug .NET)
 Release(but Debug .NET)
 /src/mamidimemo/mamidimemo.csproj.user
+/src/mamidimemo/obj/x64/Debug
+/src/mamidimemo/obj/x64/Release
+/src/wrapper/Win32/Debug
+/src/mamidimemo/obj/x86/Release
+/src/wrapper/x64/Release
+/src/wrapper/x64/Debug
+/src/wrapper/Win32/Release
+/src/mamidimemo/obj/x86/Debug
