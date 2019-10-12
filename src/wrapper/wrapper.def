@@ -1,0 +1,7 @@
+LIBRARY   WRAPPER
+EXPORTS
+   	HasExited
+	SoundUpdating
+	SoundUpdated
+	RestartApplication
+	MainWarpper			@4

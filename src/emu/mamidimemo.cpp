@@ -34,20 +34,20 @@ void StartMAmidiMEmoMain()
 	HMODULE hModule = LoadLibrary("wrapper.dll");
 	FARPROC proc;
 
-	proc = GetProcAddress(hModule, "_HasExited@0");
+	proc = GetProcAddress(hModule, "HasExited");
 	if (proc != NULL)
 		hasExited = reinterpret_cast<HasExitedProc>(proc);
-	proc = GetProcAddress(hModule, "_SoundUpdating@0");
+	proc = GetProcAddress(hModule, "SoundUpdating");
 	if (proc != NULL)
 		soundUpdating = reinterpret_cast<SoundUpdatingProc>(proc);
-	proc = GetProcAddress(hModule, "_SoundUpdated@0");
+	proc = GetProcAddress(hModule, "SoundUpdated");
 	if (proc != NULL)
 		soundUpdated = reinterpret_cast<SoundUpdatedProc>(proc);
-	proc = GetProcAddress(hModule, "_RestartApplication@0");
+	proc = GetProcAddress(hModule, "RestartApplication");
 	if (proc != NULL)
 		restartApplication = reinterpret_cast<RestartApplicationProc>(proc);
 
-	proc = GetProcAddress(hModule, "_MainWarpper@4");
+	proc = GetProcAddress(hModule, "MainWarpper");
 	if (proc != NULL)
 	{
 		MainWrapperProc main = reinterpret_cast<MainWrapperProc>(proc);
