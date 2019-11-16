@@ -10,6 +10,8 @@ using System.Windows.Forms;
 using zanac.MAmidiMEmo.Instruments;
 using System.Drawing.Drawing2D;
 using Melanchall.DryWetMidi.Smf;
+using zanac.MAmidiMEmo.Midi;
+using Melanchall.DryWetMidi.Common;
 
 namespace zanac.MAmidiMEmo.Gui
 {
@@ -35,6 +37,29 @@ namespace zanac.MAmidiMEmo.Gui
 
         private Dictionary<SoundBase, int> soundKeyOn = new Dictionary<SoundBase, int>();
 
+        private Dictionary<int, bool> receiveChs = new Dictionary<int, bool>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <param name="receive"></param>
+        public void SetReceiveChannel(int ch, bool receive)
+        {
+            receiveChs[ch] = receive;
+        }
+
+        private int mouseCh;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <param name="receive"></param>
+        public void SetMouseChannel(int ch)
+        {
+            mouseCh = ch;
+        }
 
         /// <summary>
         /// 
@@ -42,6 +67,9 @@ namespace zanac.MAmidiMEmo.Gui
         public PianoControl()
         {
             InitializeComponent();
+
+            for (int i = 0; i < 16; i++)
+                receiveChs[i] = true;
 
             SetStyle(ControlStyles.ResizeRedraw, true);
 
@@ -75,6 +103,10 @@ namespace zanac.MAmidiMEmo.Gui
             {
                 bool fill;
                 SoundBase snd = (SoundBase)sender;
+
+                if (!receiveChs[snd.NoteOnEvent.Channel])
+                    return;
+
                 if (!soundKeyOn.ContainsKey(snd))
                     soundKeyOn.Add(snd, e.NoteNumber);
                 else
@@ -108,6 +140,10 @@ namespace zanac.MAmidiMEmo.Gui
             this.BeginInvoke(new MethodInvoker(() =>
             {
                 bool fill;
+
+                if (!receiveChs[snd.NoteOnEvent.Channel])
+                    return;
+
                 int nn = (int)Math.Round(e.NoteNumber + e.Pitch);
                 if (!soundKeyOn.ContainsKey(snd))
                     soundKeyOn.Add(snd, nn);
@@ -335,6 +371,65 @@ namespace zanac.MAmidiMEmo.Gui
             keyPathTable[keyNum] = r;
 
             return r;
+        }
+
+        private int lastKeyOn = -1;
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            lastKeyOff();
+
+            for (int keyNum = 0; keyNum < 128; keyNum++)
+            {
+                bool black;
+                GraphicsPath path = getKeyPath(keyNum, out black);
+                var r = new Region(path);
+                if (r.IsVisible(e.Location))
+                {
+                    lastKeyOn = keyNum;
+                    NoteOnEvent noe = new NoteOnEvent((SevenBitNumber)keyNum, (SevenBitNumber)127);
+                    MidiManager.SendMidiEvent(noe);
+                }
+            }
+        }
+
+        private void lastKeyOff()
+        {
+            if (lastKeyOn >= 0)
+            {
+                NoteOffEvent noe = new NoteOffEvent((SevenBitNumber)lastKeyOn, (SevenBitNumber)127);
+                MidiManager.SendMidiEvent(noe);
+                lastKeyOn = -1;
+            }
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            lastKeyOff();
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            for (int keyNum = 0; keyNum < 128; keyNum++)
+            {
+                bool black;
+                GraphicsPath path = getKeyPath(keyNum, out black);
+                var r = new Region(path);
+                if (r.IsVisible(e.Location))
+                {
+                    if (lastKeyOn >= 0)
+                    {
+                        if (lastKeyOn != keyNum)
+                        {
+                            lastKeyOff();
+
+                            lastKeyOn = keyNum;
+                            NoteOnEvent noe = new NoteOnEvent((SevenBitNumber)keyNum, (SevenBitNumber)127);
+                            MidiManager.SendMidiEvent(noe);
+                        }
+                    }
+                }
+            }
         }
     }
 }

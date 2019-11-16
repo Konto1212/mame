@@ -1,4 +1,4 @@
-MAmidiMEmo V0.7.0.0 / Itoken (c)2019 / GPL-2.0
+MAmidiMEmo V0.8.0.0 / Itoken (c)2019 / GPL-2.0
 
 *** What is the MAmidiMEmo? ***
 
@@ -99,6 +99,8 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
     Panpot
 	Modulation, Modulation Depth, Modulation Range, Modulation Delay
 	Portamento, Portamento Time
+	All Note Off
+	CC#126/127 Mono/Poly mode. Spec is almost same with FITOM.
 
 6. Also, you can set the following sound driver settings from Timbre settings.
 
@@ -125,6 +127,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 9. Changes
 
+0.8.0.0 Supports piano clicks by mouse. Supports Mono mode(CC#126,CC#127) almost same with FITOM
 0.7.0.0 Added SID, C140 chips, Displays Oscilloscope, Supports VST Effect plugin(preliminary)
 0.6.1.0 Changed to new sound timer engine for perfect sound timing
 0.6.0.0 Added sound driver effects and portamento feature

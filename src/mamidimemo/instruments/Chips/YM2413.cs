@@ -398,16 +398,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 int emptySlot = -1;
                 if (parentModule.RHY == 0)
                 {
-                    emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, 9);
+                    emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 9));
                 }
                 else
                 {
                     var pn = parentModule.ProgramNumbers[note.Channel];
                     var timbre = parentModule.Timbres[pn];
                     if (timbre.ToneType != ToneType.DrumSet)
-                        emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, 6);
+                        emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 6));
                     else
-                        emptySlot = SearchEmptySlotAndOff(drumOnSounds, note, 6);
+                        emptySlot = SearchEmptySlotAndOff(drumOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 6));
                 }
                 return emptySlot;
             }

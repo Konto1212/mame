@@ -402,7 +402,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 {
                     case PhysicalChannel.Indeterminatene:
                         {
-                            emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, 3);
+                            emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 3));
                             break;
                         }
                     case PhysicalChannel.Ch1:

@@ -545,6 +545,7 @@ namespace zanac.MAmidiMEmo.Instruments
             private set;
         }
 
+
         public bool ShouldSerializeModulationRates()
         {
             foreach (var dt in ModulationRates)
@@ -760,6 +761,47 @@ namespace zanac.MAmidiMEmo.Instruments
                 PortamentoTimes[i] = 0;
         }
 
+        [DataMember]
+        [Category("Chip")]
+        [Description("Mono mode (0-127) 0:Disable mono mode <MIDI 16ch>")]
+        [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
+        [Mask(127)]
+        public byte[] MonoMode
+        {
+            get;
+            private set;
+        }
+
+
+        public bool ShouldSerializeMonoMode()
+        {
+            foreach (var dt in MonoMode)
+            {
+                if (dt != 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetMonoMode()
+        {
+            for (int i = 0; i < MonoMode.Length; i++)
+                MonoMode[i] = 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="maxVoice"></param>
+        /// <returns></returns>
+        protected int CalcMaxVoiceNumber(int channel, byte maxVoice)
+        {
+            if (MonoMode[channel] == 0 || MonoMode[channel] > maxVoice)
+                return maxVoice;
+            else
+                return MonoMode[channel];
+        }
 
         [Browsable(false)]
         public byte[] RpnLsb
@@ -1050,6 +1092,12 @@ namespace zanac.MAmidiMEmo.Instruments
                     0, 0, 0,
                     0, 0, 0,
                     0, 0, 0, 0};
+            MonoMode = new byte[] {
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0, 0};
         }
 
         /// <summary>
@@ -1285,6 +1333,12 @@ namespace zanac.MAmidiMEmo.Instruments
                         Portamentos[i] = 0;
                         PortamentoTimes[i] = 0;
                     }
+                    break;
+                case 126:    //MONO Mode
+                    MonoMode[midiEvent.Channel] = midiEvent.ControlValue;
+                    break;
+                case 127:    //POLY Mode
+                    MonoMode[midiEvent.Channel] = 0;
                     break;
             }
         }

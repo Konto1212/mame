@@ -402,22 +402,22 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 {
                     case ToneType.SQUARE:
                         {
-                            emptySlot = SearchEmptySlotAndOff(sqOnSounds, note, 2);
+                            emptySlot = SearchEmptySlotAndOff(sqOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 2));
                             break;
                         }
                     case ToneType.TRIANGLE:
                         {
-                            emptySlot = SearchEmptySlotAndOff(triOnSounds, note, 1);
+                            emptySlot = SearchEmptySlotAndOff(triOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             break;
                         }
                     case ToneType.NOISE:
                         {
-                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, 1);
+                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             break;
                         }
                     case ToneType.DPCM:
                         {
-                            emptySlot = SearchEmptySlotAndOff(dpcmOnSounds, note, 1);
+                            emptySlot = SearchEmptySlotAndOff(dpcmOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             break;
                         }
                 }

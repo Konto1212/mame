@@ -333,7 +333,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <returns></returns>
             private int searchEmptySlot(NoteOnEvent note)
             {
-                return SearchEmptySlotAndOff(sccOnSounds, note, 5);
+                return SearchEmptySlotAndOff(sccOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 5));
             }
 
         }

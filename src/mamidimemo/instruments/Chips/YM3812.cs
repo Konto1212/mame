@@ -396,7 +396,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 var pn = parentModule.ProgramNumbers[note.Channel];
 
                 var timbre = parentModule.Timbres[pn];
-                emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, 9);
+                emptySlot = SearchEmptySlotAndOff(fmOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 9));
                 return emptySlot;
             }
 

@@ -302,7 +302,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 var pn = parentModule.ProgramNumbers[note.Channel];
                 var timbre = parentModule.Timbres[pn];
-                int emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, 1);
+                int emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                 return emptySlot;
             }
 

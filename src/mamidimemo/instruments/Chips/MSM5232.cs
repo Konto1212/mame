@@ -429,12 +429,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 {
                     case SoundGroup.Group1:
                         {
-                            emptySlot = SearchEmptySlotAndOff(chAOnSounds, note, 4);
+                            emptySlot = SearchEmptySlotAndOff(chAOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 4));
                             break;
                         }
                     case SoundGroup.Group2:
                         {
-                            emptySlot = SearchEmptySlotAndOff(chBOnSounds, note, 4);
+                            emptySlot = SearchEmptySlotAndOff(chBOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 4));
                             break;
                         }
                 }

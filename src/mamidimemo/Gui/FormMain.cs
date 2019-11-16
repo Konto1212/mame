@@ -118,6 +118,8 @@ namespace zanac.MAmidiMEmo.Gui
             InstrumentManager.InstrumentChanged += InstrumentManager_InstrumentChanged;
             InstrumentManager.InstrumentAdded += InstrumentManager_InstrumentAdded;
             InstrumentManager.InstrumentRemoved += InstrumentManager_InstrumentRemoved;
+
+            toolStripComboBox1.SelectedIndex = 0;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -566,6 +568,46 @@ namespace zanac.MAmidiMEmo.Gui
         {
             propertyGrid.ResetSelectedProperty();
             propertyGrid.Refresh();
+        }
+
+        private void toolStripButton19_Click(object sender, EventArgs e)
+        {
+            toolStripButton19.Checked = !toolStripButton19.Checked;
+            bool chk = toolStripButton19.Checked;
+
+            toolStripButton18.Checked = chk;
+            toolStripButton17.Checked = chk;
+            toolStripButton16.Checked = chk;
+            toolStripButton15.Checked = chk;
+            toolStripButton14.Checked = chk;
+            toolStripButton13.Checked = chk;
+            toolStripButton12.Checked = chk;
+            toolStripButton11.Checked = chk;
+            toolStripButton10.Checked = chk;
+            toolStripButton9.Checked = chk;
+            toolStripButton8.Checked = chk;
+            toolStripButton7.Checked = chk;
+            toolStripButton6.Checked = chk;
+            toolStripButton5.Checked = chk;
+            toolStripButton4.Checked = chk;
+            toolStripButton3.Checked = chk;
+        }
+
+        private void toolStripButton18_Click(object sender, EventArgs e)
+        {
+            var tb = (ToolStripButton)sender;
+            tb.Checked = !tb.Checked;
+        }
+
+        private void toolStripButton18_CheckedChanged(object sender, EventArgs e)
+        {
+            var tb = (ToolStripButton)sender;
+            pianoControl1.SetReceiveChannel(int.Parse(tb.Text) - 1, tb.Checked);
+        }
+
+        private void toolStripComboBox1_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            pianoControl1.SetMouseChannel(toolStripComboBox1.SelectedIndex);
         }
 
     }

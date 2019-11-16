@@ -64,7 +64,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 return 11;
             }
         }
-        
+
         private byte f_EnvelopeFrequencyCoarse = 2;
 
         /// <summary>
@@ -453,7 +453,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     case SoundType.NOISE:
                     case SoundType.ENVELOPE:
                         {
-                            emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, 3);
+                            emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 3));
                             break;
                         }
                 }

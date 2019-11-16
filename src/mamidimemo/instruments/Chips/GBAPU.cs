@@ -412,25 +412,25 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 {
                     case SoundType.SPSG:
                         {
-                            emptySlot = SearchEmptySlotAndOff(spsgOnSounds, note, 1);
+                            emptySlot = SearchEmptySlotAndOff(spsgOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             break;
                         }
                     case SoundType.PSG:
                         {
                             if (parentModule.PartialReserveSPSG && spsgOnSounds.Count != 0)
-                                emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, 1);
+                                emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             else
-                                emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, 2);
+                                emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 2));
                             break;
                         }
                     case SoundType.WAV:
                         {
-                            emptySlot = SearchEmptySlotAndOff(wavOnSounds, note, 1);
+                            emptySlot = SearchEmptySlotAndOff(wavOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             break;
                         }
                     case SoundType.NOISE:
                         {
-                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, 1);
+                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             break;
                         }
                 }

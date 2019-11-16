@@ -35,22 +35,11 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.listViewIntruments = new System.Windows.Forms.ListView();
             this.contextMenuStripInst = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.decreaseThisKindOfChipToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-            this.propertyGrid = new System.Windows.Forms.PropertyGrid();
             this.contextMenuStripProp = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.resetToDefaultThisPropertyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.pianoControl1 = new zanac.MAmidiMEmo.Gui.PianoControl();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.listView1 = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -91,6 +80,43 @@
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.listViewIntruments = new System.Windows.Forms.ListView();
+            this.propertyGrid = new System.Windows.Forms.PropertyGrid();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripButton19 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton18 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton17 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton16 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton15 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton14 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton13 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton12 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton11 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton10 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton9 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton8 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton7 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
+            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.pianoControl1 = new zanac.MAmidiMEmo.Gui.PianoControl();
+            this.contextMenuStripInst.SuspendLayout();
+            this.contextMenuStripProp.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -99,61 +125,11 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
-            this.contextMenuStripInst.SuspendLayout();
-            this.contextMenuStripProp.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.toolStrip2.SuspendLayout();
             this.tabPage2.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // splitContainer1
-            // 
-            resources.ApplyResources(this.splitContainer1, "splitContainer1");
-            this.splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
-            resources.ApplyResources(this.splitContainer1.Panel1, "splitContainer1.Panel1");
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
-            resources.ApplyResources(this.splitContainer1.Panel2, "splitContainer1.Panel2");
-            // 
-            // splitContainer2
-            // 
-            resources.ApplyResources(this.splitContainer2, "splitContainer2");
-            this.splitContainer2.Name = "splitContainer2";
-            // 
-            // splitContainer2.Panel1
-            // 
-            this.splitContainer2.Panel1.Controls.Add(this.listViewIntruments);
-            // 
-            // splitContainer2.Panel2
-            // 
-            this.splitContainer2.Panel2.Controls.Add(this.propertyGrid);
-            // 
-            // listViewIntruments
-            // 
-            this.listViewIntruments.ContextMenuStrip = this.contextMenuStripInst;
-            resources.ApplyResources(this.listViewIntruments, "listViewIntruments");
-            this.listViewIntruments.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups"))),
-            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups1"))),
-            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups2"))),
-            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups3")))});
-            this.listViewIntruments.HideSelection = false;
-            this.listViewIntruments.LargeImageList = this.imageList1;
-            this.listViewIntruments.Name = "listViewIntruments";
-            this.listViewIntruments.ShowItemToolTips = true;
-            this.listViewIntruments.SmallImageList = this.imageList1;
-            this.listViewIntruments.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.listViewIntruments.UseCompatibleStateImageBehavior = false;
-            this.listViewIntruments.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.listViewIntruments_ItemSelectionChanged);
             // 
             // contextMenuStripInst
             // 
@@ -174,12 +150,6 @@
             resources.ApplyResources(this.imageList1, "imageList1");
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             // 
-            // propertyGrid
-            // 
-            this.propertyGrid.ContextMenuStrip = this.contextMenuStripProp;
-            resources.ApplyResources(this.propertyGrid, "propertyGrid");
-            this.propertyGrid.Name = "propertyGrid";
-            // 
             // contextMenuStripProp
             // 
             this.contextMenuStripProp.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -192,57 +162,6 @@
             this.resetToDefaultThisPropertyToolStripMenuItem.Name = "resetToDefaultThisPropertyToolStripMenuItem";
             resources.ApplyResources(this.resetToDefaultThisPropertyToolStripMenuItem, "resetToDefaultThisPropertyToolStripMenuItem");
             this.resetToDefaultThisPropertyToolStripMenuItem.Click += new System.EventHandler(this.resetToDefaultThisPropertyToolStripMenuItem_Click);
-            // 
-            // tabControl1
-            // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            resources.ApplyResources(this.tabControl1, "tabControl1");
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.tabPage1, "tabPage1");
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.tabPage1_Paint);
-            // 
-            // tabPage3
-            // 
-            this.tabPage3.Controls.Add(this.pianoControl1);
-            resources.ApplyResources(this.tabPage3, "tabPage3");
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.UseVisualStyleBackColor = true;
-            // 
-            // pianoControl1
-            // 
-            resources.ApplyResources(this.pianoControl1, "pianoControl1");
-            this.pianoControl1.Name = "pianoControl1";
-            // 
-            // tabPage2
-            // 
-            this.tabPage2.Controls.Add(this.listView1);
-            resources.ApplyResources(this.tabPage2, "tabPage2");
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // listView1
-            // 
-            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1});
-            resources.ApplyResources(this.listView1, "listView1");
-            this.listView1.FullRowSelect = true;
-            this.listView1.GridLines = true;
-            this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.listView1.Name = "listView1";
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
-            // 
-            // columnHeader1
-            // 
-            resources.ApplyResources(this.columnHeader1, "columnHeader1");
             // 
             // statusStrip1
             // 
@@ -522,6 +441,341 @@
             this.timer1.Interval = 50;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // splitContainer1
+            // 
+            resources.ApplyResources(this.splitContainer1, "splitContainer1");
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
+            resources.ApplyResources(this.splitContainer1.Panel1, "splitContainer1.Panel1");
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
+            resources.ApplyResources(this.splitContainer1.Panel2, "splitContainer1.Panel2");
+            // 
+            // splitContainer2
+            // 
+            resources.ApplyResources(this.splitContainer2, "splitContainer2");
+            this.splitContainer2.Name = "splitContainer2";
+            // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.Controls.Add(this.listViewIntruments);
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.propertyGrid);
+            // 
+            // listViewIntruments
+            // 
+            this.listViewIntruments.ContextMenuStrip = this.contextMenuStripInst;
+            resources.ApplyResources(this.listViewIntruments, "listViewIntruments");
+            this.listViewIntruments.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
+            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups"))),
+            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups1"))),
+            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups2"))),
+            ((System.Windows.Forms.ListViewGroup)(resources.GetObject("listViewIntruments.Groups3")))});
+            this.listViewIntruments.HideSelection = false;
+            this.listViewIntruments.LargeImageList = this.imageList1;
+            this.listViewIntruments.Name = "listViewIntruments";
+            this.listViewIntruments.ShowItemToolTips = true;
+            this.listViewIntruments.SmallImageList = this.imageList1;
+            this.listViewIntruments.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.listViewIntruments.UseCompatibleStateImageBehavior = false;
+            this.listViewIntruments.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.listViewIntruments_ItemSelectionChanged);
+            // 
+            // propertyGrid
+            // 
+            this.propertyGrid.ContextMenuStrip = this.contextMenuStripProp;
+            resources.ApplyResources(this.propertyGrid, "propertyGrid");
+            this.propertyGrid.Name = "propertyGrid";
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            resources.ApplyResources(this.tabControl1, "tabControl1");
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.tabPage1, "tabPage1");
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.tabPage1_Paint);
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.pianoControl1);
+            this.tabPage3.Controls.Add(this.toolStrip2);
+            resources.ApplyResources(this.tabPage3, "tabPage3");
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // toolStrip2
+            // 
+            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripLabel3,
+            this.toolStripButton19,
+            this.toolStripButton18,
+            this.toolStripButton17,
+            this.toolStripButton16,
+            this.toolStripButton15,
+            this.toolStripButton14,
+            this.toolStripButton13,
+            this.toolStripButton12,
+            this.toolStripButton11,
+            this.toolStripButton10,
+            this.toolStripButton9,
+            this.toolStripButton8,
+            this.toolStripButton7,
+            this.toolStripButton6,
+            this.toolStripButton5,
+            this.toolStripButton4,
+            this.toolStripButton3,
+            this.toolStripComboBox1,
+            this.toolStripLabel2});
+            resources.ApplyResources(this.toolStrip2, "toolStrip2");
+            this.toolStrip2.Name = "toolStrip2";
+            // 
+            // toolStripLabel3
+            // 
+            this.toolStripLabel3.Name = "toolStripLabel3";
+            resources.ApplyResources(this.toolStripLabel3, "toolStripLabel3");
+            // 
+            // toolStripButton19
+            // 
+            this.toolStripButton19.Checked = true;
+            this.toolStripButton19.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton19.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton19, "toolStripButton19");
+            this.toolStripButton19.Name = "toolStripButton19";
+            this.toolStripButton19.Click += new System.EventHandler(this.toolStripButton19_Click);
+            // 
+            // toolStripButton18
+            // 
+            this.toolStripButton18.Checked = true;
+            this.toolStripButton18.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton18.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton18, "toolStripButton18");
+            this.toolStripButton18.Name = "toolStripButton18";
+            this.toolStripButton18.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton18.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton17
+            // 
+            this.toolStripButton17.Checked = true;
+            this.toolStripButton17.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton17.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton17, "toolStripButton17");
+            this.toolStripButton17.Name = "toolStripButton17";
+            this.toolStripButton17.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton17.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton16
+            // 
+            this.toolStripButton16.Checked = true;
+            this.toolStripButton16.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton16.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton16, "toolStripButton16");
+            this.toolStripButton16.Name = "toolStripButton16";
+            this.toolStripButton16.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton16.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton15
+            // 
+            this.toolStripButton15.Checked = true;
+            this.toolStripButton15.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton15.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton15, "toolStripButton15");
+            this.toolStripButton15.Name = "toolStripButton15";
+            this.toolStripButton15.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton15.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton14
+            // 
+            this.toolStripButton14.Checked = true;
+            this.toolStripButton14.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton14.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton14, "toolStripButton14");
+            this.toolStripButton14.Name = "toolStripButton14";
+            this.toolStripButton14.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton14.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton13
+            // 
+            this.toolStripButton13.Checked = true;
+            this.toolStripButton13.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton13.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton13, "toolStripButton13");
+            this.toolStripButton13.Name = "toolStripButton13";
+            this.toolStripButton13.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton13.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton12
+            // 
+            this.toolStripButton12.Checked = true;
+            this.toolStripButton12.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton12.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton12, "toolStripButton12");
+            this.toolStripButton12.Name = "toolStripButton12";
+            this.toolStripButton12.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton12.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton11
+            // 
+            this.toolStripButton11.Checked = true;
+            this.toolStripButton11.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton11.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton11, "toolStripButton11");
+            this.toolStripButton11.Name = "toolStripButton11";
+            this.toolStripButton11.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton11.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton10
+            // 
+            this.toolStripButton10.Checked = true;
+            this.toolStripButton10.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton10.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton10, "toolStripButton10");
+            this.toolStripButton10.Name = "toolStripButton10";
+            this.toolStripButton10.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton10.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton9
+            // 
+            this.toolStripButton9.Checked = true;
+            this.toolStripButton9.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton9.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton9, "toolStripButton9");
+            this.toolStripButton9.Name = "toolStripButton9";
+            this.toolStripButton9.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton9.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton8
+            // 
+            this.toolStripButton8.Checked = true;
+            this.toolStripButton8.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton8.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton8, "toolStripButton8");
+            this.toolStripButton8.Name = "toolStripButton8";
+            this.toolStripButton8.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton8.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton7
+            // 
+            this.toolStripButton7.Checked = true;
+            this.toolStripButton7.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton7.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton7, "toolStripButton7");
+            this.toolStripButton7.Name = "toolStripButton7";
+            this.toolStripButton7.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton7.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton6
+            // 
+            this.toolStripButton6.Checked = true;
+            this.toolStripButton6.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton6, "toolStripButton6");
+            this.toolStripButton6.Name = "toolStripButton6";
+            this.toolStripButton6.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton6.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton5
+            // 
+            this.toolStripButton5.Checked = true;
+            this.toolStripButton5.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton5, "toolStripButton5");
+            this.toolStripButton5.Name = "toolStripButton5";
+            this.toolStripButton5.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton5.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton4
+            // 
+            this.toolStripButton4.Checked = true;
+            this.toolStripButton4.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton4, "toolStripButton4");
+            this.toolStripButton4.Name = "toolStripButton4";
+            this.toolStripButton4.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton4.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripButton3
+            // 
+            this.toolStripButton3.Checked = true;
+            this.toolStripButton3.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(this.toolStripButton3, "toolStripButton3");
+            this.toolStripButton3.Name = "toolStripButton3";
+            this.toolStripButton3.CheckedChanged += new System.EventHandler(this.toolStripButton18_CheckedChanged);
+            this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton18_Click);
+            // 
+            // toolStripComboBox1
+            // 
+            this.toolStripComboBox1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.toolStripComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.toolStripComboBox1.DropDownWidth = 32;
+            this.toolStripComboBox1.Items.AddRange(new object[] {
+            resources.GetString("toolStripComboBox1.Items"),
+            resources.GetString("toolStripComboBox1.Items1"),
+            resources.GetString("toolStripComboBox1.Items2"),
+            resources.GetString("toolStripComboBox1.Items3"),
+            resources.GetString("toolStripComboBox1.Items4"),
+            resources.GetString("toolStripComboBox1.Items5"),
+            resources.GetString("toolStripComboBox1.Items6"),
+            resources.GetString("toolStripComboBox1.Items7"),
+            resources.GetString("toolStripComboBox1.Items8"),
+            resources.GetString("toolStripComboBox1.Items9"),
+            resources.GetString("toolStripComboBox1.Items10"),
+            resources.GetString("toolStripComboBox1.Items11"),
+            resources.GetString("toolStripComboBox1.Items12"),
+            resources.GetString("toolStripComboBox1.Items13"),
+            resources.GetString("toolStripComboBox1.Items14")});
+            this.toolStripComboBox1.Name = "toolStripComboBox1";
+            resources.ApplyResources(this.toolStripComboBox1, "toolStripComboBox1");
+            this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged_1);
+            // 
+            // toolStripLabel2
+            // 
+            this.toolStripLabel2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.toolStripLabel2.Name = "toolStripLabel2";
+            resources.ApplyResources(this.toolStripLabel2, "toolStripLabel2");
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.listView1);
+            resources.ApplyResources(this.tabPage2, "tabPage2");
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // listView1
+            // 
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1});
+            resources.ApplyResources(this.listView1, "listView1");
+            this.listView1.FullRowSelect = true;
+            this.listView1.GridLines = true;
+            this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.listView1.Name = "listView1";
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            resources.ApplyResources(this.columnHeader1, "columnHeader1");
+            // 
+            // pianoControl1
+            // 
+            resources.ApplyResources(this.pianoControl1, "pianoControl1");
+            this.pianoControl1.Name = "pianoControl1";
+            // 
             // FormMain
             // 
             resources.ApplyResources(this, "$this");
@@ -532,6 +786,14 @@
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormMain";
+            this.contextMenuStripInst.ResumeLayout(false);
+            this.contextMenuStripProp.ResumeLayout(false);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -540,17 +802,12 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            this.contextMenuStripInst.ResumeLayout(false);
-            this.contextMenuStripProp.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
+            this.toolStrip2.ResumeLayout(false);
+            this.toolStrip2.PerformLayout();
             this.tabPage2.ResumeLayout(false);
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -613,6 +870,27 @@
         private System.Windows.Forms.TabPage tabPage3;
         private PianoControl pianoControl1;
         private System.Windows.Forms.ToolStripMenuItem extendBeepToolStripMenuItem;
+        private System.Windows.Forms.ToolStrip toolStrip2;
+        private System.Windows.Forms.ToolStripButton toolStripButton19;
+        private System.Windows.Forms.ToolStripButton toolStripButton18;
+        private System.Windows.Forms.ToolStripButton toolStripButton17;
+        private System.Windows.Forms.ToolStripButton toolStripButton16;
+        private System.Windows.Forms.ToolStripButton toolStripButton15;
+        private System.Windows.Forms.ToolStripButton toolStripButton14;
+        private System.Windows.Forms.ToolStripButton toolStripButton13;
+        private System.Windows.Forms.ToolStripButton toolStripButton12;
+        private System.Windows.Forms.ToolStripButton toolStripButton11;
+        private System.Windows.Forms.ToolStripButton toolStripButton10;
+        private System.Windows.Forms.ToolStripButton toolStripButton9;
+        private System.Windows.Forms.ToolStripButton toolStripButton8;
+        private System.Windows.Forms.ToolStripButton toolStripButton7;
+        private System.Windows.Forms.ToolStripButton toolStripButton6;
+        private System.Windows.Forms.ToolStripButton toolStripButton5;
+        private System.Windows.Forms.ToolStripButton toolStripButton4;
+        private System.Windows.Forms.ToolStripButton toolStripButton3;
+        private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel3;
     }
 }
 

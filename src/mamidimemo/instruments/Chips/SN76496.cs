@@ -294,12 +294,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 {
                     case SoundType.PSG:
                         {
-                            emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, 3);
+                            emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 3));
                             break;
                         }
                     case SoundType.NOISE:
                         {
-                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, 1);
+                            emptySlot = SearchEmptySlotAndOff(noiseOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             break;
                         }
                 }
