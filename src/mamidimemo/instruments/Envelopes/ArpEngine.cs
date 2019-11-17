@@ -152,7 +152,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
         public NoteOnEvent LastPassedNote
         {
             get;
-            private set;
+            set;
         }
 
         /// <summary>
@@ -300,6 +300,49 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
             }
 
             LastPassedNote = nan;
+            return nan;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public NoteOnEvent PeekNextNote()
+        {
+            var tmpSrpStep = arpStep;
+            if (SkipNextNote)
+                tmpSrpStep++;
+
+            var tmpArpOctaveCount = arpOctaveCount;
+            if (tmpSrpStep >= arpNotes.Count)
+            {
+                //ステップをループする
+                tmpSrpStep = 0;
+                tmpArpOctaveCount++;
+                if (tmpArpOctaveCount >= Range)
+                    tmpArpOctaveCount = 0;
+            }
+
+            //次のノートを取得
+            NoteOnEvent an = null;
+            if (StepStyle != ArpStepStyle.Random)
+                an = arpNotes[tmpSrpStep];
+            else
+                an = arpNotes[random.Next(arpNotes.Count)];
+            tmpSrpStep++;
+            var nan = new NoteOnEvent(an.NoteNumber, an.Velocity) { Channel = an.Channel };
+
+            //オクターブを上げる処理
+            if (tmpArpOctaveCount > 0)
+            {
+                int oc = tmpArpOctaveCount;
+                if (StepStyle == ArpStepStyle.Random)
+                    oc = random.Next(Range - 1);
+                oc *= 12;
+                if (nan.NoteNumber + oc < 128)
+                    nan.NoteNumber += (SevenBitNumber)oc;
+            }
+
             return nan;
         }
 

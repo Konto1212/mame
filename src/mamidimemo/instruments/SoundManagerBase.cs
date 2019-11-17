@@ -206,6 +206,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
             setupArp(sds, arp);
 
+            var pnn = arp.PeekNextNote();   //do not keyoff/keyon if next note is same with now
+
             if (arp.GateCounter != -1)
             {
                 arp.GateCounter += 1;
@@ -213,7 +215,8 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     //Gate Time
                     arp.GateCounter = -1;
-                    keyOffCore(arp.LastPassedNote);
+                    if (arp.LastPassedNote != null && arp.LastPassedNote.NoteNumber != pnn.NoteNumber)
+                        keyOffLastPassedCore(arp);
                 }
             }
 
@@ -223,7 +226,11 @@ namespace zanac.MAmidiMEmo.Instruments
                 // on sound
                 arp.StepCounter = 0;
                 arp.GateCounter = 0;
-                keyOnCore(arp.NextNote());
+                var lp = arp.LastPassedNote;
+                var nn = arp.NextNote();
+                if (lp == null ||
+                    (lp != null && lp.NoteNumber != nn.NoteNumber))
+                    keyOnCore(nn);
             }
 
             return arp.Step;
@@ -328,6 +335,14 @@ namespace zanac.MAmidiMEmo.Instruments
             keyOffCore(note);
         }
 
+        private void keyOffLastPassedCore(ArpEngine arp)
+        {
+            var lp = arp.LastPassedNote;
+            if (lp != null)
+                keyOffCore(new NoteOffEvent(lp.NoteNumber, (SevenBitNumber)0) { Channel = lp.Channel });
+            arp.LastPassedNote = null;
+        }
+
         private void keyOffCore(NoteOnEvent onote)
         {
             if (onote != null)
@@ -381,10 +396,11 @@ namespace zanac.MAmidiMEmo.Instruments
                             if (arp.ResetNextNoteOn)
                             {
                                 arp.ResetNextNoteOn = false;
-                                keyOffCore(arp.LastPassedNote);
+                                keyOffLastPassedCore(arp);
                                 arp.ClearAddedNotes();
                             }
                             arp.AddNote(note);
+
                             //即音を鳴らすためカウンターを進める
                             if (arp.AddedNotesCount == 1)
                                 arp.StepCounter = arp.StepNum - 1;
@@ -473,9 +489,11 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
                 if (arp.RemoveNote(note))
                 {
-                    if (arp.LastPassedNote != null)
-                        keyOffCore(arp.LastPassedNote);
-
+                    if (arp.AddedNotesCount == 0)
+                    {
+                        if (arp.LastPassedNote != null)
+                            keyOffLastPassedCore(arp);
+                    }
                     //全アルペジオ終了
                     if (arp.AddedNotesCount == 0)
                     {
@@ -563,7 +581,7 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             if (arp.ArpAction != null)
                 arp.ArpAction = null;
-            keyOffCore(arp.LastPassedNote);
+            keyOffLastPassedCore(arp);
             arp.ClearAddedNotes();
         }
 
