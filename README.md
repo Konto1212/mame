@@ -1,4 +1,4 @@
-MAmidiMEmo V0.8.0.0 / Itoken (c)2019 / GPL-2.0
+MAmidiMEmo V0.8.1.0 / Itoken (c)2019 / GPL-2.0
 
 *** What is the MAmidiMEmo? ***
 
@@ -127,6 +127,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 9. Changes
 
+0.8.1.0 Fix arpeggio algorithm. When last one key is up, the key is not held in hold mode. Otherwise, keep arpeggio.
 0.8.0.0 Supports piano clicks by mouse. Supports Mono mode(CC#126,CC#127) almost same with FITOM
 0.7.0.0 Added SID, C140 chips, Displays Oscilloscope, Supports VST Effect plugin(preliminary)
 0.6.1.0 Changed to new sound timer engine for perfect sound timing
