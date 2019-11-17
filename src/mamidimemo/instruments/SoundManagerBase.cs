@@ -481,7 +481,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (sds.Enable)
                 {
                     //ignore keyoff if hold mode
-                    if (sds.Hold)
+                    if (sds.Hold && arp.AddedNotesCount != 1)
                     {
                         arp.ResetNextNoteOn = true;
                         return true;
@@ -494,7 +494,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (arp.LastPassedNote != null)
                             keyOffLastPassedCore(arp);
                     }
-                    //全アルペジオ終了
+                    //end arp
                     if (arp.AddedNotesCount == 0)
                     {
                         if (arp.ArpAction != null)
@@ -513,18 +513,22 @@ namespace zanac.MAmidiMEmo.Instruments
                 if (sds.Enable)
                 {
                     //ignore keyoff if hold mode
-                    if (sds.Hold)
+                    if (sds.Hold && arp.AddedNotesCount != 1)
                     {
                         arp.ResetNextNoteOn = true;
                         return true;
                     }
                 }
-                if (arp.RemoveNote(note) && arp.AddedNotesCount == 0)
+                if (arp.RemoveNote(note))
                 {
-                    if (arp.ArpAction != null)
-                        arp.ArpAction = null;
-                    keyOffCore(arp.FirstAddedNote);
-                    ArpeggiatorsForPitch.Remove(ch);
+                    //end arp
+                    if (arp.AddedNotesCount == 0)
+                    {
+                        if (arp.ArpAction != null)
+                            arp.ArpAction = null;
+                        keyOffCore(arp.FirstAddedNote);
+                        ArpeggiatorsForPitch.Remove(ch);
+                    }
                     return true;
                 }
             }
