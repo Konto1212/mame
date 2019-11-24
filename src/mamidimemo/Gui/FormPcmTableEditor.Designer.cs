@@ -119,11 +119,12 @@ namespace zanac.MAmidiMEmo.Gui
             resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
             // 
-            // FormPcmEditor
+            // FormPcmTableEditor
             // 
             this.AcceptButton = this.buttonOk;
             resources.ApplyResources(this, "$this");
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -136,7 +137,7 @@ namespace zanac.MAmidiMEmo.Gui
             this.KeyPreview = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "FormPcmEditor";
+            this.Name = "FormPcmTableEditor";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;

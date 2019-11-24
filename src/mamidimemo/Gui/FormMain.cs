@@ -148,7 +148,7 @@ namespace zanac.MAmidiMEmo.Gui
             foreach (var inst in InstrumentManager.GetAllInstruments())
                 addItem(inst);
             listViewIntruments.Sort();
-            propertyGrid.SelectedObjects = null;
+            propertyGrid.SelectedObjects = new object[] { };
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace zanac.MAmidiMEmo.Gui
             foreach (var inst in InstrumentManager.GetAllInstruments())
                 addItem(inst);
             listViewIntruments.Sort();
-            propertyGrid.SelectedObjects = null;
+            propertyGrid.SelectedObjects = new object[] { };
         }
 
         /// <summary>
@@ -610,5 +610,30 @@ namespace zanac.MAmidiMEmo.Gui
             pianoControl1.SetMouseChannel(toolStripComboBox1.SelectedIndex);
         }
 
+        private void toolStripButtonCat_Click(object sender, EventArgs e)
+        {
+            propertyGrid.PropertySort = PropertySort.Categorized;
+            toolStripButtonCat.Checked = true;
+            toolStripButtonA2Z.Checked = false;
+        }
+
+        private void toolStripButtonA2Z_Click(object sender, EventArgs e)
+        {
+            propertyGrid.PropertySort = PropertySort.Alphabetical;
+            toolStripButtonCat.Checked = false;
+            toolStripButtonA2Z.Checked = true;
+        }
+
+        private void toolStripButtonPopup_Click(object sender, EventArgs e)
+        {
+            if (propertyGrid.SelectedObjects != null)
+            {
+                List<InstrumentBase> insts = new List<InstrumentBase>();
+                foreach (ListViewItem item in listViewIntruments.SelectedItems)
+                    insts.Add((InstrumentBase)item.Tag);
+                FormProp fp = new FormProp(insts.ToArray());
+                fp.Show(this);
+            }
+        }
     }
 }

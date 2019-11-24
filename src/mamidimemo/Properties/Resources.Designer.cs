@@ -63,6 +63,16 @@ namespace zanac.MAmidiMEmo.Properties {
         /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
+        internal static System.Drawing.Bitmap AtoZ {
+            get {
+                object obj = ResourceManager.GetObject("AtoZ", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
         internal static System.Drawing.Bitmap AY_3_8910 {
             get {
                 object obj = ResourceManager.GetObject("AY_3_8910", resourceCulture);
@@ -86,6 +96,16 @@ namespace zanac.MAmidiMEmo.Properties {
         internal static System.Drawing.Bitmap C140 {
             get {
                 object obj = ResourceManager.GetObject("C140", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap Cat {
+            get {
+                object obj = ResourceManager.GetObject("Cat", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -166,6 +186,16 @@ namespace zanac.MAmidiMEmo.Properties {
         internal static System.Drawing.Bitmap Panic {
             get {
                 object obj = ResourceManager.GetObject("Panic", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap Popup {
+            get {
+                object obj = ResourceManager.GetObject("Popup", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

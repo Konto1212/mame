@@ -71,12 +71,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release%28but Debug .NET%29|x86'">
     <OutputPath>..\..\Output\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -98,12 +99,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release%28but Debug .NET%29|x64'">
     <OutputPath>..\..\Output\Release64\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
@@ -158,6 +163,9 @@
     <!-- any additional x64 specific references -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\ToolStripBase.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ComponentModel\CustomObjectTypeConverter.cs" />
     <Compile Include="ComponentModel\FlagsEnumConverter.cs" />
     <Compile Include="ComponentModel\MaskableExpandableCollectionConverter.cs" />
@@ -174,6 +182,12 @@
     <Compile Include="ComponentModel\SlideEditor.cs" />
     <Compile Include="ComponentModel\UITypeEditorVstPresetDropDown.cs" />
     <Compile Include="ComponentModel\WaveFileReader.cs" />
+    <Compile Include="Gui\FormProp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gui\FormProp.Designer.cs">
+      <DependentUpon>FormProp.cs</DependentUpon>
+    </Compile>
     <Compile Include="Gui\FormVstEditorFrame.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -280,6 +294,9 @@
     <Compile Include="Midi\MidiManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Gui\FormProp.resx">
+      <DependentUpon>FormProp.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormVstEditorFrame.resx">
       <DependentUpon>FormVstEditorFrame.cs</DependentUpon>
     </EmbeddedResource>
@@ -315,6 +332,7 @@
       <Link>README.md</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="app.manifest" />
     <None Include="dummy.out">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -344,6 +362,9 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Cat.png" />
+    <None Include="Resources\AtoZ.png" />
+    <None Include="Resources\Popup.png" />
     <None Include="Resources\C140.png" />
     <None Include="Resources\Beep.png" />
     <None Include="Resources\MOS8580.png" />
