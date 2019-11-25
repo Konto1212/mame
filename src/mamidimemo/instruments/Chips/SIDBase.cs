@@ -45,7 +45,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("Resonance (0-15)")]
-        [SlideParametersAttribute(0,15, true)]
+        [SlideParametersAttribute(0,15)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte RES
@@ -69,7 +69,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("Cutoff (or Center) Frequency (0-2047)(30Hz - 10KHz)")]
-        [SlideParametersAttribute(0, 2047, true)]
+        [SlideParametersAttribute(0, 2047)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public ushort FC
         {
@@ -129,7 +129,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("Disable ch 3 sound (0:Enable 1:Disable)")]
-        [SlideParametersAttribute(0, 1, true)]
+        [SlideParametersAttribute(0, 1)]
         [EditorAttribute(typeof(SlideEditor), typeof(UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte OFF3

@@ -43,6 +43,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
         {
             SliderMax = max;
             SliderMin = min;
+            SliderDynamicSetValue = true;
         }
 
         public SlideParametersAttribute(int min, int max, bool dynamic)

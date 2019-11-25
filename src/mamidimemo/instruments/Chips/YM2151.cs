@@ -77,7 +77,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("LFO Freq (0-255)")]
-        [SlideParametersAttribute(0, 255, true)]
+        [SlideParametersAttribute(0, 255)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte LFRQ
@@ -105,7 +105,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("Select AMD or PMD (0:AMD 1:PMD)")]
-        [SlideParametersAttribute(0, 1, true)]
+        [SlideParametersAttribute(0, 1)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte LFOF
@@ -134,7 +134,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("LFO Depth (0-127)")]
-        [SlideParametersAttribute(0, 127, true)]
+        [SlideParametersAttribute(0, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte LFOD
@@ -164,7 +164,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)")]
-        [SlideParametersAttribute(0, 3, true)]
+        [SlideParametersAttribute(0, 3)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte LFOW
@@ -193,7 +193,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("Noise Enable (0:Disable 1:Enable)")]
-        [SlideParametersAttribute(0, 1, true)]
+        [SlideParametersAttribute(0, 1)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte NE
@@ -223,7 +223,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [Category("Chip")]
         [Description(" Noise Feequency (0-31)\r\n" +
             "3'579'545/(32*NFRQ)")]
-        [SlideParametersAttribute(0, 31, true)]
+        [SlideParametersAttribute(0, 31)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte NFRQ

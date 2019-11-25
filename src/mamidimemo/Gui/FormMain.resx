@@ -847,6 +847,402 @@
   <data name="toolStripButton3.Text" xml:space="preserve">
     <value>16</value>
   </data>
+  <data name="toolStripComboBox2.Items" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="toolStripComboBox2.Items1" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="toolStripComboBox2.Items2" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="toolStripComboBox2.Items3" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="toolStripComboBox2.Items4" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="toolStripComboBox2.Items5" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="toolStripComboBox2.Items6" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="toolStripComboBox2.Items7" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="toolStripComboBox2.Items8" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="toolStripComboBox2.Items9" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <data name="toolStripComboBox2.Items10" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="toolStripComboBox2.Items11" xml:space="preserve">
+    <value>11</value>
+  </data>
+  <data name="toolStripComboBox2.Items12" xml:space="preserve">
+    <value>12</value>
+  </data>
+  <data name="toolStripComboBox2.Items13" xml:space="preserve">
+    <value>13</value>
+  </data>
+  <data name="toolStripComboBox2.Items14" xml:space="preserve">
+    <value>14</value>
+  </data>
+  <data name="toolStripComboBox2.Items15" xml:space="preserve">
+    <value>15</value>
+  </data>
+  <data name="toolStripComboBox2.Items16" xml:space="preserve">
+    <value>16</value>
+  </data>
+  <data name="toolStripComboBox2.Items17" xml:space="preserve">
+    <value>17</value>
+  </data>
+  <data name="toolStripComboBox2.Items18" xml:space="preserve">
+    <value>18</value>
+  </data>
+  <data name="toolStripComboBox2.Items19" xml:space="preserve">
+    <value>19</value>
+  </data>
+  <data name="toolStripComboBox2.Items20" xml:space="preserve">
+    <value>20</value>
+  </data>
+  <data name="toolStripComboBox2.Items21" xml:space="preserve">
+    <value>21</value>
+  </data>
+  <data name="toolStripComboBox2.Items22" xml:space="preserve">
+    <value>22</value>
+  </data>
+  <data name="toolStripComboBox2.Items23" xml:space="preserve">
+    <value>23</value>
+  </data>
+  <data name="toolStripComboBox2.Items24" xml:space="preserve">
+    <value>24</value>
+  </data>
+  <data name="toolStripComboBox2.Items25" xml:space="preserve">
+    <value>25</value>
+  </data>
+  <data name="toolStripComboBox2.Items26" xml:space="preserve">
+    <value>26</value>
+  </data>
+  <data name="toolStripComboBox2.Items27" xml:space="preserve">
+    <value>27</value>
+  </data>
+  <data name="toolStripComboBox2.Items28" xml:space="preserve">
+    <value>28</value>
+  </data>
+  <data name="toolStripComboBox2.Items29" xml:space="preserve">
+    <value>29</value>
+  </data>
+  <data name="toolStripComboBox2.Items30" xml:space="preserve">
+    <value>30</value>
+  </data>
+  <data name="toolStripComboBox2.Items31" xml:space="preserve">
+    <value>31</value>
+  </data>
+  <data name="toolStripComboBox2.Items32" xml:space="preserve">
+    <value>32</value>
+  </data>
+  <data name="toolStripComboBox2.Items33" xml:space="preserve">
+    <value>33</value>
+  </data>
+  <data name="toolStripComboBox2.Items34" xml:space="preserve">
+    <value>34</value>
+  </data>
+  <data name="toolStripComboBox2.Items35" xml:space="preserve">
+    <value>35</value>
+  </data>
+  <data name="toolStripComboBox2.Items36" xml:space="preserve">
+    <value>36</value>
+  </data>
+  <data name="toolStripComboBox2.Items37" xml:space="preserve">
+    <value>37</value>
+  </data>
+  <data name="toolStripComboBox2.Items38" xml:space="preserve">
+    <value>38</value>
+  </data>
+  <data name="toolStripComboBox2.Items39" xml:space="preserve">
+    <value>39</value>
+  </data>
+  <data name="toolStripComboBox2.Items40" xml:space="preserve">
+    <value>40</value>
+  </data>
+  <data name="toolStripComboBox2.Items41" xml:space="preserve">
+    <value>41</value>
+  </data>
+  <data name="toolStripComboBox2.Items42" xml:space="preserve">
+    <value>42</value>
+  </data>
+  <data name="toolStripComboBox2.Items43" xml:space="preserve">
+    <value>43</value>
+  </data>
+  <data name="toolStripComboBox2.Items44" xml:space="preserve">
+    <value>44</value>
+  </data>
+  <data name="toolStripComboBox2.Items45" xml:space="preserve">
+    <value>45</value>
+  </data>
+  <data name="toolStripComboBox2.Items46" xml:space="preserve">
+    <value>46</value>
+  </data>
+  <data name="toolStripComboBox2.Items47" xml:space="preserve">
+    <value>47</value>
+  </data>
+  <data name="toolStripComboBox2.Items48" xml:space="preserve">
+    <value>48</value>
+  </data>
+  <data name="toolStripComboBox2.Items49" xml:space="preserve">
+    <value>49</value>
+  </data>
+  <data name="toolStripComboBox2.Items50" xml:space="preserve">
+    <value>50</value>
+  </data>
+  <data name="toolStripComboBox2.Items51" xml:space="preserve">
+    <value>51</value>
+  </data>
+  <data name="toolStripComboBox2.Items52" xml:space="preserve">
+    <value>52</value>
+  </data>
+  <data name="toolStripComboBox2.Items53" xml:space="preserve">
+    <value>53</value>
+  </data>
+  <data name="toolStripComboBox2.Items54" xml:space="preserve">
+    <value>54</value>
+  </data>
+  <data name="toolStripComboBox2.Items55" xml:space="preserve">
+    <value>55</value>
+  </data>
+  <data name="toolStripComboBox2.Items56" xml:space="preserve">
+    <value>56</value>
+  </data>
+  <data name="toolStripComboBox2.Items57" xml:space="preserve">
+    <value>57</value>
+  </data>
+  <data name="toolStripComboBox2.Items58" xml:space="preserve">
+    <value>58</value>
+  </data>
+  <data name="toolStripComboBox2.Items59" xml:space="preserve">
+    <value>59</value>
+  </data>
+  <data name="toolStripComboBox2.Items60" xml:space="preserve">
+    <value>60</value>
+  </data>
+  <data name="toolStripComboBox2.Items61" xml:space="preserve">
+    <value>61</value>
+  </data>
+  <data name="toolStripComboBox2.Items62" xml:space="preserve">
+    <value>62</value>
+  </data>
+  <data name="toolStripComboBox2.Items63" xml:space="preserve">
+    <value>63</value>
+  </data>
+  <data name="toolStripComboBox2.Items64" xml:space="preserve">
+    <value>64</value>
+  </data>
+  <data name="toolStripComboBox2.Items65" xml:space="preserve">
+    <value>65</value>
+  </data>
+  <data name="toolStripComboBox2.Items66" xml:space="preserve">
+    <value>66</value>
+  </data>
+  <data name="toolStripComboBox2.Items67" xml:space="preserve">
+    <value>67</value>
+  </data>
+  <data name="toolStripComboBox2.Items68" xml:space="preserve">
+    <value>68</value>
+  </data>
+  <data name="toolStripComboBox2.Items69" xml:space="preserve">
+    <value>69</value>
+  </data>
+  <data name="toolStripComboBox2.Items70" xml:space="preserve">
+    <value>70</value>
+  </data>
+  <data name="toolStripComboBox2.Items71" xml:space="preserve">
+    <value>71</value>
+  </data>
+  <data name="toolStripComboBox2.Items72" xml:space="preserve">
+    <value>72</value>
+  </data>
+  <data name="toolStripComboBox2.Items73" xml:space="preserve">
+    <value>73</value>
+  </data>
+  <data name="toolStripComboBox2.Items74" xml:space="preserve">
+    <value>74</value>
+  </data>
+  <data name="toolStripComboBox2.Items75" xml:space="preserve">
+    <value>75</value>
+  </data>
+  <data name="toolStripComboBox2.Items76" xml:space="preserve">
+    <value>76</value>
+  </data>
+  <data name="toolStripComboBox2.Items77" xml:space="preserve">
+    <value>77</value>
+  </data>
+  <data name="toolStripComboBox2.Items78" xml:space="preserve">
+    <value>78</value>
+  </data>
+  <data name="toolStripComboBox2.Items79" xml:space="preserve">
+    <value>79</value>
+  </data>
+  <data name="toolStripComboBox2.Items80" xml:space="preserve">
+    <value>80</value>
+  </data>
+  <data name="toolStripComboBox2.Items81" xml:space="preserve">
+    <value>81</value>
+  </data>
+  <data name="toolStripComboBox2.Items82" xml:space="preserve">
+    <value>82</value>
+  </data>
+  <data name="toolStripComboBox2.Items83" xml:space="preserve">
+    <value>83</value>
+  </data>
+  <data name="toolStripComboBox2.Items84" xml:space="preserve">
+    <value>84</value>
+  </data>
+  <data name="toolStripComboBox2.Items85" xml:space="preserve">
+    <value>85</value>
+  </data>
+  <data name="toolStripComboBox2.Items86" xml:space="preserve">
+    <value>86</value>
+  </data>
+  <data name="toolStripComboBox2.Items87" xml:space="preserve">
+    <value>87</value>
+  </data>
+  <data name="toolStripComboBox2.Items88" xml:space="preserve">
+    <value>88</value>
+  </data>
+  <data name="toolStripComboBox2.Items89" xml:space="preserve">
+    <value>89</value>
+  </data>
+  <data name="toolStripComboBox2.Items90" xml:space="preserve">
+    <value>90</value>
+  </data>
+  <data name="toolStripComboBox2.Items91" xml:space="preserve">
+    <value>91</value>
+  </data>
+  <data name="toolStripComboBox2.Items92" xml:space="preserve">
+    <value>92</value>
+  </data>
+  <data name="toolStripComboBox2.Items93" xml:space="preserve">
+    <value>93</value>
+  </data>
+  <data name="toolStripComboBox2.Items94" xml:space="preserve">
+    <value>94</value>
+  </data>
+  <data name="toolStripComboBox2.Items95" xml:space="preserve">
+    <value>95</value>
+  </data>
+  <data name="toolStripComboBox2.Items96" xml:space="preserve">
+    <value>96</value>
+  </data>
+  <data name="toolStripComboBox2.Items97" xml:space="preserve">
+    <value>97</value>
+  </data>
+  <data name="toolStripComboBox2.Items98" xml:space="preserve">
+    <value>98</value>
+  </data>
+  <data name="toolStripComboBox2.Items99" xml:space="preserve">
+    <value>99</value>
+  </data>
+  <data name="toolStripComboBox2.Items100" xml:space="preserve">
+    <value>100</value>
+  </data>
+  <data name="toolStripComboBox2.Items101" xml:space="preserve">
+    <value>101</value>
+  </data>
+  <data name="toolStripComboBox2.Items102" xml:space="preserve">
+    <value>102</value>
+  </data>
+  <data name="toolStripComboBox2.Items103" xml:space="preserve">
+    <value>103</value>
+  </data>
+  <data name="toolStripComboBox2.Items104" xml:space="preserve">
+    <value>104</value>
+  </data>
+  <data name="toolStripComboBox2.Items105" xml:space="preserve">
+    <value>105</value>
+  </data>
+  <data name="toolStripComboBox2.Items106" xml:space="preserve">
+    <value>106</value>
+  </data>
+  <data name="toolStripComboBox2.Items107" xml:space="preserve">
+    <value>107</value>
+  </data>
+  <data name="toolStripComboBox2.Items108" xml:space="preserve">
+    <value>108</value>
+  </data>
+  <data name="toolStripComboBox2.Items109" xml:space="preserve">
+    <value>109</value>
+  </data>
+  <data name="toolStripComboBox2.Items110" xml:space="preserve">
+    <value>110</value>
+  </data>
+  <data name="toolStripComboBox2.Items111" xml:space="preserve">
+    <value>111</value>
+  </data>
+  <data name="toolStripComboBox2.Items112" xml:space="preserve">
+    <value>112</value>
+  </data>
+  <data name="toolStripComboBox2.Items113" xml:space="preserve">
+    <value>113</value>
+  </data>
+  <data name="toolStripComboBox2.Items114" xml:space="preserve">
+    <value>114</value>
+  </data>
+  <data name="toolStripComboBox2.Items115" xml:space="preserve">
+    <value>115</value>
+  </data>
+  <data name="toolStripComboBox2.Items116" xml:space="preserve">
+    <value>116</value>
+  </data>
+  <data name="toolStripComboBox2.Items117" xml:space="preserve">
+    <value>117</value>
+  </data>
+  <data name="toolStripComboBox2.Items118" xml:space="preserve">
+    <value>118</value>
+  </data>
+  <data name="toolStripComboBox2.Items119" xml:space="preserve">
+    <value>119</value>
+  </data>
+  <data name="toolStripComboBox2.Items120" xml:space="preserve">
+    <value>120</value>
+  </data>
+  <data name="toolStripComboBox2.Items121" xml:space="preserve">
+    <value>121</value>
+  </data>
+  <data name="toolStripComboBox2.Items122" xml:space="preserve">
+    <value>122</value>
+  </data>
+  <data name="toolStripComboBox2.Items123" xml:space="preserve">
+    <value>123</value>
+  </data>
+  <data name="toolStripComboBox2.Items124" xml:space="preserve">
+    <value>124</value>
+  </data>
+  <data name="toolStripComboBox2.Items125" xml:space="preserve">
+    <value>125</value>
+  </data>
+  <data name="toolStripComboBox2.Items126" xml:space="preserve">
+    <value>126</value>
+  </data>
+  <data name="toolStripComboBox2.Items127" xml:space="preserve">
+    <value>127</value>
+  </data>
+  <data name="toolStripComboBox2.Items128" xml:space="preserve">
+    <value>128</value>
+  </data>
+  <data name="toolStripComboBox2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 25</value>
+  </data>
+  <data name="toolStripLabel4.Size" type="System.Drawing.Size, System.Drawing">
+    <value>32, 22</value>
+  </data>
+  <data name="toolStripLabel4.Text" xml:space="preserve">
+    <value>Prog</value>
+  </data>
   <data name="toolStripComboBox1.Items" xml:space="preserve">
     <value>1</value>
   </data>
@@ -896,10 +1292,10 @@
     <value>75, 25</value>
   </data>
   <data name="toolStripLabel2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>60, 22</value>
+    <value>43, 22</value>
   </data>
   <data name="toolStripLabel2.Text" xml:space="preserve">
-    <value>Mouse Ch</value>
+    <value>Key Ch</value>
   </data>
   <data name="toolStrip2.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
@@ -962,7 +1358,7 @@
     <value>3, 3</value>
   </data>
   <data name="listView1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>782, 92</value>
+    <value>788, 98</value>
   </data>
   <data name="listView1.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -986,7 +1382,7 @@
     <value>3, 3, 3, 3</value>
   </data>
   <data name="tabPage2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>788, 98</value>
+    <value>794, 104</value>
   </data>
   <data name="tabPage2.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -1395,7 +1791,7 @@
     <value>True</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>238</value>
+    <value>128</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>6, 12</value>
@@ -3278,9 +3674,6 @@
         TkSuQmCC
 </value>
   </data>
-  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
   <data name="$this.Text" xml:space="preserve">
     <value> MAmidiMEmo</value>
   </data>
@@ -3301,90 +3694,6 @@
   </data>
   <data name="&gt;&gt;resetToDefaultThisPropertyToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;columnHeader1.Name" xml:space="preserve">
-    <value>columnHeader1</value>
-  </data>
-  <data name="&gt;&gt;columnHeader1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ColumnHeader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;toolStripStatusLabel1.Name" xml:space="preserve">
-    <value>toolStripStatusLabel1</value>
-  </data>
-  <data name="&gt;&gt;toolStripStatusLabel1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripStatusLabel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;fileToolStripMenuItem.Name" xml:space="preserve">
-    <value>fileToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;fileToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;loadToolStripMenuItem.Name" xml:space="preserve">
-    <value>loadToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;loadToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;saveToolStripMenuItem.Name" xml:space="preserve">
-    <value>saveToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;saveToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;saveAsToolStripMenuItem.Name" xml:space="preserve">
-    <value>saveAsToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;saveAsToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;toolStripMenuItemExit.Name" xml:space="preserve">
-    <value>toolStripMenuItemExit</value>
-  </data>
-  <data name="&gt;&gt;toolStripMenuItemExit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;toolToolStripMenuItem.Name" xml:space="preserve">
-    <value>toolToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;toolToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;settingsToolStripMenuItem.Name" xml:space="preserve">
-    <value>settingsToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;settingsToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;helpToolStripMenuItem.Name" xml:space="preserve">
-    <value>helpToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;helpToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;toolStripMenuItemAbout.Name" xml:space="preserve">
-    <value>toolStripMenuItemAbout</value>
-  </data>
-  <data name="&gt;&gt;toolStripMenuItemAbout.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;saveFileDialog1.Name" xml:space="preserve">
-    <value>saveFileDialog1</value>
-  </data>
-  <data name="&gt;&gt;saveFileDialog1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.SaveFileDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;openFileDialog1.Name" xml:space="preserve">
-    <value>openFileDialog1</value>
-  </data>
-  <data name="&gt;&gt;openFileDialog1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.OpenFileDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;timer1.Name" xml:space="preserve">
-    <value>timer1</value>
-  </data>
-  <data name="&gt;&gt;timer1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Timer, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;toolStripButtonCat.Name" xml:space="preserve">
     <value>toolStripButtonCat</value>
@@ -3523,6 +3832,90 @@
   </data>
   <data name="&gt;&gt;toolStripLabel2.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripLabel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;columnHeader1.Name" xml:space="preserve">
+    <value>columnHeader1</value>
+  </data>
+  <data name="&gt;&gt;columnHeader1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ColumnHeader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripStatusLabel1.Name" xml:space="preserve">
+    <value>toolStripStatusLabel1</value>
+  </data>
+  <data name="&gt;&gt;toolStripStatusLabel1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripStatusLabel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;fileToolStripMenuItem.Name" xml:space="preserve">
+    <value>fileToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;fileToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;loadToolStripMenuItem.Name" xml:space="preserve">
+    <value>loadToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;loadToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;saveToolStripMenuItem.Name" xml:space="preserve">
+    <value>saveToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;saveToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;saveAsToolStripMenuItem.Name" xml:space="preserve">
+    <value>saveAsToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;saveAsToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItemExit.Name" xml:space="preserve">
+    <value>toolStripMenuItemExit</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItemExit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolToolStripMenuItem.Name" xml:space="preserve">
+    <value>toolToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;toolToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;settingsToolStripMenuItem.Name" xml:space="preserve">
+    <value>settingsToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;settingsToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;helpToolStripMenuItem.Name" xml:space="preserve">
+    <value>helpToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;helpToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItemAbout.Name" xml:space="preserve">
+    <value>toolStripMenuItemAbout</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItemAbout.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;saveFileDialog1.Name" xml:space="preserve">
+    <value>saveFileDialog1</value>
+  </data>
+  <data name="&gt;&gt;saveFileDialog1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.SaveFileDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;openFileDialog1.Name" xml:space="preserve">
+    <value>openFileDialog1</value>
+  </data>
+  <data name="&gt;&gt;openFileDialog1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.OpenFileDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;timer1.Name" xml:space="preserve">
+    <value>timer1</value>
+  </data>
+  <data name="&gt;&gt;timer1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Timer, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;toolStripLabel1.Name" xml:space="preserve">
     <value>toolStripLabel1</value>
@@ -3673,6 +4066,18 @@
   </data>
   <data name="&gt;&gt;multiMediaTimerComponent1.Type" xml:space="preserve">
     <value>zanac.MAmidiMEmo.ComponentModel.MultiMediaTimerComponent, MAmidiMEmo, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;toolStripComboBox2.Name" xml:space="preserve">
+    <value>toolStripComboBox2</value>
+  </data>
+  <data name="&gt;&gt;toolStripComboBox2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripLabel4.Name" xml:space="preserve">
+    <value>toolStripLabel4</value>
+  </data>
+  <data name="&gt;&gt;toolStripLabel4.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripLabel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>FormMain</value>

@@ -73,7 +73,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("Set Envelope Coarse Frequency")]
-        [SlideParametersAttribute(0, 255, true)]
+        [SlideParametersAttribute(0, 255)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)2)]
         public byte EnvelopeFrequencyCoarse
@@ -102,7 +102,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("Set Envelope Fine Frequency")]
-        [SlideParametersAttribute(0, 255, true)]
+        [SlideParametersAttribute(0, 255)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)2)]
         public byte EnvelopeFrequencyFine
@@ -131,7 +131,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("Set Envelope Type (0-15)")]
-        [SlideParametersAttribute(0, 15, true)]
+        [SlideParametersAttribute(0, 15)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte EnvelopeType

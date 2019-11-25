@@ -84,7 +84,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [Category("Chip")]
         [Description("Rhythm mode (0:Off(9ch) 1:On(6ch))\r\n" +
             "Set DrumSet to ToneType in Timbre to output")]
-        [SlideParametersAttribute(0, 1, true)]
+        [SlideParametersAttribute(0, 1)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte RHY

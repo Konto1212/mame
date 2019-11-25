@@ -105,7 +105,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
         [DataMember]
         [Description("Set arpeggio octave range (1-4)")]
         [DefaultValue(1)]
-        [SlideParametersAttribute(1, 4, true)]
+        [SlideParametersAttribute(1, 4)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public int OctaveRange
         {
@@ -127,7 +127,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
         [DataMember]
         [Description("Set arpeggio tempo (20-300)")]
         [DefaultValue(120)]
-        [SlideParametersAttribute(20, 300, true)]
+        [SlideParametersAttribute(20, 300)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public int Beat
         {

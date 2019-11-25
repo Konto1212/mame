@@ -43,6 +43,24 @@ namespace zanac.MAmidiMEmo.Gui
         /// <summary>
         /// 
         /// </summary>
+        public PianoControl()
+        {
+            InitializeComponent();
+
+            for (int i = 0; i < 16; i++)
+                receiveChs[i] = true;
+
+            SetStyle(ControlStyles.ResizeRedraw, true);
+
+            SoundBase.SoundKeyOn += SoundBase_SoundKeyOn;
+            SoundBase.SoundKeyOff += SoundBase_SoundKeyOff;
+            SoundBase.SoundPitchUpdated += SoundBase_SoundPitchUpdated;
+            //SoundBase.SoundSoundOff += SoundBase_SoundSoundOff;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="ch"></param>
         /// <param name="receive"></param>
         public void SetReceiveChannel(int ch, bool receive)
@@ -60,24 +78,6 @@ namespace zanac.MAmidiMEmo.Gui
         public void SetMouseChannel(int ch)
         {
             mouseCh = ch;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public PianoControl()
-        {
-            InitializeComponent();
-
-            for (int i = 0; i < 16; i++)
-                receiveChs[i] = true;
-
-            SetStyle(ControlStyles.ResizeRedraw, true);
-
-            SoundBase.SoundKeyOn += SoundBase_SoundKeyOn;
-            SoundBase.SoundKeyOff += SoundBase_SoundKeyOff;
-            SoundBase.SoundPitchUpdated += SoundBase_SoundPitchUpdated;
-            //SoundBase.SoundSoundOff += SoundBase_SoundSoundOff;
         }
 
         protected override void OnClientSizeChanged(EventArgs e)
@@ -100,6 +100,9 @@ namespace zanac.MAmidiMEmo.Gui
 
         private void SoundBase_SoundKeyOn(object sender, SoundUpdatedEventArgs e)
         {
+            if (this.IsDisposed)
+                return;
+
             this.BeginInvoke(new MethodInvoker(() =>
             {
                 bool fill;
@@ -121,6 +124,9 @@ namespace zanac.MAmidiMEmo.Gui
 
         private void SoundBase_SoundKeyOff(object sender, SoundUpdatedEventArgs e)
         {
+            if (this.IsDisposed)
+                return;
+
             this.BeginInvoke(new MethodInvoker(() =>
             {
                 bool fill;
@@ -137,6 +143,9 @@ namespace zanac.MAmidiMEmo.Gui
         {
             SoundBase snd = (SoundBase)sender;
             if (snd.IsKeyOff)
+                return;
+
+            if (this.IsDisposed)
                 return;
             this.BeginInvoke(new MethodInvoker(() =>
             {
@@ -389,17 +398,21 @@ namespace zanac.MAmidiMEmo.Gui
                 {
                     lastKeyOn = keyNum;
                     NoteOnEvent noe = new NoteOnEvent((SevenBitNumber)keyNum, (SevenBitNumber)127);
-                    MidiManager.SendMidiEvent(noe);
+                    NoteOn?.Invoke(this, noe);
                 }
             }
         }
+
+        public event EventHandler<NoteOnEvent> NoteOn;
+
+        public event EventHandler<NoteOffEvent> NoteOff;
 
         private void lastKeyOff()
         {
             if (lastKeyOn >= 0)
             {
                 NoteOffEvent noe = new NoteOffEvent((SevenBitNumber)lastKeyOn, (SevenBitNumber)127);
-                MidiManager.SendMidiEvent(noe);
+                NoteOff?.Invoke(this, noe);
                 lastKeyOn = -1;
             }
         }
@@ -426,7 +439,7 @@ namespace zanac.MAmidiMEmo.Gui
 
                             lastKeyOn = keyNum;
                             NoteOnEvent noe = new NoteOnEvent((SevenBitNumber)keyNum, (SevenBitNumber)127);
-                            MidiManager.SendMidiEvent(noe);
+                            NoteOn?.Invoke(this, noe);
                         }
                     }
                 }

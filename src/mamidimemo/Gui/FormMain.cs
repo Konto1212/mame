@@ -52,6 +52,7 @@ namespace zanac.MAmidiMEmo.Gui
         {
             if (outputListView == null || outputListView.IsDisposed || !outputListView.IsHandleCreated)
                 return;
+
             outputListView?.BeginInvoke(new MethodInvoker(() =>
             {
                 if (outputListView.IsDisposed)
@@ -68,6 +69,9 @@ namespace zanac.MAmidiMEmo.Gui
         /// <param name="log"></param>
         public static void OutputLog(String log)
         {
+            if (outputListView.IsDisposed)
+                return;
+
             outputListView?.BeginInvoke(new MethodInvoker(() =>
             {
                 var item = outputListView.Items.Add(log);
@@ -120,6 +124,32 @@ namespace zanac.MAmidiMEmo.Gui
             InstrumentManager.InstrumentRemoved += InstrumentManager_InstrumentRemoved;
 
             toolStripComboBox1.SelectedIndex = 0;
+            toolStripComboBox2.SelectedIndex = 0;
+
+            pianoControl1.NoteOn += PianoControl1_NoteOn;
+            pianoControl1.NoteOff += PianoControl1_NoteOff;
+        }
+
+        private void PianoControl1_NoteOn(object sender, NoteOnEvent e)
+        {
+            if (toolStripComboBox2.SelectedIndex != 0)
+            {
+                //Program change
+                var pe = new ProgramChangeEvent((SevenBitNumber)(toolStripComboBox2.SelectedIndex - 1));
+                MidiManager.SendMidiEvent(pe);
+            }
+            MidiManager.SendMidiEvent(e);
+        }
+
+        private void PianoControl1_NoteOff(object sender, NoteOffEvent e)
+        {
+            if (toolStripComboBox2.SelectedIndex != 0)
+            {
+                //Program change
+                var pe = new ProgramChangeEvent((SevenBitNumber)(toolStripComboBox2.SelectedIndex - 1));
+                MidiManager.SendMidiEvent(pe);
+            }
+            MidiManager.SendMidiEvent(e);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -626,12 +656,15 @@ namespace zanac.MAmidiMEmo.Gui
 
         private void toolStripButtonPopup_Click(object sender, EventArgs e)
         {
-            if (propertyGrid.SelectedObjects != null)
+            if (listViewIntruments.SelectedItems.Count != 0)
             {
                 List<InstrumentBase> insts = new List<InstrumentBase>();
                 foreach (ListViewItem item in listViewIntruments.SelectedItems)
                     insts.Add((InstrumentBase)item.Tag);
                 FormProp fp = new FormProp(insts.ToArray());
+                fp.StartPosition = FormStartPosition.Manual;
+                fp.Location = this.Location;
+
                 fp.Show(this);
             }
         }
