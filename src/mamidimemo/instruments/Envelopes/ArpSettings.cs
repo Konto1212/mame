@@ -240,7 +240,7 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
             typeof(UITypeEditor)), Localizable(false)]
         [IgnoreDataMember]
         [JsonIgnore]
-        [Description("You can copy and paste this text data to other same type timber.")]
+        [Description("You can copy and paste this text data to other same type timber.\r\nNote: Open dropdown editor then copy all text and paste to dropdown editor. Do not copy and paste one liner text.")]
         [DefaultValue("{}")]
         public string SerializeData
         {

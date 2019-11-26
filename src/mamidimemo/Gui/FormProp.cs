@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -18,21 +19,55 @@ namespace zanac.MAmidiMEmo.Gui
     {
         private List<InstrumentBase> instruments;
 
+        private List<TimbreBase> timbres;
+
+        private int timbreNo = 0;
+
         /// <summary>
         /// 
         /// </summary>
-        public FormProp(InstrumentBase[] insts)
+        public FormProp(InstrumentBase[] insts) : this(insts, null)
+        {
+
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public FormProp(InstrumentBase[] insts, TimbreBase[] timbres)
         {
             InitializeComponent();
 
             instruments = new List<InstrumentBase>(insts);
+            if (timbres != null)
+            {
+                this.timbres = new List<TimbreBase>(timbres);
+                propertyGrid.SelectedObjects = this.timbres.ToArray();
 
-            propertyGrid.SelectedObjects = instruments.ToArray();
+                for (int i = 0; i < 128; i++)
+                {
+                    if (instruments[0].BaseTimbres[i] == timbres[0])
+                    {
+                        timbreNo = i + 1;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                propertyGrid.SelectedObjects = instruments.ToArray();
+            }
 
             setTitle();
 
             toolStripComboBox1.SelectedIndex = 0;
-            toolStripComboBox2.SelectedIndex = 0;
+            toolStripComboBox2.SelectedIndex = timbreNo;
+            if (timbres != null)
+            {
+                toolStripComboBox2.Enabled = false;
+                toolStripButtonPopup.Enabled = false;
+            }
 
             InstrumentManager.InstrumentChanged += InstrumentManager_InstrumentChanged;
             InstrumentManager.InstrumentRemoved += InstrumentManager_InstrumentRemoved;
@@ -50,6 +85,9 @@ namespace zanac.MAmidiMEmo.Gui
                     sb.Append(", ");
                 sb.Append(i.Name + "(" + i.UnitNumber + ")");
             }
+            if (timbres != null)
+                sb.Append(" - Instrument " + timbreNo);
+
             this.Text = sb.ToString();
         }
 
@@ -111,10 +149,48 @@ namespace zanac.MAmidiMEmo.Gui
             toolStripButtonA2Z.Checked = true;
         }
 
+        private TimbreBase[] findTimbre(GridItem item)
+        {
+            List<TimbreBase> il = new List<TimbreBase>();
+            if (item == null)
+                return il.ToArray();
+
+            var instance = item.GetType().GetProperty("Instance").GetValue(item, null);
+            if (instance.GetType() == typeof(object[]))
+            {
+                var objs = instance as object[];
+                foreach (var o in objs)
+                {
+                    var inst = o as TimbreBase;
+                    if (inst != null)
+                        il.Add(inst);
+                }
+            }
+            {
+                var inst = instance as TimbreBase;
+                if (inst != null)
+                    il.Add(inst);
+            }
+            if (il.Count != 0)
+                return il.ToArray();
+
+            return findTimbre(item.Parent);
+        }
+
         private void toolStripButtonPopup_Click(object sender, EventArgs e)
         {
-            FormProp fp = new FormProp(instruments.ToArray());
-            fp.Show(Owner);
+            TimbreBase[] timbres = findTimbre(propertyGrid.SelectedGridItem);
+
+            if (timbres == null || timbres.Length == 0)
+            {
+                //FormProp fp = new FormProp(instruments.ToArray(), null);
+                //fp.Show(Owner);
+            }
+            else
+            {
+                FormProp fp = new FormProp(instruments.ToArray(), timbres);
+                fp.Show(this);
+            }
         }
 
         private void contextMenuStripProp_Click(object sender, EventArgs e)
@@ -133,13 +209,13 @@ namespace zanac.MAmidiMEmo.Gui
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            var r = MessageBox.Show(this, "Are you sure you want to close " + Text + " ?", "Qeuestion", MessageBoxButtons.OKCancel);
-            if (r == DialogResult.Cancel)
-                e.Cancel = true;
-            base.OnClosing(e);
-        }
+        //protected override void OnClosing(CancelEventArgs e)
+        //{
+        //    var r = MessageBox.Show(this, "Are you sure you want to close " + Text + " ?", "Qeuestion", MessageBoxButtons.OKCancel);
+        //    if (r == DialogResult.Cancel)
+        //        e.Cancel = true;
+        //    base.OnClosing(e);
+        //}
 
         private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -166,6 +242,15 @@ namespace zanac.MAmidiMEmo.Gui
         {
             foreach (var i in instruments)
                 i.NotifyMidiEvent(e);
+        }
+
+        private void propertyGrid_SelectedGridItemChanged(object sender, SelectedGridItemChangedEventArgs e)
+        {
+            if (timbres == null)
+            {
+                TimbreBase[] timbres = findTimbre(propertyGrid.SelectedGridItem);
+                toolStripButtonPopup.Enabled = !(timbres != null && timbres.Length == 0);
+            }
         }
     }
 }

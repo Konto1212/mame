@@ -85,6 +85,17 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        public override TimbreBase[] BaseTimbres
+        {
+            get
+            {
+                return Timbres;
+            }
+        }
 
         /// <summary>
         /// 

@@ -37,26 +37,16 @@ namespace zanac.MAmidiMEmo.ComponentModel
             if (freq < 1)
                 freq = 1;
             track.TickFrequency = (int)freq;
-            switch (value)
-            {
-                case double v:
-                    track.Value = v;
-                    break;
-                case float v:
-                    track.Value = v;
-                    break;
-            }
+
+            double result;
+            if (double.TryParse(context.PropertyDescriptor.Converter.ConvertToString(value), out result))
+                track.Value = result;
+
             if (att.SliderDynamicSetValue)
                 track.Tag = context;
             service.DropDownControl(track);
 
-            switch (value)
-            {
-                case float v:
-                    return (float)track.Value;
-                default:
-                    return track.Value;
-            }
+            return context.PropertyDescriptor.Converter.ConvertFromString(track.Value.ToString());
         }
 
         private void Track_ValueChanged(object sender, EventArgs e)
@@ -66,18 +56,10 @@ namespace zanac.MAmidiMEmo.ComponentModel
             ITypeDescriptorContext ctx = (ITypeDescriptorContext)track.Tag;
             if (ctx != null)
             {
-                switch (ctx.PropertyDescriptor.GetValue(ctx.Instance))
-                {
-                    case double v:
-                        ctx.PropertyDescriptor.SetValue(ctx.Instance, track.Value);
-                        break;
-                    case float v:
-                        ctx.PropertyDescriptor.SetValue(ctx.Instance, (float)track.Value);
-                        break;
-                }
+                var val = ctx.PropertyDescriptor.Converter.ConvertFromString(track.Value.ToString());
+                ctx.PropertyDescriptor.SetValue(ctx.Instance, val);
             }
         }
-
 
         private class DoubleTrackBar : TrackBar
         {

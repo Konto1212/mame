@@ -243,6 +243,18 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        public override TimbreBase[] BaseTimbres
+        {
+            get
+            {
+                return Timbres;
+            }
+        }
+
         [DataMember]
         [Category("Chip")]
         [Description("Timbres (0-127)")]
@@ -816,6 +828,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Feedback (0-7)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 7)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte FB
@@ -843,6 +856,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 "5: (1->2)+(1->3)+(1->4) (for Brass, organ sound)\r\n" +
                 "6: (1->2)+3+4 (for Xylophone, tom-tom, organ, vibraphone, snare drum, base drum sound)\r\n" +
                 "7: 1+2+3+4 (for Pipe organ sound)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 7)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte ALG
@@ -862,6 +876,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Amplitude Modulation Sensitivity (0-3)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 3)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte AMS
@@ -881,6 +896,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Phase Modulation Sensitivity (0-7)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 7)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte PMS
@@ -906,7 +922,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             public YM2151Operator[] Ops
             {
                 get;
-                private set;
+                set;
             }
 
             [DataMember]
@@ -987,7 +1003,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
             }
 
-            private byte f_DT1;
+            private byte f_DT1 = 4;
 
             /// <summary>
             /// Detune1(0-7)
@@ -995,6 +1011,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("DeTune 1 (1-4-7)")]
+            [DefaultValue((byte)4)]
             [SlideParametersAttribute(1, 7)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte DT1
@@ -1017,6 +1034,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Multiply (0-15)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 15)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte MUL
@@ -1039,6 +1057,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Total Level (0-127)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 127)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte TL
@@ -1061,6 +1080,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Rate Scaling (0-3)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 3)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte RS
@@ -1083,6 +1103,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Attack Rate (0-31)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 31)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte AR
@@ -1105,6 +1126,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Amplitude Modulation Sensivity (0-1)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte AM
@@ -1127,6 +1149,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("1st Decay Rate (0-31)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 31)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte D1R
@@ -1149,6 +1172,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("2nd Decay Rate (0-31)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 31)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte D2R
@@ -1171,6 +1195,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Sustain Level(0-15)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 15)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte SL
@@ -1193,6 +1218,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Release Rate (0-15)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 15)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte RR
@@ -1215,6 +1241,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Detune 2 (0-3)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 3)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte DT2
@@ -1255,6 +1282,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("LFO Freq (0-255)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 255)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte LFRQ
@@ -1272,7 +1300,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
             }
 
-
             private byte f_LFOF;
 
             /// <summary>
@@ -1281,6 +1308,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("Select AMD or PMD (0:AMD 1:PMD)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte LFOF
@@ -1308,6 +1336,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("LFO Depth (0-127)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 127)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte LFOD
@@ -1336,6 +1365,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("LFO Wave Type (0:Saw 1:SQ 2:Tri 3:Rnd)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 3)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte LFOW
@@ -1363,6 +1393,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("Noise Enable (0:Disable 1:Enable)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte NE
@@ -1384,13 +1415,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             private byte f_NFRQ;
 
             /// <summary>
-            /// Noise Feequency (0-31)
+            /// Noise Frequency (0-31)
             /// </summary>
             [Browsable(false)]
             [DataMember]
             [Category("Chip")]
             [Description(" Noise Feequency (0-31)\r\n" +
                 "3'579'545/(32*NFRQ)")]
+            [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 31)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public byte NFRQ

@@ -179,6 +179,7 @@ namespace zanac.MAmidiMEmo.Gui
                 addItem(inst);
             listViewIntruments.Sort();
             propertyGrid.SelectedObjects = new object[] { };
+            toolStripButtonPopup.Enabled = false;
         }
 
         /// <summary>
@@ -206,6 +207,7 @@ namespace zanac.MAmidiMEmo.Gui
                 addItem(inst);
             listViewIntruments.Sort();
             propertyGrid.SelectedObjects = new object[] { };
+            toolStripButtonPopup.Enabled = false;
         }
 
         /// <summary>
@@ -281,6 +283,7 @@ namespace zanac.MAmidiMEmo.Gui
             foreach (ListViewItem item in listViewIntruments.SelectedItems)
                 insts.Add((InstrumentBase)item.Tag);
             propertyGrid.SelectedObjects = insts.ToArray();
+            toolStripButtonPopup.Enabled = (listViewIntruments.SelectedItems.Count != 0);
         }
 
         /// <summary>

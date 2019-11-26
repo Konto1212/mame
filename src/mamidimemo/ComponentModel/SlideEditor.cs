@@ -56,41 +56,17 @@ namespace zanac.MAmidiMEmo.ComponentModel
             if (freq < 1)
                 freq = 1;
             track.TickFrequency = freq;
-            switch (value)
-            {
-                case byte v:
-                    track.Value = v;
-                    break;
-                case sbyte v:
-                    track.Value = v;
-                    break;
-                case short v:
-                    track.Value = v;
-                    break;
-                case ushort v:
-                    track.Value = v;
-                    break;
-                case int v:
-                    track.Value = v;
-                    break;
-            }
+
+            int result;
+            if(int.TryParse(context.PropertyDescriptor.Converter.ConvertToString(value),out result))
+                track.Value = result;
+
             if(att.SliderDynamicSetValue)
                 track.Tag = context;
+
             service.DropDownControl(track);
 
-            switch (value)
-            {
-                case byte v:
-                    return (byte)track.Value;
-                case sbyte v:
-                    return (sbyte)track.Value;
-                case short v:
-                    return (short)track.Value;
-                case ushort v:
-                    return (ushort)track.Value;
-                default:
-                    return track.Value;
-            }
+            return context.PropertyDescriptor.Converter.ConvertFromString(track.Value.ToString());
         }
 
         private void Track_ValueChanged(object sender, EventArgs e)
@@ -100,24 +76,8 @@ namespace zanac.MAmidiMEmo.ComponentModel
             ITypeDescriptorContext ctx = (ITypeDescriptorContext)track.Tag;
             if (ctx != null)
             {
-                switch (ctx.PropertyDescriptor.GetValue(ctx.Instance))
-                {
-                    case byte v:
-                        ctx.PropertyDescriptor.SetValue(ctx.Instance, (byte)track.Value);
-                        break;
-                    case sbyte v:
-                        ctx.PropertyDescriptor.SetValue(ctx.Instance, (sbyte)track.Value);
-                        break;
-                    case short v:
-                        ctx.PropertyDescriptor.SetValue(ctx.Instance, (short)track.Value);
-                        break;
-                    case ushort v:
-                        ctx.PropertyDescriptor.SetValue(ctx.Instance, (ushort)track.Value);
-                        break;
-                    default:
-                        ctx.PropertyDescriptor.SetValue(ctx.Instance, track.Value);
-                        break;
-                }
+                var val = ctx.PropertyDescriptor.Converter.ConvertFromString(track.Value.ToString());
+                ctx.PropertyDescriptor.SetValue(ctx.Instance, val);
             }
 
         }

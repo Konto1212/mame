@@ -55,9 +55,10 @@
             this.propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid.Location = new System.Drawing.Point(0, 25);
             this.propertyGrid.Name = "propertyGrid";
-            this.propertyGrid.Size = new System.Drawing.Size(487, 267);
+            this.propertyGrid.Size = new System.Drawing.Size(456, 262);
             this.propertyGrid.TabIndex = 2;
             this.propertyGrid.ToolbarVisible = false;
+            this.propertyGrid.SelectedGridItemChanged += new System.Windows.Forms.SelectedGridItemChangedEventHandler(this.propertyGrid_SelectedGridItemChanged);
             // 
             // contextMenuStripProp
             // 
@@ -78,9 +79,9 @@
             this.panel1.Controls.Add(this.pianoControl1);
             this.panel1.Controls.Add(this.toolStrip2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 292);
+            this.panel1.Location = new System.Drawing.Point(0, 287);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(487, 100);
+            this.panel1.Size = new System.Drawing.Size(456, 100);
             this.panel1.TabIndex = 4;
             // 
             // pianoControl1
@@ -88,7 +89,7 @@
             this.pianoControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pianoControl1.Location = new System.Drawing.Point(0, 25);
             this.pianoControl1.Name = "pianoControl1";
-            this.pianoControl1.Size = new System.Drawing.Size(487, 75);
+            this.pianoControl1.Size = new System.Drawing.Size(456, 75);
             this.pianoControl1.TabIndex = 0;
             // 
             // toolStrip2
@@ -101,7 +102,7 @@
             this.toolStripLabel2});
             this.toolStrip2.Location = new System.Drawing.Point(0, 0);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(487, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(456, 25);
             this.toolStrip2.TabIndex = 2;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -291,7 +292,7 @@
             this.toolStripButtonPopup});
             this.toolStrip3.Location = new System.Drawing.Point(0, 0);
             this.toolStrip3.Name = "toolStrip3";
-            this.toolStrip3.Size = new System.Drawing.Size(487, 25);
+            this.toolStrip3.Size = new System.Drawing.Size(456, 25);
             this.toolStrip3.TabIndex = 3;
             this.toolStrip3.Text = "toolStrip3";
             // 
@@ -325,14 +326,14 @@
             this.toolStripButtonPopup.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonPopup.Name = "toolStripButtonPopup";
             this.toolStripButtonPopup.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButtonPopup.Text = "Popup the property";
+            this.toolStripButtonPopup.Text = "Popup the selected timbre property";
             this.toolStripButtonPopup.Click += new System.EventHandler(this.toolStripButtonPopup_Click);
             // 
             // FormProp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(487, 392);
+            this.ClientSize = new System.Drawing.Size(456, 387);
             this.Controls.Add(this.propertyGrid);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.toolStrip3);
@@ -342,6 +343,7 @@
             this.Name = "FormProp";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.Text = "FormProp";
             this.contextMenuStripProp.ResumeLayout(false);
             this.panel1.ResumeLayout(false);

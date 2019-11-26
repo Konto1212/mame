@@ -241,7 +241,7 @@ namespace zanac.MAmidiMEmo.Instruments
     typeof(UITypeEditor)), Localizable(false)]
         [IgnoreDataMember]
         [JsonIgnore]
-        [Description("You can copy and paste this text data to other same type Instrument.")]
+        [Description("You can copy and paste this text data to other same type Instrument.\r\nNote: Open dropdown editor then copy all text and paste to dropdown editor. Do not copy and paste one liner text.")]
         public string SerializeData
         {
             get
@@ -302,6 +302,15 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        public abstract TimbreBase[] BaseTimbres
+        {
+            get;
         }
 
         /// <summary>

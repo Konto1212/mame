@@ -194,6 +194,18 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <summary>
         /// 
         /// </summary>
+        [Browsable(false)]
+        public override TimbreBase[] BaseTimbres
+        {
+            get
+            {
+                return Timbres;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         [DataMember]
         [Category("Chip")]
         [Description("Timbres (0-127)")]
