@@ -3,6 +3,7 @@ using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Smf;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -153,6 +154,57 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (t.NoteOnEvent.Channel == midiEvent.Channel)
                             t.OnVolumeUpdated();
                     }
+                    break;
+                //Sound Control
+                case 70:
+                case 71:
+                case 72:
+                case 73:
+                case 74:
+                case 75:
+                case 79:
+                    var tim = parentModule.BaseTimbres[midiEvent.Channel];
+
+                    foreach (var pi in tim.SCCS.GetPropertyInfo(tim, midiEvent.ControlNumber - 70 + 1))
+                    {
+                        if (pi != null)
+                        {
+                            SlideParametersAttribute attribute =
+                                Attribute.GetCustomAttribute(pi, typeof(SlideParametersAttribute)) as SlideParametersAttribute;
+                            if (attribute != null)
+                            {
+                                int len = (attribute.SliderMax - attribute.SliderMin) + 1;
+                                int val = len * midiEvent.ControlValue / 128;
+
+                                var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                                pd.SetValue(tim, pd.Converter.ConvertFromString(val.ToString()));
+                            }
+                            else
+                            {
+                                DoubleSlideParametersAttribute dattribute =
+                                    Attribute.GetCustomAttribute(pi, typeof(DoubleSlideParametersAttribute)) as DoubleSlideParametersAttribute;
+                                if (dattribute != null)
+                                {
+                                    double len = dattribute.SliderMax - dattribute.SliderMin;
+                                    double val = len * (double)midiEvent.ControlValue / (double)128;
+
+                                    var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                                    pd.SetValue(tim, pd.Converter.ConvertFromString(val.ToString()));
+                                }
+                            }
+                        }
+                    }
+
+                    foreach (var t in AllSounds)
+                    {
+                        if (t.NoteOnEvent.Channel == midiEvent.Channel && t.Timbre == tim)
+                        {
+                            t.OnVolumeUpdated();
+                            t.OnPitchUpdated();
+                            t.OnPanpotUpdated();
+                        }
+                    }
+
                     break;
                 case 120:   //All Sounds Off
                 case 123:   //All Note Off

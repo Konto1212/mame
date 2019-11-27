@@ -12,6 +12,7 @@ using System.Drawing.Design;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
@@ -29,7 +30,7 @@ namespace zanac.MAmidiMEmo.Instruments
     [TypeConverter(typeof(CustomExpandableObjectConverter))]
     [MidiHook]
     [DataContract]
-    public abstract class InstrumentBase : ContextBoundObject , IDisposable
+    public abstract class InstrumentBase : ContextBoundObject, IDisposable
     {
         public static readonly object VstPluginContextLockObject = new object();
 
@@ -1388,6 +1389,11 @@ namespace zanac.MAmidiMEmo.Instruments
                     MonoMode[midiEvent.Channel] = 0;
                     break;
             }
+        }
+
+        public static PropertyDescriptor GetPropertyDescriptor(PropertyInfo propertyInfo)
+        {
+            return TypeDescriptor.GetProperties(propertyInfo.DeclaringType)[propertyInfo.Name];
         }
 
         /// <summary>

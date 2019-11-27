@@ -912,7 +912,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [Description("Operators")]
             [DefaultValue((byte)0)]
             [TypeConverter(typeof(ExpandableCollectionConverter))]
-            [DisplayName("Operators")]
+            [DisplayName("Operators(Ops)")]
             public YM2612Operator[] Ops
             {
                 get;

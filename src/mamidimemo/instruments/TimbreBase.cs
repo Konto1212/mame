@@ -28,12 +28,22 @@ namespace zanac.MAmidiMEmo.Instruments
         public TimbreBase()
         {
             SDS = new SoundDriverSettings();
+            SCCS = new SoundControlChangeSettings();
         }
 
         [DataMember]
         [Description("Sound Driver Settings")]
-        [DisplayName("Sound Driver Settings")]
+        [DisplayName("Sound Driver Settings(SDS)")]
         public SoundDriverSettings SDS
+        {
+            get;
+            set;
+        }
+
+        [DataMember]
+        [Description("Sound Control Settings")]
+        [DisplayName("Sound Control Settings(SCCS)")]
+        public SoundControlChangeSettings SCCS
         {
             get;
             set;

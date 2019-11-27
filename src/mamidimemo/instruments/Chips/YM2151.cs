@@ -918,7 +918,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [Category("Sound")]
             [Description("Operators")]
             [TypeConverter(typeof(ExpandableCollectionConverter))]
-            [DisplayName("Operators")]
+            [DisplayName("Operators(Ops)")]
             public YM2151Operator[] Ops
             {
                 get;

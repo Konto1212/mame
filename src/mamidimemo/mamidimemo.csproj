@@ -72,7 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release%28but Debug .NET%29|x86'">
     <OutputPath>..\..\Output\Release\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -100,7 +100,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release%28but Debug .NET%29|x64'">
     <OutputPath>..\..\Output\Release64\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -228,6 +228,7 @@
     <Compile Include="Instruments\Envelopes\BasicFxEngine.cs" />
     <Compile Include="Instruments\Envelopes\BasicFxSettings.cs" />
     <Compile Include="Instruments\HighPrecisionTimer.cs" />
+    <Compile Include="Instruments\SoundControlChangeSettings.cs" />
     <Compile Include="Instruments\SoundList.cs" />
     <Compile Include="ComponentModel\StandardValuesDoubleConverter.cs" />
     <Compile Include="ComponentModel\ExpandableCollectionConverterForUIEditor.cs" />
