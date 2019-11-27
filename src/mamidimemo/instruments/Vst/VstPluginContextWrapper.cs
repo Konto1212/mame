@@ -65,25 +65,29 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
                 if (disposing)
                 {
                     // TODO: マネージ状態を破棄します (マネージ オブジェクト)。
-                    lock (InstrumentBase.VstPluginContextLockObject)
-                    {
-                        f_Context?.Dispose();
-                        f_Context = null;
-                    }
                 }
 
                 // TODO: アンマネージ リソース (アンマネージ オブジェクト) を解放し、下のファイナライザーをオーバーライドします。
                 // TODO: 大きなフィールドを null に設定します。
+                lock (InstrumentBase.VstPluginContextLockObject)
+                {
+                    if (f_Context != null)
+                    {
+                        f_Context.Dispose();
+                        f_Context = null;
+                    }
+                }
+
                 disposedValue = true;
             }
         }
 
         // TODO: 上の Dispose(bool disposing) にアンマネージ リソースを解放するコードが含まれる場合にのみ、ファイナライザーをオーバーライドします。
-        //~VstPluginContextWrapper()
-        //{
-        //    // このコードを変更しないでください。クリーンアップ コードを上の Dispose(bool disposing) に記述します。
-        //    Dispose(false);
-        //}
+        ~VstPluginContextWrapper()
+        {
+            // このコードを変更しないでください。クリーンアップ コードを上の Dispose(bool disposing) に記述します。
+            Dispose(false);
+        }
 
         // このコードは、破棄可能なパターンを正しく実装できるように追加されました。
         public void Dispose()
@@ -93,6 +97,7 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
             // TODO: 上のファイナライザーがオーバーライドされる場合は、次の行のコメントを解除してください。
             GC.SuppressFinalize(this);
         }
+
         #endregion
 
     }

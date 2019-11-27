@@ -229,6 +229,7 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
         }
 
         #region IDisposable Support
+
         private bool disposedValue = false; // 重複する呼び出しを検出するには
 
         protected virtual void Dispose(bool disposing)
@@ -238,23 +239,26 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
                 if (disposing)
                 {
                     //マネージ状態を破棄します (マネージ オブジェクト)。
-                    if (f_PluginContext != null)
-                        f_PluginContext.Dispose();
-                    f_PluginContext = null;
                 }
 
                 // TODO: アンマネージ リソース (アンマネージ オブジェクト) を解放し、下のファイナライザーをオーバーライドします。
                 // TODO: 大きなフィールドを null に設定します。
+                if (f_PluginContext != null)
+                {
+                    f_PluginContext.Dispose();
+                    f_PluginContext = null;
+                }
 
                 disposedValue = true;
             }
         }
 
         // TODO: 上の Dispose(bool disposing) にアンマネージ リソースを解放するコードが含まれる場合にのみ、ファイナライザーをオーバーライドします。
-        // ~VSTPlugin() {
-        //   // このコードを変更しないでください。クリーンアップ コードを上の Dispose(bool disposing) に記述します。
-        //   Dispose(false);
-        // }
+        ~VSTPlugin()
+        {
+            // このコードを変更しないでください。クリーンアップ コードを上の Dispose(bool disposing) に記述します。
+            Dispose(false);
+        }
 
         // このコードは、破棄可能なパターンを正しく実装できるように追加されました。
         public void Dispose()

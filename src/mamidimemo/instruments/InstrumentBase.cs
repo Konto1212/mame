@@ -29,7 +29,7 @@ namespace zanac.MAmidiMEmo.Instruments
     [TypeConverter(typeof(CustomExpandableObjectConverter))]
     [MidiHook]
     [DataContract]
-    public abstract class InstrumentBase : ContextBoundObject
+    public abstract class InstrumentBase : ContextBoundObject , IDisposable
     {
         public static readonly object VstPluginContextLockObject = new object();
 
@@ -771,7 +771,7 @@ namespace zanac.MAmidiMEmo.Instruments
         }
 
         [DataMember]
-        [Category("Chip")]
+        [Category("MIDI")]
         [Description("Mono mode (0-127) 0:Disable mono mode <MIDI 16ch>")]
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
@@ -897,8 +897,6 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -946,6 +944,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private delg_vst_fx_callback f_vst_fx_callback;
 
+        private GCHandle vstHandle;
+
         /// <summary>
         /// 
         /// </summary>
@@ -988,6 +988,9 @@ namespace zanac.MAmidiMEmo.Instruments
             set_filter(UnitNumber, SoundInterfaceTagNamePrefix, FilterMode, FilterCutoff, FilterResonance);
 
             f_vst_fx_callback = new delg_vst_fx_callback(vst_fx_callback);
+
+            vstHandle = GCHandle.Alloc(this);
+
             SetVstFxCallback(UnitNumber, SoundInterfaceTagNamePrefix, f_vst_fx_callback);
         }
 
@@ -1109,20 +1112,55 @@ namespace zanac.MAmidiMEmo.Instruments
                     0, 0, 0, 0};
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public virtual void Dispose()
-        {
-            set_device_enable(UnitNumber, SoundInterfaceTagNamePrefix, 0);
+        #region IDisposable Support
 
-            SetVstFxCallback(UnitNumber, SoundInterfaceTagNamePrefix, null);
-            lock (InstrumentBase.VstPluginContextLockObject)
+        private bool disposedValue = false; // 重複する呼び出しを検出するには
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
             {
-                foreach (var vp in VSTPlugins)
-                    vp.Dispose();
+                if (disposing)
+                {
+                    //マネージ状態を破棄します (マネージ オブジェクト)。
+
+                }
+
+                // TODO: アンマネージ リソース (アンマネージ オブジェクト) を解放し、下のファイナライザーをオーバーライドします。
+                // TODO: 大きなフィールドを null に設定します。
+                set_device_enable(UnitNumber, SoundInterfaceTagNamePrefix, 0);
+
+                SetVstFxCallback(UnitNumber, SoundInterfaceTagNamePrefix, null);
+                lock (InstrumentBase.VstPluginContextLockObject)
+                {
+                    foreach (var vp in VSTPlugins)
+                        vp.Dispose();
+                }
+
+                if (vstHandle != null && vstHandle.IsAllocated)
+                    vstHandle.Free();
+
+                disposedValue = true;
             }
         }
+
+        // TODO: 上の Dispose(bool disposing) にアンマネージ リソースを解放するコードが含まれる場合にのみ、ファイナライザーをオーバーライドします。
+        ~InstrumentBase()
+        {
+            // このコードを変更しないでください。クリーンアップ コードを上の Dispose(bool disposing) に記述します。
+            Dispose(false);
+        }
+
+        // このコードは、破棄可能なパターンを正しく実装できるように追加されました。
+        public virtual void Dispose()
+        {
+            // このコードを変更しないでください。クリーンアップ コードを上の Dispose(bool disposing) に記述します。
+            Dispose(true);
+            // TODO: 上のファイナライザーがオーバーライドされる場合は、次の行のコメントを解除してください。
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
 
         /// <summary>
         /// 
