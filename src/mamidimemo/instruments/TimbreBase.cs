@@ -41,8 +41,10 @@ namespace zanac.MAmidiMEmo.Instruments
         }
 
         [DataMember]
-        [Description("Sound Control Settings")]
-        [DisplayName("Sound Control Settings(SCCS)")]
+        [Description("Sound Control Change Settings\r\n" +
+            "Link Data Entry message value with the Timbre property value (Only the property that has a slider editor)\r\n" +
+            "eg) \"DutyCycle,Volume\" ... You can change DutyCycle and Volume property values dynamically via MIDI Control Change No.7x message.")]
+        [DisplayName("Sound Control Change Settings(SCCS)")]
         public SoundControlChangeSettings SCCS
         {
             get;

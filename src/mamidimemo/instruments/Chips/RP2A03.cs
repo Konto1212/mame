@@ -506,7 +506,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 2));
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
 
-
                             RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x00),
                                 (byte)(timbre.LengthCounterDisable << 7 | timbre.TriCounterLength));
 
@@ -558,6 +557,87 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                                     RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 16));
                                 }
                             }
+
+                            break;
+                        }
+                }
+            }
+
+
+            public override void OnSoundParamsUpdated()
+            {
+                base.OnSoundParamsUpdated();
+
+                switch (lastToneType)
+                {
+                    case ToneType.SQUARE:
+                        {
+                            var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
+                            var timbre = parentModule.Timbres[pn];
+
+                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << Slot));
+                            Program.SoundUpdating();
+
+                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << Slot)));
+
+                            RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x01),
+                                (byte)(timbre.SQSweep.Enable << 7 | timbre.SQSweep.UpdateRate << 4 |
+                                timbre.SQSweep.Direction << 3 | timbre.SQSweep.Range));
+
+                            Program.SoundUpdated();
+
+                            //Volume
+                            updateSqVolume();
+
+                            //Freq
+                            updateSqPitch();
+
+                            break;
+                        }
+                    case ToneType.TRIANGLE:
+                        {
+                            var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
+                            var timbre = parentModule.Timbres[pn];
+
+                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 2));
+
+                            Program.SoundUpdating();
+
+                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
+
+                            RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x00),
+                                (byte)(timbre.LengthCounterDisable << 7 | timbre.TriCounterLength));
+
+                            Program.SoundUpdated();
+
+                            //Freq
+                            updateTriPitch();
+
+                            break;
+                        }
+                    case ToneType.NOISE:
+                        {
+                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 3));
+                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 8));
+
+                            //Volume
+                            updateNoiseVolume();
+
+                            //Freq
+                            UpdateNoisePitch();
+
+                            break;
+                        }
+                    case ToneType.DPCM:
+                        {
+                            //https://wiki.nesdev.com/w/index.php/APU_DMC
+
+                            var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
+                            var timbre = parentModule.Timbres[pn];
+
+                            // Loop / Smple Rate
+                            RP2A03WriteData(parentModule.UnitNumber, (uint)0x10,
+                                (byte)(timbre.DeltaPcmLoopEnable << 6 | timbre.DeltaPcmBitRate));
 
                             break;
                         }
@@ -1140,9 +1220,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 private set;
             }
 
-            protected override void ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
+            protected override bool ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
             {
-                base.ProcessCore(sound, isKeyOff, isSoundOff);
+                bool process = base.ProcessCore(sound, isKeyOff, isSoundOff);
 
                 DutyValue = null;
                 if (settings.DutyEnvelopesNums.Length > 0)
@@ -1158,9 +1238,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                                 f_dutyCounter = (uint)settings.DutyEnvelopesRepeatPoint;
                             else
                                 f_dutyCounter = (uint)vm;
-
-                            if (f_dutyCounter >= settings.DutyEnvelopesNums.Length)
-                                f_dutyCounter = (uint)(settings.DutyEnvelopesNums.Length - 1);
                         }
                     }
                     else
@@ -1169,14 +1246,22 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             f_dutyCounter = (uint)settings.DutyEnvelopesNums.Length;
 
                         if (f_dutyCounter >= settings.DutyEnvelopesNums.Length)
-                            f_dutyCounter = (uint)(settings.DutyEnvelopesNums.Length - 1);
+                        {
+                            if (settings.DutyEnvelopesRepeatPoint >= 0)
+                                f_dutyCounter = (uint)settings.DutyEnvelopesRepeatPoint;
+                        }
                     }
-                    int vol = settings.DutyEnvelopesNums[f_dutyCounter++];
+                    if (f_dutyCounter < settings.DutyEnvelopesNums.Length)
+                    {
+                        int vol = settings.DutyEnvelopesNums[f_dutyCounter++];
 
-                    DutyValue = (byte)vol;
+                        DutyValue = (byte)vol;
+                        process = true;
+                    }
                 }
-            }
 
+                return process;
+            }
         }
 
         [JsonConverter(typeof(NoTypeConverterJsonConverter<SQSweepSettings>))]

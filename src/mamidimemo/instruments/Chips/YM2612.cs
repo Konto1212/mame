@@ -617,6 +617,26 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Ym2612WriteData(parentModule.UnitNumber, 0x28, 0, 0, (byte)(op | (reg << 1) | (byte)(Slot % 3)));
             }
 
+
+            public override void OnSoundParamsUpdated()
+            {
+                base.OnSoundParamsUpdated();
+
+                var gs = timbre.GlobalSettings;
+                if (gs.Enable)
+                {
+                    Program.SoundUpdating();
+                    parentModule.LFOEN = gs.LFOEN;
+                    parentModule.LFRQ = gs.LFRQ;
+                    Program.SoundUpdated();
+                }
+
+                //
+                SetFmTimbre();
+                //Volume
+                OnVolumeUpdated();
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -726,6 +746,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// </summary>
             public void SetFmTimbre()
             {
+                Program.SoundUpdating();
                 for (int op = 0; op < 4; op++)
                 {
                     //$30+: multiply and detune
@@ -746,6 +767,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                 //$B0+: algorithm and feedback
                 Ym2612WriteData(parentModule.UnitNumber, 0xB0, 0, Slot, (byte)(timbre.FB << 3 | timbre.ALG));
+                Program.SoundUpdated();
 
                 OnPanpotUpdated();
             }

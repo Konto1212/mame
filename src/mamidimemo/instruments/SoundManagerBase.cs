@@ -163,48 +163,51 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 74:
                 case 75:
                 case 79:
-                    var tim = parentModule.BaseTimbres[midiEvent.Channel];
-
-                    foreach (var pi in tim.SCCS.GetPropertyInfo(tim, midiEvent.ControlNumber - 70 + 1))
                     {
-                        if (pi != null)
+                        var tim = parentModule.BaseTimbres[midiEvent.Channel];
+                        bool process = false;
+                        foreach (var ipi in tim.SCCS.GetPropertyInfo(tim, midiEvent.ControlNumber - 70 + 1))
                         {
-                            SlideParametersAttribute attribute =
-                                Attribute.GetCustomAttribute(pi, typeof(SlideParametersAttribute)) as SlideParametersAttribute;
-                            if (attribute != null)
+                            if (ipi != null)
                             {
-                                int len = (attribute.SliderMax - attribute.SliderMin) + 1;
-                                int val = len * midiEvent.ControlValue / 128;
+                                var pi = ipi.Property;
 
-                                var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
-                                pd.SetValue(tim, pd.Converter.ConvertFromString(val.ToString()));
-                            }
-                            else
-                            {
-                                DoubleSlideParametersAttribute dattribute =
-                                    Attribute.GetCustomAttribute(pi, typeof(DoubleSlideParametersAttribute)) as DoubleSlideParametersAttribute;
-                                if (dattribute != null)
+                                SlideParametersAttribute attribute =
+                                    Attribute.GetCustomAttribute(pi, typeof(SlideParametersAttribute)) as SlideParametersAttribute;
+                                if (attribute != null)
                                 {
-                                    double len = dattribute.SliderMax - dattribute.SliderMin;
-                                    double val = len * (double)midiEvent.ControlValue / (double)128;
+                                    int len = (attribute.SliderMax - attribute.SliderMin) + 1;
+                                    int val = len * midiEvent.ControlValue / 128;
 
                                     var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
-                                    pd.SetValue(tim, pd.Converter.ConvertFromString(val.ToString()));
+                                    pd.SetValue(ipi.Owner, pd.Converter.ConvertFromString(val.ToString()));
+                                    process = true;
+                                }
+                                else
+                                {
+                                    DoubleSlideParametersAttribute dattribute =
+                                        Attribute.GetCustomAttribute(pi, typeof(DoubleSlideParametersAttribute)) as DoubleSlideParametersAttribute;
+                                    if (dattribute != null)
+                                    {
+                                        double len = dattribute.SliderMax - dattribute.SliderMin;
+                                        double val = len * (double)midiEvent.ControlValue / (double)128;
+
+                                        var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                                        pd.SetValue(ipi.Owner, pd.Converter.ConvertFromString(val.ToString()));
+                                        process = true;
+                                    }
                                 }
                             }
                         }
-                    }
-
-                    foreach (var t in AllSounds)
-                    {
-                        if (t.NoteOnEvent.Channel == midiEvent.Channel && t.Timbre == tim)
+                        if (process)
                         {
-                            t.OnVolumeUpdated();
-                            t.OnPitchUpdated();
-                            t.OnPanpotUpdated();
+                            foreach (var t in AllSounds)
+                            {
+                                if (t.NoteOnEvent.Channel == midiEvent.Channel && t.Timbre == tim)
+                                    t.OnSoundParamsUpdated();
+                            }
                         }
                     }
-
                     break;
                 case 120:   //All Sounds Off
                 case 123:   //All Note Off

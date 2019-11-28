@@ -30,7 +30,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Sound Control 1(Control Change No.70(0x46))\r\n" +
-            "Link Data Entry message value with the Timbre property value (Only property that has slider editor)\r\n" +
+            "Link Data Entry message value with the Timbre property value (Only the property that has a slider editor)\r\n" +
             "eg) \"DutyCycle,Volume\" ... You can change DutyCycle and Volume property values dynamically via MIDI Control Change No.70 message.")]
         public string SoundControl1
         {
@@ -125,9 +125,9 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         /// <param name="timbre"></param>
-        /// <param name="controlNo">1～5</param>
+        /// <param name="controlNo">1～6,10</param>
         /// <returns></returns>
-        public PropertyInfo[] GetPropertyInfo(TimbreBase timbre, int controlNo)
+        public InstancePropertyInfo[] GetPropertyInfo(TimbreBase timbre, int controlNo)
         {
             switch (controlNo)
             {
@@ -141,6 +141,10 @@ namespace zanac.MAmidiMEmo.Instruments
                     return getPropertiesInfo(timbre, SoundControl4);
                 case 5:
                     return getPropertiesInfo(timbre, SoundControl5);
+                case 6:
+                    return getPropertiesInfo(timbre, SoundControl6);
+                case 10:
+                    return getPropertiesInfo(timbre, SoundControl10);
             }
 
             return null;
@@ -152,33 +156,42 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="timbre"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        private PropertyInfo[] getPropertiesInfo(TimbreBase timbre, string propertyNames)
+        private InstancePropertyInfo[] getPropertiesInfo(TimbreBase timbre, string propertyNames)
         {
-            string[] propNameParts = propertyNames.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            List<PropertyInfo> plist = new List<PropertyInfo>();
+            List<InstancePropertyInfo> plist = new List<InstancePropertyInfo>();
 
-            foreach (var propertyName in propNameParts)
+            if (!string.IsNullOrWhiteSpace(propertyNames))
             {
-                var pi = getPropertyInfo(timbre, propertyName);
-                if (pi != null)
+                string[] propNameParts = propertyNames.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var propertyName in propNameParts)
                 {
-                    SlideParametersAttribute attribute =
-                        Attribute.GetCustomAttribute(pi, typeof(SlideParametersAttribute)) as SlideParametersAttribute;
-                    if (attribute != null)
-                        plist.Add(pi);
-                    DoubleSlideParametersAttribute dattribute =
-                        Attribute.GetCustomAttribute(pi, typeof(DoubleSlideParametersAttribute)) as DoubleSlideParametersAttribute;
-                    if (dattribute != null)
-                        plist.Add(pi);
+                    var pi = getPropertyInfo(timbre, propertyName);
+                    if (pi != null)
+                    {
+                        SlideParametersAttribute attribute =
+                            Attribute.GetCustomAttribute(pi.Property, typeof(SlideParametersAttribute)) as SlideParametersAttribute;
+                        if (attribute != null)
+                        {
+                            plist.Add(pi);
+                        }
+                        else
+                        {
+                            DoubleSlideParametersAttribute dattribute =
+                                Attribute.GetCustomAttribute(pi.Property, typeof(DoubleSlideParametersAttribute)) as DoubleSlideParametersAttribute;
+                            if (dattribute != null)
+                                plist.Add(pi);
+                        }
+                    }
                 }
             }
-
             return plist.ToArray();
         }
 
-        private PropertyInfo getPropertyInfo(TimbreBase timbre, string propertyName)
+        private InstancePropertyInfo getPropertyInfo(TimbreBase timbre, string propertyName)
         {
             object obj = timbre;
+            object lobj = obj;
 
             // Split property name to parts (propertyName could be hierarchical, like obj.subobj.subobj.property
             string[] propertyNameParts = propertyName.Split('.');
@@ -196,6 +209,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     pi = obj.GetType().GetProperty(propertyNamePart);
                     if (pi == null)
                         return null;
+                    lobj = obj;
                     obj = pi.GetValue(obj, null);
                 }
                 else
@@ -215,6 +229,7 @@ namespace zanac.MAmidiMEmo.Instruments
                     if (unknownCollection.GetType().IsArray)
                     {
                         object[] collectionAsArray = unknownCollection as object[];
+                        lobj = obj;
                         obj = collectionAsArray[collectionElementIndex];
                     }
                     else
@@ -223,6 +238,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         System.Collections.IList collectionAsList = unknownCollection as System.Collections.IList;
                         if (collectionAsList != null)
                         {
+                            lobj = obj;
                             obj = collectionAsList[collectionElementIndex];
                         }
                         else
@@ -233,7 +249,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 }
             }
 
-            return pi;
+            return new InstancePropertyInfo(lobj, pi);
         }
 
         #region Etc
@@ -284,6 +300,28 @@ namespace zanac.MAmidiMEmo.Instruments
 
         #endregion
 
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class InstancePropertyInfo
+    {
+        public Object Owner
+        {
+            get;
+        }
+
+        public PropertyInfo Property
+        {
+            get;
+        }
+
+        public InstancePropertyInfo(object ownerObject, PropertyInfo propertyInfo)
+        {
+            Owner = ownerObject;
+            Property = propertyInfo;
+        }
     }
 
 }

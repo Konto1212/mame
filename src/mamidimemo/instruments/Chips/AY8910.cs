@@ -319,25 +319,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 ay8910_read_ym = (delegate_ay8910_read_ym)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_ay8910_read_ym));
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public override void Dispose()
-        {
-            soundManager?.Dispose();
-            base.Dispose();
-        }
-
-        internal override void PrepareSound()
-        {
-            base.PrepareSound();
-
-            Ay8910WriteData(UnitNumber, 0, (byte)(7));
-            Ay8910WriteData(UnitNumber, 1, (byte)(0x3f));
-        }
-
-
+        
         private AY8910SoundManager soundManager;
 
         /// <summary>
@@ -354,6 +336,23 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             setPresetInstruments();
 
             this.soundManager = new AY8910SoundManager(this);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Dispose()
+        {
+            soundManager?.Dispose();
+            base.Dispose();
+        }
+
+        internal override void PrepareSound()
+        {
+            base.PrepareSound();
+
+            Ay8910WriteData(UnitNumber, 0, (byte)(7));
+            Ay8910WriteData(UnitNumber, 1, (byte)(0x3f));
         }
 
         /// <summary>

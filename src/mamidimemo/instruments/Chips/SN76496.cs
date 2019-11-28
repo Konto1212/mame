@@ -171,15 +171,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public override void Dispose()
-        {
-            soundManager?.Dispose();
-            base.Dispose();
-        }
-
         private SN76496SoundManager soundManager;
 
         /// <summary>
@@ -193,6 +184,15 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             setPresetInstruments();
 
             this.soundManager = new SN76496SoundManager(this);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Dispose()
+        {
+            soundManager?.Dispose();
+            base.Dispose();
         }
 
         /// <summary>
@@ -360,7 +360,15 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 base.KeyOn();
 
                 OnVolumeUpdated();
+
                 OnPitchUpdated();
+            }
+
+            public override void OnSoundParamsUpdated()
+            {
+                base.OnSoundParamsUpdated();
+
+                OnVolumeUpdated();
             }
 
             /// <summary>

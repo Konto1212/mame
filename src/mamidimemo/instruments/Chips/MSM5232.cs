@@ -499,6 +499,15 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 OnPitchUpdated();
             }
 
+            public override void OnSoundParamsUpdated()
+            {
+                base.OnSoundParamsUpdated();
+
+                SetTimbre();
+                //Volume
+                OnVolumeUpdated();
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -509,11 +518,11 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                 MSM5232WriteData(parentModule.UnitNumber, (uint)(0x8 + lastGroup), timbre.AT);
                 MSM5232WriteData(parentModule.UnitNumber, (uint)(0xa + lastGroup), timbre.DT);
-                MSM5232WriteData(parentModule.UnitNumber, (uint)(0xc + lastGroup), (byte)(timbre.EGE << 5 | timbre.ARM << 4 | timbre.Hormonics));
+                MSM5232WriteData(parentModule.UnitNumber, (uint)(0xc + lastGroup), (byte)(timbre.EGE << 5 | timbre.ARM << 4 | timbre.Harmonics));
             }
 
             /// <summary>
-            /// 
+            /// Harmonics
             /// </summary>
             public override void OnVolumeUpdated()
             {
@@ -521,6 +530,13 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 v *= ParentModule.Expressions[NoteOnEvent.Channel] / 127d;
                 v *= ParentModule.Volumes[NoteOnEvent.Channel] / 127d;
                 byte fv = (byte)Math.Round(15 * v);
+
+                if (FxEngine != null && FxEngine.Active)
+                {
+                    var eng = (MsmFxEngine)FxEngine;
+                    if (eng.HarmonicsValue != null)
+                        MSM5232WriteData(parentModule.UnitNumber, (uint)(0xc + lastGroup), (byte)(timbre.EGE << 5 | timbre.ARM << 4 | eng.HarmonicsValue));
+                }
 
                 MSM5232SetVolume(parentModule.UnitNumber, lastGroup, fv);
             }
@@ -669,11 +685,11 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             [DataMember]
             [Category("Sound")]
-            [Description("Hormonics mode (b0:Normal b1:1 Octave b2:2 Octave b3:3 Octave)")]
+            [Description("Harmonics mode (b0:Normal b1:1 Octave b2:2 Octave b3:3 Octave)")]
             [SlideParametersAttribute(0, 15)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
             [DefaultValue((byte)15)]
-            public byte Hormonics
+            public byte Harmonics
             {
                 get
                 {
@@ -705,7 +721,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             public MSM5232Timbre()
             {
-                this.SDS.FxS = new BasicFxSettings();
+                this.SDS.FxS = new MsmFxSettings();
             }
 
             public override void RestoreFrom(string serializeData)
@@ -722,7 +738,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     else if (ex.GetType() == typeof(SystemException))
                         throw;
 
-
                     System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
             }
@@ -735,6 +750,184 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         {
             Group1,
             Group2,
+        }
+
+
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<MsmFxSettings>))]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [DataContract]
+        [MidiHook]
+        public class MsmFxSettings : BasicFxSettings
+        {
+
+            private string f_HarmonicsEnvelopes;
+
+            [DataMember]
+            [Description("Set harmonics envelop by text. Input harmonics value and split it with space like the Famitracker.\r\n" +
+                       "0 ～ 15 \"|\" is repeat point. \"/\" is release point.")]
+            public string HarmonicsEnvelopes
+            {
+                get
+                {
+                    return f_HarmonicsEnvelopes;
+                }
+                set
+                {
+                    if (f_HarmonicsEnvelopes != value)
+                    {
+                        HarmonicsEnvelopesRepeatPoint = -1;
+                        HarmonicsEnvelopesReleasePoint = -1;
+                        if (value == null)
+                        {
+                            HarmonicsEnvelopesNums = new int[] { };
+                            f_HarmonicsEnvelopes = string.Empty;
+                            return;
+                        }
+                        f_HarmonicsEnvelopes = value;
+                        string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        List<int> vs = new List<int>();
+                        for (int i = 0; i < vals.Length; i++)
+                        {
+                            string val = vals[i];
+                            if (val.Equals("|", StringComparison.Ordinal))
+                                HarmonicsEnvelopesRepeatPoint = vs.Count;
+                            else if (val.Equals("/", StringComparison.Ordinal))
+                                HarmonicsEnvelopesReleasePoint = vs.Count;
+                            else
+                            {
+                                int v;
+                                if (int.TryParse(val, out v))
+                                {
+                                    if (v < 0)
+                                        v = 0;
+                                    else if (v > 15)
+                                        v = 15;
+                                    vs.Add(v);
+                                }
+                            }
+                        }
+                        HarmonicsEnvelopesNums = vs.ToArray();
+
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < HarmonicsEnvelopesNums.Length; i++)
+                        {
+                            if (sb.Length != 0)
+                                sb.Append(' ');
+                            if (HarmonicsEnvelopesRepeatPoint == i)
+                                sb.Append("| ");
+                            if (HarmonicsEnvelopesReleasePoint == i)
+                                sb.Append("/ ");
+                            sb.Append(HarmonicsEnvelopesNums[i].ToString((IFormatProvider)null));
+                        }
+                        f_HarmonicsEnvelopes = sb.ToString();
+                    }
+                }
+            }
+
+            public bool ShouldSerializeHarmonicsEnvelopes()
+            {
+                return !string.IsNullOrEmpty(HarmonicsEnvelopes);
+            }
+
+            public void ResetHarmonicsEnvelopes()
+            {
+                HarmonicsEnvelopes = null;
+            }
+
+            [Browsable(false)]
+            [JsonIgnore]
+            [IgnoreDataMember]
+            public int[] HarmonicsEnvelopesNums { get; set; } = new int[] { };
+
+            [Browsable(false)]
+            [JsonIgnore]
+            [IgnoreDataMember]
+            [DefaultValue(-1)]
+            public int HarmonicsEnvelopesRepeatPoint { get; set; } = -1;
+
+            [Browsable(false)]
+            [JsonIgnore]
+            [IgnoreDataMember]
+            [DefaultValue(-1)]
+            public int HarmonicsEnvelopesReleasePoint { get; set; } = -1;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
+            public override AbstractFxEngine CreateEngine()
+            {
+                return new MsmFxEngine(this);
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class MsmFxEngine : BasicFxEngine
+        {
+            private MsmFxSettings settings;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public MsmFxEngine(MsmFxSettings settings) : base(settings)
+            {
+                this.settings = settings;
+            }
+
+            private uint f_HarmonicsCounter;
+
+            public byte? HarmonicsValue
+            {
+                get;
+                private set;
+            }
+
+            protected override bool ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
+            {
+                bool process = base.ProcessCore(sound, isKeyOff, isSoundOff);
+
+                HarmonicsValue = null;
+                if (settings.HarmonicsEnvelopesNums.Length > 0)
+                {
+                    if (!isKeyOff)
+                    {
+                        var vm = settings.HarmonicsEnvelopesNums.Length;
+                        if (settings.HarmonicsEnvelopesReleasePoint >= 0)
+                            vm = settings.HarmonicsEnvelopesReleasePoint;
+                        if (f_HarmonicsCounter >= vm)
+                        {
+                            if (settings.HarmonicsEnvelopesRepeatPoint >= 0)
+                                f_HarmonicsCounter = (uint)settings.HarmonicsEnvelopesRepeatPoint;
+                            else
+                                f_HarmonicsCounter = (uint)vm;
+                        }
+                    }
+                    else
+                    {
+                        if (settings.HarmonicsEnvelopesRepeatPoint < 0)
+                            f_HarmonicsCounter = (uint)settings.HarmonicsEnvelopesNums.Length;
+
+                        if (f_HarmonicsCounter >= settings.HarmonicsEnvelopesNums.Length)
+                        {
+                            if (settings.HarmonicsEnvelopesRepeatPoint >= 0)
+                                f_HarmonicsCounter = (uint)settings.HarmonicsEnvelopesRepeatPoint;
+                        }
+                    }
+                    if (f_HarmonicsCounter < settings.HarmonicsEnvelopesNums.Length)
+                    {
+                        int vol = settings.HarmonicsEnvelopesNums[f_HarmonicsCounter++];
+
+                        HarmonicsValue = (byte)vol;
+                        process = true;
+                    }
+                }
+
+                return process;
+            }
+
         }
 
     }

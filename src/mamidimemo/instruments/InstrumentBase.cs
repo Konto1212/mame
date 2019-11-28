@@ -980,8 +980,10 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public InstrumentBase()
+        public InstrumentBase(uint unitNumber)
         {
+            UnitNumber = unitNumber;
+
             device_reset(UnitNumber, SoundInterfaceTagNamePrefix);
 
             set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 0, GainLeft);
@@ -993,14 +995,6 @@ namespace zanac.MAmidiMEmo.Instruments
             vstHandle = GCHandle.Alloc(this);
 
             SetVstFxCallback(UnitNumber, SoundInterfaceTagNamePrefix, f_vst_fx_callback);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public InstrumentBase(uint unitNumber) : this()
-        {
-            UnitNumber = unitNumber;
 
             Channels = new bool[] {
                     true, true, true,

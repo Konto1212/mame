@@ -47,6 +47,6 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
         /// <summary>
         /// 
         /// </summary>
-        public abstract void Process(SoundBase sound, bool isKeyOff, bool isSoundOff);
+        public abstract bool Process(SoundBase sound, bool isKeyOff, bool isSoundOff);
     }
 }

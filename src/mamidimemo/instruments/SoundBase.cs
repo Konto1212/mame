@@ -205,6 +205,14 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
+        public virtual void OnSoundParamsUpdated()
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         protected double CalcCurrentFrequency()
         {
@@ -305,10 +313,11 @@ namespace zanac.MAmidiMEmo.Instruments
         {
             if (!IsDisposed && !IsSoundOff && EnableFx && FxEngine != null)
             {
-                FxEngine.Process(this, IsKeyOff, IsSoundOff);
-
-                OnPitchUpdated();
-                OnVolumeUpdated();
+                if (FxEngine.Process(this, IsKeyOff, IsSoundOff))
+                {
+                    OnPitchUpdated();
+                    OnVolumeUpdated();
+                }
 
                 EnableFx = FxEngine.Active;
 

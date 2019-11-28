@@ -295,7 +295,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             Timbres[0].Ops[0].AR = 15;
             Timbres[0].Ops[0].DR = 0;
             Timbres[0].Ops[0].SL = 0;
-            Timbres[0].Ops[0].RR = 0;
+            Timbres[0].Ops[0].RR = 7;
             Timbres[0].Ops[0].WS = 1;
 
             Timbres[0].Ops[1].AM = 0;
@@ -467,6 +467,24 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 OnPitchUpdated();
             }
 
+            public override void OnSoundParamsUpdated()
+            {
+                base.OnSoundParamsUpdated();
+
+                var gs = timbre.GlobalSettings;
+                if (gs.Enable)
+                {
+                    Program.SoundUpdating();
+                    parentModule.AMD = gs.AMD;
+                    parentModule.VIB = gs.VIB;
+                    Program.SoundUpdated();
+                }
+
+                //
+                SetTimbre();
+                //Volume
+                OnVolumeUpdated();
+            }
 
             /// <summary>
             /// 
@@ -531,6 +549,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// </summary>
             public void SetTimbre()
             {
+                Program.SoundUpdating();
                 for (int op = 0; op < 2; op++)
                 {
                     YM3812Operator o = timbre.Ops[op];
@@ -545,7 +564,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
 
                 //$C0+: algorithm and feedback
-                YM3812WriteData(parentModule.UnitNumber, (byte)(0xB0 + Slot), 0, 0, (byte)(timbre.FB << 1 | timbre.ALG));
+                YM3812WriteData(parentModule.UnitNumber, (byte)(0xc0 + Slot), 0, 0, (byte)(timbre.FB << 1 | timbre.ALG));
+                Program.SoundUpdated();
             }
 
             /// <summary>

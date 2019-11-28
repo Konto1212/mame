@@ -547,6 +547,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
             }
 
+
+            public override void OnSoundParamsUpdated()
+            {
+                base.OnSoundParamsUpdated();
+
+                OnVolumeUpdated();
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -1316,9 +1324,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 private set;
             }
 
-            protected override void ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
+            protected override bool ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
             {
-                base.ProcessCore(sound, isKeyOff, isSoundOff);
+                bool process = base.ProcessCore(sound, isKeyOff, isSoundOff);
 
                 DutyValue = null;
                 if (settings.DutyEnvelopesNums.Length > 0)
@@ -1334,9 +1342,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                                 f_dutyCounter = (uint)settings.DutyEnvelopesRepeatPoint;
                             else
                                 f_dutyCounter = (uint)vm;
-
-                            if (f_dutyCounter >= settings.DutyEnvelopesNums.Length)
-                                f_dutyCounter = (uint)(settings.DutyEnvelopesNums.Length - 1);
                         }
                     }
                     else
@@ -1345,12 +1350,21 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             f_dutyCounter = (uint)settings.DutyEnvelopesNums.Length;
 
                         if (f_dutyCounter >= settings.DutyEnvelopesNums.Length)
-                            f_dutyCounter = (uint)(settings.DutyEnvelopesNums.Length - 1);
+                        {
+                            if (settings.DutyEnvelopesRepeatPoint >= 0)
+                                f_dutyCounter = (uint)settings.DutyEnvelopesRepeatPoint;
+                        }
                     }
-                    int vol = settings.DutyEnvelopesNums[f_dutyCounter++];
+                    if (f_dutyCounter < settings.DutyEnvelopesNums.Length)
+                    {
+                        int vol = settings.DutyEnvelopesNums[f_dutyCounter++];
 
-                    DutyValue = (byte)vol;
+                        DutyValue = (byte)vol;
+                        process = true;
+                    }
                 }
+
+                return process;
             }
 
         }

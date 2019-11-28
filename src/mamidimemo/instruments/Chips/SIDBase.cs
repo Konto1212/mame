@@ -494,6 +494,27 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
 
 
+            public override void OnSoundParamsUpdated()
+            {
+                base.OnSoundParamsUpdated();
+
+                var gs = timbre.GlobalSettings;
+                if (gs.Enable)
+                {
+                    Program.SoundUpdating();
+                    parentModule.FC = gs.FC;
+                    parentModule.RES = gs.RES;
+                    parentModule.OFF3 = gs.OFF3;
+                    parentModule.FILT = gs.FILT;
+                    parentModule.FilterType = gs.FilterType;
+                    Program.SoundUpdated();
+                }
+
+                SetTimbre();
+                OnVolumeUpdated();
+                OnPitchUpdated();
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -1029,9 +1050,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 private set;
             }
 
-            protected override void ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
+            protected override bool ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
             {
-                base.ProcessCore(sound, isKeyOff, isSoundOff);
+                bool process = base.ProcessCore(sound, isKeyOff, isSoundOff);
 
                 DutyValue = null;
                 if (settings.DutyEnvelopesNums.Length > 0)
@@ -1047,9 +1068,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                                 f_dutyCounter = (uint)settings.DutyEnvelopesRepeatPoint;
                             else
                                 f_dutyCounter = (uint)vm;
-
-                            if (f_dutyCounter >= settings.DutyEnvelopesNums.Length)
-                                f_dutyCounter = (uint)(settings.DutyEnvelopesNums.Length - 1);
                         }
                     }
                     else
@@ -1058,11 +1076,18 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             f_dutyCounter = (uint)settings.DutyEnvelopesNums.Length;
 
                         if (f_dutyCounter >= settings.DutyEnvelopesNums.Length)
-                            f_dutyCounter = (uint)(settings.DutyEnvelopesNums.Length - 1);
+                        {
+                            if (settings.DutyEnvelopesRepeatPoint >= 0)
+                                f_dutyCounter = (uint)settings.DutyEnvelopesRepeatPoint;
+                        }
                     }
-                    int vol = settings.DutyEnvelopesNums[f_dutyCounter++];
+                    if (f_dutyCounter < settings.DutyEnvelopesNums.Length)
+                    {
+                        int vol = settings.DutyEnvelopesNums[f_dutyCounter++];
 
-                    DutyValue = (ushort)vol;
+                        DutyValue = (ushort)vol;
+                        process = true;
+                    }
                 }
 
                 ResonanceValue = null;
@@ -1079,9 +1104,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                                 f_resCounter = (uint)settings.ResonanceEnvelopesRepeatPoint;
                             else
                                 f_resCounter = (uint)vm;
-
-                            if (f_resCounter >= settings.ResonanceEnvelopesNums.Length)
-                                f_resCounter = (uint)(settings.ResonanceEnvelopesNums.Length - 1);
                         }
                     }
                     else
@@ -1090,11 +1112,18 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             f_resCounter = (uint)settings.ResonanceEnvelopesNums.Length;
 
                         if (f_resCounter >= settings.ResonanceEnvelopesNums.Length)
-                            f_resCounter = (uint)(settings.ResonanceEnvelopesNums.Length - 1);
+                        {
+                            if (settings.ResonanceEnvelopesRepeatPoint >= 0)
+                                f_resCounter = (uint)settings.ResonanceEnvelopesRepeatPoint;
+                        }
                     }
-                    int vol = settings.ResonanceEnvelopesNums[f_resCounter++];
+                    if (f_resCounter < settings.ResonanceEnvelopesNums.Length)
+                    {
+                        int vol = settings.ResonanceEnvelopesNums[f_resCounter++];
 
-                    ResonanceValue = (byte)vol;
+                        ResonanceValue = (byte)vol;
+                        process = true;
+                    }
                 }
 
                 CutOffValue = null;
@@ -1111,9 +1140,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                                 f_cutCounter = (uint)settings.CutOffEnvelopesRepeatPoint;
                             else
                                 f_cutCounter = (uint)vm;
-
-                            if (f_cutCounter >= settings.CutOffEnvelopesNums.Length)
-                                f_cutCounter = (uint)(settings.CutOffEnvelopesNums.Length - 1);
                         }
                     }
                     else
@@ -1122,11 +1148,19 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             f_cutCounter = (uint)settings.CutOffEnvelopesNums.Length;
 
                         if (f_cutCounter >= settings.CutOffEnvelopesNums.Length)
-                            f_cutCounter = (uint)(settings.CutOffEnvelopesNums.Length - 1);
+                        {
+                            if (settings.CutOffEnvelopesRepeatPoint >= 0)
+                                f_cutCounter = (uint)settings.CutOffEnvelopesRepeatPoint;
+                        }
                     }
-                    int vol = settings.CutOffEnvelopesNums[f_cutCounter++];
 
-                    CutOffValue = (ushort)vol;
+                    if (f_cutCounter < settings.CutOffEnvelopesNums.Length)
+                    {
+                        int vol = settings.CutOffEnvelopesNums[f_cutCounter++];
+
+                        CutOffValue = (ushort)vol;
+                        process = true;
+                    }
                 }
 
                 WaveFormValue = null;
@@ -1143,9 +1177,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                                 f_wavCounter = (uint)settings.WaveFormEnvelopesRepeatPoint;
                             else
                                 f_wavCounter = (uint)vm;
-
-                            if (f_wavCounter >= settings.WaveFormEnvelopesNums.Length)
-                                f_wavCounter = (uint)(settings.WaveFormEnvelopesNums.Length - 1);
                         }
                     }
                     else
@@ -1154,12 +1185,22 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             f_wavCounter = (uint)settings.WaveFormEnvelopesNums.Length;
 
                         if (f_wavCounter >= settings.WaveFormEnvelopesNums.Length)
-                            f_wavCounter = (uint)(settings.WaveFormEnvelopesNums.Length - 1);
+                        {
+                            if (settings.WaveFormEnvelopesRepeatPoint >= 0)
+                                f_wavCounter = (uint)settings.WaveFormEnvelopesRepeatPoint;
+                        }
                     }
-                    int vol = settings.WaveFormEnvelopesNums[f_wavCounter++];
 
-                    WaveFormValue = (Waveforms)vol;
+                    if (f_wavCounter < settings.WaveFormEnvelopesNums.Length)
+                    {
+                        int vol = settings.WaveFormEnvelopesNums[f_wavCounter++];
+
+                        WaveFormValue = (Waveforms)vol;
+                        process = true;
+                    }
                 }
+
+                return process;
             }
 
         }

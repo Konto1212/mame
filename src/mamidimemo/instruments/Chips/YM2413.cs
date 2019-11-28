@@ -470,6 +470,15 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 OnPitchUpdated();
             }
 
+            public override void OnSoundParamsUpdated()
+            {
+                base.OnSoundParamsUpdated();
+
+                //
+                SetTimbre();
+                //Volume
+                OnVolumeUpdated();
+            }
 
             /// <summary>
             /// 
@@ -588,6 +597,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 YM2413Modulator m = timbre.Modulator;
                 YM2413Career c = timbre.Career;
 
+                Program.SoundUpdating();
                 //$00+:
                 YM2413WriteData(parentModule.UnitNumber, 0x00, 0, (byte)((m.AM << 7 | m.VIB << 6 | m.EG << 5 | m.KSR << 4 | m.MUL)));
                 YM2413WriteData(parentModule.UnitNumber, 0x01, 0, (byte)((c.AM << 7 | c.VIB << 6 | c.EG << 5 | c.KSR << 4 | c.MUL)));
@@ -600,6 +610,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 //$06+:
                 YM2413WriteData(parentModule.UnitNumber, 0x06, 0, (byte)((m.SR << 4 | m.RR)));
                 YM2413WriteData(parentModule.UnitNumber, 0x07, 0, (byte)((c.SR << 4 | c.RR)));
+                Program.SoundUpdated();
             }
 
             /// <summary>

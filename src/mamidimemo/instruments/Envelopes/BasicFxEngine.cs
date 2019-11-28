@@ -83,8 +83,9 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
         /// <summary>
         /// 
         /// </summary>
-        protected virtual void ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
+        protected virtual bool ProcessCore(SoundBase sound, bool isKeyOff, bool isSoundOff)
         {
+            bool process = false;
             //volume
             if (settings.VolumeEnvelopesNums.Length > 0)
             {
@@ -99,9 +100,6 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
                             volumeCounter = (uint)settings.VolumeEnvelopesRepeatPoint;
                         else
                             volumeCounter = (uint)vm;
-
-                        if (volumeCounter >= settings.VolumeEnvelopesNums.Length)
-                            volumeCounter = (uint)(settings.VolumeEnvelopesNums.Length - 1);
                     }
                 }
                 else
@@ -113,13 +111,16 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
                     {
                         if (settings.VolumeEnvelopesRepeatPoint >= 0)
                             volumeCounter = (uint)settings.VolumeEnvelopesRepeatPoint;
-                        else
-                            volumeCounter = (uint)(settings.VolumeEnvelopesNums.Length - 1);
                     }
                 }
-                int vol = settings.VolumeEnvelopesNums[volumeCounter++];
 
-                f_OutputLevel = vol / 127d;
+                if (volumeCounter < settings.VolumeEnvelopesNums.Length)
+                {
+                    int vol = settings.VolumeEnvelopesNums[volumeCounter++];
+
+                    f_OutputLevel = vol / 127d;
+                    process = true;
+                }
             }
 
             //pitch
@@ -136,9 +137,6 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
                             pitchCounter = (uint)settings.PitchEnvelopesRepeatPoint;
                         else
                             pitchCounter = (uint)vm;
-
-                        if (pitchCounter >= settings.PitchEnvelopesNums.Length)
-                            pitchCounter = (uint)(settings.PitchEnvelopesNums.Length - 1);
                     }
                 }
                 else
@@ -150,14 +148,16 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
                     {
                         if (settings.PitchEnvelopesRepeatPoint >= 0)
                             pitchCounter = (uint)settings.PitchEnvelopesRepeatPoint;
-                        else
-                            pitchCounter = (uint)(settings.PitchEnvelopesNums.Length - 1);
                     }
                 }
-                double pitch = settings.PitchEnvelopesNums[pitchCounter++];
-                double range = settings.PitchEnvelopeRange;
+                if (pitchCounter < settings.PitchEnvelopesNums.Length)
+                {
+                    double pitch = settings.PitchEnvelopesNums[pitchCounter++];
+                    double range = settings.PitchEnvelopeRange;
 
-                f_DeltaNoteNumber += ((double)pitch / 8192d) * range;
+                    f_DeltaNoteNumber += ((double)pitch / 8192d) * range;
+                    process = true;
+                }
             }
 
             //arpeggio
@@ -174,9 +174,6 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
                             arpCounter = (uint)settings.ArpEnvelopesRepeatPoint;
                         else
                             arpCounter = (uint)vm;
-
-                        if (arpCounter >= settings.ArpEnvelopesNums.Length)
-                            arpCounter = (uint)(settings.ArpEnvelopesNums.Length - 1);
                     }
                 }
                 else
@@ -188,42 +185,46 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
                     {
                         if (settings.ArpEnvelopesRepeatPoint >= 0)
                             arpCounter = (uint)settings.ArpEnvelopesRepeatPoint;
-                        else
-                            arpCounter = (uint)(settings.ArpEnvelopesNums.Length - 1);
                     }
                 }
-                int dnote = settings.ArpEnvelopesNums[arpCounter++];
-
-                switch (settings.ArpStepType)
+                if (arpCounter < settings.ArpEnvelopesNums.Length)
                 {
-                    case ArpStepType.Absolute:
-                        f_DeltaNoteNumber += -lastArpNoteNumber + dnote;
-                        break;
-                    case ArpStepType.Relative:
-                        f_DeltaNoteNumber += dnote;
-                        break;
-                    case ArpStepType.Fixed:
-                        f_DeltaNoteNumber += -sound.NoteOnEvent.NoteNumber + dnote;
-                        break;
+                    int dnote = settings.ArpEnvelopesNums[arpCounter++];
+
+                    switch (settings.ArpStepType)
+                    {
+                        case ArpStepType.Absolute:
+                            f_DeltaNoteNumber += -lastArpNoteNumber + dnote;
+                            break;
+                        case ArpStepType.Relative:
+                            f_DeltaNoteNumber += dnote;
+                            break;
+                        case ArpStepType.Fixed:
+                            f_DeltaNoteNumber += -sound.NoteOnEvent.NoteNumber + dnote;
+                            break;
+                    }
+                    lastArpNoteNumber = dnote;
+                    process = true;
                 }
-                lastArpNoteNumber = dnote;
             }
+
+            return process;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public override void Process(SoundBase sound, bool isKeyOff, bool isSoundOff)
+        public override bool Process(SoundBase sound, bool isKeyOff, bool isSoundOff)
         {
             f_Active = true;
 
             if (!settings.Enable || isSoundOff)
             {
                 f_Active = false;
-                return;
+                return false;
             }
 
-            ProcessCore(sound, isKeyOff, isSoundOff);
+            return ProcessCore(sound, isKeyOff, isSoundOff);
         }
     }
 }
