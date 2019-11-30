@@ -32,7 +32,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
             list.Click += List_Click;
             lock (InstrumentBase.VstPluginContextLockObject)
             {
-                VSTPlugin inst = (VSTPlugin)context.Instance;
+                VstPlugin inst = (VstPlugin)context.Instance;
                 var ctx = inst.PluginContext.Context;
                 if (ctx != null)
                 {

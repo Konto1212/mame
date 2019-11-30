@@ -108,7 +108,10 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
    ADSR
    Effect(Pitch/Volue/Duty macro)
 
-7. (TBD)
+7. You can modify current timbre parameters via Sound control MIDI Message(70-75,79) dynamically.
+   You can modify VST parameters via Effect Depth control MIDI Message(91-95) dynamically.
+
+8. (TBD)
    You can modify current environment and all timbre parameters via System Exclusive MIDI Message.
 
    SysEx format:
@@ -127,9 +130,14 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 9. Changes
 
-0.8.1.0 Fix arpeggio algorithm. When last one key is up, the key is not held in hold mode. Otherwise, keep arpeggio.
+0.9.3.0 Added alternate property editor window. That can be popup from toolbar in the Property pane.
+        Added Sound Control Settings feature in Timbre settings. You can link the Sound control MIDI message value with the Timbre property value. (Also VST, too)
+        Fixed arpeggio algorithm. When last one key is up, the key is not held in hold mode. Otherwise, keep arpeggio.
+		Fixed a slider editor for peoperty value. Exception occured while multiple instruments editing by slider.
+		Fixed VST(unmanaged resource) cleanup code.
+		Fixed 2nd AY8910 outputs noise.
 0.8.0.0 Supports piano clicks by mouse. Supports Mono mode(CC#126,CC#127) almost same with FITOM
-0.7.0.0 Added SID, C140 chips, Displays Oscilloscope, Supports VST Effect plugin(preliminary)
+0.7.0.0 Added SID, C140 chips, Displays Oscilloscope, Supports VST Effect plugin
 0.6.1.0 Changed to new sound timer engine for perfect sound timing
 0.6.0.0 Added sound driver effects and portamento feature
 0.5.0.0 Added several chips

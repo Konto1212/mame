@@ -6,15 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using zanac.MAmidiMEmo.ComponentModel;
-using zanac.MAmidiMEmo.Instruments.Envelopes;
-using static zanac.MAmidiMEmo.Instruments.SoundBase;
 
 namespace zanac.MAmidiMEmo.Instruments
 {
@@ -30,8 +24,9 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Sound Control 1(Control Change No.70(0x46))\r\n" +
-            "Link Data Entry message value with the Timbre property value (Only the property that has a slider editor)\r\n" +
+            "Link Data Entry message value with the Timbre property value\r\n" +
             "eg) \"DutyCycle,Volume\" ... You can change DutyCycle and Volume property values dynamically via MIDI Control Change No.70 message.")]
+        [DefaultValue(null)]
         public string SoundControl1
         {
             get;
@@ -40,6 +35,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Sound Control 2(Control Change No.71(0x47))")]
+        [DefaultValue(null)]
         public string SoundControl2
         {
             get;
@@ -48,6 +44,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Sound Control 3(Control Change No.72(0x48))")]
+        [DefaultValue(null)]
         public string SoundControl3
         {
             get;
@@ -56,6 +53,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Sound Control 4(Control Change No.73(0x49))")]
+        [DefaultValue(null)]
         public string SoundControl4
         {
             get;
@@ -64,6 +62,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Sound Control 5(Control Change No.74(0x4A))")]
+        [DefaultValue(null)]
         public string SoundControl5
         {
             get;
@@ -72,6 +71,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Sound Control 6(Control Change No.75(0x4B))")]
+        [DefaultValue(null)]
         public string SoundControl6
         {
             get;
@@ -81,6 +81,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /*
         [DataMember]
         [Description("Sound Control 7(Control Change No.76(0x4C))")]
+        [DefaultValue(null)]
         public string SoundControl7
         {
             get;
@@ -89,6 +90,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Sound Control 8(Control Change No.77(0x4D))")]
+        [DefaultValue(null)]
         public string SoundControl8
         {
             get;
@@ -97,6 +99,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Sound Control 9(Control Change No.78(0x4E))")]
+        [DefaultValue(null)]
         public string SoundControl9
         {
             get;
@@ -106,6 +109,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
         [DataMember]
         [Description("Sound Control 10(Control Change No.79(0x4F))")]
+        [DefaultValue(null)]
         public string SoundControl10
         {
             get;
@@ -150,6 +154,8 @@ namespace zanac.MAmidiMEmo.Instruments
             return null;
         }
 
+        private static Dictionary<Type, Dictionary<string, InstancePropertyInfo>> propertyInfoTable = new Dictionary<Type, Dictionary<string, InstancePropertyInfo>>();
+
         /// <summary>
         /// 
         /// </summary>
@@ -159,6 +165,7 @@ namespace zanac.MAmidiMEmo.Instruments
         private InstancePropertyInfo[] getPropertiesInfo(TimbreBase timbre, string propertyNames)
         {
             List<InstancePropertyInfo> plist = new List<InstancePropertyInfo>();
+            var tt = timbre.GetType();
 
             if (!string.IsNullOrWhiteSpace(propertyNames))
             {
@@ -166,6 +173,19 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 foreach (var propertyName in propNameParts)
                 {
+                    if (propertyInfoTable.ContainsKey(tt))
+                    {
+                        if (propertyInfoTable[tt].ContainsKey(propertyName))
+                        {
+                            plist.Add(propertyInfoTable[tt][propertyName]);
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        propertyInfoTable.Add(tt, new Dictionary<string, InstancePropertyInfo>());
+                    }
+
                     var pi = getPropertyInfo(timbre, propertyName);
                     if (pi != null)
                     {
@@ -174,13 +194,30 @@ namespace zanac.MAmidiMEmo.Instruments
                         if (attribute != null)
                         {
                             plist.Add(pi);
+                            propertyInfoTable[tt][propertyName] = pi;
                         }
                         else
                         {
                             DoubleSlideParametersAttribute dattribute =
                                 Attribute.GetCustomAttribute(pi.Property, typeof(DoubleSlideParametersAttribute)) as DoubleSlideParametersAttribute;
                             if (dattribute != null)
+                            {
                                 plist.Add(pi);
+                                propertyInfoTable[tt][propertyName] = pi;
+                            }
+                            else
+                            {
+                                if (pi.Property.PropertyType == typeof(bool))
+                                {
+                                    plist.Add(pi);
+                                    propertyInfoTable[tt][propertyName] = pi;
+                                }
+                                else if (pi.Property.PropertyType.IsEnum)
+                                {
+                                    plist.Add(pi);
+                                    propertyInfoTable[tt][propertyName] = pi;
+                                }
+                            }
                         }
                     }
                 }
@@ -300,28 +337,6 @@ namespace zanac.MAmidiMEmo.Instruments
 
         #endregion
 
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class InstancePropertyInfo
-    {
-        public Object Owner
-        {
-            get;
-        }
-
-        public PropertyInfo Property
-        {
-            get;
-        }
-
-        public InstancePropertyInfo(object ownerObject, PropertyInfo propertyInfo)
-        {
-            Owner = ownerObject;
-            Property = propertyInfo;
-        }
     }
 
 }

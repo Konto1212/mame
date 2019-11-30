@@ -196,6 +196,24 @@ namespace zanac.MAmidiMEmo.Instruments
                                         pd.SetValue(ipi.Owner, pd.Converter.ConvertFromString(val.ToString()));
                                         process = true;
                                     }
+                                    else
+                                    {
+                                        if (ipi.Property.PropertyType == typeof(bool))
+                                        {
+                                            var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                                            pd.SetValue(ipi.Owner, midiEvent.ControlValue > 63);
+                                            process = true;
+                                        }
+                                        else if (ipi.Property.PropertyType.IsEnum)
+                                        {
+                                            var vals = Enum.GetValues(ipi.Property.PropertyType);
+                                            int val = vals.Length * midiEvent.ControlValue / 128;
+
+                                            var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                                            pd.SetValue(ipi.Owner, vals.GetValue(val));
+                                            process = true;
+                                        }
+                                    }
                                 }
                             }
                         }

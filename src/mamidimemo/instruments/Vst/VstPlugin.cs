@@ -17,9 +17,9 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
 {
 
     [TypeConverter(typeof(CustomExpandableObjectConverter))]
-    [JsonConverter(typeof(NoTypeConverterJsonConverter<VSTPlugin>))]
+    [JsonConverter(typeof(NoTypeConverterJsonConverter<VstPlugin>))]
     [DataContract]
-    public class VSTPlugin : IDisposable
+    public class VstPlugin : IDisposable
     {
 
         private VstPluginContextWrapper f_PluginContext;
@@ -173,6 +173,17 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
             }
         }
 
+        [DataMember]
+        [Description("VST Effect Control Change System-wide Settings\r\n" +
+    "Link Data Entry message value with the VST property value\r\n" +
+    "eg) \"Reverb,Chorus\" ... You can change Reverb and Chorus depth property values dynamically via MIDI Control Change No.9x message.")]
+        [DisplayName("VST Effect Control Change System-wide Settings(VECCSS)")]
+        public VstEffectControlChangeSettings VECCSS
+        {
+            get;
+            set;
+        }
+
         private VstPluginContextWrapper OpenPlugin(string pluginPath)
         {
             try
@@ -212,6 +223,7 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
                     ctx.PluginCommandStub.SetSampleRate(Program.CurrentSamplingRate);
                     ctx.PluginCommandStub.MainsChanged(true);
                     ctx.PluginCommandStub.StartProcess();
+                    VECCSS = new VstEffectControlChangeSettings();
                     return new VstPluginContextWrapper(ctx);
                 }
             }
@@ -226,6 +238,14 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public VstPlugin()
+        {
+            VECCSS = new VstEffectControlChangeSettings();
         }
 
         #region IDisposable Support
@@ -254,7 +274,7 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
         }
 
         // TODO: 上の Dispose(bool disposing) にアンマネージ リソースを解放するコードが含まれる場合にのみ、ファイナライザーをオーバーライドします。
-        ~VSTPlugin()
+        ~VstPlugin()
         {
             // このコードを変更しないでください。クリーンアップ コードを上の Dispose(bool disposing) に記述します。
             Dispose(false);

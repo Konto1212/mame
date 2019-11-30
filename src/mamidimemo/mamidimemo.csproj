@@ -132,7 +132,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -163,6 +162,8 @@
     <!-- any additional x64 specific references -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\CacheMemory.cs" />
+    <Compile Include="ComponentModel\InstancePropertyInfo.cs" />
     <Compile Include="ComponentModel\ToolStripBase.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -228,6 +229,7 @@
     <Compile Include="Instruments\Envelopes\BasicFxEngine.cs" />
     <Compile Include="Instruments\Envelopes\BasicFxSettings.cs" />
     <Compile Include="Instruments\HighPrecisionTimer.cs" />
+    <Compile Include="Instruments\VstEffectControlChangeSettings.cs" />
     <Compile Include="Instruments\SoundControlChangeSettings.cs" />
     <Compile Include="Instruments\SoundList.cs" />
     <Compile Include="ComponentModel\StandardValuesDoubleConverter.cs" />

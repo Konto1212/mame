@@ -20,20 +20,20 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
     [Editor(typeof(RefreshingCollectionEditor), typeof(UITypeEditor))]
     [TypeConverter(typeof(ExpandableCollectionConverter))]
     [RefreshProperties(RefreshProperties.All)]
-    public class VSTPluginCollection : IList<VSTPlugin>, IList
+    public class VSTPluginCollection : IList<VstPlugin>, IList
     {
-        private List<VSTPlugin> f_list = new List<VSTPlugin>();
+        private List<VstPlugin> f_list = new List<VstPlugin>();
 
         public VSTPluginCollection()
         {
         }
 
-        public int IndexOf(VSTPlugin item)
+        public int IndexOf(VstPlugin item)
         {
             return f_list.IndexOf(item);
         }
 
-        public void Insert(int index, VSTPlugin item)
+        public void Insert(int index, VstPlugin item)
         {
             lock (InstrumentBase.VstPluginContextLockObject)
                 f_list.Insert(index, item);
@@ -45,7 +45,7 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
                 f_list.RemoveAt(index);
         }
 
-        public VSTPlugin this[int index]
+        public VstPlugin this[int index]
         {
             get
             {
@@ -57,7 +57,7 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
             }
         }
 
-        public void Add(VSTPlugin item)
+        public void Add(VstPlugin item)
         {
             lock (InstrumentBase.VstPluginContextLockObject)
                 f_list.Add(item);
@@ -69,12 +69,12 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
                 f_list.Clear();
         }
 
-        public bool Contains(VSTPlugin item)
+        public bool Contains(VstPlugin item)
         {
             return f_list.Contains(item);
         }
 
-        public void CopyTo(VSTPlugin[] array, int arrayIndex)
+        public void CopyTo(VstPlugin[] array, int arrayIndex)
         {
             f_list.CopyTo(array, arrayIndex);
         }
@@ -95,13 +95,13 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
             }
         }
 
-        public bool Remove(VSTPlugin item)
+        public bool Remove(VstPlugin item)
         {
             lock (InstrumentBase.VstPluginContextLockObject)
                 return f_list.Remove(item);
         }
 
-        public IEnumerator<VSTPlugin> GetEnumerator()
+        public IEnumerator<VstPlugin> GetEnumerator()
         {
             return f_list.GetEnumerator();
         }
@@ -114,23 +114,23 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
         int IList.Add(object value)
         {
             int index = Count;
-            Add((VSTPlugin)value);
+            Add((VstPlugin)value);
             return index;
         }
 
         bool IList.Contains(object value)
         {
-            return Contains((VSTPlugin)value);
+            return Contains((VstPlugin)value);
         }
 
         int IList.IndexOf(object value)
         {
-            return IndexOf((VSTPlugin)value);
+            return IndexOf((VstPlugin)value);
         }
 
         void IList.Insert(int index, object value)
         {
-            Insert(index, (VSTPlugin)value);
+            Insert(index, (VstPlugin)value);
         }
 
         bool IList.IsFixedSize
@@ -151,7 +151,7 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
 
         void IList.Remove(object value)
         {
-            Remove((VSTPlugin)value);
+            Remove((VstPlugin)value);
         }
 
         object IList.this[int index]
@@ -162,13 +162,13 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
             }
             set
             {
-                this[index] = (VSTPlugin)value;
+                this[index] = (VstPlugin)value;
             }
         }
 
         void ICollection.CopyTo(Array array, int index)
         {
-            CopyTo((VSTPlugin[])array, index);
+            CopyTo((VstPlugin[])array, index);
         }
 
         bool ICollection.IsSynchronized

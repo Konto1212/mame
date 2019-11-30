@@ -627,23 +627,35 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 base.OnSoundParamsUpdated();
 
+                Program.SoundUpdating();
+
                 var gs = timbre.GlobalSettings;
                 if (gs.Enable)
                 {
-                    Program.SoundUpdating();
                     parentModule.LFOD = gs.LFOD;
                     parentModule.LFOF = gs.LFOF;
                     parentModule.LFOW = gs.LFOW;
                     parentModule.LFRQ = gs.LFRQ;
                     parentModule.NE = gs.NE;
                     parentModule.NFRQ = gs.NFRQ;
-                    Program.SoundUpdated();
                 }
 
-                //
-                SetTimbre();
-                //Volume
+                Ym2151WriteData(parentModule.UnitNumber, 0x38, 0, Slot, (byte)((timbre.PMS << 4 | timbre.AMS)));
+                for (int op = 0; op < 4; op++)
+                {
+                    Ym2151WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)((timbre.Ops[op].DT1 << 4 | timbre.Ops[op].MUL)));
+                    //Ym2151WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)timbre.Ops[op].TL);
+                    Ym2151WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.Ops[op].RS << 6 | timbre.Ops[op].AR)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xa0, op, Slot, (byte)((timbre.Ops[op].AM << 7 | timbre.Ops[op].D1R)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xc0, op, Slot, (byte)((timbre.Ops[op].DT2 << 7 | timbre.Ops[op].D2R)));
+                    Ym2151WriteData(parentModule.UnitNumber, 0xe0, op, Slot, (byte)((timbre.Ops[op].SL << 7 | timbre.Ops[op].RR)));
+                }
+
+                OnPanpotUpdated();
+
                 OnVolumeUpdated();
+
+                Program.SoundUpdated();
             }
 
 

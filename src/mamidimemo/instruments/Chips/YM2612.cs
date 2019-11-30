@@ -622,19 +622,41 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 base.OnSoundParamsUpdated();
 
+                Program.SoundUpdating();
+
                 var gs = timbre.GlobalSettings;
                 if (gs.Enable)
                 {
-                    Program.SoundUpdating();
                     parentModule.LFOEN = gs.LFOEN;
                     parentModule.LFRQ = gs.LFRQ;
-                    Program.SoundUpdated();
                 }
 
-                //
-                SetFmTimbre();
+                for (int op = 0; op < 4; op++)
+                {
+                    //$30+: multiply and detune
+                    Ym2612WriteData(parentModule.UnitNumber, 0x30, op, Slot, (byte)((timbre.Ops[op].DT1 << 4 | timbre.Ops[op].MUL)));
+                    //$40+: total level
+                    //Ym2612WriteData(parentModule.UnitNumber, 0x40, op, Slot, (byte)timbre.Ops[op].TL);
+                    //$50+: attack rate and rate scaling
+                    Ym2612WriteData(parentModule.UnitNumber, 0x50, op, Slot, (byte)((timbre.Ops[op].RS << 6 | timbre.Ops[op].AR)));
+                    //$60+: 1st decay rate and AM enable
+                    Ym2612WriteData(parentModule.UnitNumber, 0x60, op, Slot, (byte)((timbre.Ops[op].AM << 7 | timbre.Ops[op].D1R)));
+                    //$70+: 2nd decay rate
+                    Ym2612WriteData(parentModule.UnitNumber, 0x70, op, Slot, (byte)timbre.Ops[op].D2R);
+                    //$80+: release rate and sustain level
+                    Ym2612WriteData(parentModule.UnitNumber, 0x80, op, Slot, (byte)((timbre.Ops[op].SL << 4 | timbre.Ops[op].RR)));
+                    //$90+: SSG-EG
+                    Ym2612WriteData(parentModule.UnitNumber, 0x90, op, Slot, (byte)timbre.Ops[op].SSG_EG);
+                }
+
+                //$B0+: algorithm and feedback
+                Ym2612WriteData(parentModule.UnitNumber, 0xB0, 0, Slot, (byte)(timbre.FB << 3 | timbre.ALG));
+
+                OnPanpotUpdated();
                 //Volume
                 OnVolumeUpdated();
+
+                Program.SoundUpdated();
             }
 
             /// <summary>

@@ -1352,6 +1352,25 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 78:    //Modulation Delay
                     ModulationDelays[midiEvent.Channel] = midiEvent.ControlValue;
                     break;
+
+                //Sound Control
+                case 91:
+                case 92:
+                case 93:
+                case 94:
+                case 95:
+                    {
+                        foreach (var vp in VSTPlugins)
+                        {
+                            foreach (var pn in vp.VECCSS.GetProperties(vp, midiEvent.ControlNumber - 90))
+                            {
+                                float val = (float)midiEvent.ControlValue / (float)128;
+                                vp.Settings.SetPropertyValue(pn, val);
+                            }
+                        }
+                    }
+                    break;
+
                 case 100:    //RPN LSB
                     RpnLsb[midiEvent.Channel] = midiEvent.ControlValue;
                     break;
