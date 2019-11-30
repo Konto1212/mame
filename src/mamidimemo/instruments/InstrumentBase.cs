@@ -1459,7 +1459,7 @@ namespace zanac.MAmidiMEmo.Instruments
                                 Parallel.ForEach(Partitioner.Create(0, samples), range =>
                                 {
                                     for (var i = range.Item1; i < range.Item2; i++)
-                                        vab[i] = (float)buf[idx][i] / (float)int.MaxValue;
+                                        vab[i] = (float)buf[idx][i] / 32767.0f;
                                 });
                                 //for (int i = 0; i < samples; i++)
                                 //    vab[i] = (float)buf[idx][i] / (float)int.MaxValue;
@@ -1493,7 +1493,7 @@ namespace zanac.MAmidiMEmo.Instruments
                             Parallel.ForEach(Partitioner.Create(0, samples), range =>
                             {
                                 for (var i = range.Item1; i < range.Item2; i++)
-                                    buf[idx][i] = (int)(vab[i] * int.MaxValue);
+                                    buf[idx][i] = (int)(vab[i] * 32767.0f);
                             });
                             //for (int i = 0; i < samples; i++)
                             //    buf[idx][i] = (int)(vab[i] * int.MaxValue);
