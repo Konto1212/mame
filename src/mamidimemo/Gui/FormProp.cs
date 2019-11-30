@@ -111,6 +111,8 @@ namespace zanac.MAmidiMEmo.Gui
             instruments = insts;
             propertyGrid.SelectedObjects = insts.ToArray();
             setTitle();
+            if (insts.Count == 0)
+                Close();
         }
 
         /// <summary>
@@ -133,6 +135,8 @@ namespace zanac.MAmidiMEmo.Gui
             instruments = insts;
             propertyGrid.SelectedObjects = insts.ToArray();
             setTitle();
+            if (insts.Count == 0)
+                Close();
         }
 
         private void toolStripButtonCat_Click(object sender, EventArgs e)

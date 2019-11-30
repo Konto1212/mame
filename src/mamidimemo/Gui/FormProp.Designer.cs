@@ -17,6 +17,12 @@
             {
                 components.Dispose();
             }
+            if (disposing)
+            {
+                Instruments.InstrumentManager.InstrumentChanged -= InstrumentManager_InstrumentChanged;
+                Instruments.InstrumentManager.InstrumentRemoved -= InstrumentManager_InstrumentRemoved;
+            }
+
             base.Dispose(disposing);
         }
 
