@@ -64,7 +64,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         long dueTime = (long)Math.Round(nextTime);
                         SetWaitableTimer(handle, ref dueTime, 0, IntPtr.Zero, IntPtr.Zero, false);
                         WaitForSingleObject(handle, WAIT_TIMEOUT);
-                        lock (Program.ExclusiveLockObject)
+                        lock (InstrumentManager.ExclusiveLockObject)
                             periodMs = action(data);
                         if (periodMs < 0 || shutDown)
                             break;
@@ -75,7 +75,8 @@ namespace zanac.MAmidiMEmo.Instruments
                             nextTime = lpSystemTimeAsFileTime;  // adjust to current time
                     }
                 }
-            });
+            })
+            { Priority = ThreadPriority.AboveNormal };
             th.Start(state);
         }
 
@@ -112,7 +113,7 @@ namespace zanac.MAmidiMEmo.Instruments
             foreach (var snd in list)
             {
                 double ret = -1;
-                lock (Program.ExclusiveLockObject)
+                lock (InstrumentManager.ExclusiveLockObject)
                     ret = snd.Key(snd.Value);
                 if (ret >= 0)
                     continue;

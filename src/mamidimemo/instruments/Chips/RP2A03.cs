@@ -25,6 +25,7 @@ using zanac.MAmidiMEmo.Midi;
 
 //http://hp.vector.co.jp/authors/VA042397/nes/apu.html
 //https://wiki.nesdev.com/w/index.php/APU
+//http://offgao.blog112.fc2.com/blog-entry-40.html
 
 namespace zanac.MAmidiMEmo.Instruments.Chips
 {
@@ -483,18 +484,17 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                             var timbre = parentModule.Timbres[pn];
 
-                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << Slot));
+                            //Volume
+                            updateSqVolume();
+                            //Freq
+                            updateSqPitch();
+
+                            byte data = (byte)RP2A03ReadData(parentModule.UnitNumber, 0x15);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << Slot)));
 
                             RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x01),
                                 (byte)(timbre.SQSweep.Enable << 7 | timbre.SQSweep.UpdateRate << 4 |
                                 timbre.SQSweep.Direction << 3 | timbre.SQSweep.Range));
-
-                            //Volume
-                            updateSqVolume();
-
-                            //Freq
-                            updateSqPitch();
 
                             break;
                         }
@@ -503,27 +503,27 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                             var timbre = parentModule.Timbres[pn];
 
-                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 2));
+                            //Freq
+                            updateTriPitch();
+
+                            byte data = (byte)RP2A03ReadData(parentModule.UnitNumber, 0x15);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
 
                             RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x00),
                                 (byte)(timbre.LengthCounterDisable << 7 | timbre.TriCounterLength));
 
-                            //Freq
-                            updateTriPitch();
-
                             break;
                         }
                     case ToneType.NOISE:
                         {
-                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 3));
-                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 8));
+                            byte data = (byte)RP2A03ReadData(parentModule.UnitNumber, 0x15);
 
                             //Volume
                             updateNoiseVolume();
-
                             //Freq
                             UpdateNoisePitch();
+
+                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 8));
 
                             break;
                         }
@@ -575,10 +575,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
                             var timbre = parentModule.Timbres[pn];
 
-                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << Slot));
                             Program.SoundUpdating();
 
-                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << Slot)));
+                            //Volume
+                            updateSqVolume();
+                            //Freq
+                            updateSqPitch();
 
                             RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x01),
                                 (byte)(timbre.SQSweep.Enable << 7 | timbre.SQSweep.UpdateRate << 4 |
@@ -586,30 +588,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                             Program.SoundUpdated();
 
-                            //Volume
-                            updateSqVolume();
-
-                            //Freq
-                            updateSqPitch();
-
                             break;
                         }
                     case ToneType.TRIANGLE:
                         {
-                            var pn = parentModule.ProgramNumbers[NoteOnEvent.Channel];
-                            var timbre = parentModule.Timbres[pn];
-
-                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 2));
-
-                            Program.SoundUpdating();
-
-                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
-
-                            RP2A03WriteData(parentModule.UnitNumber, (uint)((2 * 4) + 0x00),
-                                (byte)(timbre.LengthCounterDisable << 7 | timbre.TriCounterLength));
-
-                            Program.SoundUpdated();
-
                             //Freq
                             updateTriPitch();
 
@@ -617,14 +599,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         }
                     case ToneType.NOISE:
                         {
-                            byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 3));
-                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 8));
+                            Program.SoundUpdating();
 
                             //Volume
                             updateNoiseVolume();
-
                             //Freq
                             UpdateNoisePitch();
+
+                            Program.SoundUpdated();
 
                             break;
                         }
@@ -677,7 +659,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 if (FxEngine != null && FxEngine.Active)
                 {
                     var eng = (NesFxEngine)FxEngine;
-                    if(eng.DutyValue != null)
+                    if (eng.DutyValue != null)
                         dc = eng.DutyValue.Value;
                 }
 
@@ -790,28 +772,30 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     case ToneType.SQUARE:
                         {
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << Slot));
-                            Program.SoundUpdating();
+                            //Program.SoundUpdating();
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
-                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << Slot)));
-                            Program.SoundUpdated();
+                            //RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << Slot)));
+                            //Program.SoundUpdated();
                             break;
                         }
                     case ToneType.TRIANGLE:
                         {
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~(1 << 2));
-                            Program.SoundUpdating();
+                            //Program.SoundUpdating();
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
-                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
-                            Program.SoundUpdated();
+                            //RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | (1 << 2)));
+                            //Program.SoundUpdated();
                             break;
                         }
                     case ToneType.NOISE:
                         {
+                            RP2A03WriteData(parentModule.UnitNumber, 0x08, 0x80);
+
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~8);
-                            Program.SoundUpdating();
+                            //Program.SoundUpdating();
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
-                            RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 8));
-                            Program.SoundUpdated();
+                            //RP2A03WriteData(parentModule.UnitNumber, 0x15, (byte)(data | 8));
+                            //Program.SoundUpdated();
                             break;
                         }
                 }

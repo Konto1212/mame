@@ -10,6 +10,7 @@ using System.Runtime.Remoting.Services;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using zanac.MAmidiMEmo.Instruments;
 
 namespace zanac.MAmidiMEmo.ComponentModel
 {
@@ -50,8 +51,12 @@ namespace zanac.MAmidiMEmo.ComponentModel
             else
             {
                 //以下、コンストラクタ以外のメソッドを実行する処理
-
-                lock (Program.ExclusiveLockObject)
+                if (call.MethodName.StartsWith("set_"))
+                {
+                    lock (InstrumentManager.ExclusiveLockObject)
+                        res = RemotingServices.ExecuteMessage(this.f_Target, call);
+                }
+                else
                 {
                     res = RemotingServices.ExecuteMessage(this.f_Target, call);
                 }

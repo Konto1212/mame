@@ -19,6 +19,11 @@ namespace zanac.MAmidiMEmo.Instruments
 {
     public static class InstrumentManager
     {
+        /// <summary>
+        /// Exclusive control between GUI/MIDI Event/Other managed threads for Instrument objects;
+        /// </summary>
+        public static object ExclusiveLockObject = new object();
+
         private static List<List<InstrumentBase>> instruments = new List<List<InstrumentBase>>();
 
         /// <summary>
@@ -65,15 +70,13 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <returns></returns>
         public static IEnumerable<InstrumentBase> GetAllInstruments()
         {
-            lock (Program.ExclusiveLockObject)
+            List<InstrumentBase> insts = new List<InstrumentBase>();
+            lock (InstrumentManager.ExclusiveLockObject)
             {
-                List<InstrumentBase> insts = new List<InstrumentBase>();
-
                 foreach (List<InstrumentBase> i in instruments)
                     insts.AddRange(i);
-
-                return insts.AsEnumerable();
             }
+            return insts.AsEnumerable();
         }
 
         /// <summary>
@@ -81,7 +84,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// </summary>
         public static void RestoreSettings(EnvironmentSettings settings)
         {
-            lock (Program.ExclusiveLockObject)
+            lock (InstrumentManager.ExclusiveLockObject)
             {
                 if (settings.Instruments != null)
                 {
@@ -151,7 +154,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="instrumentType"></param>
         public static void AddInstrument(InstrumentType instrumentType)
         {
-            lock (Program.ExclusiveLockObject)
+            lock (InstrumentManager.ExclusiveLockObject)
             {
                 if (instruments[(int)instrumentType].Count < 8)
                 {
@@ -174,7 +177,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="instrumentType"></param>
         public static void RemoveInstrument(InstrumentType instrumentType)
         {
-            lock (Program.ExclusiveLockObject)
+            lock (InstrumentManager.ExclusiveLockObject)
             {
                 var list = instruments[(int)instrumentType];
                 list[list.Count - 1].Dispose();
@@ -190,7 +193,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="e"></param>
         private static void MidiManager_MidiEventReceived(object sender, MidiEvent e)
         {
-            lock (Program.ExclusiveLockObject)
+            lock (InstrumentManager.ExclusiveLockObject)
             {
                 foreach (var i in instruments)
                     i.ForEach((dev) => { dev.NotifyMidiEvent(e); });
@@ -204,32 +207,30 @@ namespace zanac.MAmidiMEmo.Instruments
         public static int[][] GetLastOutputBuffer(InstrumentBase inst)
         {
             int[][] retbuf = new int[2][];
-            lock (Program.ExclusiveLockObject)
+            int cnt = 0;
+            lock (InstrumentManager.ExclusiveLockObject)
+                cnt = instruments.Count;
+            uint did = inst == null ? uint.MaxValue : inst.DeviceID;
+            uint un = inst == null ? uint.MaxValue : inst.UnitNumber;
+            try
             {
-                try
-                {
-                    Program.SoundUpdating();
-
-                    copyData(retbuf, "lspeaker", 0, inst);
-                    copyData(retbuf, "rspeaker", 1, inst);
-                }
-                finally
-                {
-                    Program.SoundUpdated();
-                }
+                Program.SoundUpdating();
+                copyData(retbuf, "lspeaker", 0, inst, cnt, did, un);
+                copyData(retbuf, "rspeaker", 1, inst, cnt, did, un);
+            }
+            finally
+            {
+                Program.SoundUpdated();
             }
             return retbuf;
         }
 
-        private static void copyData(int[][] retbuf, string name, int ch, InstrumentBase inst)
+        private static void copyData(int[][] retbuf, string name, int ch, InstrumentBase inst, int cnt, uint did, uint un)
         {
             int num = getLastOutputBufferSamples(name);
             if (num != 0)
             {
-                uint did = inst == null ? uint.MaxValue : inst.DeviceID;
-                uint un = inst == null ? uint.MaxValue : inst.UnitNumber;
-
-                var pbuf = getLastOutputBuffer(name, instruments.Count, did, un);
+                var pbuf = getLastOutputBuffer(name, cnt, did, un);
                 if (pbuf != IntPtr.Zero)
                 {
                     retbuf[ch] = new int[num];

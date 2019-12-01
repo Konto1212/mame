@@ -100,7 +100,7 @@ namespace zanac.MAmidiMEmo.Gui
 
         private void SoundBase_SoundKeyOn(object sender, SoundUpdatedEventArgs e)
         {
-            if (this.IsDisposed)
+            if (!IsHandleCreated || IsDisposed)
                 return;
 
             this.BeginInvoke(new MethodInvoker(() =>
@@ -124,7 +124,7 @@ namespace zanac.MAmidiMEmo.Gui
 
         private void SoundBase_SoundKeyOff(object sender, SoundUpdatedEventArgs e)
         {
-            if (this.IsDisposed)
+            if (!IsHandleCreated || IsDisposed)
                 return;
 
             this.BeginInvoke(new MethodInvoker(() =>
@@ -141,12 +141,13 @@ namespace zanac.MAmidiMEmo.Gui
 
         private void SoundBase_SoundPitchUpdated(object sender, SoundUpdatedEventArgs e)
         {
+            if (!IsHandleCreated || IsDisposed)
+                return;
+
             SoundBase snd = (SoundBase)sender;
             if (snd.IsKeyOff)
                 return;
 
-            if (this.IsDisposed)
-                return;
             this.BeginInvoke(new MethodInvoker(() =>
             {
                 bool fill;

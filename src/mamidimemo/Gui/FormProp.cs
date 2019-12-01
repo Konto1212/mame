@@ -17,11 +17,19 @@ namespace zanac.MAmidiMEmo.Gui
 {
     public partial class FormProp : Form
     {
-        private List<InstrumentBase> instruments;
+        public List<InstrumentBase> Instruments
+        {
+            get;
+            private set;
+        }
 
         private List<TimbreBase> timbres;
 
-        private int timbreNo = 0;
+        public int TimbreNo
+        {
+            get;
+            private set;
+        } = -1;
 
         /// <summary>
         /// 
@@ -39,7 +47,7 @@ namespace zanac.MAmidiMEmo.Gui
         {
             InitializeComponent();
 
-            instruments = new List<InstrumentBase>(insts);
+            Instruments = new List<InstrumentBase>(insts);
             if (timbres != null)
             {
                 this.timbres = new List<TimbreBase>(timbres);
@@ -47,22 +55,22 @@ namespace zanac.MAmidiMEmo.Gui
 
                 for (int i = 0; i < 128; i++)
                 {
-                    if (instruments[0].BaseTimbres[i] == timbres[0])
+                    if (Instruments[0].BaseTimbres[i] == timbres[0])
                     {
-                        timbreNo = i + 1;
+                        TimbreNo = i + 1;
                         break;
                     }
                 }
             }
             else
             {
-                propertyGrid.SelectedObjects = instruments.ToArray();
+                propertyGrid.SelectedObjects = Instruments.ToArray();
             }
 
             setTitle();
 
             toolStripComboBox1.SelectedIndex = 0;
-            toolStripComboBox2.SelectedIndex = timbreNo;
+            toolStripComboBox2.SelectedIndex = TimbreNo;
             if (timbres != null)
             {
                 toolStripComboBox2.Enabled = false;
@@ -79,14 +87,14 @@ namespace zanac.MAmidiMEmo.Gui
         private void setTitle()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var i in instruments)
+            foreach (var i in Instruments)
             {
                 if (sb.Length != 0)
                     sb.Append(", ");
                 sb.Append(i.Name + "(" + i.UnitNumber + ")");
             }
             if (timbres != null)
-                sb.Append(" - Instrument " + timbreNo);
+                sb.Append(" - Instrument " + TimbreNo);
 
             this.Text = sb.ToString();
         }
@@ -98,17 +106,20 @@ namespace zanac.MAmidiMEmo.Gui
         /// <param name="e"></param>
         private void InstrumentManager_InstrumentRemoved(object sender, EventArgs e)
         {
+            if (!IsHandleCreated || IsDisposed)
+                return;
+
             List<InstrumentBase> insts = new List<InstrumentBase>();
             foreach (var inst in InstrumentManager.GetAllInstruments())
             {
-                foreach (var i in instruments)
+                foreach (var i in Instruments)
                 {
                     if (i.DeviceID == inst.DeviceID && i.UnitNumber == inst.UnitNumber)
                         insts.Add(inst);
                 }
             }
 
-            instruments = insts;
+            Instruments = insts;
             propertyGrid.SelectedObjects = insts.ToArray();
             setTitle();
             if (insts.Count == 0)
@@ -122,17 +133,20 @@ namespace zanac.MAmidiMEmo.Gui
         /// <param name="e"></param>
         private void InstrumentManager_InstrumentChanged(object sender, EventArgs e)
         {
+            if (!IsHandleCreated || IsDisposed)
+                return;
+
             List<InstrumentBase> insts = new List<InstrumentBase>();
             foreach (var inst in InstrumentManager.GetAllInstruments())
             {
-                foreach (var i in instruments)
+                foreach (var i in Instruments)
                 {
                     if (i.DeviceID == inst.DeviceID && i.UnitNumber == inst.UnitNumber)
                         insts.Add(inst);
                 }
             }
 
-            instruments = insts;
+            Instruments = insts;
             propertyGrid.SelectedObjects = insts.ToArray();
             setTitle();
             if (insts.Count == 0)
@@ -192,7 +206,7 @@ namespace zanac.MAmidiMEmo.Gui
             }
             else
             {
-                FormProp fp = new FormProp(instruments.ToArray(), timbres);
+                FormProp fp = new FormProp(Instruments.ToArray(), timbres);
                 fp.Show(this);
             }
         }
@@ -235,16 +249,16 @@ namespace zanac.MAmidiMEmo.Gui
             {
                 //Program change
                 var pe = new ProgramChangeEvent((SevenBitNumber)(toolStripComboBox2.SelectedIndex - 1));
-                foreach (var i in instruments)
+                foreach (var i in Instruments)
                     i.NotifyMidiEvent(pe);
             }
-            foreach (var i in instruments)
+            foreach (var i in Instruments)
                 i.NotifyMidiEvent(e);
         }
 
         private void PianoControl1_NoteOff(object sender, NoteOffEvent e)
         {
-            foreach (var i in instruments)
+            foreach (var i in Instruments)
                 i.NotifyMidiEvent(e);
         }
 

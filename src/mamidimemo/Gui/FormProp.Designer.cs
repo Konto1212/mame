@@ -19,8 +19,8 @@
             }
             if (disposing)
             {
-                Instruments.InstrumentManager.InstrumentChanged -= InstrumentManager_InstrumentChanged;
-                Instruments.InstrumentManager.InstrumentRemoved -= InstrumentManager_InstrumentRemoved;
+                MAmidiMEmo.Instruments.InstrumentManager.InstrumentChanged -= InstrumentManager_InstrumentChanged;
+                MAmidiMEmo.Instruments.InstrumentManager.InstrumentRemoved -= InstrumentManager_InstrumentRemoved;
             }
 
             base.Dispose(disposing);

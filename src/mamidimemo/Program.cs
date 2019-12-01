@@ -51,8 +51,6 @@ namespace zanac.MAmidiMEmo
 
         public static event EventHandler ShuttingDown;
 
-        public static object ExclusiveLockObject = new object();
-
 #pragma warning disable CS0414
         /// <summary>
         /// ダミー(遅延Assemblyロード回避)
@@ -179,7 +177,9 @@ namespace zanac.MAmidiMEmo
                 }
 
                 ShuttingDown?.Invoke(typeof(Program), EventArgs.Empty);
-            }));
+            }))
+            { Priority = ThreadPriority.BelowNormal
+            };
             mainThread.SetApartmentState(ApartmentState.STA);
             mainThread.Start();
             threadStart.WaitOne();
