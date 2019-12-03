@@ -131,7 +131,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 9. Changes
 
 0.9.3.0 Added alternate property editor window. That can be popup from toolbar in the Property pane.
-        Added Sound Control Settings feature in Timbre settings. You can link the Sound control MIDI message value with the Timbre property value. (Also VST, too)
+        Added Sound Control Settings feature in Timbre settings. You can link the Sound control MIDI message value with the Timbre property value. (Also VST effects, too)
         Fixed arpeggio algorithm. When last one key is up, the key is not held in hold mode. Otherwise, keep arpeggio.
 		Fixed a slider editor for peoperty value. Exception occured while multiple instruments editing by slider.
 		Fixed VST(unmanaged resource) cleanup code.

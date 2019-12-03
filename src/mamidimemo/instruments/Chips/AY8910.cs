@@ -104,7 +104,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [Description("Set Envelope Fine Frequency")]
         [SlideParametersAttribute(0, 255)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        [DefaultValue((byte)2)]
+        [DefaultValue((byte)0)]
         public byte EnvelopeFrequencyFine
         {
             get => f_EnvelopeFrequencyFine;

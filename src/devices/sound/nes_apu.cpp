@@ -316,8 +316,13 @@ s8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 	** reg3: 7-3=length counter, 2-0=high 3 bits of frequency
 	*/
 
-	if (false == chan->enabled)
+	if (false == chan->enabled) {
+		//HACK: -> prevent noise (mamidimemo)
+		chan->adder = 0;
+		chan->output_vol = 0;
+		//HACK: <-
 		return 0;
+	}
 
 	if (false == chan->counter_started && 0 == (chan->regs[0] & 0x80))
 	{

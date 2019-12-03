@@ -53,7 +53,8 @@ namespace zanac.MAmidiMEmo.Instruments
             periodMs = action(state);
             GetSystemTimeAsFileTime(out lpSystemTimeAsFileTime);
             double nextTime = lpSystemTimeAsFileTime;
-            Thread th = new Thread((object data) =>
+            //Thread th = new Thread((object data) =>
+            Task.Run(() =>
             {
                 using (SafeWaitHandle handle = CreateWaitableTimer(IntPtr.Zero, false, null))
                 {
@@ -65,7 +66,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         SetWaitableTimer(handle, ref dueTime, 0, IntPtr.Zero, IntPtr.Zero, false);
                         WaitForSingleObject(handle, WAIT_TIMEOUT);
                         lock (InstrumentManager.ExclusiveLockObject)
-                            periodMs = action(data);
+                            periodMs = action(state);
                         if (periodMs < 0 || shutDown)
                             break;
                         periodMs *= 1000 * 10;
@@ -75,9 +76,9 @@ namespace zanac.MAmidiMEmo.Instruments
                             nextTime = lpSystemTimeAsFileTime;  // adjust to current time
                     }
                 }
-            })
-            { Priority = ThreadPriority.AboveNormal };
-            th.Start(state);
+            });
+            //{ Priority = ThreadPriority.AboveNormal };
+            //th.Start(state);
         }
 
         private static bool shutDown;

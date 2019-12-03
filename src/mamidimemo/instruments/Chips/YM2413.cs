@@ -440,6 +440,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             private byte lastFreqData;
 
+            private ToneType lastToneType;
+
             /// <summary>
             /// 
             /// </summary>
@@ -453,6 +455,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
 
                 this.timbre = parentModule.Timbres[programNumber];
+                lastToneType = this.timbre.ToneType;
             }
 
             /// <summary>
@@ -486,10 +489,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             public override void OnVolumeUpdated()
             {
                 byte tl = (byte)(15 - (byte)Math.Round(15 * CalcCurrentVolume()));
-                if (timbre.ToneType != ToneType.DrumSet)
+                if (lastToneType != ToneType.DrumSet)
                 {
-                    if (timbre.ToneType != ToneType.DrumSet)
-                        YM2413WriteData(parentModule.UnitNumber, 0x30, Slot, (byte)((int)timbre.ToneType << 4 | tl));
+                    YM2413WriteData(parentModule.UnitNumber, 0x30, Slot, (byte)((int)lastToneType << 4 | tl));
                 }
                 else if (parentModule.RHY == 1)
                 {
@@ -524,7 +526,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <param name="slot"></param>
             public override void OnPitchUpdated()
             {
-                if (timbre.ToneType != ToneType.DrumSet)
+                if (lastToneType != ToneType.DrumSet)
                 {
                     double d = CalcCurrentPitch();
 
@@ -575,11 +577,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     }
                     if (kon != 0)
                     {
-                        Program.SoundUpdating();
-                        YM2413WriteData(parentModule.UnitNumber, 0xe, 0, (byte)(0x20 | (parentModule.lastDrumKeyOn & ~kon)));  //off
                         parentModule.lastDrumKeyOn |= (byte)kon;
                         YM2413WriteData(parentModule.UnitNumber, 0xe, 0, (byte)(0x20 | parentModule.lastDrumKeyOn));  //on
-                        Program.SoundUpdated();
                     }
                 }
 
@@ -591,7 +590,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// </summary>
             public void SetTimbre()
             {
-                if (timbre.ToneType != ToneType.Custom)
+                if (lastToneType != ToneType.Custom)
                     return;
 
                 YM2413Modulator m = timbre.Modulator;
@@ -620,8 +619,37 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 base.SoundOff();
 
-                if (timbre.ToneType != ToneType.DrumSet)
+                if (lastToneType != ToneType.DrumSet)
+                {
                     YM2413WriteData(parentModule.UnitNumber, (byte)(0x20 + Slot), 0, (byte)(timbre.SUS << 5 | lastFreqData & 0x0f));
+                }
+                else if (parentModule.RHY == 1)
+                {
+                    byte kon = 0;
+                    switch (NoteOnEvent.GetNoteName())
+                    {
+                        case NoteName.C:    //BD
+                            kon = 0x10;
+                            break;
+                        case NoteName.D:    //SD
+                            kon = 0x08;
+                            break;
+                        case NoteName.F:    //TOM
+                            kon = 0x04;
+                            break;
+                        case NoteName.FSharp:    //HH
+                            kon = 0x01;
+                            break;
+                        case NoteName.ASharp:    //Symbal
+                            kon = 0x02;
+                            break;
+                    }
+                    if (kon != 0)
+                    {
+                        parentModule.lastDrumKeyOn = (byte)(parentModule.lastDrumKeyOn & ~kon);
+                        YM2413WriteData(parentModule.UnitNumber, 0xe, 0, (byte)(0x20 | parentModule.lastDrumKeyOn));  //off
+                    }
+                }
             }
 
 
@@ -713,6 +741,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Tone type")]
+            [DefaultValue(ToneType.Custom)]
             public ToneType ToneType
             {
                 get
