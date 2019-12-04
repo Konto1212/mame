@@ -311,11 +311,37 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
         private MSM5232SoundManager soundManager;
 
+
+        private const float DEFAULT_GAIN = 2.7f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         public MSM5232(uint unitNumber) : base(unitNumber)
         {
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
+
             Timbres = new MSM5232Timbre[128];
             for (int i = 0; i < 128; i++)
                 Timbres[i] = new MSM5232Timbre();
@@ -552,12 +578,11 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                 if (!timbre.NoiseTone)
                 {
-                    byte noteNum = (byte)NoteOnEvent.NoteNumber;
-
-                    if (noteNum > 0x24)
-                        noteNum -= 24;
-                    else
-                        noteNum = 0;
+                    int nn = (int)NoteOnEvent.NoteNumber;
+                    nn -= 36;
+                    if (nn < 0)
+                        nn = 0;
+                    byte noteNum = (byte)nn;
 
                     MSM5232WriteData(parentModule.UnitNumber, (uint)(Slot + (lastGroup * 4)), (byte)(0x80 | noteNum));
                 }

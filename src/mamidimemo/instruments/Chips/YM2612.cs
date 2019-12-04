@@ -222,7 +222,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
-        private const float DEFAULT_GAIN = 2.0f;
+        private const float DEFAULT_GAIN = 1.0f;
 
         public override bool ShouldSerializeGainLeft()
         {

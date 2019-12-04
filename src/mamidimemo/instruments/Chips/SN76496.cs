@@ -173,11 +173,36 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
         private SN76496SoundManager soundManager;
 
+        private const float DEFAULT_GAIN = 1.1f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         public SN76496(uint unitNumber) : base(unitNumber)
         {
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
+
             Timbres = new SN76496Timbre[128];
             for (int i = 0; i < 128; i++)
                 Timbres[i] = new SN76496Timbre();

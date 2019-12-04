@@ -290,6 +290,28 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+        private const float DEFAULT_GAIN = 0.5f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -309,6 +331,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             FilterMode = FilterMode.LowPass;
             FilterCutoff = 0.9d;
             FilterResonance = 0.1d;
+
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
 
             Timbres = new SIDTimbre[128];
             for (int i = 0; i < 128; i++)

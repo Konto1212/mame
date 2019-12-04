@@ -231,11 +231,36 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
         private SCC1SoundManager soundManager;
 
+        private const float DEFAULT_GAIN = 0.7f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         public SCC1(uint unitNumber) : base(unitNumber)
         {
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
+
             Timbres = new SCC1Timbre[128];
             for (int i = 0; i < 128; i++)
                 Timbres[i] = new SCC1Timbre();

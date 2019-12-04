@@ -40,7 +40,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.graphControl.ByteInstance = null;
-            this.graphControl.Location = new System.Drawing.Point(12, 12);
+            this.graphControl.Location = new System.Drawing.Point(9, 9);
             this.graphControl.Name = "graphControl";
             this.graphControl.ResultOfWsgData = new byte[] {
         ((byte)(0)),
@@ -60,7 +60,7 @@
         ((byte)(14)),
         ((byte)(15))};
             this.graphControl.SbyteInstance = null;
-            this.graphControl.Size = new System.Drawing.Size(485, 357);
+            this.graphControl.Size = new System.Drawing.Size(766, 489);
             this.graphControl.TabIndex = 0;
             this.graphControl.WsgMaxValue = 15;
             // 
@@ -68,7 +68,7 @@
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(422, 400);
+            this.buttonCancel.Location = new System.Drawing.Point(619, 529);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 1;
@@ -79,7 +79,7 @@
             // 
             this.buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonOk.Location = new System.Drawing.Point(341, 400);
+            this.buttonOk.Location = new System.Drawing.Point(700, 529);
             this.buttonOk.Name = "buttonOk";
             this.buttonOk.Size = new System.Drawing.Size(75, 23);
             this.buttonOk.TabIndex = 1;
@@ -90,27 +90,29 @@
             // 
             this.textBoxWsgDataText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxWsgDataText.Location = new System.Drawing.Point(12, 375);
+            this.textBoxWsgDataText.Location = new System.Drawing.Point(9, 504);
             this.textBoxWsgDataText.Name = "textBoxWsgDataText";
-            this.textBoxWsgDataText.Size = new System.Drawing.Size(485, 19);
+            this.textBoxWsgDataText.Size = new System.Drawing.Size(766, 19);
             this.textBoxWsgDataText.TabIndex = 2;
             this.textBoxWsgDataText.TextChanged += new System.EventHandler(this.textBoxWsgDataText_TextChanged);
             // 
             // FormWsgEditor
             // 
             this.AcceptButton = this.buttonOk;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(509, 435);
+            this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.textBoxWsgDataText);
             this.Controls.Add(this.buttonOk);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.graphControl);
+            this.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
             this.MinimizeBox = false;
             this.Name = "FormWsgEditor";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.Text = "WSG Editor";
             this.ResumeLayout(false);
             this.PerformLayout();

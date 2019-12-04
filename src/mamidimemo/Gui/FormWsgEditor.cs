@@ -53,7 +53,7 @@ namespace zanac.MAmidiMEmo.Gui
                 int max = ((1 << graphControl.SbyteInstance.WsgBitWide) - 1) / 2;
                 sbyte[] data = new sbyte[graphControl.SbyteInstance.WsgData.Length];
                 for (int i = 0; i < data.Length; i++)
-                    data[i] = (sbyte)(graphControl.ResultOfWsgData[i] - max);
+                    data[i] = (sbyte)(graphControl.ResultOfWsgData[i] - max - 1);
                 return data;
             }
         }
@@ -147,7 +147,7 @@ namespace zanac.MAmidiMEmo.Gui
                     wsgBitWide = value.WsgBitWide;
                     WsgMaxValue = (1 << wsgBitWide) - 1;
                     for (int i = 0; i < value.WsgData.Length; i++)
-                        ResultOfWsgData[i] = (byte)((int)value.WsgData[i] + (WsgMaxValue / 2));
+                        ResultOfWsgData[i] = (byte)((int)value.WsgData[i] + (WsgMaxValue / 2) + 1);
 
                     updateText();
                 }

@@ -268,11 +268,36 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
         private RP2A03SoundManager soundManager;
 
+        private const float DEFAULT_GAIN = 0.8f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         public RP2A03(uint unitNumber) : base(unitNumber)
         {
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
+
             Timbres = new RP2A03Timbre[128];
             for (int i = 0; i < 128; i++)
                 Timbres[i] = new RP2A03Timbre();
@@ -707,7 +732,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     return;
 
                 double freq = CalcCurrentFrequency();
-                freq = Math.Round(1790000d / (freq * 32)) - 1;
+                freq = Math.Round(1789773d / (freq * 16)) - 1;
                 if (freq > 0x7ff)
                     freq = 0x7ff;
                 var n = (ushort)freq;
@@ -723,7 +748,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     return;
 
                 double freq = CalcCurrentFrequency();
-                freq = Math.Round(1790000d / (freq * 32)) - 1;
+                freq = Math.Round(1789773d / (freq * 32)) - 1;
                 if (freq > 0x7ff)
                     freq = 0x7ff;
                 var n = (ushort)freq;

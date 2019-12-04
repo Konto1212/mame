@@ -264,11 +264,38 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
         private GBSoundManager soundManager;
 
+
+        private const float DEFAULT_GAIN = 0.4f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
         public GB_APU(uint unitNumber) : base(unitNumber)
         {
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
+
             Timbres = new GBAPUTimbre[128];
             for (int i = 0; i < 128; i++)
                 Timbres[i] = new GBAPUTimbre();

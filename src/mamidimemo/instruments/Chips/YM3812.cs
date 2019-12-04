@@ -23,6 +23,7 @@ using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
 //http://www.oplx.com/opl2/docs/adlib_sb.txt
+//ftp://ftp.oldskool.org/pub/drivers/Yamaha/yamaha_ym3812.pdf
 
 namespace zanac.MAmidiMEmo.Instruments.Chips
 {
@@ -218,7 +219,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         }
 
 
-        private const float DEFAULT_GAIN = 2.0f;
+        private const float DEFAULT_GAIN = 1.0f;
 
         public override bool ShouldSerializeGainLeft()
         {
