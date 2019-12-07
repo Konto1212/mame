@@ -64,7 +64,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
         [DataMember]
         [Category("Chip")]
-        [Description("Set PCM clock. 21.333KHz is original clock.")]
+        [Description("Set PCM clock. Original clock is 21.333KHz.")]
         [DefaultValue(C140Clock.Clk_22050Hz)]
         public C140Clock Clock
         {
@@ -582,11 +582,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 uint reg = (uint)(Slot * 16);
                 var vol = CalcCurrentVolume();
-                byte pan = parentModule.Panpots[NoteOnEvent.Channel];
 
-                byte right = (byte)Math.Round(127d * vol * (pan / 127d));
+                int pan = parentModule.Panpots[NoteOnEvent.Channel] - 1;
+                if (pan < 0)
+                    pan = 0;
+
+                //byte right = (byte)Math.Round(127d * vol * (pan / 127d));
+                //byte left = (byte)Math.Round(127d * vol * ((127d - pan) / 127d));
+                byte left = (byte)Math.Round(127d * vol * Math.Cos(Math.PI / 2 * (pan / 126d)));
+                byte right = (byte)Math.Round(127d * vol * Math.Sin(Math.PI / 2 * (pan / 126d)));
                 C140WriteData(parentModule.UnitNumber, (reg + 0), right);
-                byte left = (byte)Math.Round(127d * vol * ((127d - pan) / 127d));
                 C140WriteData(parentModule.UnitNumber, (reg + 1), left);
             }
 

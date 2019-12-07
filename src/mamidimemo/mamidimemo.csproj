@@ -164,6 +164,7 @@
   <ItemGroup>
     <Compile Include="ComponentModel\CacheMemory.cs" />
     <Compile Include="ComponentModel\InstancePropertyInfo.cs" />
+    <Compile Include="ComponentModel\MaskAttribute.cs" />
     <Compile Include="ComponentModel\ToolStripBase.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -178,7 +179,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ComponentModel\SlideParametersAttribute.cs" />
-    <Compile Include="ComponentModel\MaskAttribute.cs" />
+    <Compile Include="ComponentModel\CollectionDefaultValueAttribute.cs" />
     <Compile Include="ComponentModel\DoubleSlideEditor.cs" />
     <Compile Include="ComponentModel\SlideEditor.cs" />
     <Compile Include="ComponentModel\UITypeEditorVstPresetDropDown.cs" />
@@ -228,6 +229,7 @@
     <Compile Include="Instruments\Envelopes\ArpSettings.cs" />
     <Compile Include="Instruments\Envelopes\BasicFxEngine.cs" />
     <Compile Include="Instruments\Envelopes\BasicFxSettings.cs" />
+    <Compile Include="Instruments\GeneralPurposeControlSettings.cs" />
     <Compile Include="Instruments\HighPrecisionTimer.cs" />
     <Compile Include="Instruments\VstEffectControlChangeSettings.cs" />
     <Compile Include="Instruments\SoundControlChangeSettings.cs" />

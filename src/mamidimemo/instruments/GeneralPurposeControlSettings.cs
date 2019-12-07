@@ -16,101 +16,82 @@ namespace zanac.MAmidiMEmo.Instruments
     /// 
     /// </summary>
     [TypeConverter(typeof(CustomExpandableObjectConverter))]
-    [JsonConverter(typeof(NoTypeConverterJsonConverter<SoundControlChangeSettings>))]
+    [JsonConverter(typeof(NoTypeConverterJsonConverter<GeneralPurposeControlSettings>))]
     [DataContract]
     [MidiHook]
-    public class SoundControlChangeSettings : ContextBoundObject
+    public class GeneralPurposeControlSettings : ContextBoundObject
     {
 
         [DataMember]
-        [Description("Sound Control 1(Control Change No.70(0x46))\r\n" +
-            "Link Data Entry message value with the Timbre property value\r\n" +
-            "eg) \"DutyCycle,Volume\" ... You can change DutyCycle and Volume property values dynamically via MIDI Control Change No.70 message.")]
+        [Description("General Purpose Control 1(Control Change No.16(0x10))\r\n" +
+            "Link Data Entry message value with the specified instrument property value (Only the property that has a slider editor)\r\n" +
+            "eg 1) \"GainLeft,GainRight\" ... You can change Gain property values dynamically via MIDI Control Change No.16 message.\r\n" +
+            "eg 2) \"Timbres[0].ALG\" ... You can change Timbre 0 FM synth algorithm values dynamically via MIDI Control Change No.16 message.")]
         [DefaultValue(null)]
-        public string SoundControl1
+        public string GeneralPurposeControl1
         {
             get;
             set;
         }
 
         [DataMember]
-        [Description("Sound Control 2(Control Change No.71(0x47))")]
+        [Description("General Purpose Control 2(Control Change No.17(0x11))")]
         [DefaultValue(null)]
-        public string SoundControl2
+        public string GeneralPurposeControl2
         {
             get;
             set;
         }
 
         [DataMember]
-        [Description("Sound Control 3(Control Change No.72(0x48))")]
+        [Description("General Purpose Control 3(Control Change No.18(0x12))")]
         [DefaultValue(null)]
-        public string SoundControl3
+        public string GeneralPurposeControl3
         {
             get;
             set;
         }
 
         [DataMember]
-        [Description("Sound Control 4(Control Change No.73(0x49))")]
+        [Description("General Purpose Control 4(Control Change No.19(0x13))")]
         [DefaultValue(null)]
-        public string SoundControl4
+        public string GeneralPurposeControl4
         {
             get;
             set;
         }
 
         [DataMember]
-        [Description("Sound Control 5(Control Change No.74(0x4A))")]
+        [Description("General Purpose Control 5(Control Change No.80(0x50))")]
         [DefaultValue(null)]
-        public string SoundControl5
+        public string GeneralPurposeControl5
         {
             get;
             set;
         }
 
         [DataMember]
-        [Description("Sound Control 6(Control Change No.75(0x4B))")]
+        [Description("General Purpose Control 6(Control Change No.81(0x51))")]
         [DefaultValue(null)]
-        public string SoundControl6
-        {
-            get;
-            set;
-        }
-
-        /*
-        [DataMember]
-        [Description("Sound Control 7(Control Change No.76(0x4C))")]
-        [DefaultValue(null)]
-        public string SoundControl7
+        public string GeneralPurposeControl6
         {
             get;
             set;
         }
 
         [DataMember]
-        [Description("Sound Control 8(Control Change No.77(0x4D))")]
+        [Description("General Purpose Control 7(Control Change No.82(0x52))")]
         [DefaultValue(null)]
-        public string SoundControl8
+        public string GeneralPurposeControl7
         {
             get;
             set;
         }
 
         [DataMember]
-        [Description("Sound Control 9(Control Change No.78(0x4E))")]
+        [Description("General Purpose Control 8(Control Change No.83(0x53))")]
         [DefaultValue(null)]
-        public string SoundControl9
-        {
-            get;
-            set;
-        }
-        */
-
-        [DataMember]
-        [Description("Sound Control 10(Control Change No.79(0x4F))")]
-        [DefaultValue(null)]
-        public string SoundControl10
+        public string GeneralPurposeControl8
         {
             get;
             set;
@@ -119,7 +100,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        public SoundControlChangeSettings()
+        public GeneralPurposeControlSettings()
         {
 
         }
@@ -128,27 +109,29 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="timbre"></param>
-        /// <param name="controlNo">1～6,10</param>
+        /// <param name="inst"></param>
+        /// <param name="controlNo">1～8</param>
         /// <returns></returns>
-        public InstancePropertyInfo[] GetPropertyInfo(TimbreBase timbre, int controlNo)
+        public InstancePropertyInfo[] GetPropertyInfo(InstrumentBase inst, int controlNo)
         {
             switch (controlNo)
             {
                 case 1:
-                    return getPropertiesInfo(timbre, SoundControl1);
+                    return getPropertiesInfo(inst, GeneralPurposeControl1);
                 case 2:
-                    return getPropertiesInfo(timbre, SoundControl2);
+                    return getPropertiesInfo(inst, GeneralPurposeControl2);
                 case 3:
-                    return getPropertiesInfo(timbre, SoundControl3);
+                    return getPropertiesInfo(inst, GeneralPurposeControl3);
                 case 4:
-                    return getPropertiesInfo(timbre, SoundControl4);
+                    return getPropertiesInfo(inst, GeneralPurposeControl4);
                 case 5:
-                    return getPropertiesInfo(timbre, SoundControl5);
+                    return getPropertiesInfo(inst, GeneralPurposeControl5);
                 case 6:
-                    return getPropertiesInfo(timbre, SoundControl6);
-                case 10:
-                    return getPropertiesInfo(timbre, SoundControl10);
+                    return getPropertiesInfo(inst, GeneralPurposeControl6);
+                case 7:
+                    return getPropertiesInfo(inst, GeneralPurposeControl7);
+                case 8:
+                    return getPropertiesInfo(inst, GeneralPurposeControl8);
             }
 
             return null;
@@ -159,13 +142,13 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="timbre"></param>
+        /// <param name="inst"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        private InstancePropertyInfo[] getPropertiesInfo(TimbreBase timbre, string propertyNames)
+        private InstancePropertyInfo[] getPropertiesInfo(InstrumentBase inst, string propertyNames)
         {
             List<InstancePropertyInfo> plist = new List<InstancePropertyInfo>();
-            var tt = timbre.GetType();
+            var tt = inst.GetType();
 
             if (!string.IsNullOrWhiteSpace(propertyNames))
             {
@@ -187,7 +170,7 @@ namespace zanac.MAmidiMEmo.Instruments
                         propertyInfoTable.Add(tt, new Dictionary<string, InstancePropertyInfo>());
                     }
 
-                    var pi = getPropertyInfo(timbre, pn);
+                    var pi = getPropertyInfo(inst, pn);
                     if (pi != null)
                     {
                         SlideParametersAttribute attribute =
@@ -226,9 +209,9 @@ namespace zanac.MAmidiMEmo.Instruments
             return plist.ToArray();
         }
 
-        private InstancePropertyInfo getPropertyInfo(TimbreBase timbre, string propertyName)
+        private InstancePropertyInfo getPropertyInfo(InstrumentBase inst, string propertyName)
         {
-            object obj = timbre;
+            object obj = inst;
             object lobj = obj;
 
             // Split property name to parts (propertyName could be hierarchical, like obj.subobj.subobj.property

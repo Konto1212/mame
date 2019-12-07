@@ -174,14 +174,40 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
         }
 
         [DataMember]
-        [Description("VST Effect Control Change System-wide Settings\r\n" +
+        [Description("VST Effect Control Change System-wide Settings  <MIDI 16ch>\r\n" +
     "Link Data Entry message value with the VST property value\r\n" +
     "eg) \"Reverb,Chorus\" ... You can change Reverb and Chorus depth property values dynamically via MIDI Control Change No.9x message.")]
         [DisplayName("VST Effect Control Change System-wide Settings(VECCSS)")]
-        public VstEffectControlChangeSettings VECCSS
+        public VstEffectControlChangeSettings[] VECCSS
         {
             get;
             set;
+        }
+
+        public bool ShouldSerializeVECCSS()
+        {
+            foreach (var dt in VECCSS)
+            {
+                if (dt.VstEffectSoundControl1 != null ||
+                    dt.VstEffectSoundControl2 != null ||
+                    dt.VstEffectSoundControl3 != null ||
+                    dt.VstEffectSoundControl4 != null ||
+                    dt.VstEffectSoundControl5 != null)
+                    return true;
+            }
+            return false;
+        }
+
+        public void ResetVECCSS()
+        {
+            for (int i = 0; i < VECCSS.Length; i++)
+            {
+                VECCSS[i].VstEffectSoundControl1 = null;
+                VECCSS[i].VstEffectSoundControl2 = null;
+                VECCSS[i].VstEffectSoundControl3 = null;
+                VECCSS[i].VstEffectSoundControl4 = null;
+                VECCSS[i].VstEffectSoundControl5 = null;
+            }
         }
 
         private VstPluginContextWrapper OpenPlugin(string pluginPath)
@@ -223,7 +249,7 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
                     ctx.PluginCommandStub.SetSampleRate(Program.CurrentSamplingRate);
                     ctx.PluginCommandStub.MainsChanged(true);
                     ctx.PluginCommandStub.StartProcess();
-                    VECCSS = new VstEffectControlChangeSettings();
+                    initVECCSS();
                     return new VstPluginContextWrapper(ctx);
                 }
             }
@@ -245,7 +271,29 @@ namespace zanac.MAmidiMEmo.Instruments.Vst
         /// </summary>
         public VstPlugin()
         {
-            VECCSS = new VstEffectControlChangeSettings();
+            initVECCSS();
+        }
+
+        private void initVECCSS()
+        {
+            VECCSS = new VstEffectControlChangeSettings[]{
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings(),
+                new VstEffectControlChangeSettings()
+            };
         }
 
         #region IDisposable Support

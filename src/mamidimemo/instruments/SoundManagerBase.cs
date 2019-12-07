@@ -155,6 +155,28 @@ namespace zanac.MAmidiMEmo.Instruments
                             t.OnVolumeUpdated();
                     }
                     break;
+
+                //GPCS
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                    {
+                        int no = midiEvent.ControlNumber - 16 + 1;
+                        ProcessGPCS(midiEvent, no);
+                    }
+                    break;
+                //GPCS
+                case 80:
+                case 81:
+                case 82:
+                case 83:
+                    {
+                        int no = midiEvent.ControlNumber - 80 + 1;
+                        ProcessGPCS(midiEvent, no);
+                    }
+                    break;
+
                 //Sound Control
                 case 70:
                 case 71:
@@ -163,69 +185,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 74:
                 case 75:
                 case 79:
-                    {
-                        var tim = parentModule.BaseTimbres[midiEvent.Channel];
-                        bool process = false;
-                        foreach (var ipi in tim.SCCS.GetPropertyInfo(tim, midiEvent.ControlNumber - 70 + 1))
-                        {
-                            if (ipi != null)
-                            {
-                                var pi = ipi.Property;
-
-                                SlideParametersAttribute attribute =
-                                    Attribute.GetCustomAttribute(pi, typeof(SlideParametersAttribute)) as SlideParametersAttribute;
-                                if (attribute != null)
-                                {
-                                    int len = (attribute.SliderMax - attribute.SliderMin) + 1;
-                                    int val = len * midiEvent.ControlValue / 128;
-
-                                    var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
-                                    pd.SetValue(ipi.Owner, pd.Converter.ConvertFromString(val.ToString()));
-                                    process = true;
-                                }
-                                else
-                                {
-                                    DoubleSlideParametersAttribute dattribute =
-                                        Attribute.GetCustomAttribute(pi, typeof(DoubleSlideParametersAttribute)) as DoubleSlideParametersAttribute;
-                                    if (dattribute != null)
-                                    {
-                                        double len = dattribute.SliderMax - dattribute.SliderMin;
-                                        double val = len * (double)midiEvent.ControlValue / (double)128;
-
-                                        var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
-                                        pd.SetValue(ipi.Owner, pd.Converter.ConvertFromString(val.ToString()));
-                                        process = true;
-                                    }
-                                    else
-                                    {
-                                        if (ipi.Property.PropertyType == typeof(bool))
-                                        {
-                                            var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
-                                            pd.SetValue(ipi.Owner, midiEvent.ControlValue > 63);
-                                            process = true;
-                                        }
-                                        else if (ipi.Property.PropertyType.IsEnum)
-                                        {
-                                            var vals = Enum.GetValues(ipi.Property.PropertyType);
-                                            int val = vals.Length * midiEvent.ControlValue / 128;
-
-                                            var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
-                                            pd.SetValue(ipi.Owner, vals.GetValue(val));
-                                            process = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (process)
-                        {
-                            foreach (var t in AllSounds)
-                            {
-                                if (t.NoteOnEvent.Channel == midiEvent.Channel && t.Timbre == tim)
-                                    t.OnSoundParamsUpdated();
-                            }
-                        }
-                    }
+                    processSCCS(midiEvent);
                     break;
                 case 120:   //All Sounds Off
                 case 123:   //All Note Off
@@ -237,6 +197,135 @@ namespace zanac.MAmidiMEmo.Instruments
                             KeyOff(new NoteOffEvent(snd.NoteOnEvent.NoteNumber, (SevenBitNumber)0) { Channel = snd.NoteOnEvent.Channel });
                         break;
                     }
+            }
+        }
+
+        private void processSCCS(ControlChangeEvent midiEvent)
+        {
+            var tim = parentModule.BaseTimbres[midiEvent.Channel];
+            bool process = false;
+            foreach (var ipi in tim.SCCS.GetPropertyInfo(tim, midiEvent.ControlNumber - 70 + 1))
+            {
+                if (ipi != null)
+                {
+                    var pi = ipi.Property;
+
+                    SlideParametersAttribute attribute =
+                        Attribute.GetCustomAttribute(pi, typeof(SlideParametersAttribute)) as SlideParametersAttribute;
+                    if (attribute != null)
+                    {
+                        int len = (attribute.SliderMax - attribute.SliderMin) + 1;
+                        int val = len * midiEvent.ControlValue / 128;
+
+                        var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                        pd.SetValue(ipi.Owner, pd.Converter.ConvertFromString(val.ToString()));
+                        process = true;
+                    }
+                    else
+                    {
+                        DoubleSlideParametersAttribute dattribute =
+                            Attribute.GetCustomAttribute(pi, typeof(DoubleSlideParametersAttribute)) as DoubleSlideParametersAttribute;
+                        if (dattribute != null)
+                        {
+                            double len = dattribute.SliderMax - dattribute.SliderMin;
+                            double val = len * (double)midiEvent.ControlValue / (double)128;
+
+                            var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                            pd.SetValue(ipi.Owner, pd.Converter.ConvertFromString(val.ToString()));
+                            process = true;
+                        }
+                        else
+                        {
+                            if (ipi.Property.PropertyType == typeof(bool))
+                            {
+                                var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                                pd.SetValue(ipi.Owner, midiEvent.ControlValue > 63);
+                                process = true;
+                            }
+                            else if (ipi.Property.PropertyType.IsEnum)
+                            {
+                                var vals = Enum.GetValues(ipi.Property.PropertyType);
+                                int val = vals.Length * midiEvent.ControlValue / 128;
+
+                                var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                                pd.SetValue(ipi.Owner, vals.GetValue(val));
+                                process = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if (process)
+            {
+                foreach (var t in AllSounds)
+                {
+                    if (t.NoteOnEvent.Channel == midiEvent.Channel && t.Timbre == tim)
+                        t.OnSoundParamsUpdated();
+                }
+            }
+        }
+
+        private void ProcessGPCS(ControlChangeEvent midiEvent, int no)
+        {
+            bool process = false;
+            foreach (var ipi in parentModule.GPCS[midiEvent.Channel].GetPropertyInfo(parentModule, no))
+            {
+                if (ipi != null)
+                {
+                    var pi = ipi.Property;
+
+                    SlideParametersAttribute attribute =
+                        Attribute.GetCustomAttribute(pi, typeof(SlideParametersAttribute)) as SlideParametersAttribute;
+                    if (attribute != null)
+                    {
+                        int len = (attribute.SliderMax - attribute.SliderMin) + 1;
+                        int val = len * midiEvent.ControlValue / 128;
+
+                        var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                        pd.SetValue(ipi.Owner, pd.Converter.ConvertFromString(val.ToString()));
+                        process = true;
+                    }
+                    else
+                    {
+                        DoubleSlideParametersAttribute dattribute =
+                            Attribute.GetCustomAttribute(pi, typeof(DoubleSlideParametersAttribute)) as DoubleSlideParametersAttribute;
+                        if (dattribute != null)
+                        {
+                            double len = dattribute.SliderMax - dattribute.SliderMin;
+                            double val = len * (double)midiEvent.ControlValue / (double)128;
+
+                            var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                            pd.SetValue(ipi.Owner, pd.Converter.ConvertFromString(val.ToString()));
+                            process = true;
+                        }
+                        else
+                        {
+                            if (ipi.Property.PropertyType == typeof(bool))
+                            {
+                                var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                                pd.SetValue(ipi.Owner, midiEvent.ControlValue > 63);
+                                process = true;
+                            }
+                            else if (ipi.Property.PropertyType.IsEnum)
+                            {
+                                var vals = Enum.GetValues(ipi.Property.PropertyType);
+                                int val = vals.Length * midiEvent.ControlValue / 128;
+
+                                var pd = TypeDescriptor.GetProperties(pi.DeclaringType)[pi.Name];
+                                pd.SetValue(ipi.Owner, vals.GetValue(val));
+                                process = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if (process)
+            {
+                foreach (var t in AllSounds)
+                {
+                    if (t.NoteOnEvent.Channel == midiEvent.Channel)
+                        t.OnSoundParamsUpdated();
+                }
             }
         }
 

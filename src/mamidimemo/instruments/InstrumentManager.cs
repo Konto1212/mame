@@ -26,6 +26,12 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private static List<List<InstrumentBase>> instruments = new List<List<InstrumentBase>>();
 
+        public static GeneralPurposeControlSettings GPCS
+        {
+            get;
+            set;
+        } = new GeneralPurposeControlSettings();
+
         /// <summary>
         /// 
         /// </summary>
@@ -186,19 +192,164 @@ namespace zanac.MAmidiMEmo.Instruments
             }
         }
 
+        public static byte[] DataLsb
+        {
+            get;
+        }
+
+        public static byte[] DataMsb
+        {
+            get;
+        }
+
+        public static byte[] NrpnLsb
+        {
+            get;
+        }
+
+        public static byte[] NrpnMsb
+        {
+            get;
+        }
+
+        public static byte[] RpnLsb
+        {
+            get;
+        }
+
+        public static byte[] RpnMsb
+        {
+            get;
+        }
+
+        private static DataEntryType lastDateEntryType;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private enum DataEntryType
+        {
+            None,
+            Nrpn,
+            Rpn
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="midiEvent"></param>
         private static void MidiManager_MidiEventReceived(object sender, MidiEvent e)
         {
             lock (InstrumentManager.ExclusiveLockObject)
             {
+                processCC(e);
+
                 foreach (var i in instruments)
                     i.ForEach((dev) => { dev.NotifyMidiEvent(e); });
             }
         }
+
+        private static void processCC(MidiEvent e)
+        {
+            ControlChangeEvent midiEvent = e as ControlChangeEvent;
+            if (midiEvent != null)
+            {
+                switch (midiEvent.ControlNumber)
+                {
+                    case 6:    //Data Entry MSB
+                        DataMsb[midiEvent.Channel] = midiEvent.ControlValue;
+
+                        switch (lastDateEntryType)
+                        {
+                            case DataEntryType.Nrpn:
+                                processNrpn(midiEvent, null);
+                                break;
+                            case DataEntryType.Rpn:
+                                break;
+                        }
+                        break;
+                    case 38:    //Data Entry LSB
+                        DataLsb[midiEvent.Channel] = midiEvent.ControlValue;
+
+                        switch (lastDateEntryType)
+                        {
+                            case DataEntryType.Nrpn:
+                                processNrpn(null, midiEvent);
+                                break;
+                            case DataEntryType.Rpn:
+                                break;
+                        }
+                        break;
+
+                    case 96:    //Data Increment
+
+                        break;
+
+                    case 97:    //Data Decrement
+
+                        break;
+
+                    case 98:    //NRPN LSB
+                        NrpnLsb[midiEvent.Channel] = midiEvent.ControlValue;
+                        lastDateEntryType = DataEntryType.Nrpn;
+                        break;
+                    case 99:    //NRPN MSB
+                        NrpnMsb[midiEvent.Channel] = midiEvent.ControlValue;
+                        lastDateEntryType = DataEntryType.Nrpn;
+                        break;
+                    case 100:    //RPN LSB
+                        RpnLsb[midiEvent.Channel] = midiEvent.ControlValue;
+                        lastDateEntryType = DataEntryType.Rpn;
+                        break;
+                    case 101:    //RPN MSB
+                        RpnMsb[midiEvent.Channel] = midiEvent.ControlValue;
+                        lastDateEntryType = DataEntryType.Rpn;
+                        break;
+                }
+            }
+        }
+
+        private static void processNrpn(ControlChangeEvent dataMsb, ControlChangeEvent dataLsb)
+        {
+            if (dataMsb != null)
+            {
+                switch (NrpnMsb[dataMsb.Channel])
+                {
+                    case 64:    // Inst Add/Del for Inst
+                        {
+                            break;
+                        }
+                    case 65:    // Ch On/Off for Inst
+                        {
+                            foreach (var inst in InstrumentManager.GetAllInstruments())
+                            {
+                                if (inst.DeviceID == NrpnLsb[dataMsb.Channel])  // for Device ID
+                                {
+                                    if (inst.UnitNumber == DataLsb[dataMsb.Channel])
+                                    {
+                                        for (int i = 0; i < 16; i++)
+                                            inst.Channels[i] = (dataMsb.ControlValue & (1 << i)) != 0;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                }
+            }
+            if (dataLsb != null)
+            {
+                switch (NrpnMsb[dataLsb.Channel])
+                {
+                    case 65:
+                        {
+                            break;
+                        }
+                }
+            }
+        }
+
 
         /// <summary>
         /// 

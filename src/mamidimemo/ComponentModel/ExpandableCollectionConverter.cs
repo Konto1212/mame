@@ -68,10 +68,15 @@ namespace zanac.MAmidiMEmo.ComponentModel
             return true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private class CollectionPropertyDescriptor : SimplePropertyDescriptor
         {
 
             private ITypeDescriptorContext context;
+
+            private object defaultValue;
 
             private int index;
 
@@ -83,11 +88,38 @@ namespace zanac.MAmidiMEmo.ComponentModel
                 }
             }
 
+            public override AttributeCollection Attributes
+            {
+                get
+                {
+                    var attrs = base.Attributes;
+                    List<Attribute> list = new List<Attribute>();
+                    foreach (Attribute attr in attrs)
+                        list.Add(attr);
+
+                    list.Add(new DefaultValueAttribute(defaultValue));
+                    AttributeCollection ac = new AttributeCollection(list.ToArray());
+                    return ac;
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="context"></param>
+            /// <param name="componentType"></param>
+            /// <param name="name"></param>
+            /// <param name="elementType"></param>
+            /// <param name="index"></param>
             public CollectionPropertyDescriptor(ITypeDescriptorContext context, Type componentType, string name, Type elementType, int index)
                 : base(componentType, name, elementType)
             {
                 this.context = context;
                 this.index = index;
+
+                CollectionDefaultValueAttribute datt = (CollectionDefaultValueAttribute)context.PropertyDescriptor.Attributes[typeof(CollectionDefaultValueAttribute)];
+                if(datt != null)
+                    defaultValue = datt.DefaultValue;
             }
 
             public override object GetValue(object component)

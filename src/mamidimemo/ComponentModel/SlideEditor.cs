@@ -61,7 +61,7 @@ namespace zanac.MAmidiMEmo.ComponentModel
             if(int.TryParse(context.PropertyDescriptor.Converter.ConvertToString(value),out result))
                 track.Value = result;
 
-            if(att.SliderDynamicSetValue)
+            if(att != null && att.SliderDynamicSetValue)
                 track.Tag = context;
 
             service.DropDownControl(track);

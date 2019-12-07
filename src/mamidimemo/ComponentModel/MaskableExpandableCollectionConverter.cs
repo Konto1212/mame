@@ -57,6 +57,9 @@ namespace zanac.MAmidiMEmo.ComponentModel
             return true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private class CollectionPropertyDescriptor : SimplePropertyDescriptor
         {
 
@@ -66,11 +69,28 @@ namespace zanac.MAmidiMEmo.ComponentModel
 
             private uint maskValue;
 
+            private object defaultValue;
+
             public override bool IsReadOnly
             {
                 get
                 {
                     return false;
+                }
+            }
+
+            public override AttributeCollection Attributes
+            {
+                get
+                {
+                    var attrs = base.Attributes;
+                    List<Attribute> list = new List<Attribute>();
+                    foreach (Attribute attr in attrs)
+                        list.Add(attr);
+
+                    list.Add(new DefaultValueAttribute(defaultValue));
+                    AttributeCollection ac = new AttributeCollection(list.ToArray());
+                    return ac;
                 }
             }
 
@@ -82,6 +102,14 @@ namespace zanac.MAmidiMEmo.ComponentModel
                 return base.GetEditor(editorBaseType);
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="context"></param>
+            /// <param name="componentType"></param>
+            /// <param name="name"></param>
+            /// <param name="elementType"></param>
+            /// <param name="index"></param>
             public CollectionPropertyDescriptor(ITypeDescriptorContext context, Type componentType, string name, Type elementType, int index)
                 : base(componentType, name, elementType)
             {
@@ -90,6 +118,10 @@ namespace zanac.MAmidiMEmo.ComponentModel
 
                 MaskAttribute att = (MaskAttribute)context.PropertyDescriptor.Attributes[typeof(MaskAttribute)];
                 maskValue = att.MaskValue;
+
+                CollectionDefaultValueAttribute datt = (CollectionDefaultValueAttribute)context.PropertyDescriptor.Attributes[typeof(CollectionDefaultValueAttribute)];
+                if (datt != null)
+                    defaultValue = datt.DefaultValue;
             }
 
             public override object GetValue(object component)
