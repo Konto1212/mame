@@ -39,12 +39,19 @@ namespace zanac.MAmidiMEmo.ComponentModel
             // プロパティ一覧をリフレクションから取得
             Type type = value.GetType();
             List<string> list = new List<string>();
+            List<string> lastlist = new List<string>();
             foreach (PropertyInfo propertyInfo in type.GetProperties())
             {
                 if (propertyInfo.Name.Equals("Enable"))
                     list.Insert(0, propertyInfo.Name);
+                if (propertyInfo.Name.Equals("Memo") || propertyInfo.Name.Equals("SerializeData"))
+                {
+                    lastlist.Add(propertyInfo.Name);
+                    continue;
+                }
                 list.Add(propertyInfo.Name);
             }
+            list.AddRange(lastlist);
             // リフレクションから取得した順でソート
             return pdc.Sort(list.ToArray());
         }
