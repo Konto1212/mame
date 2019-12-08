@@ -320,16 +320,48 @@ namespace zanac.MAmidiMEmo.Instruments
                         {
                             break;
                         }
-                    case 65:    // Ch On/Off for Inst
+                    case 65:    // Ch On/Off for Inst (ch 1-7)
                         {
                             foreach (var inst in InstrumentManager.GetAllInstruments())
                             {
                                 if (inst.DeviceID == NrpnLsb[dataMsb.Channel])  // for Device ID
                                 {
-                                    if (inst.UnitNumber == DataLsb[dataMsb.Channel])
+                                    if (inst.UnitNumber == DataLsb[dataMsb.Channel])    // for Unit No
                                     {
-                                        for (int i = 0; i < 16; i++)
+                                        for (int i = 0; i < 6; i++)
                                             inst.Channels[i] = (dataMsb.ControlValue & (1 << i)) != 0;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    case 66:    // Ch On/Off for Inst (ch 8-14)
+                        {
+                            foreach (var inst in InstrumentManager.GetAllInstruments())
+                            {
+                                if (inst.DeviceID == NrpnLsb[dataMsb.Channel])  // for Device ID
+                                {
+                                    if (inst.UnitNumber == DataLsb[dataMsb.Channel])    // for Unit No
+                                    {
+                                        for (int i = 0; i < 6; i++)
+                                            inst.Channels[i + 6] = (dataMsb.ControlValue & (1 << i)) != 0;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    case 67:    // Ch On/Off for Inst (ch 15-16)
+                        {
+                            foreach (var inst in InstrumentManager.GetAllInstruments())
+                            {
+                                if (inst.DeviceID == NrpnLsb[dataMsb.Channel])  // for Device ID
+                                {
+                                    if (inst.UnitNumber == DataLsb[dataMsb.Channel])    // for Unit No
+                                    {
+                                        for (int i = 0; i < 1; i++)
+                                            inst.Channels[i + 15] = (dataMsb.ControlValue & (1 << i)) != 0;
                                         break;
                                     }
                                 }

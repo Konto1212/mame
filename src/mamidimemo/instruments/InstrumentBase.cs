@@ -1538,36 +1538,16 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 switch (NrpnMsb[dataMsb.Channel])
                 {
-                    case 64:    // Inst On/Off for Inst
-                        {
-                            break;
-                        }
-                    case 65:    // Ch On/Off for Inst
-                        {
-                            foreach (var inst in InstrumentManager.GetAllInstruments())
-                            {
-                                if (inst.DeviceID == NrpnLsb[dataMsb.Channel])  // for Device ID
-                                {
-                                    if (inst.UnitNumber == DataLsb[dataMsb.Channel])
-                                    {
-                                        for (int i = 0; i < 16; i++)
-                                            Channels[i] = (dataMsb.ControlValue & (1 << i)) != 0;
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                        }
+                    default:
+                        break;
                 }
             }
             if (dataLsb != null)
             {
                 switch (NrpnMsb[dataLsb.Channel])
                 {
-                    case 65:
-                        {
-                            break;
-                        }
+                    default:
+                        break;
                 }
             }
         }
