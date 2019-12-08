@@ -1,4 +1,4 @@
-MAmidiMEmo V0.8.1.0 / Itoken (c)2019 / GPL-2.0
+MAmidiMEmo V0.8.3.0 / Itoken (c)2019 / GPL-2.0
 
 *** What is the MAmidiMEmo? ***
 
@@ -27,7 +27,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 1. Launch MAmidiMEmo.exe
 
-   Note: You can change the value of audio latency, sampling rate and audio output interface by modifying the "mame.ini"
+   Note: You can change the value of audio latency, sampling rate and audio output interface by [Tool] menu.
          PortAudio is a low latency sound engine. See http://www.portaudio.com/
 
 2. Select MIDI I/F from toolbar. MAmidiMEmo will recevie MIDI message from the selected MIDI I/F.
@@ -37,8 +37,11 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 3. Add your favorite chips from the [Instruments] menu on the toolbar.
 
    Note: Currently supported chips are the following.
-         YM2151, YM2612, YM3812, YM2413, SN76496, NES APU, MSM5232(+TA7630), NAMCO CUS30, GB APU, SCC, AY-3-8910
-		 SID, C140
+         YM2151, YM2612, YM3812, YM2413,
+		 SID, GB APU, SN76496, NES APU, MSM5232(+TA7630), AY-3-8910
+		 NAMCO CUS30, SCC
+		 C140
+
    Note: You can add the chip up to 8 per same chip type and MAmidiMEmo eats more CPU power.
 
 4. Select the chip from the left pane and configure the chip on the right pane.
@@ -87,31 +90,66 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
    *[Channels]
     Select which MIDI ch messages the chip receives.
 
-5. Play MIDI file by youe favorite sequencer or player.
+5. Play MIDI file by your favorite sequencer or player.
    Of course, you can connect your favrite keyboard to MAmidiMEmo for live performance.
 
    MAmidiMEmo currently supports the following MIDI messages.
 
-    Note on/off and Velocity
-    Program Number
-    Pitch and PitchRange
-    Volume and Expression
-    Panpot
-	Modulation, Modulation Depth, Modulation Range, Modulation Delay
-	Portamento, Portamento Time
-	All Note Off
-	CC#126/127 Mono/Poly mode. Spec is almost same with FITOM.
+    Note On with velocity
+    Note Off
+    Program Change
+	Control Change
+		Pitch and PitchRange
+		Volume and Expression
+		Panpot
+		Modulation, Modulation Depth, Modulation Range, Modulation Delay
+		Portamento, Portamento Time
+		All Note Off, (All Sound Off)
+		CC#126/127 Mono/Poly mode. Spec is almost same with FITOM.
+		Sound Control (for modifying a Timbre properties dynamically)
+		Effect Depth (for modifying a VST properties dynamically)
+		General Purpose Control (for modifying an instrument properties dynamically)
 
 6. Also, you can set the following sound driver settings from Timbre settings.
 
    Arpeggio
    ADSR
-   Effect(Pitch/Volue/Duty macro)
+   Effect (Pitch/Volue/Duty macro)
 
-7. You can modify current timbre parameters via Sound control MIDI Message(70-75,79) dynamically.
-   You can modify VST parameters via Effect Depth control MIDI Message(91-95) dynamically.
+7. You can modify current timbre parameters via Sound control MIDI Message (70-75,79) dynamically.
+   You can modify VST parameters via Effect Depth control MIDI Message (91-95) dynamically.
+   You can modify other parameters via General Purpose control MIDI Message (16-19,80-83) dynamically.
 
-8. (TBD)
+8. You can modify receving MIDI ch for the specific instrument via NRPN MIDI Message.
+
+   NRPN format is the following.
+
+   Bx 63 41
+   Bx 62 <Device ID> ... Specify Device ID of existing instrument.
+   Bx 26 <Unit No>   ... Specify Unit No of the above Device ID of existing instrument.
+   Bx 06 <Receiving MIDI ch(1-7) bit sets. 1=On, 0=Off>
+
+         bit  6  5  4  3  2  1  0
+		  ch  7  6  5  4  3  2  1
+
+   Bx 63 42
+   Bx 62 <Device ID> ... Specify Device ID of existing instrument.
+   Bx 26 <Unit No>   ... Specify Unit No of the above Device ID of existing instrument.
+   Bx 06 <Receiving MIDI ch(8-14) bit sets. 1=On, 0=Off>
+
+         bit  6  5  4  3  2  1  0
+		  ch 14 13 12 11 10  9  8
+
+   Bx 63 43
+   Bx 62 <Device ID> ... Specify Device ID of existing instrument.
+   Bx 26 <Unit No>   ... Specify Unit No of the above Device ID of existing instrument.
+   Bx 06 <Receiving MIDI ch(15-16) bit sets. 1=On, 0=Off>
+
+         bit  6  5  4  3  2  1  0
+          ch xx xx xx xx xx 16 15
+
+
+9. (TBD)
    You can modify current environment and all timbre parameters via System Exclusive MIDI Message.
 
    SysEx format:
@@ -131,11 +169,10 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 9. Changes
 
 0.9.3.0 Added alternate property editor window. That can be popup from toolbar in the Property pane.
-        Added Sound Control Settings feature in Timbre settings. You can link the Sound control MIDI message value with the Timbre property value. (Also VST effects, too)
+        Added Sound Control Settings feature in Timbre settings. You can link the Sound control MIDI message value with the Timbre property value. (Also VST effects and other props, too)
+		Added modifying receving MIDI ch for the specific instrument via NRPN MIDI Message feature. See the section No.8 of this README.
         Fixed arpeggio algorithm. When last one key is up, the key is not held in hold mode. Otherwise, keep arpeggio.
-		Fixed a slider editor for peoperty value. Exception occured while multiple instruments editing by slider.
-		Fixed VST(unmanaged resource) cleanup code.
-		Fixed 2nd AY8910 outputs noise.
+		Fixed 2nd AY8910 outputs noise, C140 panpot gain formula follows GM2 spec, some minor bugs.
 0.8.0.0 Supports piano clicks by mouse. Supports Mono mode(CC#126,CC#127) almost same with FITOM
 0.7.0.0 Added SID, C140 chips, Displays Oscilloscope, Supports VST Effect plugin
 0.6.1.0 Changed to new sound timer engine for perfect sound timing
