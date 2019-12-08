@@ -187,6 +187,9 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 79:
                     processSCCS(midiEvent);
                     break;
+                case 84:
+                    LastNoteNumbers[midiEvent.Channel] = 0x80 | (int)midiEvent.ControlValue;
+                    break;
                 case 120:   //All Sounds Off
                 case 123:   //All Note Off
                     {

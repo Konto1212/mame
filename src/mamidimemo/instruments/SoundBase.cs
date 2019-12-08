@@ -114,11 +114,12 @@ namespace zanac.MAmidiMEmo.Instruments
                 ParentModule.Modulations[NoteOnEvent.Channel] > 0)
                 ModulationEnabled = true;
 
-            if (ParentModule.Portamentos[NoteOnEvent.Channel] >= 64)
+            int ln = ParentManager.GetLastNoteNumber(NoteOnEvent.Channel);
+            if (ParentModule.Portamentos[NoteOnEvent.Channel] >= 64 || ln > 0x80)
             {
-                int ln = ParentManager.GetLastNoteNumber(NoteOnEvent.Channel);
                 if (ln >= 0)
                 {
+                    ln = 0x7f;
                     PortamentoDeltaNoteNumber = ln - NoteOnEvent.NoteNumber;
                     portStartNoteDeltSign = Math.Sign(PortamentoDeltaNoteNumber);
 
