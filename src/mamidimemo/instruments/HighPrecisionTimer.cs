@@ -17,14 +17,14 @@ namespace zanac.MAmidiMEmo.Instruments
         private const int WAIT_TIMEOUT = 120 * 1000;
 
         /// <summary>
-        /// Periodic Action Timer Interval
+        /// Periodic Action Timer Interval[ms]
         /// </summary>
         public const uint TIMER_BASIC_INTERVAL = 5;
 
         /// <summary>
         /// Periodic Action Timer Hz
         /// </summary>
-        public const double TIMER_BASIC_HZ = 1000d / (double)TIMER_BASIC_INTERVAL;
+        public const double TIMER_BASIC_HZ = 1000d / TIMER_BASIC_INTERVAL;
 
         private static MultiMediaTimerComponent multiMediaTimerComponent;
 

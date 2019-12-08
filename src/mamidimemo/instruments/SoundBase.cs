@@ -119,7 +119,7 @@ namespace zanac.MAmidiMEmo.Instruments
             {
                 if (ln >= 0)
                 {
-                    ln = 0x7f;
+                    ln &= 0x7f;
                     PortamentoDeltaNoteNumber = ln - NoteOnEvent.NoteNumber;
                     portStartNoteDeltSign = Math.Sign(PortamentoDeltaNoteNumber);
 
@@ -345,11 +345,26 @@ namespace zanac.MAmidiMEmo.Instruments
             return -1;
         }
 
+        private static double[] PortamentSpeedTable ={
+            1000,301.995172,181.9700859,128.8249552,91.20108394,69.18309709,53.70317964,42.65795188,35.48133892,30.1995172,26.30267992,22.90867653,
+            20.41737945,18.62087137,16.98243652,15.84893192,14.79108388,13.80384265,13.18256739,12.58925412,12.02264435,11.74897555,11.22018454,10.71519305,
+            10.47128548,10,9.54992586,9.332543008,9.120108394,8.7096359,8.511380382,8.128305162,7.943282347,7.58577575,7.244359601,6.918309709,6.60693448,6.309573445,
+            6.025595861,5.754399373,5.495408739,5.248074602,5.12861384,4.897788194,4.677351413,4.466835922,4.265795188,4.073802778,3.89045145,3.715352291,
+            3.548133892,3.388441561,3.235936569,3.090295433,2.951209227,2.818382931,2.691534804,2.570395783,2.454708916,2.398832919,2.290867653,2.187761624,
+            2.089296131,1.995262315,1.905460718,1.819700859,1.737800829,1.659586907,1.621810097,1.548816619,1.479108388,1.412537545,1.348962883,1.318256739,
+            1.258925412,1.202264435,1.148153621,1.096478196,1.071519305,1.023292992,0.977237221,0.933254301,0.891250938,0.851138038,0.812830516,0.776247117,
+            0.72443596,0.691830971,0.660693448,0.630957344,0.602559586,0.575439937,0.549540874,0.52480746,0.489778819,0.467735141,0.446683592,0.426579519,
+            0.407380278,0.389045145,0.371535229,0.354813389,0.338844156,0.323593657,0.309029543,0.295120923,0.281838293,0.26915348,0.257039578,0.239883292,
+            0.229086765,0.213796209,0.204173794,0.190546072,0.177827941,0.165958691,0.151356125,0.138038426,0.125892541,0.112201845,0.097723722,0.083176377,
+            0.069183097,0.054954087,0.042657952,0.031622777,0.020417379,0.01
+        };
+
         private double processPortamento(object state)
         {
             if (!IsDisposed && !IsSoundOff && PortamentoEnabled && PortamentoDeltaNoteNumber != 0)
             {
-                double delta = -portStartNoteDeltSign * 12d / Math.Pow(((double)ParentModule.PortamentoTimes[NoteOnEvent.Channel] / 2d) + 1d, 1.25);
+                //double delta = -portStartNoteDeltSign * 12d / Math.Pow(((double)ParentModule.PortamentoTimes[NoteOnEvent.Channel] / 2d) + 1d, 1.25);
+                double delta = -portStartNoteDeltSign * PortamentSpeedTable[ParentModule.PortamentoTimes[NoteOnEvent.Channel]] * HighPrecisionTimer.TIMER_BASIC_INTERVAL / 100d;
                 PortamentoDeltaNoteNumber += delta;
 
                 if (portStartNoteDeltSign < 0 && PortamentoDeltaNoteNumber >= 0)
