@@ -554,7 +554,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     YM2413WriteData(parentModule.UnitNumber, (byte)(0x20 + Slot), 0, lastFreqData);
                     Program.SoundUpdated();
                 }
-                else if (parentModule.RHY == 1)
+                else if (parentModule.RHY == 1 && !IsKeyOff)
                 {
                     byte kon = 0;
                     switch (NoteOnEvent.GetNoteName())

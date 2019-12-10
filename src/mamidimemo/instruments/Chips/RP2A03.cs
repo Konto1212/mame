@@ -378,6 +378,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             private SoundList<RP2A03Sound> dpcmOnSounds = new SoundList<RP2A03Sound>(1);
 
+            private SoundList<RP2A03Sound> fdsOnSounds = new SoundList<RP2A03Sound>(1);
+
             private RP2A03 parentModule;
 
             /// <summary>
@@ -420,6 +422,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         dpcmOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn DPCM ch" + emptySlot + " " + note.ToString());
                         break;
+                    case ToneType.FDS:
+                        fdsOnSounds.Add(snd);
+                        FormMain.OutputDebugLog("KeyOn FDS ch" + emptySlot + " " + note.ToString());
+                        break;
                 }
                 snd.KeyOn();
 
@@ -456,6 +462,11 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     case ToneType.DPCM:
                         {
                             emptySlot = SearchEmptySlotAndOff(dpcmOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
+                            break;
+                        }
+                    case ToneType.FDS:
+                        {
+                            emptySlot = SearchEmptySlotAndOff(fdsOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             break;
                         }
                 }
@@ -547,7 +558,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             //Volume
                             updateNoiseVolume();
                             //Freq
-                            UpdateNoisePitch();
+                            updateNoisePitch();
 
                             break;
                         }
@@ -582,6 +593,36 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                                 }
                             }
 
+                            break;
+                        }
+                    case ToneType.FDS:
+                        {
+                            //Set WSG
+                            RP2A03WriteData(parentModule.UnitNumber, 0x89, (byte)0x80);
+                            for (int i = 0; i < timbre.FDS.WsgData.Length; i++)
+                                RP2A03WriteData(parentModule.UnitNumber, (uint)(0x40 + i), (byte)(timbre.FDS.WsgData[i]));
+                            RP2A03WriteData(parentModule.UnitNumber, 0x89, (byte)0x03);
+
+                            //Set LFO
+                            if (timbre.FDS.LfoFreq == 0)
+                            {
+                                RP2A03WriteData(parentModule.UnitNumber, 0x87, (byte)0x80);
+                            }
+                            else
+                            {
+                                RP2A03WriteData(parentModule.UnitNumber, 0x84, (byte)(0x80 | timbre.FDS.LfoGain));
+                                RP2A03WriteData(parentModule.UnitNumber, 0x85, (byte)0x00);
+                                RP2A03WriteData(parentModule.UnitNumber, 0x87, (byte)0x87);
+                                for (int i = 0; i < timbre.FDS.LfoData.Length; i++)
+                                    RP2A03WriteData(parentModule.UnitNumber, (uint)(0x88), (byte)(timbre.FDS.LfoData[i]));
+                                RP2A03WriteData(parentModule.UnitNumber, 0x86, (byte)(timbre.FDS.LfoFreq & 0xff));
+                                RP2A03WriteData(parentModule.UnitNumber, 0x87, (byte)((timbre.FDS.LfoFreq >> 8) & 0xf));
+                            }
+
+                            //Volume
+                            updateFdsVolume();
+                            //Freq
+                            updateFdsPitch();
                             break;
                         }
                 }
@@ -622,7 +663,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             //Volume
                             updateNoiseVolume();
                             //Freq
-                            UpdateNoisePitch();
+                            updateNoisePitch();
 
                             break;
                         }
@@ -637,6 +678,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             RP2A03WriteData(parentModule.UnitNumber, (uint)0x10,
                                 (byte)(timbre.DeltaPcmLoopEnable << 6 | timbre.DeltaPcmBitRate));
 
+                            break;
+                        }
+                    case ToneType.FDS:
+                        {
+                            //Volume
+                            updateFdsVolume();
+                            //Freq
+                            updateFdsPitch();
                             break;
                         }
                 }
@@ -657,6 +706,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         break;
                     case ToneType.DPCM:
                         updateDpcmVolume();
+                        break;
+                    case ToneType.FDS:
+                        updateFdsVolume();
                         break;
                 }
             }
@@ -705,6 +757,45 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 RP2A03WriteData(parentModule.UnitNumber, (uint)(0x11), vol);
             }
 
+
+            /// <summary>
+            /// 
+            /// </summary>
+            private void updateFdsVolume()
+            {
+                RP2A03WriteData(parentModule.UnitNumber, 0x80, (byte)0xbf);
+                RP2A03WriteData(parentModule.UnitNumber, 0x89, calcFdsVol());
+            }
+
+            private byte calcFdsVol()
+            {
+                var cv = CalcCurrentVolume();
+                if (cv > 0.4 - 0.2)
+                {
+                    byte fv = 3;
+                    if (cv > 0.5 - 0.05)
+                    {
+                        if (cv > 0.6666666666666667 - 0.0833333333333333)
+                        {
+                            if (cv > 1.0 - 0.1666666666666667)
+                                fv = 0;
+                            else
+                                fv = 1;
+                        }
+                        else
+                        {
+                            fv = 2;
+                        }
+                    }
+                    return fv;
+                }
+                else
+                {
+                    return 4;   //HACK:
+                }
+            }
+
+
             /// <summary>
             /// 
             /// </summary>
@@ -719,7 +810,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         updateTriPitch();
                         break;
                     case ToneType.NOISE:
-                        UpdateNoisePitch();
+                        updateNoisePitch();
+                        break;
+                    case ToneType.FDS:
+                        updateFdsPitch();
                         break;
                 }
 
@@ -758,7 +852,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Program.SoundUpdated();
             }
 
-            public void UpdateNoisePitch()
+            private void updateNoisePitch()
             {
                 if (IsSoundOff)
                     return;
@@ -776,6 +870,22 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Program.SoundUpdating();
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x02), (byte)((nt << 7) | (n & 0xf)));
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((3 * 4) + 0x03), (byte)(timbre.PlayLength << 3));
+                Program.SoundUpdated();
+            }
+
+            private void updateFdsPitch()
+            {
+                if (IsSoundOff)
+                    return;
+                double freq = CalcCurrentFrequency();
+                // p = 65536 * f / 1789773d
+                freq = Math.Round(64 * 65536 * freq / 1789773d);
+                if (freq > 0x7ff)
+                    freq = 0x7ff;
+                var n = (ushort)freq;
+                Program.SoundUpdating();
+                RP2A03WriteData(parentModule.UnitNumber, 0x82, (byte)(n & 0xff));
+                RP2A03WriteData(parentModule.UnitNumber, 0x83, (byte)((n >> 8) & 0x7));
                 Program.SoundUpdated();
             }
 
@@ -803,6 +913,11 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                             byte data = (byte)(RP2A03ReadData(parentModule.UnitNumber, 0x15) & ~8);
                             RP2A03WriteData(parentModule.UnitNumber, 0x15, data);
+                            break;
+                        }
+                    case ToneType.FDS:
+                        {
+                            RP2A03WriteData(parentModule.UnitNumber, 0x83, 0xc0);
                             break;
                         }
                 }
@@ -1045,6 +1160,15 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
             }
 
+            [DataMember]
+            [Category("Sound(FDS)")]
+            [Description("FDS Tone Settings")]
+            public FdsSettings FDS
+            {
+                get;
+                set;
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -1052,6 +1176,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 SQSweep = new SQSweepSettings();
                 SDS.FxS = new NesFxSettings();
+                FDS = new FdsSettings();
             }
 
             /// <summary>
@@ -1078,6 +1203,203 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
 
         }
+
+
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<FdsSettings>))]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [DataContract]
+        [MidiHook]
+        public class FdsSettings : ContextBoundObject
+        {
+
+            private byte[] f_WsgData = new byte[64];
+
+            [TypeConverter(typeof(ArrayConverter))]
+            [Editor(typeof(WsgITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [WsgBitWideAttribute(6)]
+            [DataMember]
+            [Category("Sound(FDS)")]
+            [Description("Wave Table (64 samples, 0-63 levels)")]
+            public byte[] WsgData
+            {
+                get
+                {
+                    return f_WsgData;
+                }
+                set
+                {
+                    f_WsgData = value;
+                }
+            }
+
+            public bool ShouldSerializeWsgData()
+            {
+                foreach (var dt in WsgData)
+                {
+                    if (dt != 0)
+                        return true;
+                }
+                return false;
+            }
+
+            public void ResetWsgData()
+            {
+                f_WsgData = new byte[64];
+            }
+
+            [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+            typeof(UITypeEditor)), Localizable(false)]
+            [Category("Sound(FDS)")]
+            [Description("FDS Wave Table (64 samples, 0-63 levels)")]
+            [IgnoreDataMember]
+            [JsonIgnore]
+            public string WsgDataSerializeData
+            {
+                get
+                {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < WsgData.Length; i++)
+                    {
+                        if (sb.Length != 0)
+                            sb.Append(' ');
+                        sb.Append(WsgData[i].ToString((IFormatProvider)null));
+                    }
+                    return sb.ToString();
+                }
+                set
+                {
+                    string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    List<byte> vs = new List<byte>();
+                    foreach (var val in vals)
+                    {
+                        byte v = 0;
+                        if (byte.TryParse(val, out v))
+                            vs.Add(v);
+                    }
+                    for (int i = 0; i < Math.Min(WsgData.Length, vs.Count); i++)
+                        WsgData[i] = vs[i] > 63 ? (byte)63 : vs[i];
+                }
+            }
+
+            private uint f_LfoFreq;
+
+            [DataMember]
+            [Category("Sound(FDS)")]
+            [Description("FDS LFO Frequency(0 - 4095)")]
+            [SlideParametersAttribute(0, 4095)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
+            public uint LfoFreq
+            {
+                get
+                {
+                    return f_LfoFreq;
+                }
+                set
+                {
+                    f_LfoFreq = (uint)(value & 4095);
+                }
+            }
+
+
+            private uint f_LfoGain;
+
+            [DataMember]
+            [Category("Sound(FDS)")]
+            [Description("FDS LFO Gain(0 - 63)")]
+            [SlideParametersAttribute(0, 63)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
+            public uint LfoGain
+            {
+                get
+                {
+                    return f_LfoGain;
+                }
+                set
+                {
+                    f_LfoGain = (uint)(value & 63);
+                }
+            }
+
+            private sbyte[] f_LfoData = new sbyte[32];
+
+            [TypeConverter(typeof(ArrayConverter))]
+            [Editor(typeof(WsgITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [WsgBitWideAttribute(3)]
+            [DataMember]
+            [Category("Sound(FDS)")]
+            [Description("FDS LFO Table (32 steps, 0-7 levels)")]
+            public sbyte[] LfoData
+            {
+                get
+                {
+                    return f_LfoData;
+                }
+                set
+                {
+                    f_LfoData = value;
+                }
+            }
+
+            public bool ShouldSerializeLfoData()
+            {
+                foreach (var dt in LfoData)
+                {
+                    if (dt != 0)
+                        return true;
+                }
+                return false;
+            }
+
+            public void ResetLfoData()
+            {
+                f_LfoData = new sbyte[32];
+            }
+
+            [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+            typeof(UITypeEditor)), Localizable(false)]
+            [Category("Sound(FDS)")]
+            [Description("FDS LFO Table (32 steps, 0-7 levels)")]
+            [IgnoreDataMember]
+            [JsonIgnore]
+            public string LfoDataSerializeData
+            {
+                get
+                {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < LfoData.Length; i++)
+                    {
+                        if (sb.Length != 0)
+                            sb.Append(' ');
+                        sb.Append(LfoData[i].ToString((IFormatProvider)null));
+                    }
+                    return sb.ToString();
+                }
+                set
+                {
+                    string[] vals = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    var vs = new List<sbyte>();
+                    foreach (var val in vals)
+                    {
+                        sbyte v = 0;
+                        if (sbyte.TryParse(val, out v))
+                            vs.Add(v);
+                    }
+                    for (int i = 0; i < Math.Min(WsgData.Length, vs.Count); i++)
+                    {
+                        var val = vs[i];
+                        if (val > 3)
+                            val = 3;
+                        else if (val < -4)
+                            val = -4;
+                        LfoData[i] = val;
+                    }
+                }
+            }
+
+        }
+
 
         [JsonConverter(typeof(NoTypeConverterJsonConverter<NesFxSettings>))]
         [TypeConverter(typeof(CustomExpandableObjectConverter))]
@@ -1349,6 +1671,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             TRIANGLE,
             NOISE,
             DPCM,
+            FDS,
         }
 
         /// <summary>

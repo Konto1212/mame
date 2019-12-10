@@ -163,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\CacheMemory.cs" />
+    <Compile Include="Gui\WsgBitWideAttribute.cs" />
     <Compile Include="ComponentModel\InstancePropertyInfo.cs" />
     <Compile Include="ComponentModel\MaskAttribute.cs" />
     <Compile Include="ComponentModel\ToolStripBase.cs">
@@ -269,7 +270,6 @@
     <Compile Include="Gui\FormSettings.Designer.cs">
       <DependentUpon>FormSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Gui\IWsgEditorSbyteCapable.cs" />
     <Compile Include="Gui\PcmTableEditorAttribute.cs" />
     <Compile Include="Gui\WsgITypeEditor.cs" />
     <Compile Include="Gui\PcmTableUITypeEditor.cs" />
@@ -281,7 +281,6 @@
     </Compile>
     <Compile Include="Instruments\InstrumentBase.cs" />
     <Compile Include="Instruments\InstrumentManager.cs" />
-    <Compile Include="Gui\IWsgEditorByteCapable.cs" />
     <Compile Include="Instruments\InstrumentType.cs" />
     <Compile Include="Instruments\PcmTimbreBase.cs" />
     <Compile Include="Instruments\PcmTimbreTableBase.cs" />

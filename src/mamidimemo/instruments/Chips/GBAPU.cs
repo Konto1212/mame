@@ -839,7 +839,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// </summary>
         [JsonConverter(typeof(NoTypeConverterJsonConverter<GBAPUTimbre>))]
         [DataContract]
-        public class GBAPUTimbre : TimbreBase, IWsgEditorByteCapable
+        public class GBAPUTimbre : TimbreBase 
         {
             [DataMember]
             [Category("Sound")]
@@ -1038,24 +1038,11 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            [Browsable(false)]
-            [IgnoreDataMember]
-            [JsonIgnore]
-            public byte WsgBitWide
-            {
-                get
-                {
-                    return 4;
-                }
-            }
-
             private byte[] f_wavedata = new byte[32];
 
             [TypeConverter(typeof(ArrayConverter))]
             [Editor(typeof(WsgITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [WsgBitWideAttribute(4)]
             [DataMember]
             [Category("Sound")]
             [Description("Wave Table (32 samples, 0-15 levels)")]

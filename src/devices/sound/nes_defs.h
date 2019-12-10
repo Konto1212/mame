@@ -124,6 +124,61 @@ struct apu_t
 		signed char vol = 0;
 	};
 
+	struct	fds_t {
+		fds_t()
+		{
+			for (auto & elem : reg)
+				elem = 0;
+			for (auto & elem : main_wavetable)
+				elem = 0;
+			for (auto & elem : lfo_wavetable)
+				elem = 0;
+			for (auto & elem : output_buf)
+				elem = 0;
+		}
+
+		uint8	reg[0x80];
+
+		uint8	volenv_mode;		// Volume Envelope
+		uint8	volenv_gain;
+		uint8	volenv_decay;
+		double	volenv_phaseacc;
+
+		uint8	swpenv_mode;		// Sweep Envelope
+		uint8	swpenv_gain;
+		uint8	swpenv_decay;
+		double	swpenv_phaseacc;
+
+		// For envelope unit
+		uint8	envelope_enable;	// $4083 bit6
+		uint8	envelope_speed;		// $408A
+
+									// For $4089
+		uint8	wave_setup;		// bit7
+		int	master_volume;		// bit1-0
+
+								// For Main unit
+		int	main_wavetable[64];
+		uint8	main_enable;
+		int	main_frequency;
+		int	main_addr;
+
+		// For Effector(LFO) unit
+		uint8	lfo_wavetable[64];
+		uint8	lfo_enable;		// 0:Enable 1:Wavetable setup
+		int	lfo_frequency;
+		int	lfo_addr;
+		double	lfo_phaseacc;
+
+		// For Sweep unit
+		int	sweep_bias;
+
+		// Misc
+		int	now_volume;
+		int	now_freq;
+		int	output;
+		int	output_buf[8];
+	};
 
 	/* REGISTER DEFINITIONS */
 	static constexpr unsigned WRA0    = 0x00;
@@ -161,9 +216,10 @@ struct apu_t
 	triangle_t tri;
 	noise_t    noi;
 	dpcm_t     dpcm;
+	fds_t     fds;
 
 	/* APU registers */
-	unsigned char regs[0x18];
+	unsigned char regs[0xff];
 
 	/* Sound pointers */
 	void *buffer = nullptr;

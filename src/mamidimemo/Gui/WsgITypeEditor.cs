@@ -54,23 +54,24 @@ namespace zanac.MAmidiMEmo.Gui
             if (editorService == null)
                 return value;
 
-            var byteObj = context.Instance as IWsgEditorByteCapable;
-            var sbyteObj = context.Instance as IWsgEditorSbyteCapable;
+            WsgBitWideAttribute watt = (WsgBitWideAttribute)context.PropertyDescriptor.Attributes[typeof(WsgBitWideAttribute)];
 
             using (FormWsgEditor frm = new FormWsgEditor())
             {
-                if (byteObj != null)
-                    frm.ByteInstance = byteObj;
-                if (sbyteObj != null)
-                    frm.SbyteInstance = sbyteObj;
+                frm.WsgBitWide = watt.BitWide;
+
+                if(value.GetType() == typeof(byte[]))
+                    frm.ByteWsgData = (byte[])value;
+                else if (value.GetType() == typeof(sbyte[]))
+                    frm.SbyteWsgData = (sbyte[])value;
 
                 DialogResult dr = frm.ShowDialog();
                 if (dr == DialogResult.OK)
                 {
-                    if (byteObj != null)
-                        byteObj.WsgData = frm.ByteWsgData;
-                    if (sbyteObj != null)
-                        sbyteObj.WsgData = frm.SbyteWsgData;
+                    if (value.GetType() == typeof(byte[]))
+                        value = frm.ByteWsgData;
+                    else if (value.GetType() == typeof(sbyte[]))
+                        value = frm.SbyteWsgData;
                 }
             }
             return value;

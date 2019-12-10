@@ -13,30 +13,20 @@ namespace zanac.MAmidiMEmo.Gui
     public partial class FormWsgEditor : Form
     {
 
-        public IWsgEditorByteCapable ByteInstance
+        public int WsgBitWide
         {
             get
             {
-                return graphControl.ByteInstance;
+                return graphControl.WsgBitWide;
             }
             set
             {
-                graphControl.ByteInstance = value;
+                graphControl.WsgBitWide = value;
+                f_WsgMaxValue = (1 << WsgBitWide) - 1;
             }
         }
 
-        public IWsgEditorSbyteCapable SbyteInstance
-        {
-            get
-            {
-                return graphControl.SbyteInstance;
-            }
-            set
-            {
-                graphControl.SbyteInstance = value;
-            }
-        }
-
+        private int f_WsgMaxValue = 15;
 
         public byte[] ByteWsgData
         {
@@ -44,17 +34,29 @@ namespace zanac.MAmidiMEmo.Gui
             {
                 return graphControl.ResultOfWsgData;
             }
+            set
+            {
+                graphControl.ResultOfWsgData = value;
+            }
         }
 
         public sbyte[] SbyteWsgData
         {
             get
             {
-                int max = ((1 << graphControl.SbyteInstance.WsgBitWide) - 1) / 2;
-                sbyte[] data = new sbyte[graphControl.SbyteInstance.WsgData.Length];
+                int max = ((1 << WsgBitWide) - 1) / 2;
+                sbyte[] data = new sbyte[graphControl.ResultOfWsgData.Length];
                 for (int i = 0; i < data.Length; i++)
                     data[i] = (sbyte)(graphControl.ResultOfWsgData[i] - max - 1);
                 return data;
+            }
+            set
+            {
+                byte[] td = new byte[value.Length];
+                for (int i = 0; i < value.Length; i++)
+                    td[i] = (byte)((int)value[i] + (f_WsgMaxValue / 2) + 1);
+
+                graphControl.ResultOfWsgData = td;
             }
         }
 
@@ -72,9 +74,7 @@ namespace zanac.MAmidiMEmo.Gui
         private class GraphControl : UserControl
         {
 
-            private IWsgEditorByteCapable f_ByteInstance;
-
-            private byte[] f_ResultOfWsgData = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+            private byte[] f_ResultOfWsgData;
 
             public byte[] ResultOfWsgData
             {
@@ -84,74 +84,31 @@ namespace zanac.MAmidiMEmo.Gui
                 }
                 set
                 {
-                    f_ResultOfWsgData = value;
+                    f_ResultOfWsgData = new byte[value.Length];
+                    Array.Copy(value, f_ResultOfWsgData, value.Length);
+                    wsgLen = f_ResultOfWsgData.Length;
+                    updateText();
                 }
             }
 
-            private int wsgLen = 16;
+            private int wsgLen;
 
-            private int wsgBitWide = 4;
+            private int f_WsgBitWide = 4;
+
+            public int WsgBitWide
+            {
+                get
+                {
+                    return f_WsgBitWide;
+                }
+                set
+                {
+                    f_WsgBitWide = value;
+                    f_WsgMaxValue = (1 << WsgBitWide) - 1;
+                }
+            }
 
             private int f_WsgMaxValue = 15;
-
-            public int WsgMaxValue
-            {
-                get
-                {
-                    return f_WsgMaxValue;
-                }
-                set
-                {
-                    f_WsgMaxValue = value;
-                }
-            }
-
-            public IWsgEditorByteCapable ByteInstance
-            {
-                get
-                {
-                    return f_ByteInstance;
-                }
-                set
-                {
-                    if (value == null)
-                        return;
-
-                    f_ByteInstance = value;
-                    ResultOfWsgData = new byte[value.WsgData.Length];
-                    Array.Copy(value.WsgData, ResultOfWsgData, value.WsgData.Length);
-                    wsgLen = ResultOfWsgData.Length;
-                    wsgBitWide = value.WsgBitWide;
-                    WsgMaxValue = (1 << wsgBitWide) - 1;
-
-                    updateText();
-                }
-            }
-
-            private IWsgEditorSbyteCapable f_SbyteInstance;
-
-            public IWsgEditorSbyteCapable SbyteInstance
-            {
-                get
-                {
-                    return f_SbyteInstance;
-                }
-                set
-                {
-                    if (value == null)
-                        return;
-
-                    f_SbyteInstance = value;
-                    ResultOfWsgData = new byte[value.WsgData.Length];
-                    wsgLen = ResultOfWsgData.Length;
-                    wsgBitWide = value.WsgBitWide;
-                    WsgMaxValue = (1 << wsgBitWide) - 1;
-                    for (int i = 0; i < value.WsgData.Length; i++)
-                        ResultOfWsgData[i] = (byte)((int)value.WsgData[i] + (WsgMaxValue / 2) + 1);
-
-                    updateText();
-                }
-            }
 
             private void updateText()
             {
@@ -193,7 +150,7 @@ namespace zanac.MAmidiMEmo.Gui
                 Graphics g = e.Graphics;
                 Size sz = this.ClientSize;
                 Size dotSz = Size.Empty;
-                dotSz = new Size(sz.Width / wsgLen, sz.Height / (WsgMaxValue + 1));
+                dotSz = new Size(sz.Width / wsgLen, sz.Height / (f_WsgMaxValue + 1));
 
                 //fill bg
                 using (SolidBrush sb = new SolidBrush(Color.Black))
@@ -208,9 +165,9 @@ namespace zanac.MAmidiMEmo.Gui
                             Pen dp = x + 1 == wsgLen / 2 ? pen2 : pen;
                             g.DrawLine(dp, (x * dotSz.Width) + dotSz.Width - 1, 0, (x * dotSz.Width) + dotSz.Width - 1, sz.Height);
                         }
-                        for (int y = 0; y < (WsgMaxValue + 1); y++)
+                        for (int y = 0; y < (f_WsgMaxValue + 1); y++)
                         {
-                            Pen dp = y + 1 == (WsgMaxValue + 1) / 2 ? pen2 : pen;
+                            Pen dp = y + 1 == (f_WsgMaxValue + 1) / 2 ? pen2 : pen;
                             g.DrawLine(dp,
                                 0, sz.Height - ((y * dotSz.Height) + dotSz.Height),
                                 sz.Width, sz.Height - ((y * dotSz.Height) + dotSz.Height));
@@ -255,26 +212,15 @@ namespace zanac.MAmidiMEmo.Gui
                 if (e.Button != MouseButtons.Left)
                     return;
 
-                int len = 0;
-                int bw = 0;
-                if (ByteInstance != null)
-                {
-                    len = ByteInstance.WsgData.Length;
-                    bw = ByteInstance.WsgBitWide;
-                }
-                else if (SbyteInstance != null)
-                {
-                    len = SbyteInstance.WsgData.Length;
-                    bw = SbyteInstance.WsgBitWide;
-                }
+                int len = ResultOfWsgData.Length;
 
                 Size sz = this.ClientSize;
                 Point pt = e.Location;
-                Size dotSz = new Size(sz.Width / len, sz.Height / (WsgMaxValue + 1));
+                Size dotSz = new Size(sz.Width / len, sz.Height / (f_WsgMaxValue + 1));
 
                 Point wxv = new Point(pt.X / dotSz.Width, (sz.Height - pt.Y) / dotSz.Height);
 
-                if (0 <= wxv.X & wxv.X < len && 0 <= wxv.Y && wxv.Y <= WsgMaxValue)
+                if (0 <= wxv.X & wxv.X < len && 0 <= wxv.Y && wxv.Y <= f_WsgMaxValue)
                 {
                     if (ResultOfWsgData[wxv.X] != (byte)wxv.Y)
                     {
@@ -309,7 +255,7 @@ namespace zanac.MAmidiMEmo.Gui
             }
 
             for (int i = 0; i < Math.Min(ByteWsgData.Length, vs.Count); i++)
-                ByteWsgData[i] = vs[i] > graphControl.WsgMaxValue ? (byte)graphControl.WsgMaxValue : vs[i];
+                ByteWsgData[i] = vs[i] > f_WsgMaxValue ? (byte)f_WsgMaxValue : vs[i];
 
             graphControl.Invalidate();
         }

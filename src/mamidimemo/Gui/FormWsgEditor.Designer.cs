@@ -39,30 +39,10 @@
             this.graphControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.graphControl.ByteInstance = null;
             this.graphControl.Location = new System.Drawing.Point(9, 9);
             this.graphControl.Name = "graphControl";
-            this.graphControl.ResultOfWsgData = new byte[] {
-        ((byte)(0)),
-        ((byte)(1)),
-        ((byte)(2)),
-        ((byte)(3)),
-        ((byte)(4)),
-        ((byte)(5)),
-        ((byte)(6)),
-        ((byte)(7)),
-        ((byte)(8)),
-        ((byte)(9)),
-        ((byte)(10)),
-        ((byte)(11)),
-        ((byte)(12)),
-        ((byte)(13)),
-        ((byte)(14)),
-        ((byte)(15))};
-            this.graphControl.SbyteInstance = null;
             this.graphControl.Size = new System.Drawing.Size(766, 489);
             this.graphControl.TabIndex = 0;
-            this.graphControl.WsgMaxValue = 15;
             // 
             // buttonCancel
             // 

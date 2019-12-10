@@ -10,23 +10,21 @@ namespace zanac.MAmidiMEmo.Gui
     /// <summary>
     /// 
     /// </summary>
-    public interface IWsgEditorByteCapable
+    public class WsgBitWideAttribute : Attribute
     {
-        byte WsgBitWide
+        /// <summary>
+        /// 
+        /// </summary>
+        public int BitWide
         {
             get;
+            private set;
         }
 
-        byte[] WsgData
+        public WsgBitWideAttribute(int bitWide)
         {
-            get;
-            set;
+            BitWide = bitWide;
         }
 
-        string WsgDataSerializeData
-        {
-            get;
-            set;
-        }
     }
 }

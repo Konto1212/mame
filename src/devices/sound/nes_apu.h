@@ -87,7 +87,9 @@ private:
 	s8 apu_triangle(apu_t::triangle_t *chan);
 	s8 apu_noise(apu_t::noise_t *chan);
 	s8 apu_dpcm(apu_t::dpcm_t *chan);
+	s8 apu_fds(apu_t::fds_t *chan);
 	inline void apu_regwrite(int address, u8 value);
+	inline void apu_regwrite_fds(int address, u8 value);
 };
 
 DECLARE_DEVICE_TYPE(NES_APU, nesapu_device)

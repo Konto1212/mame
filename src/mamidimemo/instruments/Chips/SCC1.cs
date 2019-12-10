@@ -479,26 +479,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// </summary>
         [JsonConverter(typeof(NoTypeConverterJsonConverter<SCC1Timbre>))]
         [DataContract]
-        public class SCC1Timbre : TimbreBase, IWsgEditorSbyteCapable
+        public class SCC1Timbre : TimbreBase
         {
-            /// <summary>
-            /// 
-            /// </summary>
-            [Browsable(false)]
-            [IgnoreDataMember]
-            [JsonIgnore]
-            public byte WsgBitWide
-            {
-                get
-                {
-                    return 8;
-                }
-            }
 
             private sbyte[] f_wavedata = new sbyte[32];
 
             [TypeConverter(typeof(ArrayConverter))]
             [Editor(typeof(WsgITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [WsgBitWideAttribute(8)]
             [DataMember]
             [Category("Sound")]
             [Description("Wave Table (32 samples, 8 bit signed data)")]

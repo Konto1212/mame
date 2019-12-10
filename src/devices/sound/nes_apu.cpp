@@ -132,6 +132,7 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 void nesapu_device::device_reset()
 {
 	write(0x15, 0x00);
+	memset(&m_APU.fds, 0, sizeof(m_APU.fds));
 }
 
 void nesapu_device::device_clock_changed()
@@ -513,6 +514,143 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 	return (s8)(chan->vol);
 }
 
+s8 nesapu_device::apu_fds(apu_t::fds_t *fds)
+{
+	int sampling_rate = clock() / 4;
+	// Envelope unit
+	if (fds->envelope_enable && fds->envelope_speed) {
+		// Volume envelope
+		if (fds->volenv_mode < 2) {
+			double	decay = ((double)fds->envelope_speed * (double)(fds->volenv_decay + 1) * (double)sampling_rate) / (232.0*960.0);
+			fds->volenv_phaseacc -= 1.0;
+			while (fds->volenv_phaseacc < 0.0) {
+				fds->volenv_phaseacc += decay;
+
+				if (fds->volenv_mode == 0) {
+					// 減少モード
+					if (fds->volenv_gain)
+						fds->volenv_gain--;
+				}
+				else
+					if (fds->volenv_mode == 1) {
+						if (fds->volenv_gain < 0x20)
+							fds->volenv_gain++;
+					}
+			}
+		}
+
+		// Sweep envelope
+		if (fds->swpenv_mode < 2) {
+			double	decay = ((double)fds->envelope_speed * (double)(fds->swpenv_decay + 1) * (double)sampling_rate) / (232.0*960.0);
+			fds->swpenv_phaseacc -= 1.0;
+			while (fds->swpenv_phaseacc < 0.0) {
+				fds->swpenv_phaseacc += decay;
+
+				if (fds->swpenv_mode == 0) {
+					// 減少モード
+					if (fds->swpenv_gain)
+						fds->swpenv_gain--;
+				}
+				else
+					if (fds->swpenv_mode == 1) {
+						if (fds->swpenv_gain < 0x20)
+							fds->swpenv_gain++;
+					}
+			}
+		}
+	}
+
+	// Effector(LFO) unit
+	int	sub_freq = 0;
+	//	if( fds.lfo_enable && fds.envelope_speed && fds.lfo_frequency ) {
+	if (fds->lfo_enable) {
+		if (fds->lfo_frequency)
+		{
+			static int tbl[8] = { 0, 1, 2, 4, 0, -4, -2, -1 };
+
+			fds->lfo_phaseacc -= (clock()*(double)fds->lfo_frequency) / 65536.0;
+			while (fds->lfo_phaseacc < 0.0) {
+				fds->lfo_phaseacc += (double)sampling_rate;
+
+				if (fds->lfo_wavetable[fds->lfo_addr] == 4)
+					fds->sweep_bias = 0;
+				else
+					fds->sweep_bias += tbl[fds->lfo_wavetable[fds->lfo_addr]];
+
+				fds->lfo_addr = (fds->lfo_addr + 1) & 63;
+			}
+		}
+
+		if (fds->sweep_bias > 63)
+			fds->sweep_bias -= 128;
+		else if (fds->sweep_bias < -64)
+			fds->sweep_bias += 128;
+
+		int	sub_multi = fds->sweep_bias * fds->swpenv_gain;
+
+		if (sub_multi & 0x0F) {
+			// 16で割り切れない場合
+			sub_multi = (sub_multi / 16);
+			if (fds->sweep_bias >= 0)
+				sub_multi += 2;    // 正の場合
+			else
+				sub_multi -= 1;    // 負の場合
+		}
+		else {
+			// 16で割り切れる場合
+			sub_multi = (sub_multi / 16);
+		}
+		// 193を超えると-258する(-64へラップ)
+		if (sub_multi > 193)
+			sub_multi -= 258;
+		// -64を下回ると+256する(192へラップ)
+		if (sub_multi < -64)
+			sub_multi += 256;
+
+		sub_freq = (fds->main_frequency) * sub_multi / 64;
+	}
+
+	// Main unit
+	int	output = 0;
+	if (fds->main_enable && fds->main_frequency && !fds->wave_setup) {
+		int	freq;
+		int	main_addr_old = fds->main_addr;
+
+		freq = (fds->main_frequency + sub_freq) * clock() / 65536.0; //mamidimemo 1789772.5 / 65536.0;
+
+		fds->main_addr = (fds->main_addr + freq + 64 * sampling_rate) % (64 * sampling_rate);
+
+		// 1周期を超えたらボリューム更新
+		if (main_addr_old > fds->main_addr)
+			fds->now_volume = (fds->volenv_gain<0x21) ? fds->volenv_gain : 0x20;
+
+		output = fds->main_wavetable[(fds->main_addr / sampling_rate) & 0x3f] * 8 * fds->now_volume * fds->master_volume / 30;
+
+		if (fds->now_volume)
+			fds->now_freq = freq * 4;
+		else
+			fds->now_freq = 0;
+	}
+	else {
+		fds->now_freq = 0;
+		output = 0;
+	}
+	
+	// LPF
+#if	1
+	output = (fds->output_buf[0] * 2 + output) / 3;
+	fds->output_buf[0] = output;
+#else
+	output = (output_buf[0] + output_buf[1] + output) / 3;
+	output_buf[0] = output_buf[1];
+	output_buf[1] = output;
+#endif
+	
+	fds->output = output;
+	return	(fds->output >> 8) & 0xff;
+}
+
+
 /* WRITE REGISTER VALUE */
 inline void nesapu_device::apu_regwrite(int address, u8 value)
 {
@@ -715,8 +853,106 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 #endif
 		break;
 	}
+	apu_regwrite_fds(address, value);
 }
 
+inline void nesapu_device::apu_regwrite_fds(int addr, u8 data)
+{
+	if (addr < 0x40 || addr > 0xBF)
+		return;
+
+	m_APU.fds.reg[addr - 0x40] = data;
+	if (addr >= 0x40 && addr <= 0x7F) {
+		if (m_APU.fds.wave_setup) {
+			m_APU.fds.main_wavetable[addr - 0x40] = 0x20 - ((int)data & 0x3F);
+		}
+	}
+	else {
+		int rate = clock() / 4;
+
+		switch (addr) {
+		case	0x80:	// Volume Envelope
+			m_APU.fds.volenv_mode = data >> 6;
+			if (data & 0x80) {
+				m_APU.fds.volenv_gain = data & 0x3F;
+
+				// 即時反映
+				if (!m_APU.fds.main_addr) {
+					m_APU.fds.now_volume = (m_APU.fds.volenv_gain<0x21) ? m_APU.fds.volenv_gain : 0x20;
+				}
+			}
+			// エンベロープ1段階の演算
+			m_APU.fds.volenv_decay = data & 0x3F;
+			m_APU.fds.volenv_phaseacc = (double)m_APU.fds.envelope_speed * (double)(m_APU.fds.volenv_decay + 1) * rate / (232.0*960.0);
+			break;
+
+		case	0x82:	// Main Frequency(Low)
+			m_APU.fds.main_frequency = (m_APU.fds.main_frequency&~0x00FF) | (int)data;
+			break;
+		case	0x83:	// Main Frequency(High)
+			m_APU.fds.main_enable = (~data)&(1 << 7);
+			m_APU.fds.envelope_enable = (~data)&(1 << 6);
+			if (!m_APU.fds.main_enable) {
+				m_APU.fds.main_addr = 0;
+				m_APU.fds.now_volume = (m_APU.fds.volenv_gain<0x21) ? m_APU.fds.volenv_gain : 0x20;
+			}
+			//				m_APU.fds.main_frequency  = (m_APU.fds.main_frequency&0x00FF)|(((INT)data&0x3F)<<8);
+			m_APU.fds.main_frequency = (m_APU.fds.main_frequency & 0x00FF) | (((int)data & 0x0F) << 8);
+			break;
+
+		case	0x84:	// Sweep Envelope
+			m_APU.fds.swpenv_mode = data >> 6;
+			if (data & 0x80) {
+				m_APU.fds.swpenv_gain = data & 0x3F;
+			}
+			// エンベロープ1段階の演算
+			m_APU.fds.swpenv_decay = data & 0x3F;
+			m_APU.fds.swpenv_phaseacc = (double)m_APU.fds.envelope_speed * (double)(m_APU.fds.swpenv_decay + 1) * rate / (232.0*960.0);
+			break;
+
+		case	0x85:	// Sweep Bias
+			if (data & 0x40) m_APU.fds.sweep_bias = (data & 0x3f) - 0x40;
+			else		m_APU.fds.sweep_bias = data & 0x3f;
+			m_APU.fds.lfo_addr = 0;
+			break;
+
+		case	0x86:	// Effector(LFO) Frequency(Low)
+			m_APU.fds.lfo_frequency = (m_APU.fds.lfo_frequency&(~0x00FF)) | (int)data;
+			break;
+		case	0x87:	// Effector(LFO) Frequency(High)
+			m_APU.fds.lfo_enable = (~data & 0x80);
+			m_APU.fds.lfo_frequency = (m_APU.fds.lfo_frequency & 0x00FF) | (((int)data & 0x0F) << 8);
+			break;
+
+		case	0x88:	// Effector(LFO) wavetable
+			if (!m_APU.fds.lfo_enable) {
+				// FIFO?
+				for (int i = 0; i < 31; i++) {
+					m_APU.fds.lfo_wavetable[i * 2 + 0] = m_APU.fds.lfo_wavetable[(i + 1) * 2 + 0];
+					m_APU.fds.lfo_wavetable[i * 2 + 1] = m_APU.fds.lfo_wavetable[(i + 1) * 2 + 1];
+				}
+				m_APU.fds.lfo_wavetable[31 * 2 + 0] = data & 0x07;
+				m_APU.fds.lfo_wavetable[31 * 2 + 1] = data & 0x07;
+			}
+			break;
+
+		case	0x89:	// Sound control
+		{
+			int	tbl[] = { 30, 20, 15, 12, 0, 0, 0, 0 };	//HACK: mamidimemo
+			m_APU.fds.master_volume = tbl[data & 7];
+			m_APU.fds.wave_setup = data & 0x80;
+		}
+		break;
+
+		case	0x8A:	// Sound control 2
+			m_APU.fds.envelope_speed = data;
+			break;
+
+		default:
+			break;
+		}
+	}
+}
 
 
 /* READ VALUES FROM REGISTERS */
@@ -783,6 +1019,7 @@ void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		accum += apu_triangle(&m_APU.tri);
 		accum += apu_noise(&m_APU.noi);
 		accum += apu_dpcm(&m_APU.dpcm);
+		accum += apu_fds(&m_APU.fds);
 
 		/* 8-bit clamps */
 		if (accum > 127)
