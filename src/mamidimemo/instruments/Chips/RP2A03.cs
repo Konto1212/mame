@@ -380,6 +380,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             private SoundList<RP2A03Sound> fdsOnSounds = new SoundList<RP2A03Sound>(1);
 
+            private SoundList<RP2A03Sound> vrc6SqOnSounds = new SoundList<RP2A03Sound>(1);
+
+            private SoundList<RP2A03Sound> vrc6SawOnSounds = new SoundList<RP2A03Sound>(1);
+
             private RP2A03 parentModule;
 
             /// <summary>
@@ -426,6 +430,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         fdsOnSounds.Add(snd);
                         FormMain.OutputDebugLog("KeyOn FDS ch" + emptySlot + " " + note.ToString());
                         break;
+                    case ToneType.VRC6_SQ:
+                        vrc6SqOnSounds.Add(snd);
+                        FormMain.OutputDebugLog("KeyOn VRC6(SQ) ch" + emptySlot + " " + note.ToString());
+                        break;
+                    case ToneType.VRC6_SAW:
+                        vrc6SawOnSounds.Add(snd);
+                        FormMain.OutputDebugLog("KeyOn VRC6(Saw) ch" + emptySlot + " " + note.ToString());
+                        break;
                 }
                 snd.KeyOn();
 
@@ -467,6 +479,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     case ToneType.FDS:
                         {
                             emptySlot = SearchEmptySlotAndOff(fdsOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
+                            break;
+                        }
+                    case ToneType.VRC6_SQ:
+                        {
+                            emptySlot = SearchEmptySlotAndOff(vrc6SqOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 2));
+                            break;
+                        }
+                    case ToneType.VRC6_SAW:
+                        {
+                            emptySlot = SearchEmptySlotAndOff(vrc6SawOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             break;
                         }
                 }
@@ -625,6 +647,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             updateFdsPitch();
                             break;
                         }
+                    case ToneType.VRC6_SQ:
+                        updateVrc6SQVolume();
+                        updateVrc6SQPitch();
+                        break;
+                    case ToneType.VRC6_SAW:
+                        updateVrc6SawVolume();
+                        updateVrc6SawPitch();
+                        break;
                 }
             }
 
@@ -688,6 +718,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             updateFdsPitch();
                             break;
                         }
+                    case ToneType.VRC6_SQ:
+                        updateVrc6SQVolume();
+                        updateVrc6SQPitch();
+                        break;
+                    case ToneType.VRC6_SAW:
+                        updateVrc6SawVolume();
+                        updateVrc6SawPitch();
+                        break;
                 }
             }
 
@@ -710,6 +748,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     case ToneType.FDS:
                         updateFdsVolume();
                         break;
+                    case ToneType.VRC6_SQ:
+                        updateVrc6SQVolume();
+                        break;
+                    case ToneType.VRC6_SAW:
+                        updateVrc6SawVolume();
+                        break;
                 }
             }
 
@@ -728,7 +772,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 {
                     var eng = (NesFxEngine)FxEngine;
                     if (eng.DutyValue != null)
-                        dc = eng.DutyValue.Value;
+                        dc = (byte)(eng.DutyValue.Value & 3);
                 }
 
                 RP2A03WriteData(parentModule.UnitNumber, (uint)((Slot * 4) + 0x00), (byte)(dc << 6 | ld << 5 | dd << 4 | fv));
@@ -795,6 +839,27 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
             }
 
+            private void updateVrc6SQVolume()
+            {
+                byte fv = (byte)((byte)Math.Round(15 * CalcCurrentVolume()) & 0xf);
+
+                byte dc = timbre.VRC6.SQDuty;
+                if (FxEngine != null && FxEngine.Active)
+                {
+                    var eng = (NesFxEngine)FxEngine;
+                    if (eng.DutyValue != null)
+                        dc = eng.DutyValue.Value;
+                }
+
+                RP2A03WriteData(parentModule.UnitNumber, (uint)(0x9000 + (Slot << 12)), (byte)(dc << 4 | fv));
+            }
+
+            private void updateVrc6SawVolume()
+            {
+                byte fv = (byte)((byte)Math.Round(15 * CalcCurrentVolume()) & 0xf);
+
+                RP2A03WriteData(parentModule.UnitNumber, (uint)(0xb000), fv);
+            }
 
             /// <summary>
             /// 
@@ -814,6 +879,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         break;
                     case ToneType.FDS:
                         updateFdsPitch();
+                        break;
+                    case ToneType.VRC6_SQ:
+                        updateVrc6SQPitch();
+                        break;
+                    case ToneType.VRC6_SAW:
+                        updateVrc6SawPitch();
                         break;
                 }
 
@@ -889,6 +960,37 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Program.SoundUpdated();
             }
 
+            private void updateVrc6SQPitch()
+            {
+                if (IsSoundOff)
+                    return;
+                double freq = CalcCurrentFrequency();
+                freq = Math.Round(1789773d / (16 * freq)) - 1;
+                if (freq > 0x7ff)
+                    freq = 0x7ff;
+                var n = (ushort)freq;
+                Program.SoundUpdating();
+                RP2A03WriteData(parentModule.UnitNumber, (uint)(0x9001 + (Slot << 12)), (byte)(n & 0xff));
+                RP2A03WriteData(parentModule.UnitNumber, (uint)(0x9002 + (Slot << 12)), (byte)(0x80 | (n >> 8) & 0x7));
+                Program.SoundUpdated();
+            }
+
+            private void updateVrc6SawPitch()
+            {
+                if (IsSoundOff)
+                    return;
+                double freq = CalcCurrentFrequency();
+                //t = (CPU / (14 * f)) - 1
+                freq = Math.Round((1789773d / (14 * freq)) - 1);
+                if (freq > 0x7ff)
+                    freq = 0x7ff;
+                var n = (ushort)freq;
+                Program.SoundUpdating();
+                RP2A03WriteData(parentModule.UnitNumber, (uint)(0xB001), (byte)(n & 0xff));
+                RP2A03WriteData(parentModule.UnitNumber, (uint)(0xB002), (byte)(0x80 | (n >> 8) & 0x7));
+                Program.SoundUpdated();
+            }
+
             public override void SoundOff()
             {
                 base.SoundOff();
@@ -920,6 +1022,16 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                             RP2A03WriteData(parentModule.UnitNumber, 0x83, 0xc0);
                             break;
                         }
+                    case ToneType.VRC6_SQ:
+                        {
+                            RP2A03WriteData(parentModule.UnitNumber, (uint)(0x9002 + (Slot << 12)), 0x00);
+                            break;
+                        }
+                    case ToneType.VRC6_SAW:
+                        {
+                            RP2A03WriteData(parentModule.UnitNumber, 0xb002, 0x00);
+                            break;
+                        }
                 }
             }
         }
@@ -944,6 +1056,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             private byte f_Volume = 15;
 
+            [Browsable(false)]
             [DataMember]
             [Category("Sound(SQ/Noise)")]
             [Description("Square/Noise Volume (0-15)")]
@@ -1169,6 +1282,15 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 set;
             }
 
+            [DataMember]
+            [Category("Sound(VRC6)")]
+            [Description("VRC6 Tone Settings")]
+            public Vrc6Settings VRC6
+            {
+                get;
+                set;
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -1177,6 +1299,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 SQSweep = new SQSweepSettings();
                 SDS.FxS = new NesFxSettings();
                 FDS = new FdsSettings();
+                VRC6 = new Vrc6Settings();
             }
 
             /// <summary>
@@ -1401,6 +1524,44 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         }
 
 
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<Vrc6Settings>))]
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [DataContract]
+        [MidiHook]
+        public class Vrc6Settings : ContextBoundObject
+        {
+
+            private byte f_SQDuty;
+
+            [DataMember]
+            [Category("Sound(VRC6)")]
+            [Description("SQ Duty(0 - 7)\r\n" +
+                "0	 1/16     6.25 %\r\n" +
+                "1   2/16    12.50 %\r\n" +
+                "2   3/16    18.75 %\r\n" +
+                "3   4/16    25.00 %\r\n" +
+                "4   5/16    31.25 %\r\n" +
+                "5   6/16    37.50 %\r\n" +
+                "6   7/16    43.75 %\r\n" +
+                "7   8/16    50.00 %")]
+            [SlideParametersAttribute(0, 7)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [DefaultValue((byte)0)]
+            public byte SQDuty
+            {
+                get
+                {
+                    return f_SQDuty;
+                }
+                set
+                {
+                    f_SQDuty = (byte)(value & 0x7);
+                }
+            }
+
+        }
+
+
         [JsonConverter(typeof(NoTypeConverterJsonConverter<NesFxSettings>))]
         [TypeConverter(typeof(CustomExpandableObjectConverter))]
         [DataContract]
@@ -1412,7 +1573,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             [DataMember]
             [Description("Set duty/noise envelop by text. Input duty/noise value and split it with space like the Famitracker.\r\n" +
-                       "0 ～ 3 \"|\" is repeat point. \"/\" is release point.")]
+                       "0-3(0-7:VRC6) \"|\" is repeat point. \"/\" is release point.")]
             public string DutyEnvelopes
             {
                 get
@@ -1448,8 +1609,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                                 {
                                     if (v < 0)
                                         v = 0;
-                                    else if (v > 3)
-                                        v = 3;
+                                    else if (v > 7)
+                                        v = 7;
                                     vs.Add(v);
                                 }
                             }
@@ -1672,6 +1833,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             NOISE,
             DPCM,
             FDS,
+            VRC6_SQ,
+            VRC6_SAW,
         }
 
         /// <summary>

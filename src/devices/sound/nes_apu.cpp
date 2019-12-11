@@ -133,6 +133,8 @@ void nesapu_device::device_reset()
 {
 	write(0x15, 0x00);
 	memset(&m_APU.fds, 0, sizeof(m_APU.fds));
+	memset(&m_APU.vrc6rect, 0, sizeof(m_APU.vrc6rect));
+	memset(&m_APU.vrc6saw, 0, sizeof(m_APU.vrc6saw));
 }
 
 void nesapu_device::device_clock_changed()
@@ -622,7 +624,7 @@ s8 nesapu_device::apu_fds(apu_t::fds_t *fds)
 
 		// 1周期を超えたらボリューム更新
 		if (main_addr_old > fds->main_addr)
-			fds->now_volume = (fds->volenv_gain<0x21) ? fds->volenv_gain : 0x20;
+			fds->now_volume = (fds->volenv_gain < 0x21) ? fds->volenv_gain : 0x20;
 
 		output = fds->main_wavetable[(fds->main_addr / sampling_rate) & 0x3f] * 8 * fds->now_volume * fds->master_volume / 30;
 
@@ -635,7 +637,7 @@ s8 nesapu_device::apu_fds(apu_t::fds_t *fds)
 		fds->now_freq = 0;
 		output = 0;
 	}
-	
+
 	// LPF
 #if	1
 	output = (fds->output_buf[0] * 2 + output) / 3;
@@ -645,10 +647,119 @@ s8 nesapu_device::apu_fds(apu_t::fds_t *fds)
 	output_buf[0] = output_buf[1];
 	output_buf[1] = output;
 #endif
-	
+
 	fds->output = output;
 	return	(fds->output >> 8) & 0xff;
 }
+
+s8 nesapu_device::vrc6_RectangleRender(apu_t::VRC6_RECT_t *ch)
+{
+	int sampling_rate = clock() / 4;
+	int cycle_rate = (int)(clock()*65536.0f / (float)sampling_rate);
+
+	// Enable?
+	if (!ch->enable) {
+		ch->output_vol = 0;
+		ch->adder = 0;
+		return	ch->output_vol;
+	}
+
+	// Digitized output
+	if (ch->gate) {
+		ch->output_vol = ch->volume; // << RECTANGLE_VOL_SHIFT;
+		return	ch->output_vol & 0xff;
+	}
+
+	// 一定以上の周波数は処理しない(無駄)
+	if (ch->freq < INT2FIX(8)) {
+		ch->output_vol = 0;
+		return	ch->output_vol;
+	}
+
+	ch->phaseacc -= cycle_rate;
+	if (ch->phaseacc >= 0)
+		return	ch->output_vol & 0xff;
+
+	int	output = ch->volume; // << RECTANGLE_VOL_SHIFT;
+
+	if (ch->freq > cycle_rate) {
+		// add 1 step
+		ch->phaseacc += ch->freq;
+		ch->adder = (ch->adder + 1) & 0x0F;
+		if (ch->adder <= ch->duty_pos)
+			ch->output_vol = output;
+		else
+			ch->output_vol = -output;
+	}
+	else {
+		// average calculate
+		int	num_times, total;
+		num_times = total = 0;
+		while (ch->phaseacc < 0) {
+			ch->phaseacc += ch->freq;
+			ch->adder = (ch->adder + 1) & 0x0F;
+			if (ch->adder <= ch->duty_pos)
+				total += output;
+			else
+				total += -output;
+			num_times++;
+		}
+		ch->output_vol = total / num_times;
+	}
+
+	return	ch->output_vol & 0xff;
+}
+
+s8 nesapu_device::vrc6_SawtoothRender(apu_t::VRC6_SAW_t *ch)
+{
+	int sampling_rate = clock() / 4;
+	int cycle_rate = (int)(clock()*65536.0f / (float)sampling_rate);
+
+	// Digitized output
+	if (!ch->enable) {
+		ch->output_vol = 0;
+		return	ch->output_vol;
+	}
+
+	// 一定以上の周波数は処理しない(無駄)
+	if (ch->freq < INT2FIX(9)) {
+		return	ch->output_vol & 0xff;
+	}
+
+	ch->phaseacc -= cycle_rate / 2;
+	if (ch->phaseacc >= 0)
+		return	ch->output_vol & 0xff;
+
+	if (ch->freq > cycle_rate / 2) {
+		// add 1 step
+		ch->phaseacc += ch->freq;
+		if (++ch->adder >= 7) {
+			ch->adder = 0;
+			ch->accum = 0;
+		}
+		ch->accum += ch->phaseaccum;
+		ch->output_vol = ch->accum;// << SAWTOOTH_VOL_SHIFT;
+	}
+	else {
+		// average calculate
+		int	num_times, total;
+		num_times = total = 0;
+		while (ch->phaseacc < 0) {
+			ch->phaseacc += ch->freq;
+			if (++ch->adder >= 7) {
+				ch->adder = 0;
+				ch->accum = 0;
+			}
+			ch->accum += ch->phaseaccum;
+			total += ch->accum;// << SAWTOOTH_VOL_SHIFT;
+			num_times++;
+		}
+		ch->output_vol = (total / num_times);
+	}
+
+	return ch->output_vol & 0xff;
+}
+
 
 
 /* WRITE REGISTER VALUE */
@@ -853,7 +964,6 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 #endif
 		break;
 	}
-	apu_regwrite_fds(address, value);
 }
 
 inline void nesapu_device::apu_regwrite_fds(int addr, u8 data)
@@ -878,7 +988,7 @@ inline void nesapu_device::apu_regwrite_fds(int addr, u8 data)
 
 				// 即時反映
 				if (!m_APU.fds.main_addr) {
-					m_APU.fds.now_volume = (m_APU.fds.volenv_gain<0x21) ? m_APU.fds.volenv_gain : 0x20;
+					m_APU.fds.now_volume = (m_APU.fds.volenv_gain < 0x21) ? m_APU.fds.volenv_gain : 0x20;
 				}
 			}
 			// エンベロープ1段階の演算
@@ -894,7 +1004,7 @@ inline void nesapu_device::apu_regwrite_fds(int addr, u8 data)
 			m_APU.fds.envelope_enable = (~data)&(1 << 6);
 			if (!m_APU.fds.main_enable) {
 				m_APU.fds.main_addr = 0;
-				m_APU.fds.now_volume = (m_APU.fds.volenv_gain<0x21) ? m_APU.fds.volenv_gain : 0x20;
+				m_APU.fds.now_volume = (m_APU.fds.volenv_gain < 0x21) ? m_APU.fds.volenv_gain : 0x20;
 			}
 			//				m_APU.fds.main_frequency  = (m_APU.fds.main_frequency&0x00FF)|(((INT)data&0x3F)<<8);
 			m_APU.fds.main_frequency = (m_APU.fds.main_frequency & 0x00FF) | (((int)data & 0x0F) << 8);
@@ -955,6 +1065,60 @@ inline void nesapu_device::apu_regwrite_fds(int addr, u8 data)
 }
 
 
+void nesapu_device::vrc6_write(int addr, u8 data)
+{
+	switch (addr) {
+		// VRC6 CH0 rectangle
+	case	0x9000:
+		m_APU.vrc6rect[0].reg[0] = data;
+		m_APU.vrc6rect[0].gate = data & 0x80;
+		m_APU.vrc6rect[0].volume = data & 0x0F;
+		m_APU.vrc6rect[0].duty_pos = (data >> 4) & 0x07;
+		break;
+	case	0x9001:
+		m_APU.vrc6rect[0].reg[1] = data;
+		m_APU.vrc6rect[0].freq = INT2FIX((((m_APU.vrc6rect[0].reg[2] & 0x0F) << 8) | data) + 1);
+		break;
+	case	0x9002:
+		m_APU.vrc6rect[0].reg[2] = data;
+		m_APU.vrc6rect[0].enable = data & 0x80;
+		m_APU.vrc6rect[0].freq = INT2FIX((((data & 0x0F) << 8) | m_APU.vrc6rect[0].reg[1]) + 1);
+		break;
+		// VRC6 CH1 rectangle
+	case	0xA000:
+		m_APU.vrc6rect[1].reg[0] = data;
+		m_APU.vrc6rect[1].gate = data & 0x80;
+		m_APU.vrc6rect[1].volume = data & 0x0F;
+		m_APU.vrc6rect[1].duty_pos = (data >> 4) & 0x07;
+		break;
+	case	0xA001:
+		m_APU.vrc6rect[1].reg[1] = data;
+		m_APU.vrc6rect[1].freq = INT2FIX((((m_APU.vrc6rect[1].reg[2] & 0x0F) << 8) | data) + 1);
+		break;
+	case	0xA002:
+		m_APU.vrc6rect[1].reg[2] = data;
+		m_APU.vrc6rect[1].enable = data & 0x80;
+		m_APU.vrc6rect[1].freq = INT2FIX((((data & 0x0F) << 8) | m_APU.vrc6rect[1].reg[1]) + 1);
+		break;
+		// VRC6 CH2 sawtooth
+	case	0xB000:
+		m_APU.vrc6saw.reg[0] = data;
+		m_APU.vrc6saw.phaseaccum = data & 0x3F;
+		break;
+	case	0xB001:
+		m_APU.vrc6saw.reg[1] = data;
+		m_APU.vrc6saw.freq = INT2FIX((((m_APU.vrc6saw.reg[2] & 0x0F) << 8) | data) + 1);
+		break;
+	case	0xB002:
+		m_APU.vrc6saw.reg[2] = data;
+		m_APU.vrc6saw.enable = data & 0x80;
+		m_APU.vrc6saw.freq = INT2FIX((((data & 0x0F) << 8) | m_APU.vrc6saw.reg[1]) + 1);
+		//			ch2.adder = 0;	// クリアするとノイズの原因になる
+		//			ch2.accum = 0;	// クリアするとノイズの原因になる
+		break;
+	}
+}
+
 /* READ VALUES FROM REGISTERS */
 u8 nesapu_device::read(offs_t address)
 {
@@ -988,9 +1152,22 @@ u8 nesapu_device::read(offs_t address)
 /* WRITE VALUE TO TEMP REGISTRY AND QUEUE EVENT */
 void nesapu_device::write(offs_t address, u8 value)
 {
-	m_APU.regs[address] = value;
+	if (address <= 0xff)
+	{
+		m_APU.regs[address] = value;
+	}
+
 	m_stream->update();
-	apu_regwrite(address, value);
+
+	if (address <= 0xff)
+	{
+		apu_regwrite(address, value);
+		apu_regwrite_fds(address, value);
+	}
+	else if (0x9000 <= address && address <= 0xb002)
+	{
+		vrc6_write(address, value);
+	}
 }
 
 void nesapu_device::set_dpcm(u8 *dpcm_data, u32 length)
@@ -1020,13 +1197,16 @@ void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		accum += apu_noise(&m_APU.noi);
 		accum += apu_dpcm(&m_APU.dpcm);
 		accum += apu_fds(&m_APU.fds);
+		accum += vrc6_RectangleRender(&m_APU.vrc6rect[0]);
+		accum += vrc6_RectangleRender(&m_APU.vrc6rect[1]);
+		accum += vrc6_SawtoothRender(&m_APU.vrc6saw);
 
 		/* 8-bit clamps */
 		if (accum > 127)
 			accum = 127;
 		else if (accum < -128)
 			accum = -128;
-		
+
 		*(outputs[0]++) = accum << 8;
 		*(outputs[1]++) = accum << 8;
 

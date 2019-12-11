@@ -28,6 +28,10 @@
 
 #pragma once
 
+#define	INT2FIX(x)	((x)<<16)
+#define	FIX2INT(x)	((x)>>16)
+#define	RECTANGLE_VOL_SHIFT	8
+#define	SAWTOOTH_VOL_SHIFT	6
 
 /* APU type */
 struct apu_t
@@ -124,6 +128,7 @@ struct apu_t
 		signed char vol = 0;
 	};
 
+	/* FDS */ //VirtuaNES
 	struct	fds_t {
 		fds_t()
 		{
@@ -180,6 +185,48 @@ struct apu_t
 		int	output_buf[8];
 	};
 
+	struct VRC6_RECT_t {
+		VRC6_RECT_t()
+		{
+			for (auto & elem : reg)
+				elem = 0;
+		}
+
+		uint8	reg[3];
+
+		uint8	enable;
+		uint8	gate;
+		uint8	volume;
+
+		int	phaseacc;
+		int	freq;
+		int	output_vol;
+
+		uint8	adder;
+		uint8	duty_pos;
+	};
+
+	struct VRC6_SAW_t{
+		VRC6_SAW_t()
+		{
+			for (auto & elem : reg)
+				elem = 0;
+		}
+
+		uint8	reg[3];
+
+		uint8	enable;
+		uint8	volume;
+
+		int	phaseacc;
+		int	freq;
+		int	output_vol;
+
+		uint8	adder;
+		uint8	accum;
+		uint8	phaseaccum;
+	};
+
 	/* REGISTER DEFINITIONS */
 	static constexpr unsigned WRA0    = 0x00;
 	static constexpr unsigned WRA1    = 0x01;
@@ -217,6 +264,8 @@ struct apu_t
 	noise_t    noi;
 	dpcm_t     dpcm;
 	fds_t     fds;
+	VRC6_RECT_t vrc6rect[2];
+	VRC6_SAW_t vrc6saw;
 
 	/* APU registers */
 	unsigned char regs[0xff];

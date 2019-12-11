@@ -88,8 +88,13 @@ private:
 	s8 apu_noise(apu_t::noise_t *chan);
 	s8 apu_dpcm(apu_t::dpcm_t *chan);
 	s8 apu_fds(apu_t::fds_t *chan);
+	s8 vrc6_RectangleRender(apu_t::VRC6_RECT_t *chan);
+	s8 vrc6_SawtoothRender(apu_t::VRC6_SAW_t *chan);
+
 	inline void apu_regwrite(int address, u8 value);
 	inline void apu_regwrite_fds(int address, u8 value);
+
+	inline void vrc6_write(int addr, u8 data);
 };
 
 DECLARE_DEVICE_TYPE(NES_APU, nesapu_device)
