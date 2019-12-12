@@ -145,6 +145,8 @@ void nesapu_device::device_clock_changed()
 void nesapu_device::calculate_rates()
 {
 	int rate = clock() / 4;
+	sampling_rate = rate;
+	cycle_rate = (int)(clock()*65536.0f / (float)sampling_rate);
 
 	m_samps_per_sync = 89490 / 12; // Is there a different PAL value?
 	m_buffer_size = m_samps_per_sync;
@@ -518,7 +520,6 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 
 s8 nesapu_device::apu_fds(apu_t::fds_t *fds)
 {
-	int sampling_rate = clock() / 4;
 	// Envelope unit
 	if (fds->envelope_enable && fds->envelope_speed) {
 		// Volume envelope
@@ -654,9 +655,6 @@ s8 nesapu_device::apu_fds(apu_t::fds_t *fds)
 
 s8 nesapu_device::vrc6_RectangleRender(apu_t::VRC6_RECT_t *ch)
 {
-	int sampling_rate = clock() / 4;
-	int cycle_rate = (int)(clock()*65536.0f / (float)sampling_rate);
-
 	// Enable?
 	if (!ch->enable) {
 		ch->output_vol = 0;
@@ -712,9 +710,6 @@ s8 nesapu_device::vrc6_RectangleRender(apu_t::VRC6_RECT_t *ch)
 
 s8 nesapu_device::vrc6_SawtoothRender(apu_t::VRC6_SAW_t *ch)
 {
-	int sampling_rate = clock() / 4;
-	int cycle_rate = (int)(clock()*65536.0f / (float)sampling_rate);
-
 	// Digitized output
 	if (!ch->enable) {
 		ch->output_vol = 0;

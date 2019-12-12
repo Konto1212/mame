@@ -897,7 +897,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     return;
 
                 double freq = CalcCurrentFrequency();
-                freq = Math.Round(1789773d / (freq * 16)) - 1;
+                freq = Math.Round((21477272d / 12d) / (freq * 16)) - 1;
                 if (freq > 0x7ff)
                     freq = 0x7ff;
                 var n = (ushort)freq;
@@ -913,7 +913,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     return;
 
                 double freq = CalcCurrentFrequency();
-                freq = Math.Round(1789773d / (freq * 32)) - 1;
+                freq = Math.Round((21477272d / 12d) / (freq * 32)) - 1;
                 if (freq > 0x7ff)
                     freq = 0x7ff;
                 var n = (ushort)freq;
@@ -950,7 +950,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     return;
                 double freq = CalcCurrentFrequency();
                 // p = 65536 * f / 1789773d
-                freq = Math.Round(64 * 65536 * freq / 1789773d);
+                freq = Math.Round(64 * 65536 * freq / (21477272d / 12d));
                 if (freq > 0x7ff)
                     freq = 0x7ff;
                 var n = (ushort)freq;
@@ -965,7 +965,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 if (IsSoundOff)
                     return;
                 double freq = CalcCurrentFrequency();
-                freq = Math.Round(1789773d / (16 * freq)) - 1;
+                freq = Math.Round((21477272d / 12d) / (16 * freq)) - 1;
                 if (freq > 0x7ff)
                     freq = 0x7ff;
                 var n = (ushort)freq;
@@ -981,7 +981,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     return;
                 double freq = CalcCurrentFrequency();
                 //t = (CPU / (14 * f)) - 1
-                freq = Math.Round((1789773d / (14 * freq)) - 1);
+                freq = Math.Round(((21477272d / 12d) / (14 * freq)) - 1);
                 if (freq > 0x7ff)
                     freq = 0x7ff;
                 var n = (ushort)freq;

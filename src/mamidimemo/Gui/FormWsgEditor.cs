@@ -162,12 +162,12 @@ namespace zanac.MAmidiMEmo.Gui
                     {
                         for (int x = 0; x < wsgLen; x++)
                         {
-                            Pen dp = x + 1 == wsgLen / 2 ? pen2 : pen;
+                            Pen dp = x + 1 == wsgLen / 2 || x + 1 == wsgLen ? pen2 : pen;
                             g.DrawLine(dp, (x * dotSz.Width) + dotSz.Width - 1, 0, (x * dotSz.Width) + dotSz.Width - 1, sz.Height);
                         }
                         for (int y = 0; y < (f_WsgMaxValue + 1); y++)
                         {
-                            Pen dp = y + 1 == (f_WsgMaxValue + 1) / 2 ? pen2 : pen;
+                            Pen dp = y + 1 == (f_WsgMaxValue + 1) / 2 || y == f_WsgMaxValue ? pen2 : pen;
                             g.DrawLine(dp,
                                 0, sz.Height - ((y * dotSz.Height) + dotSz.Height),
                                 sz.Width, sz.Height - ((y * dotSz.Height) + dotSz.Height));

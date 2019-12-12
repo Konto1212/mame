@@ -80,6 +80,8 @@ private:
 	sound_stream *m_stream;
 	devcb_write_line m_irq_handler;
 	devcb_read8 m_mem_read_cb;
+	u32		sampling_rate;
+	u32		cycle_rate;
 
 	void calculate_rates();
 	void create_syncs(unsigned long sps);
