@@ -1610,10 +1610,16 @@
     <value>121, 25</value>
   </data>
   <data name="extendC140ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>138, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="extendC140ToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend &amp;C140</value>
+  </data>
+  <data name="extendSPC700ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>180, 22</value>
+  </data>
+  <data name="extendSPC700ToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend &amp;SPC700</value>
   </data>
   <data name="pCMToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>180, 22</value>
@@ -4090,6 +4096,12 @@
   </data>
   <data name="&gt;&gt;multiMediaTimerComponent1.Type" xml:space="preserve">
     <value>zanac.MAmidiMEmo.ComponentModel.MultiMediaTimerComponent, MAmidiMEmo, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;extendSPC700ToolStripMenuItem.Name" xml:space="preserve">
+    <value>extendSPC700ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;extendSPC700ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>FormMain</value>

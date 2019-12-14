@@ -163,6 +163,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\CacheMemory.cs" />
+    <Compile Include="Gui\BrrFileLoaderUITypeEditor.cs" />
+    <Compile Include="Gui\BrrFileLoaderEditorAttribute.cs" />
     <Compile Include="Gui\WsgBitWideAttribute.cs" />
     <Compile Include="ComponentModel\InstancePropertyInfo.cs" />
     <Compile Include="ComponentModel\MaskAttribute.cs" />
@@ -207,6 +209,7 @@
     </Compile>
     <Compile Include="Gui\VstUITypeEditor.cs" />
     <Compile Include="Instruments\Chips\AY8910.cs" />
+    <Compile Include="Instruments\Chips\SPC700.cs" />
     <Compile Include="Instruments\Chips\C140.cs" />
     <Compile Include="Instruments\Chips\HuC6280.cs" />
     <Compile Include="Instruments\Chips\GBAPU.cs" />

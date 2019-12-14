@@ -151,6 +151,7 @@ DEFINE_DEVICE_TYPE(SNES_SOUND, snes_sound_device, "snes_sound", "SNES Custom DSP
 snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SNES_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_callback(NULL)
 {
 }
 
@@ -165,7 +166,8 @@ void snes_sound_device::device_start()
 	m_ram = make_unique_clear<u8[]>(SNES_SPCRAM_SIZE);
 
 	/* put IPL image at the top of RAM */
-	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
+	//mamidimemo
+	//memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
 
 	m_tick_timer = timer_alloc(TIMER_TICK_ID);
 
@@ -313,8 +315,9 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 	sd = (src_dir_type *) &m_ram[(int) m_dsp_regs[0x5d] << 8];
 
 	/* Check for reset */
-	if (m_dsp_regs[0x6c] & 0x80)
-		dsp_reset();
+	//memidimemo
+	//if (m_dsp_regs[0x6c] & 0x80)
+	//	dsp_reset();
 
 	/* Here we check for keys on/off.  Docs say that successive writes to KON/KOF
 	must be separated by at least 2 Ts periods or risk being neglected.
@@ -359,7 +362,9 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 			m_keys       |= m;
 			m_keyed_on   |= m;
 			vl          = m_dsp_regs[(v << 4) + 4];
-			vp->samp_id = *( u32 * )&sd[vl];
+			//mamidimemo
+			//vp->samp_id = *( u32 * )&sd[vl];
+			vp->samp_id = vl;
 			vp->mem_ptr = LEtoME16(sd[vl].vptr);
 
 #ifdef DBG_KEY
@@ -475,7 +480,12 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 					}
 
 					vp->header_cnt = 8;
-					vl = (u8)m_ram[vp->mem_ptr++];
+					//mamidimemo
+					//vl = (u8)m_ram[vp->mem_ptr++];
+					vl = 0;
+					if (m_callback != NULL)
+						vl = (u8)m_callback(vp->samp_id, vp->mem_ptr++);
+
 					vp->range  = vl >> 4;
 					vp->end    = vl & 3;
 					vp->filter = (vl & 12) >> 2;
@@ -488,13 +498,21 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 				if (vp->half == 0)
 				{
 					vp->half = 1;
-					outx     = ((s8)m_ram[vp->mem_ptr]) >> 4;
+					//mamidimemo
+					//outx     = ((s8)m_ram[vp->mem_ptr]) >> 4;
+					outx = 0;
+					if (m_callback != NULL)
+						outx = ((s8)m_callback(vp->samp_id, vp->mem_ptr)) >> 4;
 				}
 				else
 				{
 					vp->half = 0;
 					/* Funkiness to get 4-bit signed to carry through */
-					outx   = (s8)(m_ram[vp->mem_ptr++] << 4);
+					//mamidimemo
+					//outx   = (s8)(m_ram[vp->mem_ptr++] << 4);
+					outx = 0;
+					if (m_callback != NULL)
+						outx = (s8)(m_callback(vp->samp_id, vp->mem_ptr++) << 4);
 					outx >>= 4;
 					vp->header_cnt--;
 				}
@@ -1178,7 +1196,15 @@ u8 snes_sound_device::spc_ram_r(offs_t offset)
 
 void snes_sound_device::spc_ram_w(offs_t offset, u8 data)
 {
-	m_ram[offset] = data;
+	//mamidimemo
+	if (0xf0 <= offset && offset <= 0xff)
+	{
+		spc_io_w(offset & 0xf, data);
+	}
+	else
+	{
+		m_ram[offset] = data;
+	}
 }
 
 

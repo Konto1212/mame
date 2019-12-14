@@ -29,7 +29,7 @@ namespace zanac.MAmidiMEmo.Gui
         {
             get;
             private set;
-        } = -1;
+        } = 0;
 
         /// <summary>
         /// 

@@ -20,6 +20,7 @@
 #include "..\devices\sound\beep.h"
 #include "..\devices\sound\c140.h"
 #include "..\devices\sound\c6280.h"
+#include "..\mame\audio\snes_snd.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -869,6 +870,53 @@ extern "C"
 		}
 		c6280_devices[unitNumber]->c6280_w(*dummy, address, data);
 	}
+
+
+	snes_sound_device *spc700_devices[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+
+	DllExport void spc_ram_w(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		if (spc700_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			snes_sound_device *spc700 = dynamic_cast<snes_sound_device *>(rm->device((std::string("snes_sound_") + num).c_str()));
+			if (spc700 == nullptr)
+				return;
+
+			spc700_devices[unitNumber] = spc700;
+		}
+		spc700_devices[unitNumber]->spc_ram_w(address, data);
+	}
+
+
+	DllExport void spc700_set_callback(unsigned int unitNumber, SPC700_CALLBACK callback)
+	{
+		if (spc700_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			snes_sound_device *spc700 = dynamic_cast<snes_sound_device *>(rm->device((std::string("snes_sound_") + num).c_str()));
+			if (spc700 == nullptr)
+				return;
+
+			spc700_devices[unitNumber] = spc700;
+		}
+		spc700_devices[unitNumber]->set_callback(callback);
+	}
+
 }
 
 

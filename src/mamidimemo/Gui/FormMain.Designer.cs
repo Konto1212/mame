@@ -122,6 +122,7 @@
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.multiMediaTimerComponent1 = new zanac.MAmidiMEmo.ComponentModel.MultiMediaTimerComponent(this.components);
+            this.extendSPC700ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -832,7 +833,8 @@
             // pCMToolStripMenuItem
             // 
             this.pCMToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.extendC140ToolStripMenuItem});
+            this.extendC140ToolStripMenuItem,
+            this.extendSPC700ToolStripMenuItem});
             this.pCMToolStripMenuItem.Name = "pCMToolStripMenuItem";
             resources.ApplyResources(this.pCMToolStripMenuItem, "pCMToolStripMenuItem");
             // 
@@ -987,6 +989,12 @@
             this.multiMediaTimerComponent1.Interval = ((uint)(1000u));
             this.multiMediaTimerComponent1.Resolution = ((uint)(1000u));
             // 
+            // extendSPC700ToolStripMenuItem
+            // 
+            this.extendSPC700ToolStripMenuItem.Name = "extendSPC700ToolStripMenuItem";
+            resources.ApplyResources(this.extendSPC700ToolStripMenuItem, "extendSPC700ToolStripMenuItem");
+            this.extendSPC700ToolStripMenuItem.Click += new System.EventHandler(this.extendSPC700ToolStripMenuItem_Click);
+            // 
             // FormMain
             // 
             resources.ApplyResources(this, "$this");
@@ -1113,6 +1121,7 @@
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox2;
         private System.Windows.Forms.ToolStripLabel toolStripLabel4;
         private System.Windows.Forms.ToolStripMenuItem extendHuC6230ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendSPC700ToolStripMenuItem;
     }
 }
 

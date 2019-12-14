@@ -28,5 +28,6 @@ namespace zanac.MAmidiMEmo.Instruments
         Beep,    //14
         C140,    //15
         HuC6280,    //16
+        SPC700,    //17
     }
 }

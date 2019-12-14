@@ -85,7 +85,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
         [DataMember]
         [Category("Chip")]
-        [Description("Signed 8bit PCM Raw Data or WAV Data. Base Freq 440Hz (MAX 64KB, 1ch)")]
+        [Description("Signed 8bit PCM Raw Data or WAV Data. (MAX 64KB, 1ch)")]
         [Editor(typeof(PcmTableUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [PcmTableEditor("Audio File(*.raw, *.wav)|*.raw;*.wav")]
         [TypeConverter(typeof(CustomObjectTypeConverter))]
@@ -498,6 +498,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             private SoundType lastSoundType;
 
+            private double baseFreq;
+
             /// <summary>
             /// 
             /// </summary>
@@ -512,6 +514,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 this.timbre = (C140Timbre)timbre;
 
                 lastSoundType = this.timbre.SoundType;
+                baseFreq = this.timbre.BaseFreqency;
             }
 
             /// <summary>
@@ -605,7 +608,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                 uint freq = 0;
                 if (lastSoundType == SoundType.INST)
-                    freq = (uint)Math.Round((CalcCurrentFrequency() / 440d) * 32768);
+                    freq = (uint)Math.Round((CalcCurrentFrequency() / baseFreq) * 32768);
                 else if (lastSoundType == SoundType.DRUM)
                     freq = (uint)Math.Round((1d + CalcCurrentPitch()) * 32768);
 
@@ -653,6 +656,19 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 set;
             }
 
+            [DataMember]
+            [Category("Sound")]
+            [Description("Set PCM base frequency [Hz]")]
+            [DefaultValue(typeof(double), "440")]
+            [DoubleSlideParametersAttribute(100, 2000, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public double BaseFreqency
+            {
+                get;
+                set;
+            } = 440;
+
+
             private bool f_LoopEnable;
 
             [DataMember]
@@ -691,7 +707,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [Editor(typeof(PcmFileLoaderUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
             [DataMember]
             [Category("Sound")]
-            [Description("Signed 8bit PCM Raw Data or WAV Data. Base Freq 440Hz (MAX 64KB, 1ch)")]
+            [Description("Signed 8bit PCM Raw Data or WAV Data. (MAX 64KB, 1ch)")]
             [PcmFileLoaderEditor("Audio File(*.raw, *.wav)|*.raw;*.wav", 0, 8, 1, 65535)]
             public sbyte[] PcmData
             {

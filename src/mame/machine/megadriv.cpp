@@ -1021,6 +1021,10 @@ void md_base_state::md_ntsc(machine_config &config)
 		C6280(config, *m_c6280[i], 3580000);
 		(*m_c6280[i])->add_route(0, "lspeaker", 1.00);
 		(*m_c6280[i])->add_route(1, "rspeaker", 1.00);
+
+		SNES_SOUND(config, *m_spc700[i], XTAL(24'576'000) / 12);
+		(*m_spc700[i])->add_route(0, "lspeaker", 1.00);
+		(*m_spc700[i])->add_route(1, "rspeaker", 1.00);
 	}
 }
 

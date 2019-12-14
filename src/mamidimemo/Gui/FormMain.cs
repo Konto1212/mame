@@ -103,6 +103,7 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("Beep", Resources.Beep);
             imageList1.Images.Add("C140", Resources.C140);
             imageList1.Images.Add("HuC6280", Resources.HuC6280);
+            imageList1.Images.Add("SPC700", Resources.C140);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -373,6 +374,12 @@ namespace zanac.MAmidiMEmo.Gui
         private void extendHuC6230ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InstrumentManager.AddInstrument(InstrumentType.HuC6280);
+        }
+
+
+        private void extendSPC700ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.SPC700);
         }
 
         /// <summary>

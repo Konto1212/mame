@@ -23,6 +23,7 @@
 #include "sound/beep.h"
 #include "sound/c140.h"
 #include "sound/c6280.h"
+#include "audio/snes_snd.h"
 #include "video/315_5313.h"
 
 /* Megadrive Console Specific */
@@ -140,10 +141,14 @@ public:
 			strcpy(device_names[didx][i], (std::string("c6280_") + num).c_str());
 			m_c6280[i] = new optional_device<c6280_device>(*this, device_names[didx][i]);
 			didx++;
+			//spc700
+			strcpy(device_names[didx][i], (std::string("snes_sound_") + num).c_str());
+			m_spc700[i] = new optional_device<snes_sound_device>(*this, device_names[didx][i]);
+			didx++;
 		}
 	}
 
-	char device_names[ 16 ][8][100];
+	char device_names[ 17 ][8][100];
 	optional_device<ym2151_device> *m_ym2151[8];	//1
 	optional_device<ym2612_device> *m_ym2612[8];	//2
 	optional_device<sn76496_device> *m_sn76496[8];	//3
@@ -160,6 +165,7 @@ public:
 	optional_device<beep_device> *m_beep[8];	//14
 	optional_device<c140_device> *m_c140[8];	//15
 	optional_device<c6280_device> *m_c6280[8];	//16
+	optional_device<snes_sound_device> *m_spc700[8];	//17
 
 	required_device<m68000_base_device> m_maincpu;
 	/*

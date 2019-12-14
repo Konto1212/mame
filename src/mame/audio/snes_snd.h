@@ -14,6 +14,8 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
+typedef int8_t(*SPC700_CALLBACK)(u8 pn, int32_t pos);
+
 class snes_sound_device : public device_t, public device_sound_interface
 {
 public:
@@ -30,6 +32,8 @@ public:
 
 //  u8 *spc_get_ram() { return m_ram; }
 
+	void set_callback(SPC700_CALLBACK callback) { m_callback = callback; };
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -41,6 +45,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	SPC700_CALLBACK m_callback;
+
 	enum class env_state_t32 : u8
 	{
 		ATTACK,
