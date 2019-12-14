@@ -27,5 +27,6 @@ namespace zanac.MAmidiMEmo.Instruments
         MOS6581,    //13
         Beep,    //14
         C140,    //15
+        HuC6280,    //16
     }
 }

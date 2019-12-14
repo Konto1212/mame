@@ -1017,6 +1017,10 @@ void md_base_state::md_ntsc(machine_config &config)
 		C140(config, *m_c140[i], 22050);	// XTAL(49'152'000) / 384 / 6); /* 21.333kHz */
 		(*m_c140[i])->add_route(0, "lspeaker", 1.00);
 		(*m_c140[i])->add_route(1, "rspeaker", 1.00);
+
+		C6280(config, *m_c6280[i], 3580000);
+		(*m_c6280[i])->add_route(0, "lspeaker", 1.00);
+		(*m_c6280[i])->add_route(1, "rspeaker", 1.00);
 	}
 }
 

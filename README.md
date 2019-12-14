@@ -1,4 +1,4 @@
-MAmidiMEmo V0.8.3.0 / Itoken (c)2019 / GPL-2.0
+MAmidiMEmo V0.9.4.0 / Itoken (c)2019 / GPL-2.0
 
 *** What is the MAmidiMEmo? ***
 
@@ -168,8 +168,12 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 9. Changes
 
+0.9.4.0 Added FDS, VRC6 tone type to the NES APU. FDS, VRC6 was imported from VirtuaNES( https://github.com/ivysnow/virtuanes )
+        Added HuC6280
+		Fixed and changed "Partial Reserve" feature for GBA ( and HuC6280 ).
+0.9.3.1 Fixed invalid portamento source note and followed portamento speed to GM2 spec.
 0.9.3.0 Added alternate property editor window. That can be popup from toolbar in the Property pane.
-        Added Sound Control Settings feature in Timbre settings. You can link the Sound control MIDI message value with the Timbre property value. (Also VST effects and other props, too)
+        Added "Sound Control Settings" feature in Timbre settings. You can link the Sound control MIDI message value with the Timbre property value. (Also VST effects and other props, too)
 		Added modifying receving MIDI ch for the specific instrument via NRPN MIDI Message feature. See the section No.8 of this README.
         Fixed arpeggio algorithm. When last one key is up, the key is not held in hold mode. Otherwise, keep arpeggio.
 		Fixed 2nd AY8910 outputs noise, C140 panpot gain formula follows GM2 spec, some minor bugs.

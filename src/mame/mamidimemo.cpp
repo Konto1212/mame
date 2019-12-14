@@ -19,6 +19,7 @@
 #include "..\devices\sound\mos6581.h"
 #include "..\devices\sound\beep.h"
 #include "..\devices\sound\c140.h"
+#include "..\devices\sound\c6280.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -843,6 +844,30 @@ extern "C"
 			c140_devices[unitNumber] = c140;
 		}
 		c140_devices[unitNumber]->set_callback(callback);
+	}
+
+
+	c6280_device *c6280_devices[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+
+	DllExport void c6280_w(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		if (c6280_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			c6280_device *c6280 = dynamic_cast<c6280_device *>(rm->device((std::string("c6280_") + num).c_str()));
+			if (c6280 == nullptr)
+				return;
+
+			c6280_devices[unitNumber] = c6280;
+		}
+		c6280_devices[unitNumber]->c6280_w(*dummy, address, data);
 	}
 }
 

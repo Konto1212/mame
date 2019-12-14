@@ -208,6 +208,7 @@
     <Compile Include="Gui\VstUITypeEditor.cs" />
     <Compile Include="Instruments\Chips\AY8910.cs" />
     <Compile Include="Instruments\Chips\C140.cs" />
+    <Compile Include="Instruments\Chips\HuC6280.cs" />
     <Compile Include="Instruments\Chips\GBAPU.cs" />
     <Compile Include="Instruments\Chips\MOS6581.cs" />
     <Compile Include="Instruments\Chips\MOS8580.cs" />
@@ -366,6 +367,7 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\HuC6280.png" />
     <None Include="Resources\Cat.png" />
     <None Include="Resources\AtoZ.png" />
     <None Include="Resources\Popup.png" />

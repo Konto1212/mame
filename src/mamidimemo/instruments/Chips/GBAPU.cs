@@ -66,25 +66,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
-        private bool f_PartialReserveSPSG;
-
-        [DataMember]
-        [Category("Chip")]
-        [Description("SPSG partial reserve against with PSG.\r\n" +
-            "Sweep PSG shared 1ch with PSG." +
-            "So, you can choose whether to give priority to SPSG over PSG")]
-        public bool PartialReserveSPSG
-        {
-            get
-            {
-                return f_PartialReserveSPSG;
-            }
-            set
-            {
-                f_PartialReserveSPSG = value;
-            }
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -416,19 +397,15 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 {
                     case SoundType.SPSG:
                         spsgOnSounds.Add(snd);
-                        FormMain.OutputDebugLog("KeyOn SPSG ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.PSG:
                         psgOnSounds.Add(snd);
-                        FormMain.OutputDebugLog("KeyOn PSG ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.WAV:
                         wavOnSounds.Add(snd);
-                        FormMain.OutputDebugLog("KeyOn WAV ch" + emptySlot + " " + note.ToString());
                         break;
                     case SoundType.NOISE:
                         noiseOnSounds.Add(snd);
-                        FormMain.OutputDebugLog("KeyOn NOISE ch" + emptySlot + " " + note.ToString());
                         break;
                 }
                 snd.KeyOn();
@@ -455,7 +432,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         }
                     case SoundType.PSG:
                         {
-                            if (parentModule.PartialReserveSPSG && spsgOnSounds.Count != 0)
+                            if (timbre.PartialReserveSPSG)
                                 emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 1));
                             else
                                 emptySlot = SearchEmptySlotAndOff(psgOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 2));
@@ -492,6 +469,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
             private SoundType lastSoundType;
 
+            private int partialReserveSpsg;
+
             /// <summary>
             /// 
             /// </summary>
@@ -506,6 +485,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 this.timbre = parentModule.Timbres[programNumber];
 
                 lastSoundType = this.timbre.SoundType;
+                if (lastSoundType == SoundType.PSG && this.timbre.PartialReserveSPSG)
+                    partialReserveSpsg = 1;
             }
 
             /// <summary>
@@ -520,7 +501,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     case SoundType.SPSG:
                     case SoundType.PSG:
                         {
-                            uint reg = (uint)(Slot * 5);
+                            uint reg = (uint)((Slot + partialReserveSpsg) * 5);
 
                             if (lastSoundType == SoundType.SPSG)
                                 GbApuWriteData(parentModule.UnitNumber, reg, (byte)(timbre.SPSGSweep.Time << 4 | timbre.SPSGSweep.Dir << 3 | timbre.SPSGSweep.Speed));
@@ -534,6 +515,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                             UpdatePitch(0x80);
 
+                            if (lastSoundType == SoundType.SPSG)
+                                FormMain.OutputDebugLog("KeyOn SPSG ch" + Slot + " " + NoteOnEvent.ToString());
+                            else
+                                FormMain.OutputDebugLog("KeyOn PSG ch" + (Slot + partialReserveSpsg) + " " + NoteOnEvent.ToString());
                             break;
                         }
                     case SoundType.WAV:
@@ -555,6 +540,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                             UpdatePitch(0x80);
 
+                            FormMain.OutputDebugLog("KeyOn WAV ch" + Slot + " " + NoteOnEvent.ToString());
                             break;
                         }
                     case SoundType.NOISE:
@@ -569,6 +555,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                             UpdatePitch(0x80);
 
+                            FormMain.OutputDebugLog("KeyOn NOISE ch" + Slot + " " + NoteOnEvent.ToString());
                             break;
                         }
                 }
@@ -592,13 +579,13 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     case SoundType.SPSG:
                     case SoundType.PSG:
                         {
-                            uint reg = (uint)(Slot * 5);
+                            uint reg = (uint)((Slot + partialReserveSpsg) * 5);
 
                             byte dt = timbre.Duty;
                             if (FxEngine != null && FxEngine.Active)
                             {
                                 var eng = (GbFxEngine)FxEngine;
-                                if(eng.DutyValue != null)
+                                if (eng.DutyValue != null)
                                     dt = eng.DutyValue.Value;
                             }
 
@@ -669,12 +656,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 double freq = CalcCurrentFrequency();
 
                 //Freq
-                switch (timbre.SoundType)
+                switch (lastSoundType)
                 {
                     case SoundType.SPSG:
                     case SoundType.PSG:
                         {
-                            uint reg = (uint)(Slot * 5);
+                            uint reg = (uint)((Slot + partialReserveSpsg) * 5);
                             ushort gfreq = convertPsgFrequency(freq);
 
                             Program.SoundUpdating();
@@ -729,7 +716,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 byte? cpan = GbApuReadData(parentModule.UnitNumber, 0x15);
                 if (cpan.HasValue)
                 {
-                    var rslot = Slot;
+                    var rslot = Slot + partialReserveSpsg;
+
                     switch (lastSoundType)
                     {
                         case SoundType.SPSG:
@@ -773,7 +761,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     case SoundType.SPSG:
                     case SoundType.PSG:
                         {
-                            uint reg = (uint)(Slot * 5);
+                            uint reg = (uint)((Slot + partialReserveSpsg) * 5);
 
                             GbApuWriteData(parentModule.UnitNumber, reg + 2, 0x00);
 
@@ -839,7 +827,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// </summary>
         [JsonConverter(typeof(NoTypeConverterJsonConverter<GBAPUTimbre>))]
         [DataContract]
-        public class GBAPUTimbre : TimbreBase 
+        public class GBAPUTimbre : TimbreBase
         {
             [DataMember]
             [Category("Sound")]
@@ -850,7 +838,27 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 get;
                 set;
             }
-            
+
+            private bool f_PartialReserveSPSG;
+
+            [DataMember]
+            [Category("Sound")]
+            [Description("SPSG partial reserve against with PSG.\r\n" +
+                "Sweep PSG shared 1ch with PSG." +
+                "So, you can choose whether to give priority to SPSG over PSG")]
+            [DefaultValue(false)]
+            public bool PartialReserveSPSG
+            {
+                get
+                {
+                    return f_PartialReserveSPSG;
+                }
+                set
+                {
+                    f_PartialReserveSPSG = value;
+                }
+            }
+
             private byte f_Duty = 2;
 
             [DataMember]

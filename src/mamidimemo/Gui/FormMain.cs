@@ -102,6 +102,7 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("MOS6581", Resources.MOS6581);
             imageList1.Images.Add("Beep", Resources.Beep);
             imageList1.Images.Add("C140", Resources.C140);
+            imageList1.Images.Add("HuC6280", Resources.HuC6280);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -366,6 +367,12 @@ namespace zanac.MAmidiMEmo.Gui
         private void extendC140ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InstrumentManager.AddInstrument(InstrumentType.C140);
+        }
+
+
+        private void extendHuC6230ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.HuC6280);
         }
 
         /// <summary>
@@ -671,5 +678,6 @@ namespace zanac.MAmidiMEmo.Gui
                 fp.Show(this);
             }
         }
+
     }
 }

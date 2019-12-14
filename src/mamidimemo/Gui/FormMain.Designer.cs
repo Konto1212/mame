@@ -109,6 +109,7 @@
             this.wSGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendSCC1kToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addNAMCOCUS30ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendHuC6230ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pSGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendMOS8580ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendMOS6581ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -879,7 +880,8 @@
             // 
             this.wSGToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.extendSCC1kToolStripMenuItem,
-            this.addNAMCOCUS30ToolStripMenuItem});
+            this.addNAMCOCUS30ToolStripMenuItem,
+            this.extendHuC6230ToolStripMenuItem});
             this.wSGToolStripMenuItem.Name = "wSGToolStripMenuItem";
             resources.ApplyResources(this.wSGToolStripMenuItem, "wSGToolStripMenuItem");
             // 
@@ -894,6 +896,12 @@
             this.addNAMCOCUS30ToolStripMenuItem.Name = "addNAMCOCUS30ToolStripMenuItem";
             resources.ApplyResources(this.addNAMCOCUS30ToolStripMenuItem, "addNAMCOCUS30ToolStripMenuItem");
             this.addNAMCOCUS30ToolStripMenuItem.Click += new System.EventHandler(this.addNAMCOCUS30ToolStripMenuItem_Click);
+            // 
+            // extendHuC6230ToolStripMenuItem
+            // 
+            this.extendHuC6230ToolStripMenuItem.Name = "extendHuC6230ToolStripMenuItem";
+            resources.ApplyResources(this.extendHuC6230ToolStripMenuItem, "extendHuC6230ToolStripMenuItem");
+            this.extendHuC6230ToolStripMenuItem.Click += new System.EventHandler(this.extendHuC6230ToolStripMenuItem_Click);
             // 
             // pSGToolStripMenuItem
             // 
@@ -1104,6 +1112,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButtonPopup;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox2;
         private System.Windows.Forms.ToolStripLabel toolStripLabel4;
+        private System.Windows.Forms.ToolStripMenuItem extendHuC6230ToolStripMenuItem;
     }
 }
 

@@ -1616,7 +1616,7 @@
     <value>Extend &amp;C140</value>
   </data>
   <data name="pCMToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>143, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="pCMToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;PCM</value>
@@ -1646,7 +1646,7 @@
     <value>Extend YM2&amp;413</value>
   </data>
   <data name="fMSynthesisToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>143, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="fMSynthesisToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;FM Synthesis</value>
@@ -1663,8 +1663,14 @@
   <data name="addNAMCOCUS30ToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend &amp;NAMCO CUS30(WSG)</value>
   </data>
+  <data name="extendHuC6230ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>226, 22</value>
+  </data>
+  <data name="extendHuC6230ToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend &amp;HuC6280</value>
+  </data>
   <data name="wSGToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>143, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="wSGToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;WSG</value>
@@ -1721,7 +1727,7 @@
     <value>False</value>
   </data>
   <data name="pSGToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>143, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="pSGToolStripMenuItem.Text" xml:space="preserve">
     <value>PS&amp;G</value>
@@ -4005,6 +4011,12 @@
     <value>addNAMCOCUS30ToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;addNAMCOCUS30ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;extendHuC6230ToolStripMenuItem.Name" xml:space="preserve">
+    <value>extendHuC6230ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;extendHuC6230ToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;pSGToolStripMenuItem.Name" xml:space="preserve">
