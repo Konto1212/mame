@@ -39,8 +39,8 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
    Note: Currently supported chips are the following.
          YM2151, YM2612, YM3812, YM2413,
 		 SID, GB APU, SN76496, NES APU, MSM5232(+TA7630), AY-3-8910
-		 NAMCO CUS30, SCC
-		 C140
+		 NAMCO CUS30, SCC, HuC6280
+		 C140, SPC700
 
    Note: You can add the chip up to 8 per same chip type and MAmidiMEmo eats more CPU power.
 
@@ -86,6 +86,14 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 	 http://ngs.no.coocan.jp/doc/wiki.cgi/TechHan?page=1%BE%CF+PSG%A4%C8%B2%BB%C0%BC%BD%D0%CE%CF
 	 https://w.atwiki.jp/msx-sdcc/pages/45.html
 	 http://f.rdw.se/AY-3-8910-datasheet.pdf
+	SID:
+	 https://www.waitingforfriday.com/?p=661#6581_SID_Block_Diagram
+	 http://www.bellesondes.fr/wiki/doku.php?id=mos6581#mos6581_sound_interface_device_sid
+	 https://www.sfpgmr.net/blog/entry/mos-sid-6581‚ð’²‚×‚½.html
+	HuC6280:
+	 http://www.magicengine.com/mkit/doc_hard_psg.html
+	SPC700:
+	 https://wiki.superfamicom.org/spc700-reference
 
    *[Channels]
     Select which MIDI ch messages the chip receives.
@@ -169,7 +177,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 9. Changes
 
 0.9.4.0 Added FDS, VRC6 tone type to the NES APU. FDS, VRC6 was imported from VirtuaNES( https://github.com/ivysnow/virtuanes )
-        Added HuC6280
+        Added HuC6280 and SPC700(RAM limit breaking).
 		Fixed and changed "Partial Reserve" feature for GBA ( and HuC6280 ).
 0.9.3.1 Fixed invalid portamento source note and followed portamento speed to GM2 spec.
 0.9.3.0 Added alternate property editor window. That can be popup from toolbar in the Property pane.
@@ -178,7 +186,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
         Fixed arpeggio algorithm. When last one key is up, the key is not held in hold mode. Otherwise, keep arpeggio.
 		Fixed 2nd AY8910 outputs noise, C140 panpot gain formula follows GM2 spec, some minor bugs.
 0.8.0.0 Supports piano clicks by mouse. Supports Mono mode(CC#126,CC#127) almost same with FITOM
-0.7.0.0 Added SID, C140 chips, Displays Oscilloscope, Supports VST Effect plugin
+0.7.0.0 Added SID, C140(RAM limit breaking) chips, Displays Oscilloscope, Supports VST Effect plugin
 0.6.1.0 Changed to new sound timer engine for perfect sound timing
 0.6.0.0 Added sound driver effects and portamento feature
 0.5.0.0 Added several chips

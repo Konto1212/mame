@@ -597,11 +597,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 base.KeyOn();
 
                 var gs = timbre.GlobalSettings;
-                if (gs.Enable)
                 {
                     Program.SoundUpdating();
-                    parentModule.LFOEN = gs.LFOEN;
-                    parentModule.LFRQ = gs.LFRQ;
+                    if (gs.LFOEN.HasValue)
+                        parentModule.LFOEN = gs.LFOEN.Value;
+                    if (gs.LFRQ.HasValue)
+                        parentModule.LFRQ = gs.LFRQ.Value;
                     Program.SoundUpdated();
                 }
 
@@ -625,10 +626,11 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Program.SoundUpdating();
 
                 var gs = timbre.GlobalSettings;
-                if (gs.Enable)
                 {
-                    parentModule.LFOEN = gs.LFOEN;
-                    parentModule.LFRQ = gs.LFRQ;
+                    if (gs.LFOEN.HasValue)
+                        parentModule.LFOEN = gs.LFOEN.Value;
+                    if (gs.LFRQ.HasValue)
+                        parentModule.LFRQ = gs.LFRQ.Value;
                 }
 
                 for (int op = 0; op < 4; op++)
@@ -1347,17 +1349,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         public class YM2612GlobalSettings : ContextBoundObject
         {
 
-            [DataMember]
-            [Category("Chip")]
-            [Description("Override global settings")]
-            public bool Enable
-            {
-                get;
-                set;
-            }
-
-
-            private byte f_LFOEN;
+            private byte? f_LFOEN;
 
             /// <summary>
             /// LFRQ (0-255)
@@ -1365,10 +1357,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("LFO Enable (0:Off 1:Enable)")]
-            [DefaultValue((byte)0)]
+            [DefaultValue(null)]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte LFOEN
+            public byte? LFOEN
             {
                 get
                 {
@@ -1376,15 +1368,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
                 set
                 {
-                    byte v = (byte)(value & 1);
-                    if (f_LFOEN != v)
-                    {
-                        f_LFOEN = v;
-                    }
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 1);
+                    f_LFOEN = v;
                 }
             }
 
-            private byte f_LFRQ;
+            private byte? f_LFRQ;
 
             /// <summary>
             /// LFRQ (0-7)
@@ -1400,10 +1391,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 "5: 9.23 Hz\r\n" +
                 "6: 46.11 Hz\r\n" +
                 "7: 69.22 Hz\r\n")]
-            [DefaultValue((byte)0)]
+            [DefaultValue(null)]
             [SlideParametersAttribute(0, 7)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte LFRQ
+            public byte? LFRQ
             {
                 get
                 {
@@ -1411,15 +1402,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
                 set
                 {
-                    byte v = (byte)(value & 7);
-                    if (f_LFRQ != v)
-                    {
-                        f_LFRQ = v;
-                    }
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 7);
+                    f_LFRQ = v;
                 }
             }
 
         }
 
-        }
     }
+}

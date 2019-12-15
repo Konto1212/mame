@@ -45,7 +45,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Chip")]
         [Description("Resonance (0-15)")]
-        [SlideParametersAttribute(0,15)]
+        [SlideParametersAttribute(0, 15)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [DefaultValue((byte)0)]
         public byte RES
@@ -502,14 +502,18 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 base.KeyOn();
 
                 var gs = timbre.GlobalSettings;
-                if (gs.Enable)
                 {
                     Program.SoundUpdating();
-                    parentModule.FC = gs.FC;
-                    parentModule.RES = gs.RES;
-                    parentModule.OFF3 = gs.OFF3;
-                    parentModule.FILT = gs.FILT;
-                    parentModule.FilterType = gs.FilterType;
+                    if (gs.FC.HasValue)
+                        parentModule.FC = gs.FC.Value;
+                    if (gs.RES.HasValue)
+                        parentModule.RES = gs.RES.Value;
+                    if (gs.OFF3.HasValue)
+                        parentModule.OFF3 = gs.OFF3.Value;
+                    if (gs.FILT.HasValue)
+                        parentModule.FILT = gs.FILT.Value;
+                    if (gs.FilterType.HasValue)
+                        parentModule.FilterType = gs.FilterType.Value;
                     Program.SoundUpdated();
                 }
 
@@ -524,14 +528,18 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 base.OnSoundParamsUpdated();
 
                 var gs = timbre.GlobalSettings;
-                if (gs.Enable)
                 {
                     Program.SoundUpdating();
-                    parentModule.FC = gs.FC;
-                    parentModule.RES = gs.RES;
-                    parentModule.OFF3 = gs.OFF3;
-                    parentModule.FILT = gs.FILT;
-                    parentModule.FilterType = gs.FilterType;
+                    if (gs.FC.HasValue)
+                        parentModule.FC = gs.FC.Value;
+                    if (gs.RES.HasValue)
+                        parentModule.RES = gs.RES.Value;
+                    if (gs.OFF3.HasValue)
+                        parentModule.OFF3 = gs.OFF3.Value;
+                    if (gs.FILT.HasValue)
+                        parentModule.FILT = gs.FILT.Value;
+                    if (gs.FilterType.HasValue)
+                        parentModule.FilterType = gs.FilterType.Value;
                     Program.SoundUpdated();
                 }
 
@@ -589,7 +597,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         pw = eng.DutyValue.Value;
                     if (eng.WaveFormValue != null)
                         w = eng.WaveFormValue.Value;
-                    if (timbre.GlobalSettings.Enable)
+                    if (eng.Settings.Enable)
                     {
                         if (eng.ResonanceValue != null)
                             res = eng.ResonanceValue.Value;
@@ -858,94 +866,84 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         public class SIDGlobalSettings : ContextBoundObject
         {
 
-            [DataMember]
-            [Category("Chip")]
-            [DefaultValue(false)]
-            [Description("Override global settings")]
-            public bool Enable
-            {
-                get;
-                set;
-            }
-
-            private byte f_RES;
+            private byte? f_RES;
 
             /// <summary>
             /// 
             /// </summary>
             [DataMember]
             [Category("Chip")]
-            [DefaultValue((byte)0)]
+            [DefaultValue(null)]
             [Description("Resonance (0-15)")]
             [SlideParametersAttribute(0, 15)]
             [EditorAttribute(typeof(SlideEditor), typeof(UITypeEditor))]
-            public byte RES
+            public byte? RES
             {
                 get => f_RES;
                 set
                 {
-                    f_RES = (byte)(value & 15);
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 15);
+                    f_RES = v;
                 }
             }
 
-            private ushort f_FC;
+            private ushort? f_FC;
 
             /// <summary>
             /// 
             /// </summary>
             [DataMember]
             [Category("Chip")]
+            [DefaultValue(null)]
             [Description("Cutoff (or Center) Frequency (0-2047)(30Hz - 10KHz)")]
             [SlideParametersAttribute(0, 2047)]
             [EditorAttribute(typeof(SlideEditor), typeof(UITypeEditor))]
-            public ushort FC
+            public ushort? FC
             {
                 get => f_FC;
                 set
                 {
-                    f_FC = (ushort)(value & 2047);
+                    ushort? v = value;
+                    if (value.HasValue)
+                        v = (ushort)(value & 2047);
+                    f_FC = v;
                 }
             }
 
-            public bool ShouldSerializeFC()
-            {
-                return FC != 0;
-            }
-
-            public void ResetFC()
-            {
-                FC = 0;
-            }
-
-            private byte f_Off3;
+            private byte? f_Off3;
 
             /// <summary>
             /// </summary>
             [DataMember]
             [Category("Chip")]
-            [DefaultValue((byte)0)]
+            [DefaultValue(null)]
             [Description("Disable ch 3 sound (0:Enable 1:Disable)")]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(UITypeEditor))]
-            public byte OFF3
+            public byte? OFF3
             {
                 get => f_Off3;
                 set
                 {
-                    f_Off3 = (byte)(value & 1);
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 1);
+                    f_Off3 = v;
                 }
             }
 
-            private FilterChannel f_FILT;
+            private FilterChannel? f_FILT;
 
             /// <summary>
             /// 
             /// </summary>
             [DataMember]
             [Category("Chip")]
-            [DefaultValue(FilterChannel.None)]
+            [DefaultValue(null)]
             [Description("Apply Filter Ch")]
-            public FilterChannel FILT
+            public FilterChannel? FILT
             {
                 get => f_FILT;
                 set
@@ -954,26 +952,22 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
             }
 
-
-            private FilterTypes f_FilterType;
+            private FilterTypes? f_FilterType;
 
             /// <summary>
             /// 
             /// </summary>
             [DataMember]
             [Category("Chip")]
-            [DefaultValue(FilterTypes.None)]
+            [DefaultValue(null)]
             [Description("Filter Type")]
             [TypeConverter(typeof(FlagsEnumConverter))]
-            public FilterTypes FilterType
+            public FilterTypes? FilterType
             {
                 get => f_FilterType;
                 set
                 {
-                    if (f_FilterType != value)
-                    {
-                        f_FilterType = value;
-                    }
+                    f_FilterType = value;
                 }
             }
         }

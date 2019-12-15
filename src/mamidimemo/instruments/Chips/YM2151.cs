@@ -597,15 +597,20 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 base.KeyOn();
 
                 var gs = timbre.GlobalSettings;
-                if (gs.Enable)
                 {
                     Program.SoundUpdating();
-                    parentModule.LFOD = gs.LFOD;
-                    parentModule.LFOF = gs.LFOF;
-                    parentModule.LFOW = gs.LFOW;
-                    parentModule.LFRQ = gs.LFRQ;
-                    parentModule.NE = gs.NE;
-                    parentModule.NFRQ = gs.NFRQ;
+                    if (gs.LFOD.HasValue)
+                        parentModule.LFOD = gs.LFOD.Value;
+                    if (gs.LFOF.HasValue)
+                        parentModule.LFOF = gs.LFOF.Value;
+                    if (gs.LFOW.HasValue)
+                        parentModule.LFOW = gs.LFOW.Value;
+                    if (gs.LFRQ.HasValue)
+                        parentModule.LFRQ = gs.LFRQ.Value;
+                    if (gs.NE.HasValue)
+                        parentModule.NE = gs.NE.Value;
+                    if (gs.NFRQ.HasValue)
+                        parentModule.NFRQ = gs.NFRQ.Value;
                     Program.SoundUpdated();
                 }
 
@@ -630,14 +635,19 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Program.SoundUpdating();
 
                 var gs = timbre.GlobalSettings;
-                if (gs.Enable)
                 {
-                    parentModule.LFOD = gs.LFOD;
-                    parentModule.LFOF = gs.LFOF;
-                    parentModule.LFOW = gs.LFOW;
-                    parentModule.LFRQ = gs.LFRQ;
-                    parentModule.NE = gs.NE;
-                    parentModule.NFRQ = gs.NFRQ;
+                    if (gs.LFOD.HasValue)
+                        parentModule.LFOD = gs.LFOD.Value;
+                    if (gs.LFOF.HasValue)
+                        parentModule.LFOF = gs.LFOF.Value;
+                    if (gs.LFOW.HasValue)
+                        parentModule.LFOW = gs.LFOW.Value;
+                    if (gs.LFRQ.HasValue)
+                        parentModule.LFRQ = gs.LFRQ.Value;
+                    if (gs.NE.HasValue)
+                        parentModule.NE = gs.NE.Value;
+                    if (gs.NFRQ.HasValue)
+                        parentModule.NFRQ = gs.NFRQ.Value;
                 }
 
                 Ym2151WriteData(parentModule.UnitNumber, 0x38, 0, Slot, (byte)((timbre.PMS << 4 | timbre.AMS)));
@@ -1354,17 +1364,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         public class YM2151GlobalSettings : ContextBoundObject
         {
 
-            [DataMember]
-            [Category("Chip")]
-            [Description("Override global settings")]
-            public bool Enable
-            {
-                get;
-                set;
-            }
-
-
-            private byte f_LFRQ;
+            private byte? f_LFRQ;
 
             /// <summary>
             /// LFRQ (0-255)
@@ -1372,10 +1372,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("LFO Freq (0-255)")]
-            [DefaultValue((byte)0)]
+            [DefaultValue(null)]
             [SlideParametersAttribute(0, 255)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte LFRQ
+            public byte? LFRQ
             {
                 get
                 {
@@ -1383,14 +1383,11 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
                 set
                 {
-                    if (f_LFRQ != value)
-                    {
-                        f_LFRQ = value;
-                    }
+                    f_LFRQ = value;
                 }
             }
 
-            private byte f_LFOF;
+            private byte? f_LFOF;
 
             /// <summary>
             /// Select AMD or PMD(0:AMD 1:PMD)
@@ -1398,10 +1395,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("Select AMD or PMD (0:AMD 1:PMD)")]
-            [DefaultValue((byte)0)]
+            [DefaultValue(null)]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte LFOF
+            public byte? LFOF
             {
                 get
                 {
@@ -1409,15 +1406,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
                 set
                 {
-                    byte v = (byte)(value & 1);
-                    if (f_LFOF != v)
-                    {
-                        f_LFOF = v;
-                    }
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 1);
+                    f_LFOF = v;
                 }
             }
 
-            private byte f_LFOD;
+            private byte? f_LFOD;
 
 
             /// <summary>
@@ -1429,7 +1425,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 127)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte LFOD
+            public byte? LFOD
             {
                 get
                 {
@@ -1437,16 +1433,15 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
                 set
                 {
-                    byte v = (byte)(value & 127);
-                    if (f_LFOD != v)
-                    {
-                        f_LFOD = v;
-                    }
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 127);
+                    f_LFOD = v;
                 }
             }
 
 
-            private byte f_LFOW;
+            private byte? f_LFOW;
 
 
             /// <summary>
@@ -1458,7 +1453,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 3)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte LFOW
+            public byte? LFOW
             {
                 get
                 {
@@ -1466,15 +1461,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
                 set
                 {
-                    byte v = (byte)(value & 3);
-                    if (f_LFOW != v)
-                    {
-                        f_LFOW = v;
-                    }
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 3);
+                    f_LFOW = v;
                 }
             }
 
-            private byte f_NE;
+            private byte? f_NE;
 
             /// <summary>
             /// Noise Enable (0:Disable 1:Enable)
@@ -1486,7 +1480,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte NE
+            public byte? NE
             {
                 get
                 {
@@ -1494,15 +1488,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
                 set
                 {
-                    byte v = (byte)(value & 1);
-                    if (f_NE != v)
-                    {
-                        f_NE = v;
-                    }
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 1);
+                    f_NE = v;
                 }
             }
 
-            private byte f_NFRQ;
+            private byte? f_NFRQ;
 
             /// <summary>
             /// Noise Frequency (0-31)
@@ -1515,7 +1508,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DefaultValue((byte)0)]
             [SlideParametersAttribute(0, 31)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte NFRQ
+            public byte? NFRQ
             {
                 get
                 {
@@ -1523,11 +1516,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
                 set
                 {
-                    byte v = (byte)(value & 31);
-                    if (f_NFRQ != v)
-                    {
-                        f_NFRQ = v;
-                    }
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 31);
+                    f_NFRQ = v;
                 }
             }
 

@@ -103,7 +103,7 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("Beep", Resources.Beep);
             imageList1.Images.Add("C140", Resources.C140);
             imageList1.Images.Add("HuC6280", Resources.HuC6280);
-            imageList1.Images.Add("SPC700", Resources.C140);
+            imageList1.Images.Add("SPC700", Resources.SPC700);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())

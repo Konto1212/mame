@@ -452,11 +452,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 base.KeyOn();
 
                 var gs = timbre.GlobalSettings;
-                if (gs.Enable)
                 {
                     Program.SoundUpdating();
-                    parentModule.AMD = gs.AMD;
-                    parentModule.VIB = gs.VIB;
+                    if (gs.AMD.HasValue)
+                        parentModule.AMD = gs.AMD.Value;
+                    if (gs.VIB.HasValue)
+                        parentModule.VIB = gs.VIB.Value;
                     Program.SoundUpdated();
                 }
 
@@ -473,11 +474,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 base.OnSoundParamsUpdated();
 
                 var gs = timbre.GlobalSettings;
-                if (gs.Enable)
                 {
                     Program.SoundUpdating();
-                    parentModule.AMD = gs.AMD;
-                    parentModule.VIB = gs.VIB;
+                    if (gs.AMD.HasValue)
+                        parentModule.AMD = gs.AMD.Value;
+                    if (gs.VIB.HasValue)
+                        parentModule.VIB = gs.VIB.Value;
                     Program.SoundUpdated();
                 }
 
@@ -1075,16 +1077,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         public class YM3812GlobalSettings : ContextBoundObject
         {
 
-            [DataMember]
-            [Category("Chip")]
-            [Description("Override global settings")]
-            public bool Enable
-            {
-                get;
-                set;
-            }
-
-            private byte f_AMD;
+            private byte? f_AMD;
 
             /// <summary>
             /// AM Depth (0-1)
@@ -1092,10 +1085,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("AM depth (0:1dB 1:4.8dB)")]
-            [DefaultValue((byte)0)]
+            [DefaultValue(null)]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte AMD
+            public byte? AMD
             {
                 get
                 {
@@ -1103,15 +1096,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
                 set
                 {
-                    var v = (byte)(value & 1);
-                    if (f_AMD != v)
-                    {
-                        f_AMD = v;
-                    }
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 1);
+                    f_AMD = v;
                 }
             }
 
-            private byte f_VIB;
+            private byte? f_VIB;
 
             /// <summary>
             /// Vibrato depth (0:7 cent 1:14 cent)
@@ -1119,10 +1111,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Chip")]
             [Description("Vibrato depth (0:7 cent 1:14 cent)")]
-            [DefaultValue((byte)0)]
+            [DefaultValue(null)]
             [SlideParametersAttribute(0, 1)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte VIB
+            public byte? VIB
             {
                 get
                 {
@@ -1130,11 +1122,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 }
                 set
                 {
-                    var v = (byte)(value & 1);
-                    if (f_VIB != v)
-                    {
-                        f_VIB = v;
-                    }
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 1);
+                    f_VIB = v;
                 }
             }
         }

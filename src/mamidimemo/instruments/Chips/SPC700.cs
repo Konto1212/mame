@@ -21,6 +21,8 @@ using zanac.MAmidiMEmo.Instruments.Envelopes;
 using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
+//https://wiki.superfamicom.org/spc700-reference
+
 namespace zanac.MAmidiMEmo.Instruments.Chips
 {
     /// <summary>
@@ -114,7 +116,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("Set Left Output Echo Volume")]
-        [DefaultValue((sbyte)127)]
+        [DefaultValue(typeof(sbyte), "127")]
         [SlideParametersAttribute(-128, 128)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte LEVOL
@@ -139,7 +141,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("Set Right Output Echo Volume")]
-        [DefaultValue((sbyte)127)]
+        [DefaultValue(typeof(sbyte), "127")]
         [SlideParametersAttribute(-128, 128)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte REVOL
@@ -215,7 +217,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("Echo Feedback")]
-        [DefaultValue((byte)0)]
+        [DefaultValue(typeof(sbyte), "0")]
         [SlideParametersAttribute(-128, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte EFB
@@ -265,7 +267,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("COEF are used by the 8-tap FIR filter.")]
-        [DefaultValue((sbyte)127)]
+        [DefaultValue(typeof(sbyte), "127")]
         [SlideParametersAttribute(-128, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte COEF1
@@ -290,7 +292,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("COEF are used by the 8-tap FIR filter.")]
-        [DefaultValue((sbyte)0)]
+        [DefaultValue(typeof(sbyte), "0")]
         [SlideParametersAttribute(-128, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte COEF2
@@ -315,7 +317,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("COEF are used by the 8-tap FIR filter.")]
-        [DefaultValue((sbyte)0)]
+        [DefaultValue(typeof(sbyte), "0")]
         [SlideParametersAttribute(-128, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte COEF3
@@ -340,7 +342,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("COEF are used by the 8-tap FIR filter.")]
-        [DefaultValue((sbyte)0)]
+        [DefaultValue(typeof(sbyte), "0")]
         [SlideParametersAttribute(-128, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte COEF4
@@ -365,7 +367,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("COEF are used by the 8-tap FIR filter.")]
-        [DefaultValue((sbyte)0)]
+        [DefaultValue(typeof(sbyte), "0")]
         [SlideParametersAttribute(-128, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte COEF5
@@ -391,7 +393,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("COEF are used by the 8-tap FIR filter.")]
-        [DefaultValue((sbyte)0)]
+        [DefaultValue(typeof(sbyte), "0")]
         [SlideParametersAttribute(-128, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte COEF6
@@ -416,7 +418,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("COEF are used by the 8-tap FIR filter.")]
-        [DefaultValue((sbyte)0)]
+        [DefaultValue(typeof(sbyte), "0")]
         [SlideParametersAttribute(-128, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte COEF7
@@ -441,7 +443,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [DataMember]
         [Category("Filter")]
         [Description("COEF are used by the 8-tap FIR filter.")]
-        [DefaultValue((sbyte)0)]
+        [DefaultValue(typeof(sbyte), "0")]
         [SlideParametersAttribute(-128, 127)]
         [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public sbyte COEF8
@@ -573,6 +575,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void delegate_spc_ram_w(uint unitNumber, uint address, byte data);
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate byte delegate_spc_ram_r(uint unitNumber, uint address);
+
         /// <summary>
         /// 
         /// </summary>
@@ -606,6 +611,41 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static byte SPC700RegReadData(uint unitNumber, byte reg)
+        {
+            try
+            {
+                Program.SoundUpdating();
+                spc_ram_w(unitNumber, 0xf2, reg);
+                return spc_ram_r(unitNumber, 0xf3);
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static byte SPC700RamReadData(uint unitNumber, uint address)
+        {
+            try
+            {
+                Program.SoundUpdating();
+                return spc_ram_r(unitNumber, address);
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -615,6 +655,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_spc_ram_r spc_ram_r
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// 
@@ -661,16 +709,6 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
         private Dictionary<int, byte[]> tmpPcmDataTable = new Dictionary<int, byte[]>();
 
-        private byte keyOnFlags;
-
-        private byte keyOffFlags;
-
-        private byte pmonFlags;
-
-        private byte nonFlags;
-
-        private byte eonFlags;
-
         /// <summary>
         /// 
         /// </summary>
@@ -679,6 +717,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             IntPtr funcPtr = MameIF.GetProcAddress("spc_ram_w");
             if (funcPtr != IntPtr.Zero)
                 spc_ram_w = (delegate_spc_ram_w)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_spc_ram_w));
+
+            funcPtr = MameIF.GetProcAddress("spc_ram_r");
+            if (funcPtr != IntPtr.Zero)
+                spc_ram_r = (delegate_spc_ram_r)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_spc_ram_r));
 
             funcPtr = MameIF.GetProcAddress("spc700_set_callback");
             if (funcPtr != IntPtr.Zero)
@@ -957,6 +999,44 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 uint reg = (uint)(Slot * 16);
                 byte bitPos = (byte)(1 << Slot);
 
+                Program.SoundUpdating();
+
+                var gs = timbre.GlobalSettings;
+                {
+                    if (gs.LMVOL.HasValue)
+                        parentModule.LMVOL = gs.LMVOL.Value;
+                    if (gs.RMVOL.HasValue)
+                        parentModule.RMVOL = gs.RMVOL.Value;
+                    if (gs.LEVOL.HasValue)
+                        parentModule.LEVOL = gs.LEVOL.Value;
+                    if (gs.REVOL.HasValue)
+                        parentModule.REVOL = gs.REVOL.Value;
+                    if (gs.NOISE_CLOCK.HasValue)
+                        parentModule.NOISE_CLOCK = gs.NOISE_CLOCK.Value;
+                    if (gs.ECEN.HasValue)
+                        parentModule.ECEN = gs.ECEN.Value;
+                    if (gs.EFB.HasValue)
+                        parentModule.EFB = gs.EFB.Value;
+                    if (gs.EDL.HasValue)
+                        parentModule.EDL = gs.EDL.Value;
+                    if (gs.COEF1.HasValue)
+                        parentModule.COEF1 = gs.COEF1.Value;
+                    if (gs.COEF2.HasValue)
+                        parentModule.COEF2 = gs.COEF2.Value;
+                    if (gs.COEF3.HasValue)
+                        parentModule.COEF3 = gs.COEF3.Value;
+                    if (gs.COEF4.HasValue)
+                        parentModule.COEF4 = gs.COEF4.Value;
+                    if (gs.COEF5.HasValue)
+                        parentModule.COEF5 = gs.COEF5.Value;
+                    if (gs.COEF6.HasValue)
+                        parentModule.COEF6 = gs.COEF6.Value;
+                    if (gs.COEF7.HasValue)
+                        parentModule.COEF7 = gs.COEF7.Value;
+                    if (gs.COEF8.HasValue)
+                        parentModule.COEF8 = gs.COEF8.Value;
+                }
+
                 OnVolumeUpdated();
                 OnPanpotUpdated();
                 OnPitchUpdated();
@@ -989,25 +1069,110 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     SPC700RegWriteData(parentModule.UnitNumber, (byte)(reg + 7), 0x7f);
                 }
                 //PMON
-                //parentModule.pmonFlags &= (byte)~bitPos;
-                //parentModule.pmonFlags |= (byte)(timbre.PMON << Slot);
-                //SPC700RegWriteData(parentModule.UnitNumber, 0x2d, parentModule.pmonFlags);
+                //byte pmon = SPC700RegReadData(parentModule.UnitNumber, 0x2d);
+                //pmon &= (byte)~bitPos;
+                //pmon |= (byte)(timbre.PMON << Slot);
+                //SPC700RegWriteData(parentModule.UnitNumber, 0x2d, pmon);
                 //NON
-                parentModule.nonFlags &= (byte)~bitPos;
-                parentModule.nonFlags |= (byte)(timbre.NON << Slot);
-                SPC700RegWriteData(parentModule.UnitNumber, 0x3d, parentModule.nonFlags);
+                byte non = SPC700RegReadData(parentModule.UnitNumber, 0x3d);
+                non &= (byte)~bitPos;
+                non |= (byte)(timbre.NON << Slot);
+                SPC700RegWriteData(parentModule.UnitNumber, 0x3d, non);
                 //EON
-                parentModule.eonFlags &= (byte)~bitPos;
-                parentModule.eonFlags |= (byte)(timbre.EON << Slot);
-                SPC700RegWriteData(parentModule.UnitNumber, 0x4d, parentModule.eonFlags);
+                byte eon = SPC700RegReadData(parentModule.UnitNumber, 0x3d);
+                eon &= (byte)~bitPos;
+                eon |= (byte)(timbre.EON << Slot);
+                SPC700RegWriteData(parentModule.UnitNumber, 0x4d, eon);
 
                 //KON
-                parentModule.keyOffFlags &= (byte)~bitPos;
-                SPC700RegWriteData(parentModule.UnitNumber, 0x5c, parentModule.keyOffFlags);
-                parentModule.keyOnFlags &= (byte)~bitPos;
-                parentModule.keyOnFlags |= (byte)(1 << Slot);
-                SPC700RegWriteData(parentModule.UnitNumber, 0x4c, parentModule.keyOnFlags);
+                byte koff = (byte)(SPC700RegReadData(parentModule.UnitNumber, 0x5c) & ~bitPos);
+                SPC700RegWriteData(parentModule.UnitNumber, 0x5c, koff);
+                byte kon = (byte)(SPC700RegReadData(parentModule.UnitNumber, 0x4c) | bitPos);
+                SPC700RegWriteData(parentModule.UnitNumber, 0x4c, kon);
+
+                Program.SoundUpdated();
             }
+
+
+            public override void OnSoundParamsUpdated()
+            {
+                base.OnSoundParamsUpdated();
+
+                uint reg = (uint)(Slot * 16);
+                byte bitPos = (byte)(1 << Slot);
+
+                Program.SoundUpdating();
+
+                var gs = timbre.GlobalSettings;
+                {
+                    if (gs.LMVOL.HasValue)
+                        parentModule.LMVOL = gs.LMVOL.Value;
+                    if (gs.RMVOL.HasValue)
+                        parentModule.RMVOL = gs.RMVOL.Value;
+                    if (gs.LEVOL.HasValue)
+                        parentModule.LEVOL = gs.LEVOL.Value;
+                    if (gs.REVOL.HasValue)
+                        parentModule.REVOL = gs.REVOL.Value;
+                    if (gs.NOISE_CLOCK.HasValue)
+                        parentModule.NOISE_CLOCK = gs.NOISE_CLOCK.Value;
+                    if (gs.ECEN.HasValue)
+                        parentModule.ECEN = gs.ECEN.Value;
+                    if (gs.EFB.HasValue)
+                        parentModule.EFB = gs.EFB.Value;
+                    if (gs.EDL.HasValue)
+                        parentModule.EDL = gs.EDL.Value;
+                    if (gs.COEF1.HasValue)
+                        parentModule.COEF1 = gs.COEF1.Value;
+                    if (gs.COEF2.HasValue)
+                        parentModule.COEF2 = gs.COEF2.Value;
+                    if (gs.COEF3.HasValue)
+                        parentModule.COEF3 = gs.COEF3.Value;
+                    if (gs.COEF4.HasValue)
+                        parentModule.COEF4 = gs.COEF4.Value;
+                    if (gs.COEF5.HasValue)
+                        parentModule.COEF5 = gs.COEF5.Value;
+                    if (gs.COEF6.HasValue)
+                        parentModule.COEF6 = gs.COEF6.Value;
+                    if (gs.COEF7.HasValue)
+                        parentModule.COEF7 = gs.COEF7.Value;
+                    if (gs.COEF8.HasValue)
+                        parentModule.COEF8 = gs.COEF8.Value;
+                }
+
+                OnVolumeUpdated();
+                OnPanpotUpdated();
+                OnPitchUpdated();
+
+                //ADSR
+                if (timbre.AdsrEnable)
+                {
+                    SPC700RegWriteData(parentModule.UnitNumber, (byte)(reg + 5), (byte)(0x80 | (timbre.AdsrDR << 4) | timbre.AdsrAR));
+                    SPC700RegWriteData(parentModule.UnitNumber, (byte)(reg + 6), (byte)((timbre.AdsrSL << 5) | timbre.AdsrSR));
+                }
+                else
+                {
+                    SPC700RegWriteData(parentModule.UnitNumber, (byte)(reg + 5), 0);
+                    SPC700RegWriteData(parentModule.UnitNumber, (byte)(reg + 7), 0x7f);
+                }
+                //PMON
+                //byte pmon = SPC700RegReadData(parentModule.UnitNumber, 0x2d);
+                //pmon &= (byte)~bitPos;
+                //pmon |= (byte)(timbre.PMON << Slot);
+                //SPC700RegWriteData(parentModule.UnitNumber, 0x2d, pmon);
+                //NON
+                byte non = SPC700RegReadData(parentModule.UnitNumber, 0x3d);
+                non &= (byte)~bitPos;
+                non |= (byte)(timbre.NON << Slot);
+                SPC700RegWriteData(parentModule.UnitNumber, 0x3d, non);
+                //EON
+                byte eon = SPC700RegReadData(parentModule.UnitNumber, 0x3d);
+                eon &= (byte)~bitPos;
+                eon |= (byte)(timbre.EON << Slot);
+                SPC700RegWriteData(parentModule.UnitNumber, 0x4d, eon);
+
+                Program.SoundUpdated();
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -1061,9 +1226,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                 byte bitPos = (byte)(1 << Slot);
 
-                parentModule.keyOnFlags &= (byte)~bitPos;
-                parentModule.keyOffFlags |= bitPos;
-                SPC700RegWriteData(parentModule.UnitNumber, 0x5c, parentModule.keyOffFlags);
+                byte kon = (byte)(SPC700RegReadData(parentModule.UnitNumber, 0x4c) & ~bitPos);
+                SPC700RegWriteData(parentModule.UnitNumber, 0x4c, kon);
+                byte koff = (byte)(SPC700RegReadData(parentModule.UnitNumber, 0x5c) | bitPos);
+                SPC700RegWriteData(parentModule.UnitNumber, 0x5c, koff);
             }
 
         }
@@ -1290,11 +1456,22 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
 
 
+            [DataMember]
+            [Category("Chip")]
+            [Description("Global Settings")]
+            public SPC700GlobalSettings GlobalSettings
+            {
+                get;
+                set;
+            }
+
+
             /// <summary>
             /// 
             /// </summary>
             public SPC700Timbre()
             {
+                GlobalSettings = new SPC700GlobalSettings();
                 SDS.FxS = new BasicFxSettings();
             }
 
@@ -1390,6 +1567,349 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
             }
         }
+
+
+        [TypeConverter(typeof(CustomExpandableObjectConverter))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<SPC700GlobalSettings>))]
+        [DataContract]
+        [MidiHook]
+        public class SPC700GlobalSettings : ContextBoundObject
+        {
+
+            private byte? f_LMVOL;
+
+            [DataMember]
+            [Category("Chip")]
+            [Description("Set Left Output Main Volume")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(0, 255)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public byte? LMVOL
+            {
+                get
+                {
+                    return f_LMVOL;
+                }
+                set
+                {
+                    f_LMVOL = value;
+                }
+            }
+
+            private byte? f_RMVOL;
+
+            [DataMember]
+            [Category("Chip")]
+            [Description("Set Right Output Main Volume")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(0, 255)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public byte? RMVOL
+            {
+                get
+                {
+                    return f_RMVOL;
+                }
+                set
+                {
+                    f_RMVOL = value;
+                }
+            }
+
+            private sbyte? f_LEVOL;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("Set Left Output Echo Volume")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 128)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? LEVOL
+            {
+                get
+                {
+                    return f_LEVOL;
+                }
+                set
+                {
+                    f_LEVOL = value;
+                }
+            }
+
+            private sbyte? f_REVOL;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("Set Right Output Echo Volume")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 128)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? REVOL
+            {
+                get
+                {
+                    return f_REVOL;
+                }
+                set
+                {
+                    f_REVOL = value;
+                }
+            }
+
+            private byte? f_NOISE_CLOCK;
+
+            [DataMember]
+            [Category("Chip")]
+            [Description("Designates the frequency for the white noise.")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(0, 31)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public byte? NOISE_CLOCK
+            {
+                get
+                {
+                    return f_NOISE_CLOCK;
+                }
+                set
+                {
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 31);
+                    f_NOISE_CLOCK = v;
+                }
+            }
+
+            private byte? f_ECEN;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("Echo enable")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(0, 1)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public byte? ECEN
+            {
+                get
+                {
+                    return f_ECEN;
+                }
+                set
+                {
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 1);
+                    f_ECEN = v;
+                }
+            }
+
+
+            private sbyte? f_EFB;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("Echo Feedback")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 127)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? EFB
+            {
+                get
+                {
+                    return f_EFB;
+                }
+                set
+                {
+                    f_EFB = value;
+                }
+            }
+
+            private byte? f_EDL;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("EDL specifies the delay between the main sound and the echoed sound. The delay is calculated as EDL * 16ms.")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(0, 15)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public byte? EDL
+            {
+                get
+                {
+                    return f_EDL;
+                }
+                set
+                {
+                    byte? v = value;
+                    if (value.HasValue)
+                        v = (byte)(value & 15);
+                    f_EDL = v;
+                }
+            }
+
+            private sbyte? f_COEF1;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("COEF are used by the 8-tap FIR filter.")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 127)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? COEF1
+            {
+                get
+                {
+                    return f_COEF1;
+                }
+                set
+                {
+                    f_COEF1 = value;
+                }
+            }
+
+            private sbyte? f_COEF2;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("COEF are used by the 8-tap FIR filter.")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 127)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? COEF2
+            {
+                get
+                {
+                    return f_COEF2;
+                }
+                set
+                {
+                    f_COEF2 = value;
+                }
+            }
+
+            private sbyte? f_COEF3;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("COEF are used by the 8-tap FIR filter.")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 127)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? COEF3
+            {
+                get
+                {
+                    return f_COEF3;
+                }
+                set
+                {
+                    f_COEF3 = value;
+                }
+            }
+
+            private sbyte? f_COEF4 = 0;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("COEF are used by the 8-tap FIR filter.")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 127)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? COEF4
+            {
+                get
+                {
+                    return f_COEF4;
+                }
+                set
+                {
+                    f_COEF4 = value;
+                }
+            }
+
+            private sbyte? f_COEF5;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("COEF are used by the 8-tap FIR filter.")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 127)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? COEF5
+            {
+                get
+                {
+                    return f_COEF5;
+                }
+                set
+                {
+                    f_COEF5 = value;
+                }
+            }
+
+
+            private sbyte? f_COEF6 = 0;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("COEF are used by the 8-tap FIR filter.")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 127)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? COEF6
+            {
+                get
+                {
+                    return f_COEF6;
+                }
+                set
+                {
+                    f_COEF6 = value;
+                }
+            }
+
+            private sbyte? f_COEF7;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("COEF are used by the 8-tap FIR filter.")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 127)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? COEF7
+            {
+                get
+                {
+                    return f_COEF7;
+                }
+                set
+                {
+                    f_COEF7 = value;
+                }
+            }
+
+            private sbyte? f_COEF8;
+
+            [DataMember]
+            [Category("Filter")]
+            [Description("COEF are used by the 8-tap FIR filter.")]
+            [DefaultValue(null)]
+            [SlideParametersAttribute(-128, 127)]
+            [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public sbyte? COEF8
+            {
+                get
+                {
+                    return f_COEF8;
+                }
+                set
+                {
+                    f_COEF8 = value;
+                }
+            }
+
+
+        }
+
     }
 
 }

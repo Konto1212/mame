@@ -895,6 +895,26 @@ extern "C"
 		spc700_devices[unitNumber]->spc_ram_w(address, data);
 	}
 
+	DllExport unsigned char spc_ram_r(unsigned int unitNumber, unsigned int address)
+	{
+		if (spc700_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return 0;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return 0;
+
+			std::string num = std::to_string(unitNumber);
+			snes_sound_device *spc700 = dynamic_cast<snes_sound_device *>(rm->device((std::string("snes_sound_") + num).c_str()));
+			if (spc700 == nullptr)
+				return 0;
+
+			spc700_devices[unitNumber] = spc700;
+		}
+		return spc700_devices[unitNumber]->spc_ram_r(address);
+	}
 
 	DllExport void spc700_set_callback(unsigned int unitNumber, SPC700_CALLBACK callback)
 	{

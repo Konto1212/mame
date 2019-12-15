@@ -370,6 +370,7 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\SPC700.png" />
     <None Include="Resources\HuC6280.png" />
     <None Include="Resources\Cat.png" />
     <None Include="Resources\AtoZ.png" />

@@ -1191,7 +1191,15 @@ u8 snes_sound_device::spc_ram_r(offs_t offset)
 	if (offset >= 0xffc0 && m_ram[0xf1] & 0x80)
 		return m_ipl_region[offset & 0x3f];
 
-	return m_ram[offset];
+	//mamidimemo
+	if (0xf0 <= offset && offset <= 0xff)
+	{
+		return spc_io_r(offset & 0xf);
+	}
+	else
+	{
+		return m_ram[offset];
+	}
 }
 
 void snes_sound_device::spc_ram_w(offs_t offset, u8 data)
