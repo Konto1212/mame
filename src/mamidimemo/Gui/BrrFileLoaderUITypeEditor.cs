@@ -89,26 +89,18 @@ namespace zanac.MAmidiMEmo.Gui
                                 return rvalue;
                             return value;
                         }
-                        else
-                        {
-                            //var data = WaveFileReader.ReadWaveFile(fn);
+                        //else if (Path.GetExtension(fn).Equals(".wav", StringComparison.OrdinalIgnoreCase))
+                        //{
+                        //    var data = WaveFileReader.ReadWaveFile(fn);
 
-                            //if (att.Bits != 0 && att.Bits != data.BitPerSample ||
-                            //    att.Rate != 0 && att.Rate != data.SampleRate ||
-                            //    att.Channels != 0 && att.Channels != data.Channel)
-                            //{
-                            //    throw new FileLoadException(
-                            //        string.Format($"Incorrect wave format(Expected Ch={att.Channels} Bit={att.Bits}, Rate={att.Rate},{2})"));
-                            //}
-
-                            //if (data.Data != null)
-                            //{
-                            //    object rvalue = convertToRetValue(context, data.Data);
-                            //    if (rvalue != null)
-                            //        return rvalue;
-                            //}
-                            //return value;
-                        }
+                        //    if (data.Data != null)
+                        //    {
+                        //        object rvalue = convertToRetValue(context, data.Data);
+                        //        if (rvalue != null)
+                        //            return rvalue;
+                        //    }
+                        //    return value;
+                        //}
                     }
                     catch (Exception ex)
                     {

@@ -101,6 +101,7 @@
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.pCMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendC140ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendSPC700ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fMSynthesisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addYM2151ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addYM2612ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -115,6 +116,7 @@
             this.extendMOS6581ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendNESAPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendGBAPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendPOKEYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addSN76496ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendAY38910ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendMSM5232ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -122,7 +124,6 @@
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.multiMediaTimerComponent1 = new zanac.MAmidiMEmo.ComponentModel.MultiMediaTimerComponent(this.components);
-            this.extendSPC700ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -844,6 +845,12 @@
             resources.ApplyResources(this.extendC140ToolStripMenuItem, "extendC140ToolStripMenuItem");
             this.extendC140ToolStripMenuItem.Click += new System.EventHandler(this.extendC140ToolStripMenuItem_Click);
             // 
+            // extendSPC700ToolStripMenuItem
+            // 
+            this.extendSPC700ToolStripMenuItem.Name = "extendSPC700ToolStripMenuItem";
+            resources.ApplyResources(this.extendSPC700ToolStripMenuItem, "extendSPC700ToolStripMenuItem");
+            this.extendSPC700ToolStripMenuItem.Click += new System.EventHandler(this.extendSPC700ToolStripMenuItem_Click);
+            // 
             // fMSynthesisToolStripMenuItem
             // 
             this.fMSynthesisToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -912,6 +919,7 @@
             this.extendMOS6581ToolStripMenuItem,
             this.extendNESAPUToolStripMenuItem,
             this.extendGBAPUToolStripMenuItem,
+            this.extendPOKEYToolStripMenuItem,
             this.addSN76496ToolStripMenuItem,
             this.extendAY38910ToolStripMenuItem,
             this.extendMSM5232ToolStripMenuItem,
@@ -942,6 +950,12 @@
             this.extendGBAPUToolStripMenuItem.Name = "extendGBAPUToolStripMenuItem";
             resources.ApplyResources(this.extendGBAPUToolStripMenuItem, "extendGBAPUToolStripMenuItem");
             this.extendGBAPUToolStripMenuItem.Click += new System.EventHandler(this.extendGBAPUToolStripMenuItem_Click);
+            // 
+            // extendPOKEYToolStripMenuItem
+            // 
+            this.extendPOKEYToolStripMenuItem.Name = "extendPOKEYToolStripMenuItem";
+            resources.ApplyResources(this.extendPOKEYToolStripMenuItem, "extendPOKEYToolStripMenuItem");
+            this.extendPOKEYToolStripMenuItem.Click += new System.EventHandler(this.extendPOKEYToolStripMenuItem_Click);
             // 
             // addSN76496ToolStripMenuItem
             // 
@@ -988,12 +1002,6 @@
             this.multiMediaTimerComponent1.Enabled = false;
             this.multiMediaTimerComponent1.Interval = ((uint)(1000u));
             this.multiMediaTimerComponent1.Resolution = ((uint)(1000u));
-            // 
-            // extendSPC700ToolStripMenuItem
-            // 
-            this.extendSPC700ToolStripMenuItem.Name = "extendSPC700ToolStripMenuItem";
-            resources.ApplyResources(this.extendSPC700ToolStripMenuItem, "extendSPC700ToolStripMenuItem");
-            this.extendSPC700ToolStripMenuItem.Click += new System.EventHandler(this.extendSPC700ToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -1122,6 +1130,7 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel4;
         private System.Windows.Forms.ToolStripMenuItem extendHuC6230ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem extendSPC700ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendPOKEYToolStripMenuItem;
     }
 }
 

@@ -263,12 +263,12 @@ void pokey_device::device_start()
 	m_serin_r_cb.resolve();
 	m_serout_w_cb.resolve_safe();
 
-	m_stream = stream_alloc(0, 1, clock());
+	m_stream = stream_alloc(0, 2, clock());
 
 	timer_alloc(SYNC_WRITE);    /* timer for sync operation */
-	timer_alloc(SYNC_NOOP);
-	timer_alloc(SYNC_POT);
-	timer_alloc(SYNC_SET_IRQST);
+	//timer_alloc(SYNC_NOOP);
+	//timer_alloc(SYNC_POT);
+	//timer_alloc(SYNC_SET_IRQST);
 
 	for (i=0; i<POKEY_CHANNELS; i++)
 	{
@@ -359,7 +359,7 @@ void pokey_device::device_clock_changed()
 		if (m_stream != nullptr)
 			m_stream->set_sample_rate(clock());
 		else
-			m_stream = stream_alloc(0, 1, clock());
+			m_stream = stream_alloc(0, 2, clock());
 	}
 }
 
@@ -368,8 +368,17 @@ void pokey_device::device_clock_changed()
 //  our sound stream
 //-------------------------------------------------
 
+//mamidimemo
+void SoundUpdating();
+void SoundUpdated();
+
 void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	if (m_enable == 0)
+		return;
+
+	SoundUpdating();
+
 	switch (id)
 	{
 	case 3:
@@ -419,16 +428,23 @@ void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	default:
 		assert_always(false, "Unknown id in pokey_device::device_timer");
 	}
+	SoundUpdated();
 }
 
 void pokey_device::execute_run()
 {
+	int en = m_enable;
+	if (en != 0)
+		SoundUpdating();
 	do
 	{
-		step_one_clock();
+		if (en != 0)
+			step_one_clock();
 		m_icount--;
-	} while (m_icount > 0);
 
+	} while (m_icount > 0);
+	if (en != 0)
+		SoundUpdated();
 }
 
 
@@ -695,6 +711,7 @@ void pokey_device::step_one_clock(void)
 void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
+	stream_sample_t *buffer1 = outputs[1];
 
 	if (m_output_type == LEGACY_LINEAR)
 	{
@@ -706,6 +723,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		while( samples > 0 )
 		{
 			*buffer++ = out;
+			*buffer1++ = out;
 			samples--;
 		}
 	}
@@ -721,6 +739,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			/* store sum of output signals into the buffer */
 			m_out_filter += (V0 - m_out_filter) * mult;
 			*buffer++ = m_out_filter;
+			*buffer1++ = m_out_filter;
 			samples--;
 
 		}
@@ -743,6 +762,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		{
 			/* store sum of output signals into the buffer */
 			*buffer++ = V0;
+			*buffer1++ = V0;
 			samples--;
 
 		}
@@ -762,6 +782,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			/* store sum of output signals into the buffer */
 			m_out_filter += (V0 - m_out_filter) * mult;
 			*buffer++ = m_out_filter /* + m_v_ref */;       // see above
+			*buffer1++ = m_out_filter /* + m_v_ref */;       // see above
 			samples--;
 		}
 	}
@@ -771,6 +792,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		while( samples > 0 )
 		{
 			*buffer++ = out;
+			*buffer1++ = out;
 			samples--;
 		}
 	}
@@ -878,7 +900,9 @@ uint8_t pokey_device::read(offs_t offset)
 
 void pokey_device::write(offs_t offset, uint8_t data)
 {
-	synchronize(SYNC_WRITE, (offset << 8) | data);
+	//mamidimemo HACK
+	write_internal(offset, data);
+	//synchronize(SYNC_WRITE, (offset << 8) | data);
 }
 
 void pokey_device::write_internal(offs_t offset, uint8_t data)

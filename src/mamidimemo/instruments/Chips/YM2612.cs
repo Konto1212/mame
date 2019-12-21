@@ -597,6 +597,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 base.KeyOn();
 
                 var gs = timbre.GlobalSettings;
+                if (gs.Enable)
                 {
                     Program.SoundUpdating();
                     if (gs.LFOEN.HasValue)
@@ -626,6 +627,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Program.SoundUpdating();
 
                 var gs = timbre.GlobalSettings;
+                if (gs.Enable)
                 {
                     if (gs.LFOEN.HasValue)
                         parentModule.LFOEN = gs.LFOEN.Value;
@@ -1348,6 +1350,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [MidiHook]
         public class YM2612GlobalSettings : ContextBoundObject
         {
+            [DataMember]
+            [Category("Chip")]
+            [Description("Override global settings")]
+            public bool Enable
+            {
+                get;
+                set;
+            }
 
             private byte? f_LFOEN;
 

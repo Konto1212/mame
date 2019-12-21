@@ -74,11 +74,11 @@ namespace zanac.MAmidiMEmo.Instruments.Envelopes
             f_DeltaNoteNumber = 0d;
         }
 
-        public uint volumeCounter;
+        private uint volumeCounter;
 
-        public uint pitchCounter;
+        private uint pitchCounter;
 
-        public uint arpCounter;
+        private uint arpCounter;
 
         /// <summary>
         /// 

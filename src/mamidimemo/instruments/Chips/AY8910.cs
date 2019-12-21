@@ -724,11 +724,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [MidiHook]
         public class AY8910GlobalSettings : ContextBoundObject
         {
-
             [DataMember]
             [Category("Chip")]
             [Description("Override global settings")]
-            [DefaultValue(false)]
             public bool Enable
             {
                 get;

@@ -1025,6 +1025,10 @@ void md_base_state::md_ntsc(machine_config &config)
 		SNES_SOUND(config, *m_spc700[i], XTAL(24'576'000) / 12);
 		(*m_spc700[i])->add_route(0, "lspeaker", 1.00);
 		(*m_spc700[i])->add_route(1, "rspeaker", 1.00);
+
+		POKEY(config, *m_pokey[i], pokey_device::FREQ_17_EXACT);
+		(*m_pokey[i])->add_route(0, "lspeaker", 1.00);
+		(*m_pokey[i])->add_route(1, "rspeaker", 1.00);
 	}
 }
 

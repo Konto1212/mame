@@ -21,6 +21,8 @@
 #include "..\devices\sound\c140.h"
 #include "..\devices\sound\c6280.h"
 #include "..\mame\audio\snes_snd.h"
+#include "..\devices\sound\pokey.h"
+#include "..\devices\sound\2610intf.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -935,6 +937,73 @@ extern "C"
 			spc700_devices[unitNumber] = spc700;
 		}
 		spc700_devices[unitNumber]->set_callback(callback);
+	}
+
+
+
+	pokey_device *pokey_devices[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+
+	DllExport void pokey_write(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		if (pokey_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			pokey_device *pokey = dynamic_cast<pokey_device *>(rm->device((std::string("pokey_") + num).c_str()));
+			if (pokey == nullptr)
+				return;
+
+			pokey_devices[unitNumber] = pokey;
+		}
+		pokey_devices[unitNumber]->write(address, data);
+	}
+
+	DllExport unsigned char pokey_read(unsigned int unitNumber, unsigned int address)
+	{
+		if (pokey_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return 0;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return 0;
+
+			std::string num = std::to_string(unitNumber);
+			pokey_device *pokey = dynamic_cast<pokey_device *>(rm->device((std::string("pokey_") + num).c_str()));
+			if (pokey == nullptr)
+				return 0;
+
+			pokey_devices[unitNumber] = pokey;
+		}
+		return pokey_devices[unitNumber]->read(address);
+	}
+
+	DllExport void pokey_set_output_type(unsigned int unitNumber, int type, double r, double c, double v)
+	{
+		if (pokey_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			pokey_device *pokey = dynamic_cast<pokey_device *>(rm->device((std::string("pokey_") + num).c_str()));
+			if (pokey == nullptr)
+				return;
+
+			pokey_devices[unitNumber] = pokey;
+		}
+		pokey_devices[unitNumber]->set_output_type(type, r, c, v);
 	}
 
 }

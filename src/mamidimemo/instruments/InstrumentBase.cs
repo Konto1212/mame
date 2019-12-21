@@ -239,7 +239,7 @@ namespace zanac.MAmidiMEmo.Instruments
         }
 
         [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
-    typeof(UITypeEditor)), Localizable(false)]
+        typeof(UITypeEditor)), Localizable(false)]
         [IgnoreDataMember]
         [JsonIgnore]
         [Description("You can copy and paste this text data to other same type Instrument.\r\nNote: Open dropdown editor then copy all text and paste to dropdown editor. Do not copy and paste one liner text.")]
@@ -984,14 +984,13 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         /// <param name="unitNumber"></param>
-        /// <param name="tagName"></param>
         /// <param name="clock"></param>
-        protected void SetClock(uint unitNumber, string tagName, uint clock)
+        protected void SetClock(uint unitNumber, uint clock)
         {
             try
             {
                 Program.SoundUpdating();
-                set_clock(unitNumber, tagName, clock);
+                set_clock(unitNumber, SoundInterfaceTagNamePrefix, clock);
             }
             finally
             {

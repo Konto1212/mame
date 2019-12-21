@@ -177,7 +177,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 9. Changes
 
 0.9.4.0 Added FDS, VRC6 tone type to the NES APU. FDS, VRC6 was imported from VirtuaNES( https://github.com/ivysnow/virtuanes )
-        Added HuC6280 and SPC700(RAM limit breaking).
+        Added HuC6280 and SPC700(RAM limit breaking) and POKEY.
 		Fixed and changed "Partial Reserve" feature for GBA ( and HuC6280 ).
 0.9.3.1 Fixed invalid portamento source note and followed portamento speed to GM2 spec.
 0.9.3.0 Added alternate property editor window. That can be popup from toolbar in the Property pane.

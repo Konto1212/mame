@@ -394,6 +394,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 base.OnSoundParamsUpdated();
 
                 OnVolumeUpdated();
+
+                OnPitchUpdated();
             }
 
             /// <summary>

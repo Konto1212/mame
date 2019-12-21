@@ -171,6 +171,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sid_w ); // pin 24
 	void serin_ready(int after);
 
+	void set_output_type(int type, double r, double c, double v)
+	{
+		m_output_type = (output_type)type;
+		m_r_pullup = r;
+		m_cap = c;
+		m_v_ref = v;
+	}
+
 	// analog output configuration
 	void set_output_rc(double r, double c, double v)
 	{

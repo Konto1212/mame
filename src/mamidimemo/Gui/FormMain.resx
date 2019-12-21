@@ -1610,13 +1610,13 @@
     <value>121, 25</value>
   </data>
   <data name="extendC140ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>151, 22</value>
   </data>
   <data name="extendC140ToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend &amp;C140</value>
   </data>
   <data name="extendSPC700ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>151, 22</value>
   </data>
   <data name="extendSPC700ToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend &amp;SPC700</value>
@@ -1628,25 +1628,31 @@
     <value>&amp;PCM</value>
   </data>
   <data name="addYM2151ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>155, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="addYM2151ToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend YM&amp;2151</value>
   </data>
+  <data name="extendYM2610BToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>180, 22</value>
+  </data>
+  <data name="extendYM2610BToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend YM2610&amp;B</value>
+  </data>
   <data name="addYM2612ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>155, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="addYM2612ToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend YM2&amp;612</value>
   </data>
   <data name="extendYM3812ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>155, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="extendYM3812ToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend YM&amp;3812</value>
   </data>
   <data name="extendYM2413ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>155, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="extendYM2413ToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend YM2&amp;413</value>
@@ -1705,11 +1711,17 @@
   <data name="extendGBAPUToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend &amp;GB(DMG-01) APU</value>
   </data>
+  <data name="extendPOKEYToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>211, 22</value>
+  </data>
+  <data name="extendPOKEYToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend &amp;POKEY</value>
+  </data>
   <data name="addSN76496ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>211, 22</value>
   </data>
   <data name="addSN76496ToolStripMenuItem.Text" xml:space="preserve">
-    <value>Extend &amp;SN76496(PSG)</value>
+    <value>Extend &amp;SN76496</value>
   </data>
   <data name="extendAY38910ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>211, 22</value>
@@ -3971,6 +3983,12 @@
   <data name="&gt;&gt;extendC140ToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;extendSPC700ToolStripMenuItem.Name" xml:space="preserve">
+    <value>extendSPC700ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;extendSPC700ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;fMSynthesisToolStripMenuItem.Name" xml:space="preserve">
     <value>fMSynthesisToolStripMenuItem</value>
   </data>
@@ -4055,6 +4073,12 @@
   <data name="&gt;&gt;extendGBAPUToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;extendPOKEYToolStripMenuItem.Name" xml:space="preserve">
+    <value>extendPOKEYToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;extendPOKEYToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;addSN76496ToolStripMenuItem.Name" xml:space="preserve">
     <value>addSN76496ToolStripMenuItem</value>
   </data>
@@ -4097,10 +4121,10 @@
   <data name="&gt;&gt;multiMediaTimerComponent1.Type" xml:space="preserve">
     <value>zanac.MAmidiMEmo.ComponentModel.MultiMediaTimerComponent, MAmidiMEmo, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
-  <data name="&gt;&gt;extendSPC700ToolStripMenuItem.Name" xml:space="preserve">
-    <value>extendSPC700ToolStripMenuItem</value>
+  <data name="&gt;&gt;extendYM2610BToolStripMenuItem.Name" xml:space="preserve">
+    <value>extendYM2610BToolStripMenuItem</value>
   </data>
-  <data name="&gt;&gt;extendSPC700ToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;extendYM2610BToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

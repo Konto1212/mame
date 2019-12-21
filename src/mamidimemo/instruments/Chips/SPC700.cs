@@ -468,6 +468,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [Description("BRR ADPCM Data (MAX 64KB)")]
         [Editor(typeof(PcmTableUITypeEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [PcmTableEditor("Audio File(*.brr)|*.brr")]
+        //[PcmTableEditor("Audio File(*.brr, *.wav)|*.brr;*.wav")]
         [TypeConverter(typeof(CustomObjectTypeConverter))]
         public SPC700PcmSoundTable DrumSoundTable
         {
@@ -1002,6 +1003,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Program.SoundUpdating();
 
                 var gs = timbre.GlobalSettings;
+                if (gs.Enable)
                 {
                     if (gs.LMVOL.HasValue)
                         parentModule.LMVOL = gs.LMVOL.Value;
@@ -1104,6 +1106,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 Program.SoundUpdating();
 
                 var gs = timbre.GlobalSettings;
+                if (gs.Enable)
                 {
                     if (gs.LMVOL.HasValue)
                         parentModule.LMVOL = gs.LMVOL.Value;
@@ -1283,6 +1286,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [Category("Sound")]
             [Description("BRR ADPCM Data (MAX 64KB)")]
             [BrrFileLoaderEditor("Audio File(*.brr)|*.brr", 65535)]
+            //[BrrFileLoaderEditor("Audio File(*.brr, *.wav)|*.brr;*.wav", 65535)]
             public byte[] AdpcmData
             {
                 get
@@ -1575,6 +1579,14 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         [MidiHook]
         public class SPC700GlobalSettings : ContextBoundObject
         {
+            [DataMember]
+            [Category("Chip")]
+            [Description("Override global settings")]
+            public bool Enable
+            {
+                get;
+                set;
+            }
 
             private byte? f_LMVOL;
 
