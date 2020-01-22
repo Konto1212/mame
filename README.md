@@ -38,7 +38,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
    Note: Currently supported chips are the following.
          YM2151, YM2612, YM3812, YM2413,
-		 SID, GB APU, SN76496, NES APU, MSM5232(+TA7630), AY-3-8910
+		 SID, POKEY, GB APU, SN76496, NES APU, MSM5232(+TA7630), AY-3-8910
 		 NAMCO CUS30, SCC, HuC6280
 		 C140, SPC700
 
@@ -94,6 +94,12 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 	 http://www.magicengine.com/mkit/doc_hard_psg.html
 	SPC700:
 	 https://wiki.superfamicom.org/spc700-reference
+	POKEY:
+	 https://en.wikipedia.org/wiki/POKEY
+	 http://ftp.pigwa.net/stuff/collections/SIO2SD_DVD/PC/RMT%201.19/docs/rmt_en.htm
+	 https://www.atariarchives.org/dere/chapt07.php
+	 http://user.xmission.com/~trevin/atari/pokey_regs.html
+
 
    *[Channels]
     Select which MIDI ch messages the chip receives.
@@ -176,6 +182,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 9. Changes
 
+0.9.4.1 Fixed YM2413 serialized data could not apply properly.
 0.9.4.0 Added FDS, VRC6 tone type to the NES APU. FDS, VRC6 was imported from VirtuaNES( https://github.com/ivysnow/virtuanes )
         Added HuC6280 and SPC700(RAM limit breaking) and POKEY.
 		Fixed and changed "Partial Reserve" feature for GBA ( and HuC6280 ).

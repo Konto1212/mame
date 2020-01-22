@@ -809,7 +809,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             public YM2413Modulator Modulator
             {
                 get;
-                private set;
+                set;
             }
 
 
@@ -822,7 +822,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             public YM2413Career Career
             {
                 get;
-                private set;
+                set;
             }
 
             /// <summary>
