@@ -139,8 +139,10 @@ namespace zanac.MAmidiMEmo.Gui
             {
                 //Program change
                 var pe = new ProgramChangeEvent((SevenBitNumber)(toolStripComboBox2.SelectedIndex - 1));
+                pe.Channel = (FourBitNumber)(toolStripComboBox1.SelectedIndex);
                 MidiManager.SendMidiEvent(pe);
             }
+            e.Channel = (FourBitNumber)(toolStripComboBox1.SelectedIndex);
             MidiManager.SendMidiEvent(e);
         }
 
@@ -150,8 +152,10 @@ namespace zanac.MAmidiMEmo.Gui
             {
                 //Program change
                 var pe = new ProgramChangeEvent((SevenBitNumber)(toolStripComboBox2.SelectedIndex - 1));
+                pe.Channel = (FourBitNumber)(toolStripComboBox1.SelectedIndex);
                 MidiManager.SendMidiEvent(pe);
             }
+            e.Channel = (FourBitNumber)(toolStripComboBox1.SelectedIndex);
             MidiManager.SendMidiEvent(e);
         }
 

@@ -182,6 +182,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 9. Changes
 
+0.9.4.2 Fixed Key ch of piano pane is not applied properly.
 0.9.4.1 Fixed YM2413 serialized data could not apply properly.
 0.9.4.0 Added FDS, VRC6 tone type to the NES APU. FDS, VRC6 was imported from VirtuaNES( https://github.com/ivysnow/virtuanes )
         Added HuC6280 and SPC700(RAM limit breaking) and POKEY.
