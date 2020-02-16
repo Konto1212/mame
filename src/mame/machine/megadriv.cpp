@@ -1029,6 +1029,12 @@ void md_base_state::md_ntsc(machine_config &config)
 		POKEY(config, *m_pokey[i], pokey_device::FREQ_17_EXACT);
 		(*m_pokey[i])->add_route(0, "lspeaker", 1.00);
 		(*m_pokey[i])->add_route(1, "rspeaker", 1.00);
+
+		YM2610B(config, *m_ym2610b[i], XTAL(8'000'000)); /* 8 MHz */
+		//(*m_ym2610b[i])->add_route(0, "lspeaker", 0.25);	//HACK: mamidimemo
+		//(*m_ym2610b[i])->add_route(1, "rspeaker", 0.25);  //HACK: mamidimemo
+		(*m_ym2610b[i])->add_route(2, "lspeaker", 2.00);
+		(*m_ym2610b[i])->add_route(3, "rspeaker", 2.00);
 	}
 }
 

@@ -225,6 +225,7 @@
     <Compile Include="Instruments\Chips\SN76496.cs" />
     <Compile Include="Instruments\Chips\YM2151.cs" />
     <Compile Include="Instruments\Chips\YM2413.cs" />
+    <Compile Include="Instruments\Chips\YM2610B.cs" />
     <Compile Include="Instruments\Chips\YM2612.cs" />
     <Compile Include="Instruments\Chips\YM3812.cs" />
     <Compile Include="Instruments\Envelopes\AbstractFxEngine.cs" />

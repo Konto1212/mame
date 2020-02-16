@@ -75,6 +75,9 @@ void ym2610_device::stream_generate(sound_stream &stream, stream_sample_t **inpu
 
 void ym2610b_device::stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	//mamidimemo
+	psg_sound_stream_update(stream , inputs, outputs, samples);
+
 	ym2610b_update_one(m_chip, outputs, samples);
 }
 
@@ -193,6 +196,7 @@ ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, co
 	, m_adpcm_b_region_name("^" + std::string(basetag()) + ".deltat")
 	, m_adpcm_a_region(*this, DEVICE_SELF)
 	, m_adpcm_b_region(*this, m_adpcm_b_region_name.c_str())
+	, m_adpcm_callback(NULL)
 {
 }
 

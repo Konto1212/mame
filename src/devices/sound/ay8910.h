@@ -122,12 +122,17 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	//mamidimemo
+	void sound_stream_update_core(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// trampolines for callbacks from fm.cpp
 	static void psg_set_clock(device_t *device, int clock) { downcast<ay8910_device *>(device)->ay_set_clock(clock); }
 	static void psg_write(device_t *device, int address, int data) { downcast<ay8910_device *>(device)->ay8910_write_ym(address, data); }
 	static int psg_read(device_t *device) { return downcast<ay8910_device *>(device)->ay8910_read_ym(); }
 	static void psg_reset(device_t *device) { downcast<ay8910_device *>(device)->ay8910_reset_ym(); }
+
+	//mamidimemo
+	void psg_sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) { downcast<ay8910_device *>(this)->sound_stream_update_core(stream, inputs, outputs, samples); }
 
 private:
 	static constexpr unsigned NUM_CHANNELS = 3;

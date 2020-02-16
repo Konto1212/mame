@@ -488,6 +488,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// </summary>
             public override void OnVolumeUpdated()
             {
+                if (IsSoundOff)
+                    return;
+
                 byte tl = (byte)(15 - (byte)Math.Round(15 * CalcCurrentVolume()));
                 if (lastToneType != ToneType.DrumSet)
                 {

@@ -1006,6 +1006,73 @@ extern "C"
 		pokey_devices[unitNumber]->set_output_type(type, r, c, v);
 	}
 
+
+	ym2610b_device  *ym2610b_devices[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+
+	DllExport void ym2610b_write(unsigned int unitNumber, unsigned int address, unsigned char data)
+	{
+		if (ym2610b_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			ym2610b_device *ym2610b = dynamic_cast<ym2610b_device  *>(rm->device((std::string("ym2610b_") + num).c_str()));
+			if (ym2610b == nullptr)
+				return;
+
+			ym2610b_devices[unitNumber] = ym2610b;
+		}
+		ym2610b_devices[unitNumber]->write(address, data);
+	}
+
+
+	DllExport unsigned char ym2610b_read(unsigned int unitNumber, unsigned int address)
+	{
+		if (ym2610b_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return 0;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return 0;
+
+			std::string num = std::to_string(unitNumber);
+			ym2610b_device *ym2610b = dynamic_cast<ym2610b_device  *>(rm->device((std::string("ym2610b_") + num).c_str()));
+			if (ym2610b == nullptr)
+				return 0;
+
+			ym2610b_devices[unitNumber] = ym2610b;
+		}
+		return ym2610b_devices[unitNumber]->read(address);
+	}
+
+	DllExport void ym2610b_set_adpcm_callback(unsigned int unitNumber, OPNA_ADPCM_CALLBACK callback)
+	{
+		if (c140_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			ym2610b_device *ym2610b = dynamic_cast<ym2610b_device  *>(rm->device((std::string("ym2610b_") + num).c_str()));
+			if (ym2610b == nullptr)
+				return;
+
+			ym2610b_devices[unitNumber] = ym2610b;
+		}
+		ym2610b_devices[unitNumber]->set_adpcm_callback(callback);
+	}
+
 }
 
 

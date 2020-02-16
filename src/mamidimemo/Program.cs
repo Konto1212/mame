@@ -33,7 +33,7 @@ namespace zanac.MAmidiMEmo
         /// <summary>
         /// 
         /// </summary>
-        public const string FILE_VERSION = "0.9.4.2";
+        public const string FILE_VERSION = "1.0.0.0";
 
         public static ISerializationBinder SerializationBinder = new KnownTypesBinder();
 

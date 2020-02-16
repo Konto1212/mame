@@ -668,6 +668,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// </summary>
             public override void OnVolumeUpdated()
             {
+                if (IsSoundOff)
+                    return;
+
                 List<int> ops = new List<int>();
                 switch (timbre.ALG)
                 {

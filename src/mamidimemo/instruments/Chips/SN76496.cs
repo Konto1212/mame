@@ -403,6 +403,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// </summary>
             public override void OnVolumeUpdated()
             {
+                if (IsSoundOff)
+                    return;
+
                 switch (lastSoundType)
                 {
                     case SoundType.PSG:

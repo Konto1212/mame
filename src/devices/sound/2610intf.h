@@ -10,6 +10,7 @@
 
 struct ssg_callbacks;
 
+typedef int8_t(*OPNA_ADPCM_CALLBACK)(u8 pn, int32_t pos);
 
 class ym2610_device : public ay8910_device,
 	public device_memory_interface
@@ -27,6 +28,8 @@ public:
 
 	// update request from fm.cpp
 	static void update_request(device_t *param) { downcast<ym2610_device *>(param)->update_request(); }
+
+	void set_adpcm_callback(OPNA_ADPCM_CALLBACK callback) { m_adpcm_callback = callback; };
 
 protected:
 	ym2610_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -49,8 +52,20 @@ private:
 	void timer_handler(int c, int count, int clock);
 	void update_request() { m_stream->update(); }
 
-	static uint8_t static_adpcm_a_read_byte(device_t *param, offs_t offset) { return downcast<ym2610_device *>(param)->space(0).read_byte(offset); }
-	static uint8_t static_adpcm_b_read_byte(device_t *param, offs_t offset) { return downcast<ym2610_device *>(param)->space(1).read_byte(offset); }
+	static uint8_t static_adpcm_a_read_byte(device_t *param, offs_t offset) {
+		if (downcast<ym2610_device *>(param)->m_adpcm_callback != NULL)
+			return downcast<ym2610_device *>(param)->m_adpcm_callback(offset >> 24, offset & 0xffffff);
+		return 0;
+
+		//return downcast<ym2610_device *>(param)->space(0).read_byte(offset);
+	}
+	static uint8_t static_adpcm_b_read_byte(device_t *param, offs_t offset) {
+		if (downcast<ym2610_device *>(param)->m_adpcm_callback != NULL)
+			return downcast<ym2610_device *>(param)->m_adpcm_callback(offset >> 24, offset & 0xffffff);
+		return 0;
+
+		//return downcast<ym2610_device *>(param)->space(1).read_byte(offset);
+	}
 
 	static void static_irq_handler(device_t *param, int irq) { downcast<ym2610_device *>(param)->irq_handler(irq); }
 	static void static_timer_handler(device_t *param, int c, int count, int clock) { downcast<ym2610_device *>(param)->timer_handler(c, count, clock); }
@@ -66,8 +81,9 @@ private:
 	optional_memory_region m_adpcm_b_region;
 
 	static const ssg_callbacks psgintf;
-};
 
+	OPNA_ADPCM_CALLBACK m_adpcm_callback;
+};
 
 class ym2610b_device : public ym2610_device
 {
@@ -78,8 +94,8 @@ protected:
 	virtual void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
-
-DECLARE_DEVICE_TYPE(YM2610,  ym2610_device)
+DECLARE_DEVICE_TYPE(YM2610, ym2610_device)
 DECLARE_DEVICE_TYPE(YM2610B, ym2610b_device)
+
 
 #endif // MAME_SOUND_2610INTF_H

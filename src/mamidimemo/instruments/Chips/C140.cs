@@ -546,7 +546,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     C140WriteData(parentModule.UnitNumber, (reg + 6), 0);
                     C140WriteData(parentModule.UnitNumber, (reg + 7), 0);
                     //pcm end
-                    ushort len = (ushort)(timbre.PcmData.Length & 0xffff);
+                    ushort len = 0;
+                    if (timbre.PcmData.Length > 0)
+                        len = (ushort)((timbre.PcmData.Length - 1) & 0xffff);
                     C140WriteData(parentModule.UnitNumber, (reg + 8), (byte)(len >> 8));
                     C140WriteData(parentModule.UnitNumber, (reg + 9), (byte)(len & 0xff));
                     //loop
@@ -569,8 +571,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     //pcm end
                     var pd = parentModule.DrumSoundTable.PcmTimbres[nn].PcmData;
                     ushort len = 0;
-                    if (pd != null)
-                        len = (ushort)(pd.Length & 0xffff);
+                    if (pd != null && pd.Length > 0)
+                        len = (ushort)((pd.Length - 1) & 0xffff);
                     C140WriteData(parentModule.UnitNumber, (reg + 8), (byte)(len >> 8));
                     C140WriteData(parentModule.UnitNumber, (reg + 9), (byte)(len & 0xff));
                     //mode keyon(0x80)
@@ -583,6 +585,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// </summary>
             public override void OnVolumeUpdated()
             {
+                if (IsSoundOff)
+                    return;
+
                 uint reg = (uint)(Slot * 16);
                 var vol = CalcCurrentVolume();
 

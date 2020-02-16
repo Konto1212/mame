@@ -30,5 +30,6 @@ namespace zanac.MAmidiMEmo.Instruments
         HuC6280,    //16
         SPC700,    //17
         POKEY,    //18
+        YM2610B,    //19
     }
 }

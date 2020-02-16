@@ -46,6 +46,7 @@ struct YM_DELTAT {     /* AT: rearranged and tightened structure */
 	uint8_t   portshift;      /* address bits shift-left:
 	                        ** 8 for YM2610,
 	                        ** 5 for Y8950 and YM2608 */
+	uint8_t   program_no;     /* prog no mamidimemo */
 
 	uint8_t   DRAMportshift;  /* address bits shift-right:
 	                        ** 0 for ROM and x8bit DRAMs,

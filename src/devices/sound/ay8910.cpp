@@ -1046,6 +1046,14 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 
 void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	if (m_type == psg_type_t::PSG_TYPE_YM)
+		return;
+
+	sound_stream_update_core(stream, inputs, outputs, samples);
+}
+
+void ay8910_device::sound_stream_update_core(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
 	stream_sample_t *buf[NUM_CHANNELS];
 	int chan;
 

@@ -119,7 +119,7 @@ uint8_t YM_DELTAT::ADPCM_Read()
 		}
 
 
-		if (now_addr != (end << 1))
+		if (now_addr != ((end | 0xff) << 1))
 		{
 			v = read_byte(device, now_addr>>1);
 
@@ -289,6 +289,9 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 		break;
 
 	case 0x06:  /* Prescale L (ADPCM and Record frq) */
+		program_no = reg[0x6];	//mamidimemo
+		break;
+
 	case 0x07:  /* Prescale H */
 		break;
 
@@ -493,7 +496,7 @@ static inline void YM_DELTAT_synthesis_from_external_memory(YM_DELTAT *DELTAT)
 			if( DELTAT->now_addr&1 ) data = DELTAT->now_data & 0x0f;
 			else
 			{
-				DELTAT->now_data = DELTAT->read_byte(DELTAT->device, DELTAT->now_addr>>1);
+				DELTAT->now_data = DELTAT->read_byte(DELTAT->device, (DELTAT->program_no << 24) | DELTAT->now_addr>>1);
 				data = DELTAT->now_data >> 4;
 			}
 

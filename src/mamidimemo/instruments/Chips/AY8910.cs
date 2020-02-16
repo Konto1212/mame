@@ -516,9 +516,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 if (gs.Enable)
                 {
                     Program.SoundUpdating();
-                    parentModule.EnvelopeType = gs.EnvelopeType;
-                    parentModule.EnvelopeFrequencyFine = gs.EnvelopeFrequencyFine;
-                    parentModule.EnvelopeFrequencyCoarse = gs.EnvelopeFrequencyCoarse;
+                    if(gs.EnvelopeType.HasValue)
+                        parentModule.EnvelopeType = gs.EnvelopeType.Value;
+                    if (gs.EnvelopeFrequencyFine.HasValue)
+                        parentModule.EnvelopeFrequencyFine = gs.EnvelopeFrequencyFine.Value;
+                    if (gs.EnvelopeFrequencyCoarse.HasValue)
+                        parentModule.EnvelopeFrequencyCoarse = gs.EnvelopeFrequencyCoarse.Value;
                     Program.SoundUpdated();
                 }
 
@@ -531,6 +534,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// </summary>
             public override void OnVolumeUpdated()
             {
+                if (IsSoundOff)
+                    return;
+
                 switch (lastSoundType)
                 {
                     case SoundType.PSG:
@@ -639,7 +645,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 int v = NoteOnEvent.NoteNumber % 15;
 
-                Ay8910WriteData(parentModule.UnitNumber, 0, (byte)(5));
+                Ay8910WriteData(parentModule.UnitNumber, 0, (byte)(6));
                 Ay8910WriteData(parentModule.UnitNumber, 1, (byte)v);
             }
 
@@ -677,6 +683,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [DataMember]
             [Category("Sound")]
             [Description("Sound Type")]
+            [DefaultValue(SoundType.PSG)]
             public SoundType SoundType
             {
                 get;
@@ -733,28 +740,33 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 set;
             }
 
-            private byte f_EnvelopeFrequencyCoarse = 2;
+            private byte? f_EnvelopeFrequencyCoarse;
 
             /// <summary>
             /// 
             /// </summary>
             [DataMember]
             [Category("Chip")]
-            [DefaultValue((byte)2)]
+            [DefaultValue(null)]
             [Description("Set Envelope Coarse Frequency")]
             [SlideParametersAttribute(0, 255)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public byte EnvelopeFrequencyCoarse
+            public byte? EnvelopeFrequencyCoarse
             {
                 get => f_EnvelopeFrequencyCoarse;
                 set
                 {
-                    if (f_EnvelopeFrequencyCoarse != value)
+                    if (value.HasValue)
+                    {
+                        if (f_EnvelopeFrequencyCoarse != value)
+                            f_EnvelopeFrequencyCoarse = value;
+                    }
+                    else
                         f_EnvelopeFrequencyCoarse = value;
                 }
             }
 
-            private byte f_EnvelopeFrequencyFine;
+            private byte? f_EnvelopeFrequencyFine;
 
             /// <summary>
             /// 
@@ -764,18 +776,23 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [Description("Set Envelope Fine Frequency")]
             [SlideParametersAttribute(0, 255)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            [DefaultValue((byte)0)]
-            public byte EnvelopeFrequencyFine
+            [DefaultValue(null)]
+            public byte? EnvelopeFrequencyFine
             {
                 get => f_EnvelopeFrequencyFine;
                 set
                 {
-                    if (f_EnvelopeFrequencyFine != value)
+                    if (value.HasValue)
+                    {
+                        if (f_EnvelopeFrequencyFine != value)
+                            f_EnvelopeFrequencyFine = value;
+                    }
+                    else
                         f_EnvelopeFrequencyFine = value;
                 }
             }
 
-            private byte f_EnvelopeType;
+            private byte? f_EnvelopeType;
 
             /// <summary>
             /// 
@@ -785,15 +802,20 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             [Description("Set Envelope Type")]
             [SlideParametersAttribute(0, 15)]
             [EditorAttribute(typeof(SlideEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            [DefaultValue((byte)0)]
-            public byte EnvelopeType
+            [DefaultValue(null)]
+            public byte? EnvelopeType
             {
                 get => f_EnvelopeType;
                 set
                 {
-                    byte v = (byte)(value & 15);
-                    if (f_EnvelopeType != v)
-                        f_EnvelopeType = v;
+                    if (value.HasValue)
+                    {
+                        byte v = (byte)(value & 15);
+                        if (f_EnvelopeType != v)
+                            f_EnvelopeType = v;
+                    }
+                    else
+                        f_EnvelopeType = value;
                 }
             }
         }

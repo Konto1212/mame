@@ -75,7 +75,7 @@ namespace zanac.MAmidiMEmo.Gui
                     var fn = frm.FileName;
                     try
                     {
-                        if (Path.GetExtension(fn).Equals(".raw", StringComparison.OrdinalIgnoreCase))
+                        if (!Path.GetExtension(fn).Equals(".wav", StringComparison.OrdinalIgnoreCase))
                         {
                             List<byte> buf = new List<byte>();
                             foreach (byte data in File.ReadAllBytes(fn))

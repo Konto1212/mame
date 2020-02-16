@@ -37,7 +37,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 3. Add your favorite chips from the [Instruments] menu on the toolbar.
 
    Note: Currently supported chips are the following.
-         YM2151, YM2612, YM3812, YM2413,
+         YM2151, YM2612, YM3812, YM2413, YM2610B
 		 SID, POKEY, GB APU, SN76496, NES APU, MSM5232(+TA7630), AY-3-8910
 		 NAMCO CUS30, SCC, HuC6280
 		 C140, SPC700
@@ -99,6 +99,8 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 	 http://ftp.pigwa.net/stuff/collections/SIO2SD_DVD/PC/RMT%201.19/docs/rmt_en.htm
 	 https://www.atariarchives.org/dere/chapt07.php
 	 http://user.xmission.com/~trevin/atari/pokey_regs.html
+	YM2610:
+	 http://www.ajworld.net/neogeodev/ym2610am2.html
 
 
    *[Channels]
@@ -182,6 +184,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 9. Changes
 
+1.0.0.0 Added YM2610B chip.
 0.9.4.2 Fixed Key ch of piano pane is not applied properly.
 0.9.4.1 Fixed YM2413 serialized data could not apply properly.
 0.9.4.0 Added FDS, VRC6 tone type to the NES APU. FDS, VRC6 was imported from VirtuaNES( https://github.com/ivysnow/virtuanes )

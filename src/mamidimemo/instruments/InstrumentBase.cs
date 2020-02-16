@@ -62,7 +62,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Gain Left ch. (0.0-*) of this Instrument")]
         [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
         [DoubleSlideParameters(0d, 10d, 0.1d)]
-        public float GainLeft
+        public virtual float GainLeft
         {
             get
             {
@@ -74,7 +74,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     f_GainLeft = value;
                     Program.SoundUpdating();
-                    set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 0, value);
+                    SetOutputGain(UnitNumber, SoundInterfaceTagNamePrefix, 0, value);
                     Program.SoundUpdated();
                 }
             }
@@ -100,7 +100,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Gain Right ch. (0.0-*) of this Instrument")]
         [EditorAttribute(typeof(DoubleSlideEditor), typeof(UITypeEditor))]
         [DoubleSlideParameters(0d, 10d, 0.1d)]
-        public float GainRight
+        public virtual float GainRight
         {
             get
             {
@@ -112,7 +112,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 {
                     f_GainRight = value;
                     Program.SoundUpdating();
-                    set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 1, value);
+                    SetOutputGain(UnitNumber, SoundInterfaceTagNamePrefix, 1, value);
                     Program.SoundUpdated();
                 }
             }
@@ -128,12 +128,12 @@ namespace zanac.MAmidiMEmo.Instruments
             GainRight = 1.0f;
         }
 
-        private FilterMode f_FilterMode;
+        private FilterMode f_FilterMode = FilterMode.LowPass;
 
         [DataMember]
         [Category("Filter")]
         [Description("Audio Filter Type")]
-        [DefaultValue(FilterMode.None)]
+        [DefaultValue(FilterMode.LowPass)]
         public FilterMode FilterMode
         {
             get => f_FilterMode;
@@ -952,9 +952,9 @@ namespace zanac.MAmidiMEmo.Instruments
         /// <param name="address"></param>
         /// <param name="data"></param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void delegate_set_output_gain(uint unitNumber, string tagName, int channel, float gain);
+        public delegate void delegate_set_output_gain(uint unitNumber, string tagName, int channel, float gain);
 
-        private static delegate_set_output_gain set_output_gain;
+        public static delegate_set_output_gain SetOutputGain;
 
         /// <summary>
         /// 
@@ -1058,7 +1058,7 @@ namespace zanac.MAmidiMEmo.Instruments
 
             funcPtr = MameIF.GetProcAddress("set_output_gain");
             if (funcPtr != IntPtr.Zero)
-                set_output_gain = Marshal.GetDelegateForFunctionPointer<delegate_set_output_gain>(funcPtr);
+                SetOutputGain = Marshal.GetDelegateForFunctionPointer<delegate_set_output_gain>(funcPtr);
 
             funcPtr = MameIF.GetProcAddress("device_reset");
             if (funcPtr != IntPtr.Zero)
@@ -1086,8 +1086,8 @@ namespace zanac.MAmidiMEmo.Instruments
 
             device_reset(UnitNumber, SoundInterfaceTagNamePrefix);
 
-            set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 0, GainLeft);
-            set_output_gain(UnitNumber, SoundInterfaceTagNamePrefix, 1, GainRight);
+            SetOutputGain(UnitNumber, SoundInterfaceTagNamePrefix, 0, GainLeft);
+            SetOutputGain(UnitNumber, SoundInterfaceTagNamePrefix, 1, GainRight);
             set_filter(UnitNumber, SoundInterfaceTagNamePrefix, FilterMode, FilterCutoff, FilterResonance);
 
             f_vst_fx_callback = new delg_vst_fx_callback(vst_fx_callback);

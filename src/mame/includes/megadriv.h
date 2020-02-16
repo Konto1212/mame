@@ -151,10 +151,14 @@ public:
 			strcpy(device_names[didx][i], (std::string("pokey_") + num).c_str());
 			m_pokey[i] = new optional_device<pokey_device>(*this, device_names[didx][i]);
 			didx++;
+			//ym2610b
+			strcpy(device_names[didx][i], (std::string("ym2610b_") + num).c_str());
+			m_ym2610b[i] = new optional_device<ym2610b_device>(*this, device_names[didx][i]);
+			didx++;
 		}
 	}
 
-	char device_names[ 18 ][8][100];
+	char device_names[ 20 ][8][100];
 	optional_device<ym2151_device> *m_ym2151[8];	//1
 	optional_device<ym2612_device> *m_ym2612[8];	//2
 	optional_device<sn76496_device> *m_sn76496[8];	//3
@@ -173,6 +177,7 @@ public:
 	optional_device<c6280_device> *m_c6280[8];	//16
 	optional_device<snes_sound_device> *m_spc700[8];	//17
 	optional_device<pokey_device> *m_pokey[8];	//18
+	optional_device<ym2610b_device> *m_ym2610b[8];	//19
 
 	required_device<m68000_base_device> m_maincpu;
 	/*

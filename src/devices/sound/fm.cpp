@@ -2430,6 +2430,8 @@ struct ADPCM_CH
 	int8_t        vol_mul;        /* volume in "0.75dB" steps */
 	uint8_t       vol_shift;      /* volume in "-6dB" steps   */
 	int32_t       *pan;           /* &out_adpcm[OPN_xxxx]     */
+	uint8_t       program_no;     /* prog no mamidimemo */
+
 };
 
 /* here's the virtual YM2610 */
@@ -2474,7 +2476,7 @@ struct ym2610_state
 				/* YM2610 checks lower 20 bits only, the 4 MSB bits are sample bank */
 				/* Here we use 1<<21 to compensate for nibble calculations */
 
-				if (   (ch->now_addr & ((1<<21)-1)) == ((ch->end<<1) & ((1<<21)-1))    )
+				if (   (ch->now_addr & ((1<<21)-1)) == ((ch->end <<1) & ((1<<21)-1))    )
 				{
 					ch->flag = 0;
 					adpcm_arrivedEndAddress |= ch->flagMask;
@@ -2491,7 +2493,7 @@ struct ym2610_state
 					data = ch->now_data & 0x0f;
 				else
 				{
-					ch->now_data = read_byte(device, ch->now_addr>>1);
+					ch->now_data = read_byte(device, (ch->program_no << 24) | ch->now_addr>>1);
 					data = (ch->now_data >> 4) & 0x0f;
 				}
 
@@ -2574,6 +2576,14 @@ struct ym2610_state
 				/* calc pcm * volume data */
 				adpcm[c].adpcm_out = ((adpcm[c].adpcm_acc * adpcm[c].vol_mul) >> adpcm[c].vol_shift) & ~3;  /* multiply, shift and mask out low 2 bits */
 			}
+			break;
+		case 0x02:
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x06:
+		case 0x07:
+			adpcm[r - 2].program_no = v;
 			break;
 		default:
 			c = r&0x07;
@@ -3415,6 +3425,7 @@ void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
 	ym2610_state *F2610 = (ym2610_state *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
+	FM_ST ST = OPN->ST;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 	int i,j;
 	FMSAMPLE  *bufL,*bufR;
@@ -3536,13 +3547,14 @@ void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
 			#endif
 
 			/* buffering */
-			bufL[i] = lt;
-			bufR[i] = rt;
+			bufL[i] = lt + bufL[i] / 8;	//mamidimemo
+			bufR[i] = rt + bufR[i] / 8;	//mamidimemo
 		}
 
 		/* timer A control */
 		INTERNAL_TIMER_A( &OPN->ST , cch[2] )
 	}
+
 	INTERNAL_TIMER_B(&OPN->ST,length)
 
 }
