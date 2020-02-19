@@ -105,7 +105,7 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("HuC6280", Resources.HuC6280);
             imageList1.Images.Add("SPC700", Resources.SPC700);
             imageList1.Images.Add("POKEY", Resources.POKEY);
-            imageList1.Images.Add("YM2610", Resources.YM2612);
+            imageList1.Images.Add("YM2610B", Resources.YM2610B);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -117,7 +117,7 @@ namespace zanac.MAmidiMEmo.Gui
             }
             if (toolStripComboBoxMidiIf.Items.Count < 1)
             {
-                MessageBox.Show("There are no MIDI IN devices.\r\nPlease install at lease one MIDI IN device to use the MAmidiMEmo.\r\nOr, install the loopMIDI to the PC.");
+                MessageBox.Show("There are no MIDI IN devices.\r\nPlease install at least one MIDI IN device to use the MAmidiMEmo.\r\nOr, install the loopMIDI to the PC.");
             }
             outputListView = listView1;
 
