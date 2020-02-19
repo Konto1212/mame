@@ -23,6 +23,7 @@ using zanac.MAmidiMEmo.Mame;
 using zanac.MAmidiMEmo.Midi;
 
 //http://www.ajworld.net/neogeodev/ym2610am2.html
+//https://wiki.neogeodev.org/index.php?title=YM2610_registers
 
 namespace zanac.MAmidiMEmo.Instruments.Chips
 {
