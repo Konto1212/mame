@@ -17,9 +17,9 @@ using zanac.MAmidiMEmo.Instruments;
 using zanac.MAmidiMEmo.ComponentModel;
 using Newtonsoft.Json;
 using System.IO;
-using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Common;
 using System.Reflection;
+using Melanchall.DryWetMidi.Core;
 
 namespace zanac.MAmidiMEmo.Gui
 {
@@ -106,6 +106,7 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("SPC700", Resources.SPC700);
             imageList1.Images.Add("POKEY", Resources.POKEY);
             imageList1.Images.Add("YM2610B", Resources.YM2610B);
+            imageList1.Images.Add("MT32", Resources.YM2610B);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -396,6 +397,11 @@ namespace zanac.MAmidiMEmo.Gui
         private void extendYM2610BToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InstrumentManager.AddInstrument(InstrumentType.YM2610B);
+        }
+
+        private void mT32ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.MT32);
         }
 
         /// <summary>

@@ -1035,6 +1035,10 @@ void md_base_state::md_ntsc(machine_config &config)
 		//(*m_ym2610b[i])->add_route(1, "rspeaker", 0.25);  //HACK: mamidimemo
 		(*m_ym2610b[i])->add_route(2, "lspeaker", 2.00);
 		(*m_ym2610b[i])->add_route(3, "rspeaker", 2.00);
+
+		MT32(config, *m_mt32[i], XTAL(3'579'545));
+		(*m_mt32[i])->add_route(0, "lspeaker", 1.00);
+		(*m_mt32[i])->add_route(1, "rspeaker", 1.00);
 	}
 }
 

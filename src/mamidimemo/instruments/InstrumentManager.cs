@@ -1,5 +1,4 @@
 ﻿// copyright-holders:K.Ito
-using Melanchall.DryWetMidi.Smf;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,6 +13,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.Threading;
 using zanac.MAmidiMEmo.Mame;
+using Melanchall.DryWetMidi.Core;
 
 namespace zanac.MAmidiMEmo.Instruments
 {

@@ -1,7 +1,6 @@
 ﻿// copyright-holders:K.Ito
 using Accessibility;
 using Melanchall.DryWetMidi.Devices;
-using Melanchall.DryWetMidi.Smf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;

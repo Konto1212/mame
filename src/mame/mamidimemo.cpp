@@ -23,6 +23,8 @@
 #include "..\mame\audio\snes_snd.h"
 #include "..\devices\sound\pokey.h"
 #include "..\devices\sound\2610intf.h"
+#include "..\devices\sound\mt32.h"
+#include "..\mt32emu\src\c_interface\c_interface.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -67,7 +69,7 @@ extern "C"
 		if (sd == nullptr)
 			return;
 
-		sd->m_enable = enable;
+		sd->set_enable(enable);
 	}
 
 
@@ -1054,7 +1056,7 @@ extern "C"
 
 	DllExport void ym2610b_set_adpcm_callback(unsigned int unitNumber, OPNA_ADPCM_CALLBACK callback)
 	{
-		if (c140_devices[unitNumber] == NULL)
+		if (ym2610b_devices[unitNumber] == NULL)
 		{
 			mame_machine_manager *mmm = mame_machine_manager::instance();
 			if (mmm == nullptr)
@@ -1071,6 +1073,54 @@ extern "C"
 			ym2610b_devices[unitNumber] = ym2610b;
 		}
 		ym2610b_devices[unitNumber]->set_adpcm_callback(callback);
+	}
+
+	mt32_device  *mt32_devices[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+
+	/** Enqueues a single short MIDI message to be processed ASAP. The message must contain a status byte. */
+	DllExport void mt32_play_msg(unsigned int unitNumber, mt32emu_bit32u msg)
+	{
+		if (mt32_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			mt32_device *mt32 = dynamic_cast<mt32_device   *>(rm->device((std::string("mt32_") + num).c_str()));
+			if (mt32 == nullptr)
+				return;
+
+			mt32_devices[unitNumber] = mt32;
+		}
+
+		mt32_devices[unitNumber]->play_msg(msg);
+	}
+
+	/** Enqueues a single well formed System Exclusive MIDI message to be processed ASAP. */
+	DllExport void mt32_play_sysex(unsigned int unitNumber, const mt32emu_bit8u *sysex, mt32emu_bit32u len)
+	{
+		if (mt32_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			mt32_device *mt32 = dynamic_cast<mt32_device   *>(rm->device((std::string("mt32_") + num).c_str()));
+			if (mt32 == nullptr)
+				return;
+
+			mt32_devices[unitNumber] = mt32;
+		}
+
+		mt32_devices[unitNumber]->play_sysex(sysex, len);
 	}
 
 }

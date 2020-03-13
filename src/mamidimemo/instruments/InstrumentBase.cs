@@ -2,7 +2,7 @@
 using Jacobi.Vst.Core;
 using Jacobi.Vst.Interop.Host;
 using Melanchall.DryWetMidi.Common;
-using Melanchall.DryWetMidi.Smf;
+using Melanchall.DryWetMidi.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -322,7 +322,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [Description("Receving MIDI ch <MIDI 16ch>")]
         [TypeConverter(typeof(ExpandableCollectionConverter))]
         [CollectionDefaultValue(true)]
-        public bool[] Channels
+        public virtual bool[] Channels
         {
             get;
             private set;
@@ -353,7 +353,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(16383)]
         [CollectionDefaultValue((ushort)8192)]
-        public ushort[] Pitchs
+        public virtual ushort[] Pitchs
         {
             get;
             private set;
@@ -381,7 +381,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)2)]
-        public byte[] PitchBendRanges
+        public virtual byte[] PitchBendRanges
         {
             get;
             private set;
@@ -409,7 +409,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)0)]
-        public byte[] ProgramNumbers
+        public virtual byte[] ProgramNumbers
         {
             get;
             private set;
@@ -444,7 +444,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)127)]
-        public byte[] Volumes
+        public virtual byte[] Volumes
         {
             get;
             private set;
@@ -472,7 +472,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)127)]
-        public byte[] Expressions
+        public virtual byte[] Expressions
         {
             get;
             private set;
@@ -501,7 +501,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)64)]
-        public byte[] Panpots
+        public virtual byte[] Panpots
         {
             get;
             private set;
@@ -529,7 +529,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)0)]
-        public byte[] Modulations
+        public virtual byte[] Modulations
         {
             get;
             private set;
@@ -558,7 +558,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)64)]
-        public byte[] ModulationRates
+        public virtual byte[] ModulationRates
         {
             get;
             private set;
@@ -601,7 +601,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)64)]
-        public byte[] ModulationDepthes
+        public virtual byte[] ModulationDepthes
         {
             get;
             private set;
@@ -629,7 +629,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)64)]
-        public byte[] ModulationDelays
+        public virtual byte[] ModulationDelays
         {
             get;
             private set;
@@ -674,7 +674,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)0)]
-        public byte[] ModulationDepthRangesNote
+        public virtual byte[] ModulationDepthRangesNote
         {
             get;
             private set;
@@ -703,7 +703,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)64)]
-        public byte[] ModulationDepthRangesCent
+        public virtual byte[] ModulationDepthRangesCent
         {
             get;
             private set;
@@ -733,7 +733,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)0)]
-        public byte[] Portamentos
+        public virtual byte[] Portamentos
         {
             get;
             private set;
@@ -763,7 +763,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)0)]
-        public byte[] PortamentoTimes
+        public virtual byte[] PortamentoTimes
         {
             get;
             private set;
@@ -792,7 +792,7 @@ namespace zanac.MAmidiMEmo.Instruments
         [TypeConverter(typeof(MaskableExpandableCollectionConverter))]
         [Mask(127)]
         [CollectionDefaultValue((byte)0)]
-        public byte[] MonoMode
+        public virtual byte[] MonoMode
         {
             get;
             private set;

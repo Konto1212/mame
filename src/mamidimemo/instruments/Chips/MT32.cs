@@ -1,0 +1,523 @@
+﻿// copyright-holders:K.Ito
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+using Melanchall.DryWetMidi.Common;
+using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.MusicTheory;
+using Newtonsoft.Json;
+using Omu.ValueInjecter;
+using Omu.ValueInjecter.Injections;
+using zanac.MAmidiMEmo.ComponentModel;
+using zanac.MAmidiMEmo.Gui;
+using zanac.MAmidiMEmo.Instruments.Envelopes;
+using zanac.MAmidiMEmo.Mame;
+using zanac.MAmidiMEmo.Midi;
+
+
+namespace zanac.MAmidiMEmo.Instruments.Chips
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    [DataContract]
+    public class MT32 : InstrumentBase
+    {
+
+        public override string Name => "MT32";
+
+        public override string Group => "LA";
+
+        public override InstrumentType InstrumentType => InstrumentType.MT32;
+
+        [Browsable(false)]
+        public override string ImageKey => "MT32";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        protected override string SoundInterfaceTagNamePrefix => "mt32_";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Category("MIDI")]
+        [Description("MIDI Device ID")]
+        [IgnoreDataMember]
+        [JsonIgnore]
+        public override uint DeviceID
+        {
+            get
+            {
+                return 20;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        public override TimbreBase[] BaseTimbres
+        {
+            get
+            {
+                return Timbres;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        public MT32Timbre[] Timbres
+        {
+            get;
+            private set;
+        }
+
+        [Browsable(false)]
+        public override bool[] Channels
+        {
+            get
+            {
+                return base.Channels;
+            }
+        }
+
+        [Browsable(false)]
+        public override ushort[] Pitchs
+        {
+            get
+            {
+                return base.Pitchs;
+            }
+        }
+
+        [Browsable(false)]
+        public override byte[] PitchBendRanges
+        {
+            get
+            {
+                return base.PitchBendRanges;
+            }
+        }
+
+        [Browsable(false)]
+        public override byte[] ProgramNumbers
+        {
+            get
+            {
+                return base.ProgramNumbers;
+            }
+        }
+
+        [Browsable(false)]
+        public override byte[] Volumes
+        {
+            get
+            {
+                return base.Volumes;
+            }
+        }
+
+        [Browsable(false)]
+        public override byte[] Expressions
+        {
+            get
+            {
+                return base.Expressions;
+            }
+        }
+
+
+        [Browsable(false)]
+        public override byte[] Panpots
+        {
+            get
+            {
+                return base.Panpots;
+            }
+        }
+
+
+        [Browsable(false)]
+        public override byte[] Modulations
+        {
+            get
+            {
+                return base.Modulations;
+            }
+        }
+
+        [Browsable(false)]
+        public override byte[] ModulationRates
+        {
+            get
+            {
+                return base.ModulationRates;
+            }
+        }
+
+        [Browsable(false)]
+        public override byte[] ModulationDepthes
+        {
+            get
+            {
+                return base.ModulationDepthes;
+            }
+        }
+
+
+        [Browsable(false)]
+        public override byte[] ModulationDelays
+        {
+            get
+            {
+                return base.ModulationDelays;
+            }
+        }
+
+
+        [Browsable(false)]
+        public override byte[] ModulationDepthRangesNote
+        {
+            get
+            {
+                return base.ModulationDepthRangesNote;
+            }
+        }
+
+        [Browsable(false)]
+        public override byte[] ModulationDepthRangesCent
+        {
+            get
+            {
+                return base.ModulationDepthRangesCent;
+            }
+        }
+
+        [Browsable(false)]
+        public override byte[] Portamentos
+        {
+            get
+            {
+                return base.Portamentos;
+            }
+        }
+
+        [Browsable(false)]
+        public override byte[] PortamentoTimes
+        {
+            get
+            {
+                return base.PortamentoTimes;
+            }
+        }
+
+        [Browsable(false)]
+        public override byte[] MonoMode
+        {
+            get
+            {
+                return base.MonoMode;
+            }
+        }
+
+
+        private const float DEFAULT_GAIN = 1f;
+
+        public override bool ShouldSerializeGainLeft()
+        {
+            return GainLeft != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainLeft()
+        {
+            GainLeft = DEFAULT_GAIN;
+        }
+
+        public override bool ShouldSerializeGainRight()
+        {
+            return GainRight != DEFAULT_GAIN;
+        }
+
+        public override void ResetGainRight()
+        {
+            GainRight = DEFAULT_GAIN;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override TimbreBase GetTimbre(int channel)
+        {
+            var pn = (SevenBitNumber)ProgramNumbers[channel];
+            return Timbres[pn];
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serializeData"></param>
+        public override void RestoreFrom(string serializeData)
+        {
+            try
+            {
+                var obj = JsonConvert.DeserializeObject<MT32>(serializeData);
+                this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+            }
+            catch (Exception ex)
+            {
+                if (ex.GetType() == typeof(Exception))
+                    throw;
+                else if (ex.GetType() == typeof(SystemException))
+                    throw;
+
+
+                System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
+        }
+
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_mt32_play_msg(uint unitNumber, uint msg);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_mt32_play_msg mt32_play_msg
+        {
+            get;
+            set;
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_mt32_play_sysex(uint unitNumber, byte[] sysex, int len);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_mt32_play_sysex mt32_play_sysex
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static void MT32PlayMsgNow(uint unitNumber, uint msg)
+        {
+            try
+            {
+                Program.SoundUpdating();
+                mt32_play_msg(unitNumber, msg);
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static void MT32PlaySysExNow(uint unitNumber, byte[] sysex)
+        {
+            try
+            {
+                Program.SoundUpdating();
+                mt32_play_sysex(unitNumber, sysex, sysex.Length);
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
+        }
+
+        private static FieldInfo channelEventParameters;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        static MT32()
+        {
+            IntPtr funcPtr = MameIF.GetProcAddress("mt32_play_msg");
+            if (funcPtr != IntPtr.Zero)
+            {
+                mt32_play_msg = (delegate_mt32_play_msg)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_mt32_play_msg));
+            }
+            funcPtr = MameIF.GetProcAddress("mt32_play_sysex");
+            if (funcPtr != IntPtr.Zero)
+            {
+                mt32_play_sysex = (delegate_mt32_play_sysex)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_mt32_play_sysex));
+            }
+
+            channelEventParameters = typeof(ChannelEvent).GetField("_parameters", BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public MT32(uint unitNumber) : base(unitNumber)
+        {
+            GainLeft = DEFAULT_GAIN;
+            GainRight = DEFAULT_GAIN;
+
+            Timbres = new MT32Timbre[128];
+            for (int i = 0; i < 128; i++)
+                Timbres[i] = new MT32Timbre();
+        }
+
+        protected override void OnMidiEvent(MidiEvent midiEvent)
+        {
+            uint msg = 0;
+            switch (midiEvent)
+            {
+                case SysExEvent sysex:
+                    {
+                        MT32PlaySysExNow(UnitNumber, sysex.Data);
+                        return;
+                    }
+                case NoteOffEvent noff:
+                    {
+                        msg = (uint)((0x80 | noff.Channel) | noff.NoteNumber << 8 | noff.Velocity << 16);
+                        break;
+                    }
+                case NoteOnEvent non:
+                    {
+                        if (non.Velocity == 0)
+                            msg = (uint)((0x80 | non.Channel) | non.NoteNumber << 8 | non.Velocity << 16);
+                        else
+                            msg = (uint)((0x90 | non.Channel) | non.NoteNumber << 8 | non.Velocity << 16);
+                        break;
+                    }
+                case NoteAftertouchEvent na:
+                    {
+                        msg = (uint)((0xa0 | na.Channel) | na.NoteNumber << 8 | na.AftertouchValue << 16);
+                        break;
+                    }
+                case ControlChangeEvent cc:
+                    {
+                        msg = (uint)((0xb0 | cc.Channel) | cc.ControlNumber << 8 | cc.ControlValue << 16);
+                        break;
+                    }
+                case ProgramChangeEvent pc:
+                    {
+                        msg = (uint)((0xc0 | pc.Channel) | pc.ProgramNumber << 8);
+                        break;
+                    }
+                case ChannelAftertouchEvent ca:
+                    {
+                        msg = (uint)((0xd0 | ca.Channel) | ca.AftertouchValue << 8);
+                        break;
+                    }
+                case PitchBendEvent pb:
+                    {
+                        msg = (uint)((0xe0 | pb.Channel) | ((pb.PitchValue & 0x7f) << 8) | ((pb.PitchValue >> 7) << 16));
+                        break;
+                    }
+                case TimingClockEvent tc:
+                    {
+                        msg = (uint)(0xf8);
+                        break;
+                    }
+                case ActiveSensingEvent ase:
+                    {
+                        msg = (uint)(0xfe);
+                        break;
+                    }
+                case ResetEvent re:
+                    {
+                        msg = (uint)(0xff);
+                        break;
+                    }
+            }
+            MT32PlayMsgNow(UnitNumber, msg);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="midiEvent"></param>
+        protected override void OnNoteOnEvent(NoteOnEvent midiEvent)
+        {
+            //soundManager.KeyOn(midiEvent);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="midiEvent"></param>
+        protected override void OnNoteOffEvent(NoteOffEvent midiEvent)
+        {
+            //soundManager.KeyOff(midiEvent);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="midiEvent"></param>
+        protected override void OnPitchBendEvent(PitchBendEvent midiEvent)
+        {
+            base.OnPitchBendEvent(midiEvent);
+
+            //soundManager.PitchBend(midiEvent);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<MT32Timbre>))]
+        [DataContract]
+        public class MT32Timbre : TimbreBase
+        {
+            /// <summary>
+            /// 
+            /// </summary>
+            public MT32Timbre()
+            {
+                this.SDS.FxS = new BasicFxSettings();
+            }
+
+            public override void RestoreFrom(string serializeData)
+            {
+                try
+                {
+                    var obj = JsonConvert.DeserializeObject<MT32Timbre>(serializeData);
+                    this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
+                }
+                catch (Exception ex)
+                {
+                    if (ex.GetType() == typeof(Exception))
+                        throw;
+                    else if (ex.GetType() == typeof(SystemException))
+                        throw;
+
+
+                    System.Windows.Forms.MessageBox.Show(ex.ToString());
+                }
+            }
+        }
+
+    }
+}

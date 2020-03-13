@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using zanac.MAmidiMEmo.Instruments;
 using System.Drawing.Drawing2D;
-using Melanchall.DryWetMidi.Smf;
 using zanac.MAmidiMEmo.Midi;
 using Melanchall.DryWetMidi.Common;
+using Melanchall.DryWetMidi.Core;
 
 namespace zanac.MAmidiMEmo.Gui
 {

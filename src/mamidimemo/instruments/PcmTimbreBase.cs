@@ -1,6 +1,6 @@
 ﻿// copyright-holders:K.Ito
 using Melanchall.DryWetMidi.Common;
-using Melanchall.DryWetMidi.Smf;
+using Melanchall.DryWetMidi.Core;
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel;

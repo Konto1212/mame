@@ -1,11 +1,11 @@
 ﻿// copyright-holders:K.Ito
+using Melanchall.DryWetMidi.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Melanchall.DryWetMidi.Smf;
 using zanac.MAmidiMEmo.ComponentModel;
 using zanac.MAmidiMEmo.Instruments.Envelopes;
 

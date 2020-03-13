@@ -719,7 +719,7 @@ void sound_stream::pre_generate_samples(std::vector<device_sound_interface *> &s
 		//memidimemo
 		device_t *dev = sound_stream::input_source_device(inputnum);
 		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(dev);
-		if (!sd->m_enable)
+		if (!sd->is_enabled())
 			continue;
 
 		// update the stream to the current time
