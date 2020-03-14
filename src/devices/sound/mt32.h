@@ -1,5 +1,4 @@
-// license:GPL
-// copyright-holders:Kenichi Ito
+// copyright-holders:K.Ito
 #ifndef MAME_SOUND_MT32
 #define MAME_SOUND_MT32
 

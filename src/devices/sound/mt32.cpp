@@ -1,5 +1,4 @@
-// license:GPL
-// copyright-holders:Kenichi Ito
+// copyright-holders:K.Ito
 /***************************************************************************
 
 
