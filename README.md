@@ -1,4 +1,4 @@
-MAmidiMEmo V1.0.0.0 / Itoken (c)2019, 2020 / GPL-2.0
+MAmidiMEmo V1.1.0.0 / Itoken (c)2019, 2020 / GPL-2.0
 
 *** What is the MAmidiMEmo? ***
 
@@ -17,13 +17,16 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 0. Requirements
 
 	*H/W
-		*CPU: Intel Core series CPU or equivalent, at least 2.0 GHz
-		*MEM: at least 4GB
-		*Sound: DirectSound capable sound card/onboard audio
-		*MIDI: MIDI IN I/F
+
+		CPU: Intel Core series CPU or equivalent, at least 2.0 GHz
+		MEM: at least 4GB
+		Sound: DirectSound capable sound card/onboard audio
+		MIDI: MIDI IN I/F
+
 	*S/W
-		*OS: Windows 7 SP1 or lator
-		*Runtime: .NET Framework 4.7 or lator
+
+		OS: Windows 7 SP1 or lator
+		Runtime: .NET Framework 4.7 or lator
 
 1. Launch MAmidiMEmo.exe
 
@@ -37,10 +40,12 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 3. Add your favorite chips from the [Instruments] menu on the toolbar.
 
    Note: Currently supported chips are the following.
-         YM2151, YM2612, YM3812, YM2413, YM2610B
-		 SID, POKEY, GB APU, SN76496, NES APU, MSM5232(+TA7630), AY-3-8910
-		 NAMCO CUS30, SCC, HuC6280
-		 C140, SPC700
+
+        YM2151, YM2612, YM3812, YM2413, YM2610B
+        SID, POKEY, GB APU, SN76496, NES APU, MSM5232(+TA7630), AY-3-8910
+        NAMCO CUS30, SCC, HuC6280
+        C140, SPC700
+        MT-32 ★★★Place legitimate MT32_CONTROL.ROM and MT32_PCM.ROM files in the Mami dir★★★
 
    Note: You can add the chip up to 8 per same chip type and MAmidiMEmo eats more CPU power.
 
@@ -52,56 +57,74 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 	YM2151:
 	 https://www16.atwiki.jp/mxdrv/pages/24.html
+
 	YM2612:
 	 https://www.plutiedev.com/ym2612-registers
 	 http://www.smspower.org/maxim/Documents/YM2612
+
 	NES APU:
 	 http://hp.vector.co.jp/authors/VA042397/nes/apu.html
 	 https://wiki.nesdev.com/w/index.php/APU
 	 https://wiki.nesdev.com/w/index.php/APU_DMC
+
 	GB APU:
 	 http://bgb.bircd.org/pandocs.htm#soundcontrolregisters
 	 https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
 	 http://mydocuments.g2.xrea.com/
 	 http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
 	 http://www.devrs.com/gb/files/hosted/GBSOUND.txt
+
 	NAMCO CUS30:
      https://www.walkofmind.com/programming/pie/wsg3.htm
-	 http://fpga.blog.shinobi.jp/fpga/���񂰂�I
+	 http://fpga.blog.shinobi.jp/fpga/おんげん！
+
 	SN76489:
 	 http://www.smspower.org/Development/SN76489
 	 http://www.st.rim.or.jp/~nkomatsu/peripheral/SN76489.html
+
 	SCC:
 	 http://bifi.msxnet.org/msxnet/tech/scc.html
+
 	YM3812:
 	 http://www.oplx.com/opl2/docs/adlib_sb.txt
+
 	YM2413:
 	 http://d4.princess.ne.jp/msx/datas/OPLL/YM2413AP.html#31
 	 http://www.smspower.org/maxim/Documents/YM2413ApplicationManual
 	 http://hp.vector.co.jp/authors/VA054130/yamaha_curse.html
+
 	MSM5232(+TA7630):
 	 http://www.citylan.it/wiki/images/3/3e/5232.pdf
 	 http://sr4.sakura.ne.jp/acsound/taito/taito5232.html
+
 	AY-3-8910:
 	 http://ngs.no.coocan.jp/doc/wiki.cgi/TechHan?page=1%BE%CF+PSG%A4%C8%B2%BB%C0%BC%BD%D0%CE%CF
 	 https://w.atwiki.jp/msx-sdcc/pages/45.html
 	 http://f.rdw.se/AY-3-8910-datasheet.pdf
+
 	SID:
 	 https://www.waitingforfriday.com/?p=661#6581_SID_Block_Diagram
 	 http://www.bellesondes.fr/wiki/doku.php?id=mos6581#mos6581_sound_interface_device_sid
-	 https://www.sfpgmr.net/blog/entry/mos-sid-6581�𒲂ׂ�.html
+	 https://www.sfpgmr.net/blog/entry/mos-sid-6581を調べた.html
+
 	HuC6280:
 	 http://www.magicengine.com/mkit/doc_hard_psg.html
+
 	SPC700:
 	 https://wiki.superfamicom.org/spc700-reference
+
 	POKEY:
 	 https://en.wikipedia.org/wiki/POKEY
 	 http://ftp.pigwa.net/stuff/collections/SIO2SD_DVD/PC/RMT%201.19/docs/rmt_en.htm
 	 https://www.atariarchives.org/dere/chapt07.php
 	 http://user.xmission.com/~trevin/atari/pokey_regs.html
+
 	YM2610:
 	 http://www.ajworld.net/neogeodev/ym2610am2.html
 
+    MT-32:
+     https://sourceforge.net/projects/munt/
+     http://lib.roland.co.jp/support/jp/manuals/res/1809744/MT-32_j2.pdf
 
    *[Channels]
     Select which MIDI ch messages the chip receives.
@@ -146,7 +169,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
    Bx 06 <Receiving MIDI ch(1-7) bit sets. 1=On, 0=Off>
 
          bit  6  5  4  3  2  1  0
-		  ch  7  6  5  4  3  2  1
+	      ch   7  6  5  4  3  2  1
 
    Bx 63 42
    Bx 62 <Device ID> ... Specify Device ID of existing instrument.
@@ -154,7 +177,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
    Bx 06 <Receiving MIDI ch(8-14) bit sets. 1=On, 0=Off>
 
          bit  6  5  4  3  2  1  0
-		  ch 14 13 12 11 10  9  8
+	      ch  14 13 12 11 10  9  8
 
    Bx 63 43
    Bx 62 <Device ID> ... Specify Device ID of existing instrument.
@@ -177,29 +200,42 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 	NAMCO CUS30:(TBD)
 	SN76489:(TBD)
 	:::
- 
-8. Donate for supporting the MAmidiMEmo
+
+*** Known issues and limitations *** 
+
+   1. MT-32 can not store/restore last settings.
+   
+*** How to create build environment ***
+
+   1. Install Visual Studio 2017 version 15.7.6. w/ VC++, C#, Windows Universal CRT SDK, .NET 4.7 SDK and Targeting Pack
+   2. Install Windows 8.1 SDK and 10 SDK
+   3. Install MinGW Development Environment(https://www.mamedev.org/tools/)
+
+*** Donate for supporting the MAmidiMEmo *** 
 
    [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SNQ9JE3JAQMNQ)
 
-9. Changes
+*** Changes ***
 
+1.1.0.0 Added MT-32 MIDI module ( imported from MUNT https://sourceforge.net/projects/munt/ )
+            Place legitimate MT32_CONTROL.ROM and MT32_PCM.ROM files in the Mami dir.
 1.0.0.0 Added YM2610B chip.
 0.9.4.2 Fixed Key ch of piano pane is not applied properly.
 0.9.4.1 Fixed YM2413 serialized data could not apply properly.
-0.9.4.0 Added FDS, VRC6 tone type to the NES APU. FDS, VRC6 was imported from VirtuaNES( https://github.com/ivysnow/virtuanes )
-        Added HuC6280 and SPC700(RAM limit breaking) and POKEY.
-		Fixed and changed "Partial Reserve" feature for GBA ( and HuC6280 ).
+0.9.4.0 Added FDS, VRC6 tone type to the NES APU.
+            FDS, VRC6 was imported from VirtuaNES https://github.com/ivysnow/virtuanes
+            Added HuC6280 and SPC700(RAM limit breaking) and POKEY.
+            Fixed and changed "Partial Reserve" feature for GBA ( and HuC6280 ).
 0.9.3.1 Fixed invalid portamento source note and followed portamento speed to GM2 spec.
 0.9.3.0 Added alternate property editor window. That can be popup from toolbar in the Property pane.
-        Added "Sound Control Settings" feature in Timbre settings. You can link the Sound control MIDI message value with the Timbre property value. (Also VST effects and other props, too)
-		Added modifying receving MIDI ch for the specific instrument via NRPN MIDI Message feature. See the section No.8 of this README.
-        Fixed arpeggio algorithm. When last one key is up, the key is not held in hold mode. Otherwise, keep arpeggio.
-		Fixed 2nd AY8910 outputs noise, C140 panpot gain formula follows GM2 spec, some minor bugs.
+            Added "Sound Control Settings" feature in Timbre settings. You can link the Sound control MIDI message value with the Timbre property value. (Also VST effects and other props, too)
+            Added modifying receving MIDI ch for the specific instrument via NRPN MIDI Message feature.
+            See the section No.8 of this README.
+            Fixed arpeggio algorithm. When last one key is up, the key is not held in hold mode. Otherwise, keep arpeggio.
+            Fixed 2nd AY8910 outputs noise, C140 panpot gain formula follows GM2 spec, some minor bugs.
 0.8.0.0 Supports piano clicks by mouse. Supports Mono mode(CC#126,CC#127) almost same with FITOM
 0.7.0.0 Added SID, C140(RAM limit breaking) chips, Displays Oscilloscope, Supports VST Effect plugin
 0.6.1.0 Changed to new sound timer engine for perfect sound timing
 0.6.0.0 Added sound driver effects and portamento feature
 0.5.0.0 Added several chips
 0.1.0.0 First release
-

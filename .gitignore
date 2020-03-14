@@ -64,3 +64,14 @@ Release(but Debug .NET)
 /src/wrapper/x64/Debug
 /src/wrapper/Win32/Release
 /src/mamidimemo/obj/x86/Debug
+/src/mt32emu/x64/Debug
+/src/mt32emu/x64/Debug
+/src/mt32emu/x64/Release
+/src/mt32emu/Debug
+/src/mt32emu/Release
+/src/mt32emu/soxr/msvc/*.user
+/src/mt32emu/soxr/msvc/*.filters
+/src/mt32emu/.vs
+/src/mt32emu/*.user
+/src/mt32emu/*.filters
+/src/mt32emu/soxr/.gitignore
