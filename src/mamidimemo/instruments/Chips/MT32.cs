@@ -375,6 +375,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             base.Dispose();
         }
 
+        private MT32SoundManager soundManager;
+
         /// <summary>
         /// 
         /// </summary>
@@ -382,6 +384,8 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         {
             GainLeft = DEFAULT_GAIN;
             GainRight = DEFAULT_GAIN;
+
+            this.soundManager = new MT32SoundManager(this);
 
             Timbres = new MT32Timbre[128];
             for (int i = 0; i < 128; i++)
@@ -395,7 +399,10 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 case SysExEvent sysex:
                     {
-                        MT32PlaySysExNow(UnitNumber, sysex.Data);
+                        List<byte> data = new List<byte>();
+                        data.Add(0xf0);
+                        data.AddRange(sysex.Data);
+                        MT32PlaySysExNow(UnitNumber, data.ToArray());
                         return;
                     }
                 case NoteOffEvent noff:
@@ -453,6 +460,23 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     }
             }
             MT32PlayMsgNow(UnitNumber, msg);
+
+            switch (midiEvent)
+            {
+                case NoteOffEvent noff:
+                    {
+                        OnNoteOffEvent(noff);
+                        break;
+                    }
+                case NoteOnEvent non:
+                    {
+                        if (non.Velocity == 0)
+                            OnNoteOffEvent(new NoteOffEvent(non.NoteNumber, (SevenBitNumber)0) { Channel = non.Channel, DeltaTime = non.DeltaTime });
+                        else
+                            OnNoteOnEvent(non);
+                        break;
+                    }
+            }
         }
 
         /// <summary>
@@ -461,7 +485,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <param name="midiEvent"></param>
         protected override void OnNoteOnEvent(NoteOnEvent midiEvent)
         {
-            //soundManager.KeyOn(midiEvent);
+            soundManager.KeyOn(midiEvent);
         }
 
         /// <summary>
@@ -470,18 +494,89 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <param name="midiEvent"></param>
         protected override void OnNoteOffEvent(NoteOffEvent midiEvent)
         {
-            //soundManager.KeyOff(midiEvent);
+            soundManager.KeyOff(midiEvent);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="midiEvent"></param>
-        protected override void OnPitchBendEvent(PitchBendEvent midiEvent)
+        private class MT32SoundManager : SoundManagerBase
         {
-            base.OnPitchBendEvent(midiEvent);
+            private SoundList<MT32Sound> instOnSounds = new SoundList<MT32Sound>(24);
 
-            //soundManager.PitchBend(midiEvent);
+            private MT32 parentModule;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="parent"></param>
+            public MT32SoundManager(MT32 parent) : base(parent)
+            {
+                this.parentModule = parent;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="note"></param>
+            public override SoundBase SoundOn(NoteOnEvent note)
+            {
+                int emptySlot = searchEmptySlot(note);
+                if (emptySlot < 0)
+                    return null;
+
+                var programNumber = (SevenBitNumber)parentModule.ProgramNumbers[note.Channel];
+                var timbre = parentModule.Timbres[programNumber];
+                MT32Sound snd = new MT32Sound(parentModule, this, timbre, note, emptySlot);
+                instOnSounds.Add(snd);
+
+                FormMain.OutputDebugLog("KeyOn ch" + emptySlot + " " + note.ToString());
+                snd.KeyOn();
+
+                return snd;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
+            private int searchEmptySlot(NoteOnEvent note)
+            {
+                int emptySlot = -1;
+
+                var programNumber = (SevenBitNumber)parentModule.ProgramNumbers[note.Channel];
+                var timbre = parentModule.Timbres[programNumber];
+                emptySlot = SearchEmptySlotAndOff(instOnSounds, note, parentModule.CalcMaxVoiceNumber(note.Channel, 24));
+                return emptySlot;
+            }
+
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private class MT32Sound : SoundBase
+        {
+            private MT32 parentModule;
+
+            private SevenBitNumber programNumber;
+
+            private MT32Timbre timbre;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="parentModule"></param>
+            /// <param name="noteOnEvent"></param>
+            /// <param name="programNumber"></param>
+            /// <param name="slot"></param>
+            public MT32Sound(MT32 parentModule, MT32SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
+            {
+                this.parentModule = parentModule;
+                this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
+                this.timbre = (MT32Timbre)timbre;
+            }
         }
 
         /// <summary>

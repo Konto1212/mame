@@ -373,6 +373,7 @@
     <None Include="Resources\GB_APU.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\MT32.png" />
     <None Include="Resources\YM2610B.png" />
     <None Include="Resources\POKEY.png" />
     <None Include="Resources\SPC700.png" />

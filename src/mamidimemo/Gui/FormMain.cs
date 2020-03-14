@@ -106,7 +106,7 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("SPC700", Resources.SPC700);
             imageList1.Images.Add("POKEY", Resources.POKEY);
             imageList1.Images.Add("YM2610B", Resources.YM2610B);
-            imageList1.Images.Add("MT32", Resources.YM2610B);
+            imageList1.Images.Add("MT32", Resources.MT32);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -520,8 +520,12 @@ namespace zanac.MAmidiMEmo.Gui
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
+            //All Note Off
+            var me = new ControlChangeEvent((SevenBitNumber)123, (SevenBitNumber)0);
+            MidiManager.SendMidiEvent(me);
+
             //All Sounds Off
-            var me = new ControlChangeEvent((SevenBitNumber)120, (SevenBitNumber)0);
+            me = new ControlChangeEvent((SevenBitNumber)120, (SevenBitNumber)0);
             MidiManager.SendMidiEvent(me);
         }
 

@@ -66,6 +66,7 @@ void mt32_device::device_start()
 	mt32emu_set_samplerate_conversion_quality(context, mt32emu_samplerate_conversion_quality::MT32EMU_SRCQ_BEST);
 	mt32emu_select_renderer_type(context, mt32emu_renderer_type::MT32EMU_RT_BIT16S);
 	mt32emu_is_nice_partial_mixing_enabled(context);
+	mt32emu_preallocate_reverb_memory(context, mt32emu_boolean::MT32EMU_BOOL_TRUE);
 
 	mt32emu_add_rom_file(context, "MT32_CONTROL.ROM");
 	mt32emu_add_rom_file(context, "MT32_PCM.ROM");
