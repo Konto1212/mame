@@ -24,7 +24,7 @@
 #include "..\devices\sound\pokey.h"
 #include "..\devices\sound\2610intf.h"
 #include "..\devices\sound\mt32.h"
-#include "..\mt32emu\src\c_interface\c_interface.h"
+#include "..\munt\mt32emu\src\c_interface\c_interface.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 

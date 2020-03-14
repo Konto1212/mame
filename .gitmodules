@@ -1,0 +1,3 @@
+[submodule "src/munt"]
+	path = src/munt
+	url = https://github.com/110-kenichi/munt

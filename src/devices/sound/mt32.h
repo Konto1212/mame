@@ -2,7 +2,7 @@
 #ifndef MAME_SOUND_MT32
 #define MAME_SOUND_MT32
 
-#include "..\mt32emu\src\c_interface\c_interface.h"
+#include "..\munt\mt32emu\src\c_interface\c_interface.h"
 
 #pragma once
 

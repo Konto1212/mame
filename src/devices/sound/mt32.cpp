@@ -7,7 +7,7 @@
 
 #include "emu.h"
 #include "sound/mt32.h"
-#include "..\mt32emu\src\c_interface\c_interface.h"
+#include "..\munt\mt32emu\src\c_interface\c_interface.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(MT32, mt32_device, "mt32", "MT32")
