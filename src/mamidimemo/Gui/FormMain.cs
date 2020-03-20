@@ -107,6 +107,7 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("POKEY", Resources.POKEY);
             imageList1.Images.Add("YM2610B", Resources.YM2610B);
             imageList1.Images.Add("MT32", Resources.MT32);
+            imageList1.Images.Add("CM32P", Resources.MT32);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -402,6 +403,11 @@ namespace zanac.MAmidiMEmo.Gui
         private void mT32ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InstrumentManager.AddInstrument(InstrumentType.MT32);
+        }
+
+        private void extendCM32PToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InstrumentManager.AddInstrument(InstrumentType.CM32P);
         }
 
         /// <summary>

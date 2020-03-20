@@ -127,6 +127,7 @@
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.multiMediaTimerComponent1 = new zanac.MAmidiMEmo.ComponentModel.MultiMediaTimerComponent(this.components);
+            this.extendCM32PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -845,7 +846,8 @@
             // lAToolStripMenuItem
             // 
             this.lAToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mT32ToolStripMenuItem});
+            this.mT32ToolStripMenuItem,
+            this.extendCM32PToolStripMenuItem});
             this.lAToolStripMenuItem.Name = "lAToolStripMenuItem";
             resources.ApplyResources(this.lAToolStripMenuItem, "lAToolStripMenuItem");
             // 
@@ -1034,6 +1036,12 @@
             this.multiMediaTimerComponent1.Interval = ((uint)(1000u));
             this.multiMediaTimerComponent1.Resolution = ((uint)(1000u));
             // 
+            // extendCM32PToolStripMenuItem
+            // 
+            this.extendCM32PToolStripMenuItem.Name = "extendCM32PToolStripMenuItem";
+            resources.ApplyResources(this.extendCM32PToolStripMenuItem, "extendCM32PToolStripMenuItem");
+            this.extendCM32PToolStripMenuItem.Click += new System.EventHandler(this.extendCM32PToolStripMenuItem_Click);
+            // 
             // FormMain
             // 
             resources.ApplyResources(this, "$this");
@@ -1163,6 +1171,7 @@
         private System.Windows.Forms.ToolStripMenuItem extendYM2610BToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem lAToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mT32ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extendCM32PToolStripMenuItem;
     }
 }
 

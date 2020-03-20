@@ -32,5 +32,6 @@ namespace zanac.MAmidiMEmo.Instruments
         POKEY,    //18
         YM2610B,    //19
         MT32,    //20
+        CM32P,    //21
     }
 }

@@ -28,6 +28,7 @@
 #include "sound/2610intf.h"
 #include "video/315_5313.h"
 #include "sound/mt32.h"
+#include "sound/cm32p.h"
 
 /* Megadrive Console Specific */
 #include "bus/megadrive/md_slot.h"
@@ -160,10 +161,14 @@ public:
 			strcpy(device_names[didx][i], (std::string("mt32_") + num).c_str());
 			m_mt32[i] = new optional_device<mt32_device>(*this, device_names[didx][i]);
 			didx++;
+			//cm32p
+			strcpy(device_names[didx][i], (std::string("cm32p_") + num).c_str());
+			m_cm32p[i] = new optional_device<cm32p_device>(*this, device_names[didx][i]);
+			didx++;
 		}
 	}
 
-	char device_names[ 21 ][8][100];
+	char device_names[ 22 ][8][100];
 	optional_device<ym2151_device> *m_ym2151[8];	//1
 	optional_device<ym2612_device> *m_ym2612[8];	//2
 	optional_device<sn76496_device> *m_sn76496[8];	//3
@@ -184,6 +189,7 @@ public:
 	optional_device<pokey_device> *m_pokey[8];	//18
 	optional_device<ym2610b_device> *m_ym2610b[8];	//19
 	optional_device<mt32_device> *m_mt32[8];	//20
+	optional_device<cm32p_device> *m_cm32p[8];	//21
 
 	required_device<m68000_base_device> m_maincpu;
 	/*

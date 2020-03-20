@@ -133,7 +133,6 @@ namespace zanac.MAmidiMEmo.Instruments
         [DataMember]
         [Category("Filter")]
         [Description("Audio Filter Type")]
-        [DefaultValue(FilterMode.LowPass)]
         public FilterMode FilterMode
         {
             get => f_FilterMode;
@@ -147,6 +146,16 @@ namespace zanac.MAmidiMEmo.Instruments
                     Program.SoundUpdated();
                 }
             }
+        }
+
+        public virtual bool ShouldSerializeFilterMode()
+        {
+            return FilterMode != FilterMode.LowPass;
+        }
+
+        public virtual void ResetFilterMode()
+        {
+            FilterMode = FilterMode.LowPass;
         }
 
         private double f_FilterCutOff = 0.99d;

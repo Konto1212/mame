@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -29,23 +30,23 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
     /// 
     /// </summary>
     [DataContract]
-    public class MT32 : InstrumentBase
+    public class CM32P : InstrumentBase
     {
 
-        public override string Name => "MT32";
+        public override string Name => "CM32P";
 
         public override string Group => "LA";
 
-        public override InstrumentType InstrumentType => InstrumentType.MT32;
+        public override InstrumentType InstrumentType => InstrumentType.CM32P;
 
         [Browsable(false)]
-        public override string ImageKey => "MT32";
+        public override string ImageKey => "CM32P";
 
         /// <summary>
         /// 
         /// </summary>
         [Browsable(false)]
-        protected override string SoundInterfaceTagNamePrefix => "mt32_";
+        protected override string SoundInterfaceTagNamePrefix => "cm32p_";
 
         /// <summary>
         /// 
@@ -58,7 +59,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         {
             get
             {
-                return 20;
+                return 21;
             }
         }
 
@@ -78,7 +79,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// 
         /// </summary>
         [Browsable(false)]
-        public MT32Timbre[] Timbres
+        public CM32PTimbre[] Timbres
         {
             get;
             private set;
@@ -283,7 +284,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject<MT32>(serializeData);
+                var obj = JsonConvert.DeserializeObject<CM32P>(serializeData);
                 this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
             }
             catch (Exception ex)
@@ -300,24 +301,61 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void delegate_mt32_play_msg(uint unitNumber, uint msg);
+        private delegate void delegate_CM32P_play_msg(uint unitNumber, byte type, byte channel, byte param1, byte param2);
 
         /// <summary>
         /// 
         /// </summary>
-        private static delegate_mt32_play_msg mt32_play_msg
+        private static delegate_CM32P_play_msg CM32P_play_msg
         {
             get;
             set;
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void delegate_mt32_play_sysex(uint unitNumber, byte[] sysex, int len);
+        private delegate void delegate_CM32P_set_tone(uint unitNumber, byte card_id, byte tone_no, ushort sf_preset_no);
 
         /// <summary>
         /// 
         /// </summary>
-        private static delegate_mt32_play_sysex mt32_play_sysex
+        private static delegate_CM32P_set_tone CM32P_set_tone
+        {
+            get;
+            set;
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_CM32P_initlaize_meory(uint unitNumber);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_CM32P_initlaize_meory CM32P_initlaize_meory
+        {
+            get;
+            set;
+        }
+
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_CM32P_play_sysex(uint unitNumber, byte[] sysex, int len);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_CM32P_play_sysex CM32P_play_sysex
+        {
+            get;
+            set;
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_CM32P_load_sf(uint unitNumber, byte cardId, string fileName);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_CM32P_load_sf CM32P_load_sf
         {
             get;
             set;
@@ -326,12 +364,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <summary>
         /// 
         /// </summary>
-        private static void MT32PlayMsgNow(uint unitNumber, uint msg)
+        private static void CM32PPlayMsgNow(uint unitNumber, byte type, byte channel, byte param1, byte param2)
         {
             try
             {
                 Program.SoundUpdating();
-                mt32_play_msg(unitNumber, msg);
+                CM32P_play_msg(unitNumber, type, channel, param1, param2);
             }
             finally
             {
@@ -343,12 +381,12 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <summary>
         /// 
         /// </summary>
-        private static void MT32PlaySysExNow(uint unitNumber, byte[] sysex)
+        private static void CM32PPlaySysExNow(uint unitNumber, byte[] sysex)
         {
             try
             {
                 Program.SoundUpdating();
-                mt32_play_sysex(unitNumber, sysex, sysex.Length);
+                CM32P_play_sysex(unitNumber, sysex, sysex.Length);
             }
             finally
             {
@@ -361,17 +399,32 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <summary>
         /// 
         /// </summary>
-        static MT32()
+        static CM32P()
         {
-            IntPtr funcPtr = MameIF.GetProcAddress("mt32_play_msg");
+            IntPtr funcPtr = MameIF.GetProcAddress("cm32p_play_msg");
             if (funcPtr != IntPtr.Zero)
             {
-                mt32_play_msg = (delegate_mt32_play_msg)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_mt32_play_msg));
+                CM32P_play_msg = (delegate_CM32P_play_msg)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_CM32P_play_msg));
             }
-            funcPtr = MameIF.GetProcAddress("mt32_play_sysex");
+            funcPtr = MameIF.GetProcAddress("cm32p_play_sysex");
             if (funcPtr != IntPtr.Zero)
             {
-                mt32_play_sysex = (delegate_mt32_play_sysex)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_mt32_play_sysex));
+                CM32P_play_sysex = (delegate_CM32P_play_sysex)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_CM32P_play_sysex));
+            }
+            funcPtr = MameIF.GetProcAddress("cm32p_load_sf");
+            if (funcPtr != IntPtr.Zero)
+            {
+                CM32P_load_sf = (delegate_CM32P_load_sf)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_CM32P_load_sf));
+            }
+            funcPtr = MameIF.GetProcAddress("cm32p_set_tone");
+            if (funcPtr != IntPtr.Zero)
+            {
+                CM32P_set_tone = (delegate_CM32P_set_tone)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_CM32P_set_tone));
+            }
+            funcPtr = MameIF.GetProcAddress("cm32p_initialize_memory");
+            if (funcPtr != IntPtr.Zero)
+            {
+                CM32P_initlaize_meory = (delegate_CM32P_initlaize_meory)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_CM32P_initlaize_meory));
             }
 
             channelEventParameters = typeof(ChannelEvent).GetField("_parameters", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -385,27 +438,52 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             base.Dispose();
         }
 
-        private MT32SoundManager soundManager;
+        private CM32PSoundManager soundManager;
 
         /// <summary>
         /// 
         /// </summary>
-        public MT32(uint unitNumber) : base(unitNumber)
+        public CM32P(uint unitNumber) : base(unitNumber)
         {
             GainLeft = DEFAULT_GAIN;
             GainRight = DEFAULT_GAIN;
             FilterMode = FilterMode.None;
 
-            this.soundManager = new MT32SoundManager(this);
+            this.soundManager = new CM32PSoundManager(this);
 
-            Timbres = new MT32Timbre[128];
+            Timbres = new CM32PTimbre[128];
             for (int i = 0; i < 128; i++)
-                Timbres[i] = new MT32Timbre();
+                Timbres[i] = new CM32PTimbre();
+        }
+
+        internal override void PrepareSound()
+        {
+            base.PrepareSound();
+
+            using (var s = File.OpenText(Path.Combine(Environment.CurrentDirectory, "cm32p_internal_tone.tbl")))
+            {
+                string fn = s.ReadLine();
+                CM32P_load_sf(UnitNumber, 0, Path.Combine(Environment.CurrentDirectory, fn));
+                while (!s.EndOfStream)
+                {
+                    var line = s.ReadLine();
+                    string[] ns = line.Split(',');
+                    string tone_no_t = ns[0].Split(':')[1];
+                    byte tone_no = byte.Parse(tone_no_t);
+                    string[] preset_no_t = ns[1].Split(':');
+                    ushort preset_no = (ushort)(ushort.Parse(preset_no_t[0]) << 8 | ushort.Parse(preset_no_t[1]));
+                    CM32P_set_tone(UnitNumber, 0, tone_no, preset_no);
+                }
+            }
+            CM32P_initlaize_meory(UnitNumber);
         }
 
         protected override void OnMidiEvent(MidiEvent midiEvent)
         {
-            uint msg = 0;
+            byte type = 0;
+            byte ch = 0;
+            byte param1 = 0;
+            byte param2 = 0;
             switch (midiEvent)
             {
                 case SysExEvent sysex:
@@ -413,64 +491,84 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         List<byte> data = new List<byte>();
                         data.Add(0xf0);
                         data.AddRange(sysex.Data);
-                        MT32PlaySysExNow(UnitNumber, data.ToArray());
+                        CM32PPlaySysExNow(UnitNumber, data.ToArray());
                         return;
                     }
                 case NoteOffEvent noff:
                     {
-                        msg = (uint)((0x80 | noff.Channel) | noff.NoteNumber << 8 | noff.Velocity << 16);
+                        type = 0x80;
+                        ch = noff.Channel;
+                        param1 = noff.NoteNumber;
+                        param2 = noff.Velocity;
                         break;
                     }
                 case NoteOnEvent non:
                     {
                         if (non.Velocity == 0)
-                            msg = (uint)((0x80 | non.Channel) | non.NoteNumber << 8 | non.Velocity << 16);
+                            type = 0x80;
                         else
-                            msg = (uint)((0x90 | non.Channel) | non.NoteNumber << 8 | non.Velocity << 16);
+                            type = 0x90;
+                        ch = non.Channel;
+                        param1 = non.NoteNumber;
+                        param2 = non.Velocity;
                         break;
                     }
                 case NoteAftertouchEvent na:
                     {
-                        msg = (uint)((0xa0 | na.Channel) | na.NoteNumber << 8 | na.AftertouchValue << 16);
+                        type = 0xa0;
+                        ch = na.Channel;
+                        param1 = na.NoteNumber;
+                        param2 = na.AftertouchValue;
                         break;
                     }
                 case ControlChangeEvent cc:
                     {
-                        msg = (uint)((0xb0 | cc.Channel) | cc.ControlNumber << 8 | cc.ControlValue << 16);
+                        type = 0xb0;
+                        ch = cc.Channel;
+                        param1 = cc.ControlNumber;
+                        param2 = cc.ControlValue;
                         break;
                     }
                 case ProgramChangeEvent pc:
                     {
-                        msg = (uint)((0xc0 | pc.Channel) | pc.ProgramNumber << 8);
+                        type = 0xc0;
+                        ch = pc.Channel;
+                        param1 = pc.ProgramNumber;
                         break;
                     }
                 case ChannelAftertouchEvent ca:
                     {
-                        msg = (uint)((0xd0 | ca.Channel) | ca.AftertouchValue << 8);
+                        type = 0xd0;
+                        ch = ca.Channel;
+                        param1 = ca.AftertouchValue;
                         break;
                     }
                 case PitchBendEvent pb:
                     {
-                        msg = (uint)((0xe0 | pb.Channel) | ((pb.PitchValue & 0x7f) << 8) | ((pb.PitchValue >> 7) << 16));
+                        type = 0xe0;
+                        ch = pb.Channel;
+                        param1 = (byte)(pb.PitchValue & 0x7f);
+                        param2 = (byte)(pb.PitchValue >> 7);
                         break;
                     }
                 case TimingClockEvent tc:
                     {
-                        msg = (uint)(0xf8);
+                        type = 0xf8;
                         break;
                     }
                 case ActiveSensingEvent ase:
                     {
-                        msg = (uint)(0xfe);
+                        type = 0xfe;
                         break;
                     }
                 case ResetEvent re:
                     {
-                        msg = (uint)(0xff);
+                        type = 0xff;
                         break;
                     }
             }
-            MT32PlayMsgNow(UnitNumber, msg);
+
+            CM32PPlayMsgNow(UnitNumber, type, ch, param1, param2);
 
             switch (midiEvent)
             {
@@ -511,17 +609,17 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <summary>
         /// 
         /// </summary>
-        private class MT32SoundManager : SoundManagerBase
+        private class CM32PSoundManager : SoundManagerBase
         {
-            private SoundList<MT32Sound> instOnSounds = new SoundList<MT32Sound>(24);
+            private SoundList<CM32PSound> instOnSounds = new SoundList<CM32PSound>(24);
 
-            private MT32 parentModule;
+            private CM32P parentModule;
 
             /// <summary>
             /// 
             /// </summary>
             /// <param name="parent"></param>
-            public MT32SoundManager(MT32 parent) : base(parent)
+            public CM32PSoundManager(CM32P parent) : base(parent)
             {
                 this.parentModule = parent;
             }
@@ -538,7 +636,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
                 var programNumber = (SevenBitNumber)parentModule.ProgramNumbers[note.Channel];
                 var timbre = parentModule.Timbres[programNumber];
-                MT32Sound snd = new MT32Sound(parentModule, this, timbre, note, emptySlot);
+                CM32PSound snd = new CM32PSound(parentModule, this, timbre, note, emptySlot);
                 instOnSounds.Add(snd);
 
                 FormMain.OutputDebugLog("KeyOn ch" + emptySlot + " " + note.ToString());
@@ -567,13 +665,13 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <summary>
         /// 
         /// </summary>
-        private class MT32Sound : SoundBase
+        private class CM32PSound : SoundBase
         {
-            private MT32 parentModule;
+            private CM32P parentModule;
 
             private SevenBitNumber programNumber;
 
-            private MT32Timbre timbre;
+            private CM32PTimbre timbre;
 
             /// <summary>
             /// 
@@ -582,25 +680,25 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             /// <param name="noteOnEvent"></param>
             /// <param name="programNumber"></param>
             /// <param name="slot"></param>
-            public MT32Sound(MT32 parentModule, MT32SoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
+            public CM32PSound(CM32P parentModule, CM32PSoundManager manager, TimbreBase timbre, NoteOnEvent noteOnEvent, int slot) : base(parentModule, manager, timbre, noteOnEvent, slot)
             {
                 this.parentModule = parentModule;
                 this.programNumber = (SevenBitNumber)parentModule.ProgramNumbers[noteOnEvent.Channel];
-                this.timbre = (MT32Timbre)timbre;
+                this.timbre = (CM32PTimbre)timbre;
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        [JsonConverter(typeof(NoTypeConverterJsonConverter<MT32Timbre>))]
+        [JsonConverter(typeof(NoTypeConverterJsonConverter<CM32PTimbre>))]
         [DataContract]
-        public class MT32Timbre : TimbreBase
+        public class CM32PTimbre : TimbreBase
         {
             /// <summary>
             /// 
             /// </summary>
-            public MT32Timbre()
+            public CM32PTimbre()
             {
                 this.SDS.FxS = new BasicFxSettings();
             }
@@ -609,7 +707,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 try
                 {
-                    var obj = JsonConvert.DeserializeObject<MT32Timbre>(serializeData);
+                    var obj = JsonConvert.DeserializeObject<CM32PTimbre>(serializeData);
                     this.InjectFrom(new LoopInjection(new[] { "SerializeData" }), obj);
                 }
                 catch (Exception ex)

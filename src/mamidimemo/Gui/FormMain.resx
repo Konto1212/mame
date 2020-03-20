@@ -1672,6 +1672,12 @@
   <data name="mT32ToolStripMenuItem.Text" xml:space="preserve">
     <value>Extend MT-&amp;32</value>
   </data>
+  <data name="extendCM32PToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>252, 30</value>
+  </data>
+  <data name="extendCM32PToolStripMenuItem.Text" xml:space="preserve">
+    <value>Extend CM-32&amp;P</value>
+  </data>
   <data name="lAToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>200, 30</value>
   </data>
@@ -4213,6 +4219,12 @@
   </data>
   <data name="&gt;&gt;multiMediaTimerComponent1.Type" xml:space="preserve">
     <value>zanac.MAmidiMEmo.ComponentModel.MultiMediaTimerComponent, MAmidiMEmo, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;extendCM32PToolStripMenuItem.Name" xml:space="preserve">
+    <value>extendCM32PToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;extendCM32PToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>FormMain</value>

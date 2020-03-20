@@ -25,7 +25,6 @@ mt32_device::mt32_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, MT32, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_frequency(clock)
 {
 
 }
@@ -53,6 +52,8 @@ void mt32_device::set_enable(int enable)
 
 void mt32_device::device_start()
 {
+	m_frequency = clock();
+
 	m_stream = stream_alloc(0, 2, m_frequency);
 	m_enable = 0;
 

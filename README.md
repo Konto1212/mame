@@ -210,6 +210,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
    1. Install Visual Studio 2017 version 15.7.6. w/ VC++, C#, Windows Universal CRT SDK, .NET 4.7 SDK and Targeting Pack
    2. Install Windows 8.1 SDK and 10 SDK
    3. Install MinGW Development Environment(https://www.mamedev.org/tools/)
+   4. Install vcpkg
 
 *** Donate for supporting the MAmidiMEmo *** 
 

@@ -25,6 +25,7 @@
 #include "..\devices\sound\2610intf.h"
 #include "..\devices\sound\mt32.h"
 #include "..\munt\mt32emu\src\c_interface\c_interface.h"
+#include "..\devices\sound\cm32p.h"
 
 #define DllExport extern "C" __declspec (dllexport)
 
@@ -1123,6 +1124,118 @@ extern "C"
 		mt32_devices[unitNumber]->play_sysex(sysex, len);
 	}
 
+	cm32p_device  *cm32p_devices[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+
+	/** Enqueues a single short MIDI message to be processed ASAP. The message must contain a status byte. */
+	DllExport void cm32p_play_msg(unsigned int unitNumber, unsigned char type, unsigned char channel, unsigned int param1, unsigned int param2)
+	{
+		if (cm32p_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			cm32p_device *cm32p = dynamic_cast<cm32p_device   *>(rm->device((std::string("cm32p_") + num).c_str()));
+			if (cm32p == nullptr)
+				return;
+
+			cm32p_devices[unitNumber] = cm32p;
+		}
+
+		cm32p_devices[unitNumber]->play_msg(type, channel, param1, param2);
+	}
+
+	DllExport void cm32p_play_sysex(unsigned int unitNumber, const u8 *sysex, u32 len)
+	{
+		if (cm32p_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			cm32p_device *cm32p = dynamic_cast<cm32p_device   *>(rm->device((std::string("cm32p_") + num).c_str()));
+			if (cm32p == nullptr)
+				return;
+
+			cm32p_devices[unitNumber] = cm32p;
+		}
+
+		cm32p_devices[unitNumber]->play_sysex(sysex, len);
+	}
+
+	DllExport void cm32p_load_sf(unsigned int unitNumber, unsigned char card_id, const char* filename)
+	{
+		if (cm32p_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			cm32p_device *cm32p = dynamic_cast<cm32p_device   *>(rm->device((std::string("cm32p_") + num).c_str()));
+			if (cm32p == nullptr)
+				return;
+
+			cm32p_devices[unitNumber] = cm32p;
+		}
+
+		cm32p_devices[unitNumber]->load_sf(card_id, filename);
+	}
+
+	DllExport void cm32p_set_tone(unsigned int unitNumber, unsigned char card_id, unsigned char tone_no, unsigned short sf_preset_no)
+	{
+		if (cm32p_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			cm32p_device *cm32p = dynamic_cast<cm32p_device   *>(rm->device((std::string("cm32p_") + num).c_str()));
+			if (cm32p == nullptr)
+				return;
+
+			cm32p_devices[unitNumber] = cm32p;
+		}
+
+		cm32p_devices[unitNumber]->set_tone(card_id, tone_no, sf_preset_no);
+	}
+
+	DllExport void cm32p_initialize_memory(unsigned int unitNumber)
+	{
+		if (cm32p_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			cm32p_device *cm32p = dynamic_cast<cm32p_device   *>(rm->device((std::string("cm32p_") + num).c_str()));
+			if (cm32p == nullptr)
+				return;
+
+			cm32p_devices[unitNumber] = cm32p;
+		}
+
+		cm32p_devices[unitNumber]->initialize_memory();
+	}
 }
 
 
