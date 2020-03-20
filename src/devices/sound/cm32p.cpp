@@ -6,8 +6,9 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/cm32p.h"
+#include "cm32p.h"
 #include "..\..\FluidLite\include\fluidlite.h"
+#include "cm32p_BReverbModel.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(CM32P, cm32p_device, "cm32p", "CM32P")
@@ -27,8 +28,14 @@ cm32p_device::cm32p_device(const machine_config &mconfig, const char *tag, devic
 	, m_stream(nullptr)
 	, m_frequency(clock)
 	, cm32p_ram(*new MemParams)
+	, memory_initialized(0)
 {
 	initMemoryRegions();
+
+	for (int mode = ReverbMode::REVERB_MODE_ROOM; mode <= ReverbMode::REVERB_MODE_TAP_DELAY; mode++) {
+		reverbModels[mode] = CM32P_BReverbModel::createBReverbModel(ReverbMode(mode), false, RendererType::REVERB_BIT16S);
+		reverbModels[mode]->open();
+	}
 }
 
 void cm32p_device::set_enable(int enable)
@@ -40,6 +47,9 @@ void cm32p_device::set_enable(int enable)
 		if (m_enable != 0)
 		{
 			synth = new_fluid_synth(settings);
+			//fluid_synth_set_polyphony(synth, 31);
+			fluid_synth_set_reverb_on(synth, 0);
+			fluid_synth_set_chorus_on(synth, 0);
 		}
 		else
 		{
@@ -52,11 +62,16 @@ void cm32p_device::initialize_memory()
 {
 	fluid_synth_system_reset(synth);
 
+	for (int mode = ReverbMode::REVERB_MODE_ROOM; mode <= ReverbMode::REVERB_MODE_TAP_DELAY; mode++) {
+		reverbModels[mode]->mute();
+	}
 	//system params
 	cm32p_ram.system.masterTune = 0x4A;
 	cm32p_ram.system.reverbMode = ReverbMode::REVERB_MODE_HALL;
 	cm32p_ram.system.reverbTime = 5;
 	cm32p_ram.system.reverbLevel = 5;
+
+	reverbModels[cm32p_ram.system.reverbMode]->setParameters(cm32p_ram.system.reverbTime, cm32p_ram.system.reverbLevel);
 
 	cm32p_ram.system.reserveSettings[0] = 2;
 	cm32p_ram.system.reserveSettings[1] = 8;
@@ -170,6 +185,7 @@ void cm32p_device::initialize_memory()
 		patch->detuneDepth = 12;
 	}
 
+	memory_initialized = 1;
 }
 
 //-------------------------------------------------
@@ -194,31 +210,35 @@ void cm32p_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	stream_sample_t *buffer1 = outputs[0];
 	stream_sample_t *buffer2 = outputs[1];
 
-	if (!m_enable)
+	if (!m_enable || memory_initialized == 0)
 	{
 		memset(buffer1, 0, samples * sizeof(*buffer1));
 		memset(buffer2, 0, samples * sizeof(*buffer2));
 		return;
 	}
 
-	if(synth == NULL)
-		return;
-
-	short *buf1 = (short *)malloc(sizeof(short) * samples);
-	short *buf2 = (short *)malloc(sizeof(short) * samples);
-
+	s16 *buf1 = (s16 *)malloc(sizeof(s16) * samples);
+	s16 *buf2 = (s16 *)malloc(sizeof(s16) * samples);
 	fluid_synth_write_s16(synth, samples, buf1, 0, 1, buf2, 0, 1);
 
-	short *ptr1 = buf1;
-	short *ptr2 = buf2;
+	s16 *rbuf1 = (s16 *)malloc(sizeof(s16) * samples);
+	s16 *rbuf2 = (s16 *)malloc(sizeof(s16) * samples);
+	reverbModels[cm32p_ram.system.reverbMode]->process(buf1, buf2, rbuf1, rbuf2, samples);
+
+	s16 *ptr1 = buf1;
+	s16 *ptr2 = buf2;
+	s16 *rptr1 = rbuf1;
+	s16 *rptr2 = rbuf2;
 	while (samples-- > 0)
 	{
-		*buffer1++ = ((stream_sample_t)*ptr1++);
-		*buffer2++ = ((stream_sample_t)*ptr2++);
+		*buffer1++ = ((stream_sample_t)(*ptr1++ + *rptr1++));
+		*buffer2++ = ((stream_sample_t)(*ptr2++ + *rptr2++));
 	}
 
 	free(buf1);
 	free(buf2);
+	free(rbuf1);
+	free(rbuf2);
 }
 
 
@@ -250,6 +270,11 @@ void cm32p_device::set_tone(u8 card_id, u8 tone_no, u16 sf_preset_no)
 	tone_table[card_id << 8 | tone_no] = sf_preset_no;
 }
 
+void cm32p_device::set_card(u8 id)
+{
+	card_id = id;
+}
+
 void cm32p_device::program_select(u8 channel, u8 tone_media, u8 tone_no)
 {
 	u8 cid = card_id;
@@ -275,11 +300,31 @@ void cm32p_device::play_msg(u8 type, u8 channel, u32 param1, u32 param2)
 			fluid_synth_noteon(synth, channel, param1, param2);
 			break;
 		case 0xb0:
+		{
 			fluid_synth_cc(synth, channel, param1, param2);
+			MemParams::PatchTemp pt = cm32p_ram.patchTemp[i];
+			PatchParam pp = pt.patch;
+			switch (param1)
+			{
+			case 7:
+				pt.outputLevel = u8(param2 * 100 / 127);
+				break;
+			case 10:
+				pt.panpot = param2;
+				break;
+			}
+		}
 			break;
 		case 0xc0:
-			program_select(cm32p_ram.system.chanAssign[i], cm32p_ram.patches[param1].toneMedia, cm32p_ram.patches[param1].toneNumber);
-			//fluid_synth_program_change(synth, channel, param1);
+		{
+			cm32p_ram.patchTemp[i].patch = cm32p_ram.patches[param1];
+			MemParams::PatchTemp pt = cm32p_ram.patchTemp[i];
+			PatchParam pp = pt.patch;
+			program_select(channel, pp.toneMedia, pp.toneNumber);
+			fluid_synth_pitch_wheel_sens(synth, channel, pp.benderRange);
+			fluid_synth_cc(synth, channel, 10, 127 - pt.panpot);
+			fluid_synth_cc(synth, channel, 7, 127 * pt.outputLevel / 100);
+		}
 			break;
 		case 0xe0:
 			fluid_synth_pitch_bend(synth, channel, (param2 << 7) | param1);
@@ -390,7 +435,7 @@ void cm32p_device::playSysexWithoutHeader(u8 device, u8 command, const u8 *sysex
 		//printDebug("playSysexWithoutHeader: Unsupported command %02x", command);
 		return;
 	}
-}
+	}
 
 void cm32p_device::writeSysex(u8 device, const u8 *sysex, u32 len)
 {
@@ -503,9 +548,15 @@ void cm32p_device::writeMemoryRegion(const MemoryRegion *region, u32 addr, u32 l
 		//printDebug("Patch temp: Patch %d, offset %x, len %d", off/16, off % 16, len);
 
 		for (unsigned int i = first; i <= last; i++) {
+			if (cm32p_ram.patchTemp[i].outputLevel > 100)
+				cm32p_ram.patchTemp[i].outputLevel = 100;
+			if (cm32p_ram.patchTemp[i].patch.toneMedia > 1)
+				cm32p_ram.patchTemp[i].patch.toneMedia = 1;
+
 			program_select(cm32p_ram.system.chanAssign[i], cm32p_ram.patchTemp[i].patch.toneMedia, cm32p_ram.patchTemp[i].patch.toneNumber);
 			fluid_synth_cc(synth, cm32p_ram.system.chanAssign[i], 10, 127 - cm32p_ram.patchTemp[i].panpot);
 			fluid_synth_cc(synth, cm32p_ram.system.chanAssign[i], 7, (int)roundf((float)127 * ((float)cm32p_ram.patchTemp[i].outputLevel / (float)100)));
+			fluid_synth_pitch_wheel_sens(synth, cm32p_ram.system.chanAssign[i], cm32p_ram.patchTemp[i].patch.benderRange);
 		}
 		break;
 	case MR_Patches:
@@ -539,7 +590,7 @@ void cm32p_device::writeMemoryRegion(const MemoryRegion *region, u32 addr, u32 l
 			//TODO: mami refreshSystemMasterTune();
 		}
 		if (off <= SYSTEM_REVERB_LEVEL_OFF && off + len > SYSTEM_REVERB_MODE_OFF) {
-			//TODO: mami refreshSystemReverbParameters();
+			reverbModels[cm32p_ram.system.reverbMode]->setParameters(cm32p_ram.system.reverbTime, cm32p_ram.system.reverbLevel);
 		}
 		if (off <= SYSTEM_RESERVE_SETTINGS_END_OFF && off + len > SYSTEM_RESERVE_SETTINGS_START_OFF) {
 			//TODO: mami refreshSystemReserveSettings();
@@ -554,7 +605,6 @@ void cm32p_device::writeMemoryRegion(const MemoryRegion *region, u32 addr, u32 l
 			//TODO: mami refreshSystemChanAssign(u8(firstPart), u8(lastPart));
 		}
 		if (off <= SYSTEM_MASTER_VOL_OFF && off + len > SYSTEM_MASTER_VOL_OFF) {
-			//TODO: mami refreshSystemMasterVol();
 			if (cm32p_ram.system.masterVol > 100)
 				cm32p_ram.system.masterVol = 100;
 			fluid_synth_set_gain(synth, (float)cm32p_ram.system.masterVol / 100.f);
@@ -592,7 +642,7 @@ void MemoryRegion::read(unsigned int entry, unsigned int off, u8 *dst, unsigned 
 		return;
 	}
 	memcpy(dst, src + off, len);
-}
+	}
 
 void MemoryRegion::write(unsigned int entry, unsigned int off, const u8 *src, unsigned int len, bool init) const {
 	unsigned int memOff = entry * entrySize + off;
@@ -628,9 +678,9 @@ void MemoryRegion::write(unsigned int entry, unsigned int off, const u8 *src, un
 				synth->printDebug("write[%d]: Wanted 0x%02x at %d, but max 0x%02x", type, desiredValue, memOff, maxValue);
 #endif
 				desiredValue = maxValue;
-			}
+	}
 			dest[memOff] = desiredValue;
-		}
+}
 		else if (desiredValue != 0) {
 #if MT32EMU_MONITOR_SYSEX > 0
 			// Only output debug info if they wanted to write non-zero, since a lot of things cause this to spit out a lot of debug info otherwise.

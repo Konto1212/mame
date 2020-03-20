@@ -107,7 +107,7 @@ namespace zanac.MAmidiMEmo.Gui
             imageList1.Images.Add("POKEY", Resources.POKEY);
             imageList1.Images.Add("YM2610B", Resources.YM2610B);
             imageList1.Images.Add("MT32", Resources.MT32);
-            imageList1.Images.Add("CM32P", Resources.MT32);
+            imageList1.Images.Add("CM32P", Resources.CM32P);
 
             //Set MIDI I/F
             foreach (var dev in InputDevice.GetAll())
@@ -134,6 +134,8 @@ namespace zanac.MAmidiMEmo.Gui
 
             pianoControl1.NoteOn += PianoControl1_NoteOn;
             pianoControl1.NoteOff += PianoControl1_NoteOff;
+
+            ImageUtility.AdjustControlImagesDpiScale(this);
         }
 
         private void PianoControl1_NoteOn(object sender, NoteOnEvent e)

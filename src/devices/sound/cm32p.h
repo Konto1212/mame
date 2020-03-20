@@ -5,6 +5,7 @@
 #pragma once
 
 #include "..\..\FluidLite\include\fluidlite.h"
+//#include "cm32p_BReverbModel.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -17,17 +18,8 @@
 #define ALIGN_PACKED __attribute__((packed))
 #endif
 
-enum ReverbMode {
-	REVERB_MODE_ROOM,
-	REVERB_MODE_HALL,
-	REVERB_MODE_PLATE,
-	REVERB_MODE_TAP_DELAY
-};
-
-enum ToneMedia {
-	TONE_MEDIA_INTERNAL,
-	TONE_MEDIA_CARD
-};
+#define CM32P_MEMADDR(x) ((((x) & 0x7f0000) >> 2) | (((x) & 0x7f00) >> 1) | ((x) & 0x7f))
+#define CM32P_SYSEXMEMADDR(x) ((((x) & 0x1FC000) << 2) | (((x) & 0x3F80) << 1) | ((x) & 0x7f))
 
 const u8 SYSEX_MANUFACTURER_ROLAND = 0x41;
 
@@ -42,9 +34,6 @@ const u8 SYSEX_CMD_ACK = 0x43; // Acknowledge
 const u8 SYSEX_CMD_EOD = 0x45; // End of data
 const u8 SYSEX_CMD_ERR = 0x4E; // Communications error
 const u8 SYSEX_CMD_RJC = 0x4F; // Rejection
-
-#define CM32P_MEMADDR(x) ((((x) & 0x7f0000) >> 2) | (((x) & 0x7f00) >> 1) | ((x) & 0x7f))
-#define CM32P_SYSEXMEMADDR(x) ((((x) & 0x1FC000) << 2) | (((x) & 0x3F80) << 1) | ((x) & 0x7f))
 
 const unsigned int SYSTEM_MASTER_TUNE_OFF = 0;
 const unsigned int SYSTEM_REVERB_MODE_OFF = 1;
@@ -101,6 +90,19 @@ struct MemParams {
 	} ALIGN_PACKED system;
 };
 
+enum ReverbMode {
+	REVERB_MODE_ROOM,
+	REVERB_MODE_HALL,
+	REVERB_MODE_PLATE,
+	REVERB_MODE_TAP_DELAY
+};
+
+enum ToneMedia {
+	TONE_MEDIA_INTERNAL,
+	TONE_MEDIA_CARD
+};
+
+
 enum MemoryRegionType {
 	MR_PatchTemp, MR_Patches, MR_System, MR_Reset
 };
@@ -110,6 +112,7 @@ class PatchTempMemoryRegion;
 class PatchesMemoryRegion;
 class SystemMemoryRegion;
 class ResetMemoryRegion;
+class CM32P_BReverbModel;
 
 class cm32p_device : public device_t,
 	public device_sound_interface
@@ -149,11 +152,13 @@ private:
 	fluid_synth_t *synth;
 
 	std::map<u16, u16> tone_table;
-
 	std::map<u8, unsigned int> sf_table;
 	u8 card_id;
 
 	MemParams &cm32p_ram;
+	int memory_initialized;
+
+	CM32P_BReverbModel *reverbModels[4];
 
 	u8 default_patch_table_no[128] =
 	{

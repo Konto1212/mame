@@ -63,6 +63,29 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+        private SN_U110_Cards card;
+
+        [DataMember]
+        [Category("Chip")]
+        [Description("Set inserted SN-U110 card No.")]
+        [DefaultValue(SN_U110_Cards.None)]
+        public SN_U110_Cards Card
+        {
+            get
+            {
+                return card;
+            }
+            set
+            {
+                if (card != value)
+                {
+                    card = value;
+
+                    CM32P_set_card(UnitNumber, (byte)card);
+                }
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -361,6 +384,18 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             set;
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delegate_CM32P_set_card(uint unitNumber, byte cardId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delegate_CM32P_set_card CM32P_set_card
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -426,6 +461,11 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             {
                 CM32P_initlaize_meory = (delegate_CM32P_initlaize_meory)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_CM32P_initlaize_meory));
             }
+            funcPtr = MameIF.GetProcAddress("cm32p_set_card");
+            if (funcPtr != IntPtr.Zero)
+            {
+                CM32P_set_card = (delegate_CM32P_set_card)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delegate_CM32P_set_card));
+            }
 
             channelEventParameters = typeof(ChannelEvent).GetField("_parameters", BindingFlags.NonPublic | BindingFlags.Instance);
         }
@@ -460,10 +500,17 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         {
             base.PrepareSound();
 
-            using (var s = File.OpenText(Path.Combine(Environment.CurrentDirectory, "cm32p_internal_tone.tbl")))
+            loadSfTable("cm32p_internal_tone.tbl", 0);
+            loadSfTable("cm32p_card07_tone.tbl", 7);
+            CM32P_initlaize_meory(UnitNumber);
+        }
+
+        private void loadSfTable(string tblfn, byte cid)
+        {
+            using (var s = File.OpenText(Path.Combine(Environment.CurrentDirectory, tblfn)))
             {
                 string fn = s.ReadLine();
-                CM32P_load_sf(UnitNumber, 0, Path.Combine(Environment.CurrentDirectory, fn));
+                CM32P_load_sf(UnitNumber, cid, Path.Combine(Environment.CurrentDirectory, fn));
                 while (!s.EndOfStream)
                 {
                     var line = s.ReadLine();
@@ -472,10 +519,9 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                     byte tone_no = byte.Parse(tone_no_t);
                     string[] preset_no_t = ns[1].Split(':');
                     ushort preset_no = (ushort)(ushort.Parse(preset_no_t[0]) << 8 | ushort.Parse(preset_no_t[1]));
-                    CM32P_set_tone(UnitNumber, 0, tone_no, preset_no);
+                    CM32P_set_tone(UnitNumber, cid, tone_no, preset_no);
                 }
             }
-            CM32P_initlaize_meory(UnitNumber);
         }
 
         protected override void OnMidiEvent(MidiEvent midiEvent)
@@ -724,4 +770,26 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         }
 
     }
+
+    public enum SN_U110_Cards : byte
+    {
+        None,
+        C01_PipeOrgan_Harpsichord,
+        C02_Latin_FX_Percussions,
+        C03_Ethnic,
+        C04_Electric_Grand_Clavi,
+        C05_Orchestral_Strings,
+        C06_Orchestral_Winds,
+        C07_Electric_Guitar,
+        C08_Synthesizer,
+        C09_Guitar_Keyboard,
+        C10_Rock_Drums,
+        C11_Sound_Effects,
+        C12_Sax_Trombone,
+        C13_Super_Strings,
+        C14_Super_Ac_Guitar,
+        C15_Super_Brass
+    }
+
+
 }

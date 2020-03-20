@@ -1215,6 +1215,30 @@ extern "C"
 		cm32p_devices[unitNumber]->set_tone(card_id, tone_no, sf_preset_no);
 	}
 
+
+	DllExport void cm32p_set_card(unsigned int unitNumber, unsigned char card_id)
+	{
+		if (cm32p_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return;
+
+			std::string num = std::to_string(unitNumber);
+			cm32p_device *cm32p = dynamic_cast<cm32p_device   *>(rm->device((std::string("cm32p_") + num).c_str()));
+			if (cm32p == nullptr)
+				return;
+
+			cm32p_devices[unitNumber] = cm32p;
+		}
+
+		cm32p_devices[unitNumber]->set_card(card_id);
+	}
+
+
 	DllExport void cm32p_initialize_memory(unsigned int unitNumber)
 	{
 		if (cm32p_devices[unitNumber] == NULL)
