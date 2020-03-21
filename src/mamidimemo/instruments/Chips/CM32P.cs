@@ -501,25 +501,30 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             base.PrepareSound();
 
             loadSfTable("cm32p_internal_tone.tbl", 0);
-            loadSfTable("cm32p_card07_tone.tbl", 7);
+            for (byte ci = 1; ci <= 15; ci++)
+                loadSfTable("cm32p_card" + ci.ToString("00") + "_tone.tbl", ci);
             CM32P_initlaize_meory(UnitNumber);
         }
 
         private void loadSfTable(string tblfn, byte cid)
         {
-            using (var s = File.OpenText(Path.Combine(Environment.CurrentDirectory, tblfn)))
+            string tblp = Path.Combine(Environment.CurrentDirectory, "Data", tblfn);
+            if (File.Exists(tblp))
             {
-                string fn = s.ReadLine();
-                CM32P_load_sf(UnitNumber, cid, Path.Combine(Environment.CurrentDirectory, fn));
-                while (!s.EndOfStream)
+                using (var s = File.OpenText(tblp))
                 {
-                    var line = s.ReadLine();
-                    string[] ns = line.Split(',');
-                    string tone_no_t = ns[0].Split(':')[1];
-                    byte tone_no = byte.Parse(tone_no_t);
-                    string[] preset_no_t = ns[1].Split(':');
-                    ushort preset_no = (ushort)(ushort.Parse(preset_no_t[0]) << 8 | ushort.Parse(preset_no_t[1]));
-                    CM32P_set_tone(UnitNumber, cid, tone_no, preset_no);
+                    string fn = s.ReadLine();
+                    CM32P_load_sf(UnitNumber, cid, Path.Combine(Environment.CurrentDirectory, "Data", fn));
+                    while (!s.EndOfStream)
+                    {
+                        var line = s.ReadLine();
+                        string[] ns = line.Split(',');
+                        string tone_no_t = ns[0].Split(':')[1];
+                        byte tone_no = byte.Parse(tone_no_t);
+                        string[] preset_no_t = ns[1].Split(':');
+                        ushort preset_no = (ushort)(ushort.Parse(preset_no_t[0]) << 8 | ushort.Parse(preset_no_t[1]));
+                        CM32P_set_tone(UnitNumber, cid, tone_no, preset_no);
+                    }
                 }
             }
         }

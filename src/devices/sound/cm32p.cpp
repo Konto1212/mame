@@ -88,6 +88,7 @@ void cm32p_device::initialize_memory()
 	cm32p_ram.system.chanAssign[5] = 15;
 
 	cm32p_ram.system.masterVol = 100;
+	fluid_synth_set_gain(synth, 100.f / 200.f);
 
 	//patch temp
 	for (int i = 0; i < 6; i++) {
@@ -210,7 +211,7 @@ void cm32p_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	stream_sample_t *buffer1 = outputs[0];
 	stream_sample_t *buffer2 = outputs[1];
 
-	if (!m_enable || memory_initialized == 0)
+	if (!m_enable || memory_initialized == 0 || synth == 0)
 	{
 		memset(buffer1, 0, samples * sizeof(*buffer1));
 		memset(buffer2, 0, samples * sizeof(*buffer2));
@@ -607,7 +608,7 @@ void cm32p_device::writeMemoryRegion(const MemoryRegion *region, u32 addr, u32 l
 		if (off <= SYSTEM_MASTER_VOL_OFF && off + len > SYSTEM_MASTER_VOL_OFF) {
 			if (cm32p_ram.system.masterVol > 100)
 				cm32p_ram.system.masterVol = 100;
-			fluid_synth_set_gain(synth, (float)cm32p_ram.system.masterVol / 100.f);
+			fluid_synth_set_gain(synth, (float)cm32p_ram.system.masterVol / 200.f);
 		}
 
 		break;

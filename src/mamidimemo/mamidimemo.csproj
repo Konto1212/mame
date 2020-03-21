@@ -345,6 +345,24 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.manifest" />
+    <None Include="Data\cm32p_card06_tone.tbl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\cm32p_card07_tone.tbl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\cm32p_card08_tone.tbl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\cm32p_internal_tone.tbl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\GeneralUser GS v1.471.sf2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Panic.pdn" />
+    <None Include="Data\Popup.pdn" />
+    <None Include="Data\SCC.pdn" />
     <None Include="dummy.out">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -404,8 +422,6 @@
     <None Include="..\..\build\generated\version.cpp">
       <Link>version.cpp</Link>
     </None>
-    <Content Include="Data\main.c" />
-    <Content Include="Data\main.s" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
