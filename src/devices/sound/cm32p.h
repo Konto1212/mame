@@ -149,7 +149,8 @@ private:
 	int m_frequency;          /* set frequency - this can be changed using the appropriate function */
 
 	fluid_settings_t *settings;
-	fluid_synth_t *synth;
+	fluid_synth_t *synth_rev_on;
+	fluid_synth_t *synth_rev_off;
 
 	std::map<u16, u16> tone_table;
 	std::map<u8, unsigned int> sf_table;
@@ -208,6 +209,8 @@ private:
 	void readMemoryRegion(const MemoryRegion *region, u32 addr, u32 len, u8 *data);
 
 	void writeMemoryRegion(const MemoryRegion *region, u32 addr, u32 len, const u8 *data);
+
+	void applyPatchParameters(const u8 &channel, PatchParam &pp, MemParams::PatchTemp &pt);
 
 	PatchTempMemoryRegion *patchTempMemoryRegion;
 	PatchesMemoryRegion *patchesMemoryRegion;
