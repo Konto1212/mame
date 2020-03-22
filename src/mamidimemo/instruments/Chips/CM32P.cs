@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -63,12 +64,38 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+        private static string[] cardToneTableFileNames;
+
+        private static string[] CardToneTableFilesNames
+        {
+            get
+            {
+                if (cardToneTableFileNames == null)
+                {
+                    List<string> cn = new List<string>();
+                    {
+                        string tblp = Path.Combine(Environment.CurrentDirectory, "Data", "cm32p_internal_tone.tbl");
+                        cn.Add(tblp);
+                    }
+                    for (byte ci = 1; ci <= 15; ci++)
+                    {
+                        string tn = "cm32p_card" + ci.ToString("00") + "_tone.tbl";
+                        string tblp = Path.Combine(Environment.CurrentDirectory, "Data", tn);
+                        cn.Add(tblp);
+                    }
+                    cardToneTableFileNames = cn.ToArray();
+                }
+                return cardToneTableFileNames;
+            }
+        }
+
         private SN_U110_Cards card;
 
         [DataMember]
         [Category("Chip")]
         [Description("Set inserted SN-U110 card No.")]
         [DefaultValue(SN_U110_Cards.None)]
+        [TypeConverter(typeof(SN_U110_CardsConverter))]
         public SN_U110_Cards Card
         {
             get
@@ -86,6 +113,46 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
             }
         }
 
+        private class SN_U110_CardsConverter : TypeConverter
+        {
+
+            public override bool CanConvertFrom(ITypeDescriptorContext context, Type srcType)
+            {
+                return srcType == typeof(string);
+            }
+
+            public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+            {
+                return Enum.Parse(typeof(SN_U110_Cards), (string)value);
+            }
+
+            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+            {
+                CM32P cm32p = context.Instance as CM32P;
+
+                if (cm32p != null)
+                    return true;
+                else
+                    return base.GetStandardValuesSupported();
+            }
+
+            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
+            public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+            {
+                List<string> names = new List<string>();
+                names.Add(Enum.GetName(typeof(SN_U110_Cards), SN_U110_Cards.None));
+                for (byte ci = 1; ci < CardToneTableFilesNames.Length; ci++)
+                {
+                    if (File.Exists(CardToneTableFilesNames[ci]))
+                        names.Add(Enum.GetName(typeof(SN_U110_Cards), ci));
+                }
+                return new StandardValuesCollection(names);
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -500,30 +567,31 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         {
             base.PrepareSound();
 
-            loadSfTable("cm32p_internal_tone.tbl", 0);
-            for (byte ci = 1; ci <= 15; ci++)
-                loadSfTable("cm32p_card" + ci.ToString("00") + "_tone.tbl", ci);
+            loadSfTable();
             CM32P_initlaize_meory(UnitNumber);
         }
 
-        private void loadSfTable(string tblfn, byte cid)
+        private void loadSfTable()
         {
-            string tblp = Path.Combine(Environment.CurrentDirectory, "Data", tblfn);
-            if (File.Exists(tblp))
+            for (byte cid = 0; cid < CardToneTableFilesNames.Length; cid++)
             {
-                using (var s = File.OpenText(tblp))
+                string cfn = CardToneTableFilesNames[cid];
+                if (File.Exists(CardToneTableFilesNames[cid]))
                 {
-                    string fn = s.ReadLine();
-                    CM32P_load_sf(UnitNumber, cid, Path.Combine(Environment.CurrentDirectory, "Data", fn));
-                    while (!s.EndOfStream)
+                    using (var s = File.OpenText(cfn))
                     {
-                        var line = s.ReadLine();
-                        string[] ns = line.Split(',');
-                        string tone_no_t = ns[0].Split(':')[1];
-                        byte tone_no = byte.Parse(tone_no_t);
-                        string[] preset_no_t = ns[1].Split(':');
-                        ushort preset_no = (ushort)(ushort.Parse(preset_no_t[0]) << 8 | ushort.Parse(preset_no_t[1]));
-                        CM32P_set_tone(UnitNumber, cid, tone_no, preset_no);
+                        string fn = s.ReadLine();
+                        CM32P_load_sf(UnitNumber, cid, Path.Combine(Environment.CurrentDirectory, "Data", fn));
+                        while (!s.EndOfStream)
+                        {
+                            var line = s.ReadLine();
+                            string[] ns = line.Split(',');
+                            string tone_no_t = ns[0].Split(':')[1];
+                            byte tone_no = byte.Parse(tone_no_t);
+                            string[] preset_no_t = ns[1].Split(':');
+                            ushort preset_no = (ushort)(ushort.Parse(preset_no_t[0]) << 8 | ushort.Parse(preset_no_t[1]));
+                            CM32P_set_tone(UnitNumber, cid, tone_no, preset_no);
+                        }
                     }
                 }
             }

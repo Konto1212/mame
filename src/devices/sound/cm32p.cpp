@@ -411,7 +411,7 @@ void cm32p_device::applyPatchParameters(const u8 &channel, PatchParam &pp, MemPa
 	{
 		if (pp.lfoAutoDepth > 15)
 			pp.lfoAutoDepth = 15;
-		float ld = 400.0f * (pp.lfoAutoDepth / 15.f);
+		float ld = 250.0f * (pp.lfoAutoDepth / 15.f);
 		fluid_synth_set_gen(synth_rev_off, channel, GEN_MODLFOTOPITCH, ld);
 		fluid_synth_set_gen(synth_rev_on, channel, GEN_MODLFOTOPITCH, ld);
 	}
