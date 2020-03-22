@@ -1,4 +1,4 @@
-MAmidiMEmo V1.1.0.0 / Itoken (c)2019, 2020 / GPL-2.0
+MAmidiMEmo V1.2.0.0 / Itoken (c)2019, 2020 / GPL-2.0
 
 *** What is the MAmidiMEmo? ***
 
@@ -46,6 +46,8 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
         NAMCO CUS30, SCC, HuC6280
         C140, SPC700
         MT-32 ★★★Place legitimate MT32_CONTROL.ROM and MT32_PCM.ROM files in the Mami dir★★★
+		CM-32P This is not an emulator. This is an incomplete simulator.)
+		       Please contact me if you can help me to create CM-32P and SN-U110 sound fonts.
 
    Note: You can add the chip up to 8 per same chip type and MAmidiMEmo eats more CPU power.
 
@@ -125,6 +127,9 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
     MT-32:
      https://sourceforge.net/projects/munt/
      http://lib.roland.co.jp/support/jp/manuals/res/1809744/MT-32_j2.pdf
+
+    CM-64:
+	 http://lib.roland.co.jp/support/jp/manuals/res/1809003/CM-64_j.pdf
 
    *[Channels]
     Select which MIDI ch messages the chip receives.
@@ -218,6 +223,10 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 *** Changes ***
 
+1.1.0.0 Added CM-32P(This is not an emulator. This is an incomplete simulator.)
+              Using FluidLite https://github.com/divideconcept/FluidLite , 
+			  Using GeneralUser GS http://schristiancollins.com/generaluser.php
+			  Please contact me if you can help me to create CM-32P and SN-U110 sound fonts.
 1.1.0.0 Added MT-32 MIDI module ( imported from MUNT https://sourceforge.net/projects/munt/ )
             Place legitimate MT32_CONTROL.ROM and MT32_PCM.ROM files in the Mami dir.
 1.0.0.0 Added YM2610B chip.
