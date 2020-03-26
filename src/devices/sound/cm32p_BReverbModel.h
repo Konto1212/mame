@@ -46,6 +46,7 @@ public:
 	virtual bool isActive() const = 0;
 	virtual bool isMT32Compatible(ReverbMode mode) const = 0;
 	virtual bool process(const s16 *inLeft, const s16 *inRight, s16 *outLeft, s16 *outRight, u32 numSamples) = 0;
+	virtual bool process(const float *inLeft, const float *inRight, float *outLeft, float *outRight, u32 numSamples) = 0;
 };
 
 #endif // #ifndef CM32PEMU_B_REVERB_MODEL_H

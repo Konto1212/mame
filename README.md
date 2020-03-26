@@ -45,8 +45,9 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
         SID, POKEY, GB APU, SN76496, NES APU, MSM5232(+TA7630), AY-3-8910
         NAMCO CUS30, SCC, HuC6280
         C140, SPC700
-        MT-32 ★★★Place legitimate MT32_CONTROL.ROM and MT32_PCM.ROM files in the Mami dir★★★
-		CM-32P This is not an emulator. This is an incomplete simulator.)
+        MT-32 ★★★ Place legitimate MT32_CONTROL.ROM and MT32_PCM.ROM files in the Mami dir ★★★
+		CM-32P This is an incomplete, preliminary and experimental simulator, not an emulator.
+		       You can use and add your custom sound font and SN-U110 card.
 		       Please contact me if you can help me to create CM-32P and SN-U110 sound fonts.
 
    Note: You can add the chip up to 8 per same chip type and MAmidiMEmo eats more CPU power.
@@ -223,10 +224,9 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 *** Changes ***
 
-1.1.0.0 Added CM-32P(This is not an emulator. This is an incomplete simulator.)
+1.2.0.0 Added CM-32P (This is an incomplete simulator)
               Using FluidLite https://github.com/divideconcept/FluidLite , 
 			  Using GeneralUser GS http://schristiancollins.com/generaluser.php
-			  Please contact me if you can help me to create CM-32P and SN-U110 sound fonts.
 1.1.0.0 Added MT-32 MIDI module ( imported from MUNT https://sourceforge.net/projects/munt/ )
             Place legitimate MT32_CONTROL.ROM and MT32_PCM.ROM files in the Mami dir.
 1.0.0.0 Added YM2610B chip.

@@ -33,7 +33,7 @@ cm32p_device::cm32p_device(const machine_config &mconfig, const char *tag, devic
 	initMemoryRegions();
 
 	for (int mode = ReverbMode::REVERB_MODE_ROOM; mode <= ReverbMode::REVERB_MODE_TAP_DELAY; mode++) {
-		reverbModels[mode] = CM32P_BReverbModel::createBReverbModel(ReverbMode(mode), false, RendererType::REVERB_BIT16S);
+		reverbModels[mode] = CM32P_BReverbModel::createBReverbModel(ReverbMode(mode), false, RendererType::REVERB_FLOAT);
 		reverbModels[mode]->open();
 	}
 }
@@ -53,6 +53,8 @@ void cm32p_device::set_enable(int enable)
 			fluid_synth_set_reverb_on(synth_rev_on, 0);
 			fluid_synth_set_chorus_on(synth_rev_off, 0);
 			fluid_synth_set_chorus_on(synth_rev_on, 0);
+			clipping_overflow_l = 0.0f;
+			clipping_overflow_r = 0.0f;
 		}
 		else
 		{
@@ -93,8 +95,8 @@ void cm32p_device::initialize_memory()
 	cm32p_ram.system.chanAssign[5] = 15;
 
 	cm32p_ram.system.masterVol = 100;
-	fluid_synth_set_gain(synth_rev_off, 100.f / 200.f);
-	fluid_synth_set_gain(synth_rev_on, 100.f / 200.f);
+	fluid_synth_set_gain(synth_rev_off, 100.f / DEFAULT_GAIN_BASE);
+	fluid_synth_set_gain(synth_rev_on, 100.f / DEFAULT_GAIN_BASE);
 
 	//patch temp
 	for (int i = 0; i < 6; i++) {
@@ -203,11 +205,11 @@ void cm32p_device::initialize_memory()
 
 void cm32p_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, m_frequency);
+	m_stream = stream_alloc(0, 2, machine().sample_rate());
 	m_enable = 0;
 
 	settings = new_fluid_settings();
-	fluid_settings_setnum(settings, "synth.sample-rate", m_frequency);
+	fluid_settings_setnum(settings, "synth.sample-rate", machine().sample_rate());
 }
 
 //-------------------------------------------------
@@ -226,23 +228,44 @@ void cm32p_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		return;
 	}
 
-	s16 *ptr = (s16 *)malloc(sizeof(s16) * samples * 6);
-	s16 *buf1 = ptr;
-	s16 *buf2 = buf1 + samples;
-	s16 *rbuf1 = buf2 + samples;
-	s16 *rbuf2 = rbuf1 + samples;
-	s16 *nbuf1 = rbuf2 + samples;
-	s16 *nbuf2 = nbuf1 + samples;
+	float *ptr = (float *)malloc(sizeof(float) * samples * 6);
+	float *buf1 = ptr;
+	float *buf2 = buf1 + samples;
+	float *rbuf1 = buf2 + samples;
+	float *rbuf2 = rbuf1 + samples;
+	float *nbuf1 = rbuf2 + samples;
+	float *nbuf2 = nbuf1 + samples;
 
-	fluid_synth_write_s16(synth_rev_on, samples, buf1, 0, 1, buf2, 0, 1);
+	fluid_synth_write_float(synth_rev_on, samples, buf1, 0, 1, buf2, 0, 1);
 	reverbModels[cm32p_ram.system.reverbMode]->process(buf1, buf2, rbuf1, rbuf2, samples);
 
-	fluid_synth_write_s16(synth_rev_off, samples, nbuf1, 0, 1, nbuf2, 0, 1);
+	fluid_synth_write_float(synth_rev_off, samples, nbuf1, 0, 1, nbuf2, 0, 1);
 
 	while (samples-- > 0)
 	{
-		*buffer1++ = ((stream_sample_t)(*buf1++ + *rbuf1++ + *nbuf1++));
-		*buffer2++ = ((stream_sample_t)(*buf2++ + *rbuf2++ + *nbuf2++));
+		float outl = *buf1++ + *rbuf1++ + *nbuf1++;
+		float outr = *buf2++ + *rbuf2++ + *nbuf2++;
+		/*
+		outl += clipping_overflow_l;
+		clipping_overflow_l = 0;
+		if (outl > 1.0f) {
+			clipping_overflow_l = outl - 1.0f;
+			outl = 1.0f;
+		} else if (outl < -1.0f) {
+			clipping_overflow_l = outl + 1.0f;
+			outl = -1.0f;
+		}
+		outr += clipping_overflow_r;
+		clipping_overflow_r = 0;
+		if (outr > 1.0f) {
+			clipping_overflow_r = outr - 1.0f;
+			outr = 1.0f;
+		} else if (outr < -1.0f) {
+			clipping_overflow_r = outr + 1.0f;
+			outr = -1.0f;
+		}*/
+		*buffer1++ = ((stream_sample_t)(outl * 32767.f * 3.f));
+		*buffer2++ = ((stream_sample_t)(outr * 32767.f * 3.f));
 	}
 
 	free(ptr);
@@ -695,8 +718,8 @@ void cm32p_device::writeMemoryRegion(const MemoryRegion *region, u32 addr, u32 l
 		if (off <= SYSTEM_MASTER_VOL_OFF && off + len > SYSTEM_MASTER_VOL_OFF) {
 			if (cm32p_ram.system.masterVol > 100)
 				cm32p_ram.system.masterVol = 100;
-			fluid_synth_set_gain(synth_rev_off, (float)cm32p_ram.system.masterVol / 200.f);
-			fluid_synth_set_gain(synth_rev_on, (float)cm32p_ram.system.masterVol / 200.f);
+			fluid_synth_set_gain(synth_rev_off, (float)cm32p_ram.system.masterVol / DEFAULT_GAIN_BASE);
+			fluid_synth_set_gain(synth_rev_on, (float)cm32p_ram.system.masterVol / DEFAULT_GAIN_BASE);
 		}
 
 		break;

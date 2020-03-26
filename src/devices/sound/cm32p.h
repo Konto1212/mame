@@ -45,6 +45,8 @@ const unsigned int SYSTEM_CHAN_ASSIGN_START_OFF = 0xa;
 const unsigned int SYSTEM_CHAN_ASSIGN_END_OFF = 0xf;
 const unsigned int SYSTEM_MASTER_VOL_OFF = 0x10;
 
+const float DEFAULT_GAIN_BASE = 1000.0f;
+
 struct PatchParam {
 	u8 toneMedia; // TONE MEDIA 0 - 1 Internal,Card
 	u8 toneNumber; // TONE NUMBER 0 -127
@@ -160,8 +162,10 @@ private:
 	int memory_initialized;
 
 	CM32P_BReverbModel *reverbModels[4];
+	float clipping_overflow_l;
+	float clipping_overflow_r;
 
-	u8 default_patch_table_no[128] =
+	const u8 default_patch_table_no[128] =
 	{
 		 0, 2, 3, 4, 5, 6, 8,10,12,14,15,17,18,20,21,26,
 		27,28,29,32,33,34,35,36,37,38,39,49,42,43,44,45,
@@ -173,7 +177,7 @@ private:
 		48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,
 	};
 
-	u8 default_patch_table_media[128] =
+	const u8 default_patch_table_media[128] =
 	{
 		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

@@ -43,6 +43,9 @@ private:
 	sound_stream *m_stream;   /* stream number */
 	int m_frequency;          /* set frequency - this can be changed using the appropriate function */
 	mt32emu_context context;
+
+	float clipping_overflow_l;
+	float clipping_overflow_r;
 };
 
 DECLARE_DEVICE_TYPE(MT32, mt32_device)

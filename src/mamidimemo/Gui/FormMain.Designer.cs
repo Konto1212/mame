@@ -240,7 +240,7 @@
             // 
             resources.ApplyResources(this.toolStrip3, "toolStrip3");
             this.toolStrip3.ClickThrough = false;
-            this.toolStrip3.ImageScalingSize = new System.Drawing.Size(54, 54);
+            this.toolStrip3.ImageScalingSize = new System.Drawing.Size(81, 81);
             this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButtonCat,
             this.toolStripButtonA2Z,
@@ -307,7 +307,7 @@
             // 
             resources.ApplyResources(this.toolStrip2, "toolStrip2");
             this.toolStrip2.ClickThrough = false;
-            this.toolStrip2.ImageScalingSize = new System.Drawing.Size(121, 121);
+            this.toolStrip2.ImageScalingSize = new System.Drawing.Size(181, 181);
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel3,
             this.toolStripButton19,
@@ -811,7 +811,7 @@
             // 
             resources.ApplyResources(this.toolStrip1, "toolStrip1");
             this.toolStrip1.ClickThrough = false;
-            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(54, 54);
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(81, 81);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel1,
             this.toolStripComboBoxMidiIf,
