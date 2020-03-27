@@ -46,8 +46,6 @@ void cm32p_device::set_enable(int enable)
 
 		if (m_enable != 0)
 		{
-			synth_rev_off = new_fluid_synth(settings);
-			synth_rev_on = new_fluid_synth(settings);
 			//fluid_synth_set_polyphony(synth, 31);
 			fluid_synth_set_reverb_on(synth_rev_off, 0);
 			fluid_synth_set_reverb_on(synth_rev_on, 0);
@@ -58,8 +56,10 @@ void cm32p_device::set_enable(int enable)
 		}
 		else
 		{
-			delete_fluid_synth(synth_rev_off);
-			delete_fluid_synth(synth_rev_on);
+			//delete_fluid_synth(synth_rev_off);
+			//delete_fluid_synth(synth_rev_on);
+			fluid_synth_system_reset(synth_rev_off);
+			fluid_synth_system_reset(synth_rev_on);
 		}
 	}
 }
@@ -143,6 +143,11 @@ void cm32p_device::initialize_memory()
 		patchTemp->patch.lfoManDepth = 4;
 		patchTemp->patch.detuneDepth = 12;
 
+		memset(rpn_lsb, 0, sizeof(rpn_lsb));
+		memset(rpn_msb, 0, sizeof(rpn_msb));
+		memset(rpn_data, 0, sizeof(rpn_data));
+		memset(rpn_type, 0, sizeof(rpn_type));
+
 		switch (i)
 		{
 		case 0:
@@ -210,6 +215,8 @@ void cm32p_device::device_start()
 
 	settings = new_fluid_settings();
 	fluid_settings_setnum(settings, "synth.sample-rate", machine().sample_rate());
+	synth_rev_off = new_fluid_synth(settings);
+	synth_rev_on = new_fluid_synth(settings);
 }
 
 //-------------------------------------------------
@@ -287,7 +294,7 @@ WRITE_LINE_MEMBER(cm32p_device::set_state)
 	set_enable(on);
 }
 
-void cm32p_device::load_sf(u8 card_id, const char* filename)
+fluid_sfont_t *cm32p_device::load_sf(u8 card_id, const char* filename)
 {
 	if (sf_table.count(card_id) != 0) {
 		fluid_synth_sfunload(synth_rev_off, sf_table[card_id], 0);
@@ -295,7 +302,31 @@ void cm32p_device::load_sf(u8 card_id, const char* filename)
 	}
 
 	sf_table[card_id] = fluid_synth_sfload(synth_rev_off, filename, 0);
-	sf_table[card_id] = fluid_synth_sfload(synth_rev_on, filename, 0);
+	fluid_sfont_t* sf = fluid_synth_get_sfont_by_id(synth_rev_off, sf_table[card_id]);
+	fluid_synth_add_sfont(synth_rev_on, sf);
+
+	return sf;
+}
+
+
+void cm32p_device::add_sf(u8 card_id, fluid_sfont_t *sf)
+{
+	if (sf_table.count(card_id) != 0) {
+		fluid_synth_sfunload(synth_rev_off, sf_table[card_id], 0);
+		fluid_synth_sfunload(synth_rev_on, sf_table[card_id], 0);
+	}
+
+
+	fluid_sfont_t* tsf = fluid_synth_get_sfont_by_id(synth_rev_off, sf->id);
+	if (tsf == 0)
+	{
+		sf_table[card_id] = fluid_synth_add_sfont(synth_rev_off, sf);
+		fluid_synth_add_sfont(synth_rev_on, sf);
+	}
+	else
+	{
+		sf_table[card_id] = sf->id;
+	}
 }
 
 void cm32p_device::set_tone(u8 card_id, u8 tone_no, u16 sf_preset_no)
@@ -350,7 +381,7 @@ void cm32p_device::play_msg(u8 type, u8 channel, u32 param1, u32 param2)
 				fluid_synth_noteon(synth_rev_on, channel, key, param2);
 			}
 		}
-			break;
+		break;
 		case 0xb0:
 		{
 			fluid_synth_cc(synth_rev_off, channel, param1, param2);
@@ -359,11 +390,38 @@ void cm32p_device::play_msg(u8 type, u8 channel, u32 param1, u32 param2)
 			PatchParam pp = pt.patch;
 			switch (param1)
 			{
+			case 6:
+				if (rpn_lsb[channel] == 0 && rpn_msb[channel] == 0)
+				{
+					switch(rpn_type[channel])
+					{
+					case 2:
+						pp.benderRange = rpn_data[channel];
+						fluid_synth_pitch_wheel_sens(synth_rev_off, channel, rpn_data[channel]);
+						fluid_synth_pitch_wheel_sens(synth_rev_on, channel, rpn_data[channel]);
+						break;
+					}
+				}
+				break;
 			case 7:
 				pt.outputLevel = u8(param2 * 100 / 127);
 				break;
 			case 10:
 				pt.panpot = param2;
+				break;
+			case 98:
+				rpn_type[channel] = 1;
+				break;
+			case 99:
+				rpn_type[channel] = 1;
+				break;
+			case 100:
+				rpn_lsb[channel] = u8(param2);
+				rpn_type[channel] = 2;
+				break;
+			case 101:
+				rpn_msb[channel] = u8(param2);
+				rpn_type[channel] = 2;
 				break;
 			}
 		}
@@ -550,7 +608,7 @@ void cm32p_device::playSysexWithoutHeader(u8 device, u8 command, const u8 *sysex
 		//printDebug("playSysexWithoutHeader: Unsupported command %02x", command);
 		return;
 	}
-}
+	}
 
 void cm32p_device::writeSysex(u8 device, const u8 *sysex, u32 len)
 {
@@ -754,7 +812,7 @@ void MemoryRegion::read(unsigned int entry, unsigned int off, u8 *dst, unsigned 
 		return;
 	}
 	memcpy(dst, src + off, len);
-}
+	}
 
 void MemoryRegion::write(unsigned int entry, unsigned int off, const u8 *src, unsigned int len, bool init) const {
 	unsigned int memOff = entry * entrySize + off;
@@ -790,9 +848,9 @@ void MemoryRegion::write(unsigned int entry, unsigned int off, const u8 *src, un
 				synth->printDebug("write[%d]: Wanted 0x%02x at %d, but max 0x%02x", type, desiredValue, memOff, maxValue);
 #endif
 				desiredValue = maxValue;
-			}
-			dest[memOff] = desiredValue;
 		}
+			dest[memOff] = desiredValue;
+	}
 		else if (desiredValue != 0) {
 #if MT32EMU_MONITOR_SYSEX > 0
 			// Only output debug info if they wanted to write non-zero, since a lot of things cause this to spit out a lot of debug info otherwise.

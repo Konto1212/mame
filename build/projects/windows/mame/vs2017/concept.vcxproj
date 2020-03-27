@@ -64,25 +64,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>..\..\..\..\vs2017\bin\x32\Debug\mame_mame\</OutDir>
-    <IntDir>e:\mame_src\mame\build\projects\windows\mame\vs2017\..\..\..\..\vs2017\obj\x32\Debug\concept\</IntDir>
+    <IntDir>..\..\..\..\vs2017\obj\x32\Debug\concept\</IntDir>
     <TargetName>concept</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\..\..\vs2017\bin\x64\Debug\mame_mame\</OutDir>
-    <IntDir>e:\mame_src\mame\build\projects\windows\mame\vs2017\..\..\..\..\vs2017\obj\x64\Debug\concept\</IntDir>
+    <IntDir>..\..\..\..\vs2017\obj\x64\Debug\concept\</IntDir>
     <TargetName>concept</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\..\..\..\vs2017\bin\x32\Release\mame_mame\</OutDir>
-    <IntDir>e:\mame_src\mame\build\projects\windows\mame\vs2017\..\..\..\..\vs2017\obj\x32\Release\concept\</IntDir>
+    <IntDir>..\..\..\..\vs2017\obj\x32\Release\concept\</IntDir>
     <TargetName>concept</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\..\..\vs2017\bin\x64\Release\mame_mame\</OutDir>
-    <IntDir>e:\mame_src\mame\build\projects\windows\mame\vs2017\..\..\..\..\vs2017\obj\x64\Release\concept\</IntDir>
+    <IntDir>..\..\..\..\vs2017\obj\x64\Release\concept\</IntDir>
     <TargetName>concept</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>

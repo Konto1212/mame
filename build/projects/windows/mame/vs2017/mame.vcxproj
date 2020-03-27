@@ -65,7 +65,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>..\..\..\..\..\Output\Debug\</OutDir>
-    <IntDir>e:\mame_src\mame\build\projects\windows\mame\vs2017\..\..\..\..\vs2017\obj\x32\Debug\mame\</IntDir>
+    <IntDir>..\..\..\..\vs2017\obj\x32\Debug\mame\</IntDir>
     <TargetName>MAmidiMEmo</TargetName>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
@@ -73,7 +73,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\..\..\..\Output\Debug64\</OutDir>
-    <IntDir>e:\mame_src\mame\build\projects\windows\mame\vs2017\..\..\..\..\vs2017\obj\x64\Debug\mame\</IntDir>
+    <IntDir>..\..\..\..\vs2017\obj\x64\Debug\mame\</IntDir>
     <TargetName>MAmidiMEmo</TargetName>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
@@ -81,7 +81,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\..\..\..\..\Output\Release\</OutDir>
-    <IntDir>e:\mame_src\mame\build\projects\windows\mame\vs2017\..\..\..\..\vs2017\obj\x32\Release\mame\</IntDir>
+    <IntDir>..\..\..\..\vs2017\obj\x32\Release\mame\</IntDir>
     <TargetName>MAmidiMEmo</TargetName>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>false</LinkIncremental>
@@ -89,7 +89,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\..\..\..\Output\Release64\</OutDir>
-    <IntDir>e:\mame_src\mame\build\projects\windows\mame\vs2017\..\..\..\..\vs2017\obj\x64\Release\mame\</IntDir>
+    <IntDir>..\..\..\..\vs2017\obj\x64\Release\mame\</IntDir>
     <TargetName>MAmidiMEmo</TargetName>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>false</LinkIncremental>

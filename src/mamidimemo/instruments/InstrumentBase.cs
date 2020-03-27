@@ -924,7 +924,7 @@ namespace zanac.MAmidiMEmo.Instruments
             get;
         }
 
-        private DataEntryType lastDateEntryType;
+        private DataEntryType[] lastDateEntryType;
 
         /// <summary>
         /// 
@@ -1256,6 +1256,25 @@ namespace zanac.MAmidiMEmo.Instruments
                 new GeneralPurposeControlSettings(),
                 new GeneralPurposeControlSettings()
             };
+            lastDateEntryType = new DataEntryType[]
+            {
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None,
+                DataEntryType.None
+            };
         }
 
         #region IDisposable Support
@@ -1421,7 +1440,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 6:    //Data Entry MSB
                     DataMsb[midiEvent.Channel] = midiEvent.ControlValue;
 
-                    switch (lastDateEntryType)
+                    switch (lastDateEntryType[midiEvent.Channel])
                     {
                         case DataEntryType.Nrpn:
                             processNrpn(midiEvent, null);
@@ -1434,7 +1453,7 @@ namespace zanac.MAmidiMEmo.Instruments
                 case 38:    //Data Entry LSB
                     DataLsb[midiEvent.Channel] = midiEvent.ControlValue;
 
-                    switch (lastDateEntryType)
+                    switch (lastDateEntryType[midiEvent.Channel])
                     {
                         case DataEntryType.Nrpn:
                             processNrpn(null, midiEvent);
@@ -1497,20 +1516,20 @@ namespace zanac.MAmidiMEmo.Instruments
 
                 case 98:    //NRPN LSB
                     NrpnLsb[midiEvent.Channel] = midiEvent.ControlValue;
-                    lastDateEntryType = DataEntryType.Nrpn;
+                    lastDateEntryType[midiEvent.Channel] = DataEntryType.Nrpn;
                     break;
                 case 99:    //NRPN MSB
                     NrpnMsb[midiEvent.Channel] = midiEvent.ControlValue;
-                    lastDateEntryType = DataEntryType.Nrpn;
+                    lastDateEntryType[midiEvent.Channel] = DataEntryType.Nrpn;
                     break;
 
                 case 100:    //RPN LSB
                     RpnLsb[midiEvent.Channel] = midiEvent.ControlValue;
-                    lastDateEntryType = DataEntryType.Rpn;
+                    lastDateEntryType[midiEvent.Channel] = DataEntryType.Rpn;
                     break;
                 case 101:    //RPN MSB
                     RpnMsb[midiEvent.Channel] = midiEvent.ControlValue;
-                    lastDateEntryType = DataEntryType.Rpn;
+                    lastDateEntryType[midiEvent.Channel] = DataEntryType.Rpn;
                     break;
                 case 121:    //Reset All Controller
                     for (int i = 0; i < 16; i++)

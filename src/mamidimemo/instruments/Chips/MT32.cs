@@ -34,7 +34,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
 
         public override string Name => "MT32";
 
-        public override string Group => "LA";
+        public override string Group => "MIDI";
 
         public override InstrumentType InstrumentType => InstrumentType.MT32;
 

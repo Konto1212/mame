@@ -68,6 +68,12 @@ namespace zanac.MAmidiMEmo.Instruments
             for (int i = 0; i < Enum.GetNames(typeof(InstrumentType)).Length; i++)
                 instruments.Add(new List<InstrumentBase>());
 
+            NrpnLsb = new byte[16];
+            NrpnMsb = new byte[16];
+            RpnLsb = new byte[16];
+            RpnMsb = new byte[16];
+            DataLsb = new byte[16];
+            DataMsb = new byte[16];
         }
 
         /// <summary>

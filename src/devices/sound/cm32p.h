@@ -126,7 +126,9 @@ public:
 
 	void play_sysex(const u8 *sysex, u32 len);
 
-	void load_sf(u8 card_id, const char* filename);
+	fluid_sfont_t *load_sf(u8 card_id, const char* filename);
+
+	void add_sf(u8 card_id, fluid_sfont_t *sf);
 
 	void set_tone(u8 card_id, u8 tone_no, u16 sf_preset_no);
 
@@ -153,6 +155,11 @@ private:
 	fluid_settings_t *settings;
 	fluid_synth_t *synth_rev_on;
 	fluid_synth_t *synth_rev_off;
+
+	u8 rpn_lsb[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	u8 rpn_msb[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	u8 rpn_data[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	u8 rpn_type[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	std::map<u16, u16> tone_table;
 	std::map<u8, unsigned int> sf_table;

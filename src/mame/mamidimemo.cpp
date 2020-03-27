@@ -1171,7 +1171,30 @@ extern "C"
 		cm32p_devices[unitNumber]->play_sysex(sysex, len);
 	}
 
-	DllExport void cm32p_load_sf(unsigned int unitNumber, unsigned char card_id, const char* filename)
+	DllExport fluid_sfont_t * cm32p_load_sf(unsigned int unitNumber, unsigned char card_id, const char* filename)
+	{
+		if (cm32p_devices[unitNumber] == NULL)
+		{
+			mame_machine_manager *mmm = mame_machine_manager::instance();
+			if (mmm == nullptr)
+				return 0;
+			running_machine *rm = mmm->machine();
+			if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+				return 0;
+
+			std::string num = std::to_string(unitNumber);
+			cm32p_device *cm32p = dynamic_cast<cm32p_device   *>(rm->device((std::string("cm32p_") + num).c_str()));
+			if (cm32p == nullptr)
+				return 0;
+
+			cm32p_devices[unitNumber] = cm32p;
+		}
+
+		return cm32p_devices[unitNumber]->load_sf(card_id, filename);
+	}
+
+
+	DllExport void cm32p_add_sf(unsigned int unitNumber, u8 card_id, fluid_sfont_t * sf)
 	{
 		if (cm32p_devices[unitNumber] == NULL)
 		{
@@ -1190,7 +1213,7 @@ extern "C"
 			cm32p_devices[unitNumber] = cm32p;
 		}
 
-		cm32p_devices[unitNumber]->load_sf(card_id, filename);
+		return cm32p_devices[unitNumber]->add_sf(card_id, sf);
 	}
 
 	DllExport void cm32p_set_tone(unsigned int unitNumber, unsigned char card_id, unsigned char tone_no, unsigned short sf_preset_no)
