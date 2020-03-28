@@ -42,8 +42,6 @@ void cm32p_device::set_enable(int enable)
 {
 	if (m_enable != enable)
 	{
-		m_enable = enable;
-
 		if (m_enable != 0)
 		{
 			//fluid_synth_set_polyphony(synth, 31);
@@ -61,6 +59,7 @@ void cm32p_device::set_enable(int enable)
 			fluid_synth_system_reset(synth_rev_off);
 			fluid_synth_system_reset(synth_rev_on);
 		}
+		m_enable = enable;
 	}
 }
 
@@ -228,7 +227,7 @@ void cm32p_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	stream_sample_t *buffer1 = outputs[0];
 	stream_sample_t *buffer2 = outputs[1];
 
-	if (!m_enable || memory_initialized == 0 || synth_rev_off == 0 || synth_rev_on == 0)
+	if (!m_enable || memory_initialized == 0)
 	{
 		memset(buffer1, 0, samples * sizeof(*buffer1));
 		memset(buffer2, 0, samples * sizeof(*buffer2));
@@ -278,21 +277,6 @@ void cm32p_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	free(ptr);
 }
 
-
-//-------------------------------------------------
-//  changing state to on from off will restart tone
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(cm32p_device::set_state)
-{
-	/* only update if new state is not the same as old state */
-	int on = (state) ? 1 : 0;
-	if (m_enable == on)
-		return;
-
-	m_stream->update();
-	set_enable(on);
-}
 
 fluid_sfont_t *cm32p_device::load_sf(u8 card_id, const char* filename)
 {

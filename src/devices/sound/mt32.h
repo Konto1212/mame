@@ -37,7 +37,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(set_state);   // enable/disable sound output
 
 private:
 	sound_stream *m_stream;   /* stream number */

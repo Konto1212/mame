@@ -531,7 +531,7 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 		//memidimemo
 		device_t *dev = stream.input_source_device(inp);
 		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(dev);
-		if (!sd->is_enabled())
+		if (!sd->m_enable)
 			continue;
 
 		// loop over samples

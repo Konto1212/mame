@@ -92,10 +92,8 @@ public:
 	void set_input_gain(int inputnum, float gain);
 	void set_output_gain(int outputnum, float gain);
 	int inputnum_from_device(device_t &device, int outputnum = 0) const;
-
+	volatile int m_enable;
 	virtual void set_enable(int enable) { m_enable = enable; }
-
-	virtual int is_enabled() { return m_enable; }
 
 	//
 	//  Filter.h
@@ -142,8 +140,6 @@ protected:
 	std::vector<sound_route> m_route_list;      // list of sound routes
 	int             m_outputs;                  // number of outputs from this instance
 	int             m_auto_allocated_inputs;    // number of auto-allocated inputs targeting us
-
-	volatile int m_enable;
 
 private:
 	double cutoff;

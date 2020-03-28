@@ -33,9 +33,7 @@ void mt32_device::set_enable(int enable)
 {
 	if (m_enable != enable)
 	{
-		m_enable = enable;
-
-		if (m_enable != 0)
+		if (enable != 0)
 		{
 			mt32emu_open_synth(context);
 			clipping_overflow_l = 0.0f;
@@ -45,6 +43,7 @@ void mt32_device::set_enable(int enable)
 		{
 			mt32emu_close_synth(context);
 		}
+		m_enable = enable;
 	}
 }
 
@@ -129,18 +128,3 @@ void mt32_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	free(ptr);
 }
 
-
-//-------------------------------------------------
-//  changing state to on from off will restart tone
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(mt32_device::set_state)
-{
-	/* only update if new state is not the same as old state */
-	int on = (state) ? 1 : 0;
-	if (m_enable == on)
-		return;
-
-	m_stream->update();
-	set_enable(on);
-}
