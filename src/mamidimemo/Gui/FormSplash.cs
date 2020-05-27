@@ -13,10 +13,12 @@ using zanac.MAmidiMEmo.ComponentModel;
 
 namespace zanac.MAmidiMEmo.Gui
 {
-    public partial class FormAbout : Form
+    public partial class FormSplash : Form
     {
-        public FormAbout()
+        public FormSplash()
         {
+            DoubleBuffered = true;
+
             InitializeComponent();
 
             labelVer.Text = string.Format(Program.FILE_COPYRIGHT, Program.FILE_VERSION);
@@ -24,14 +26,10 @@ namespace zanac.MAmidiMEmo.Gui
             ImageUtility.AdjustControlImagesDpiScale(this);
         }
 
-        private void pictureBox1_Click(object sender, EventArgs e)
+        private void FormSplash_Paint(object sender, PaintEventArgs e)
         {
-            Process.Start("https://github.com/110-kenichi/mame");
+            e.Graphics.DrawRectangle(SystemPens.WindowFrame, new Rectangle(0, 0, Width - 1, Height - 1));
         }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
-            Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SNQ9JE3JAQMNQ");
-        }
     }
 }

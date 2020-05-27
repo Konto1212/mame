@@ -326,7 +326,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <summary>
         /// 
         /// </summary>
-        private static void MT32PlayMsgNow(uint unitNumber, uint msg)
+        private static void MT32PlayMsg(uint unitNumber, uint msg)
         {
             try
             {
@@ -343,7 +343,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <summary>
         /// 
         /// </summary>
-        private static void MT32PlaySysExNow(uint unitNumber, byte[] sysex)
+        private static void MT32PlaySysEx(uint unitNumber, byte[] sysex)
         {
             try
             {
@@ -413,7 +413,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         List<byte> data = new List<byte>();
                         data.Add(0xf0);
                         data.AddRange(sysex.Data);
-                        MT32PlaySysExNow(UnitNumber, data.ToArray());
+                        MT32PlaySysEx(UnitNumber, data.ToArray());
                         return;
                     }
                 case NoteOffEvent noff:
@@ -470,7 +470,7 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                         break;
                     }
             }
-            MT32PlayMsgNow(UnitNumber, msg);
+            MT32PlayMsg(UnitNumber, msg);
 
             switch (midiEvent)
             {

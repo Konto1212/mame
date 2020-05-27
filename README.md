@@ -227,7 +227,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 1.2.0.0 Added CM-32P (This is an incomplete simulator)
             Using FluidLite https://github.com/divideconcept/FluidLite , 
 			Using GeneralUser GS http://schristiancollins.com/generaluser.php
-		Fixed RPN/NRPN MIDI massages can not be handled properly.
+		Fixed RPN/NRPN MIDI massages can not be handled properly. OMG.
 1.1.0.0 Added MT-32 MIDI module ( imported from MUNT https://sourceforge.net/projects/munt/ )
             Place legitimate MT32_CONTROL.ROM and MT32_PCM.ROM files in the Mami dir.
 1.0.0.0 Added YM2610B chip.

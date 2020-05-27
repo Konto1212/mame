@@ -34,6 +34,9 @@ namespace zanac.MAmidiMEmo
         /// </summary>
         public const string FILE_VERSION = "1.2.0.0";
 
+        public const string FILE_COPYRIGHT = @"Virtual chiptune sound MIDI module ""MAmidiMEmo"" Version {0}
+Copyright(C) 2019, 2020 Itoken.All rights reserved.";
+
         public static ISerializationBinder SerializationBinder = new KnownTypesBinder();
 
         public static readonly JsonSerializerSettings JsonAutoSettings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, DefaultValueHandling = DefaultValueHandling.Ignore, SerializationBinder = SerializationBinder };
@@ -138,13 +141,47 @@ namespace zanac.MAmidiMEmo
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
-                if (!string.IsNullOrEmpty(Settings.Default.EnvironmentSettings))
+                using (var fs = new FormSplash())
                 {
+                    fs.Show();
+                    while (fs.Opacity != 1)
+                    {
+                        fs.Opacity += 0.1;
+                        Thread.Sleep(50);
+                        fs.Refresh();
+                    }
+
+                    if (!string.IsNullOrEmpty(Settings.Default.EnvironmentSettings))
+                    {
+                        try
+                        {
+                            var dso = StringCompressionUtility.Decompress(Settings.Default.EnvironmentSettings);
+                            var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(dso, JsonAutoSettings);
+                            InstrumentManager.RestoreSettings(settings);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ex.GetType() == typeof(Exception))
+                                throw;
+                            else if (ex.GetType() == typeof(SystemException))
+                                throw;
+
+                            MessageBox.Show(ex.ToString());
+                        }
+                    }
+
                     try
                     {
-                        var dso = StringCompressionUtility.Decompress(Settings.Default.EnvironmentSettings);
-                        var settings = JsonConvert.DeserializeObject<EnvironmentSettings>(dso, JsonAutoSettings);
-                        InstrumentManager.RestoreSettings(settings);
+                        var fm = new FormMain();
+                        fm.Shown += (_, __) =>
+                        {
+                            fm.BeginInvoke(new MethodInvoker(() => { fs.Close(); }));
+                        };
+                        Application.Run(fm);
+
+                        var so = JsonConvert.SerializeObject(SaveEnvironmentSettings(), Formatting.Indented, JsonAutoSettings);
+                        Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(so);
+                        Settings.Default.Save();
                     }
                     catch (Exception ex)
                     {
@@ -155,29 +192,12 @@ namespace zanac.MAmidiMEmo
 
                         MessageBox.Show(ex.ToString());
                     }
+
+                    ShuttingDown?.Invoke(typeof(Program), EventArgs.Empty);
                 }
-
-                try
-                {
-                    Application.Run(new FormMain());
-
-                    var so = JsonConvert.SerializeObject(SaveEnvironmentSettings(), Formatting.Indented, JsonAutoSettings);
-                    Settings.Default.EnvironmentSettings = StringCompressionUtility.Compress(so);
-                    Settings.Default.Save();
-                }
-                catch (Exception ex)
-                {
-                    if (ex.GetType() == typeof(Exception))
-                        throw;
-                    else if (ex.GetType() == typeof(SystemException))
-                        throw;
-
-                    MessageBox.Show(ex.ToString());
-                }
-
-                ShuttingDown?.Invoke(typeof(Program), EventArgs.Empty);
             }))
-            { Priority = ThreadPriority.BelowNormal
+            {
+                Priority = ThreadPriority.BelowNormal
             };
             mainThread.SetApartmentState(ApartmentState.STA);
             mainThread.Start();

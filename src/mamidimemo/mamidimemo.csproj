@@ -165,6 +165,12 @@
     <Compile Include="ComponentModel\CacheMemory.cs" />
     <Compile Include="Gui\BrrFileLoaderUITypeEditor.cs" />
     <Compile Include="Gui\BrrFileLoaderEditorAttribute.cs" />
+    <Compile Include="Gui\FormSplash.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gui\FormSplash.Designer.cs">
+      <DependentUpon>FormSplash.cs</DependentUpon>
+    </Compile>
     <Compile Include="Gui\WsgBitWideAttribute.cs" />
     <Compile Include="ComponentModel\InstancePropertyInfo.cs" />
     <Compile Include="ComponentModel\MaskAttribute.cs" />
@@ -306,6 +312,9 @@
     <Compile Include="Midi\MidiManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Gui\FormSplash.resx">
+      <DependentUpon>FormSplash.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormProp.resx">
       <DependentUpon>FormProp.cs</DependentUpon>
     </EmbeddedResource>
