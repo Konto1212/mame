@@ -12,7 +12,7 @@ using zanac.MAmidiMEmo;
 [assembly: AssemblyConfiguration("-")]
 [assembly: AssemblyCompany("-")]
 [assembly: AssemblyProduct("MAmidiMEmo")]
-[assembly: AssemblyCopyright("Copyright ©  2021 Itoken")]
+[assembly: AssemblyCopyright("Copyright © 2019, 2020 Itoken")]
 [assembly: AssemblyTrademark("-")]
 [assembly: AssemblyCulture("")]
 
