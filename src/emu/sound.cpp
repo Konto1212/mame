@@ -443,7 +443,7 @@ void sound_stream::update_with_accounting(bool second_tick)
 		{
 			// if we have samples to move, do so for each output
 			if (output_bufindex > 0)
-				for (auto & output : m_output)
+				for (auto &output : m_output)
 				{
 					memmove(&output.m_buffer[0], &output.m_buffer[samples_to_lose], sizeof(output.m_buffer[0]) * (output_bufindex - samples_to_lose));
 				}
@@ -490,8 +490,8 @@ void sound_stream::apply_sample_rate_changes()
 
 	// clear out the buffer
 	if (m_max_samples_per_update)
-		for (auto & elem : m_output)
-			memset(&elem.m_buffer[0], 0, m_max_samples_per_update * sizeof(elem.m_buffer[0]));
+		for (auto &elem : m_output)
+			std::fill_n(&elem.m_buffer[0], m_max_samples_per_update, 0);
 }
 
 
@@ -507,7 +507,7 @@ void sound_stream::recompute_sample_rate_data()
 	{
 		m_sample_rate = 0;
 		// When synchronous, pick the sample rate for the inputs, if any
-		for (auto & input : m_input)
+		for (auto &input : m_input)
 		{
 			if (input.m_source != nullptr)
 			{
@@ -539,7 +539,7 @@ void sound_stream::recompute_sample_rate_data()
 	allocate_output_buffers();
 
 	// iterate over each input
-	for (auto & input : m_input)
+	for (auto &input : m_input)
 	{
 		// if we have a source, see if its sample rate changed
 
@@ -602,11 +602,8 @@ void sound_stream::allocate_resample_buffers()
 		m_resample_bufalloc = bufsize;
 
 		// iterate over outputs and realloc their buffers
-		for (auto & elem : m_input) {
-			unsigned int old_size = elem.m_resample.size();
-			elem.m_resample.resize(m_resample_bufalloc);
-			memset(&elem.m_resample[old_size], 0, (m_resample_bufalloc - old_size)*sizeof(elem.m_resample[0]));
-		}
+		for (auto &elem : m_input)
+			elem.m_resample.resize(m_resample_bufalloc, 0);
 	}
 }
 
@@ -626,11 +623,8 @@ void sound_stream::allocate_output_buffers()
 		m_output_bufalloc = bufsize;
 
 		// iterate over outputs and realloc their buffers
-		for (auto & elem : m_output) {
-			unsigned int old_size = elem.m_buffer.size();
-			elem.m_buffer.resize(m_output_bufalloc);
-			memset(&elem.m_buffer[old_size], 0, (m_output_bufalloc - old_size)*sizeof(elem.m_buffer[0]));
-		}
+		for (auto &elem : m_output)
+			elem.m_buffer.resize(m_output_bufalloc, 0);
 	}
 }
 
@@ -645,8 +639,8 @@ void sound_stream::postload()
 	recompute_sample_rate_data();
 
 	// make sure our output buffers are fully cleared
-	for (auto & elem : m_output)
-		memset(&elem.m_buffer[0], 0, m_output_bufalloc * sizeof(elem.m_buffer[0]));
+	for (auto &elem : m_output)
+		std::fill_n(&elem.m_buffer[0], m_output_bufalloc, 0);
 
 	// recompute the sample indexes to make sense
 	m_output_sampindex = m_attoseconds_per_sample ? m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample : 0;
@@ -746,7 +740,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, u32 
 	stream_sample_t *dest = &input.m_resample[0];
 	if (input.m_source == nullptr || input.m_source->m_stream->m_attoseconds_per_sample == 0)
 	{
-		memset(dest, 0, numsamples * sizeof(*dest));
+		std::fill_n(dest, numsamples, 0);
 		return &input.m_resample[0];
 	}
 
@@ -906,6 +900,7 @@ sound_manager::sound_manager(running_machine &machine)
 		m_finalmix(machine.sample_rate()),
 		m_leftmix(machine.sample_rate()),
 		m_rightmix(machine.sample_rate()),
+		m_samples_this_update(0),
 		m_muted(0),
 		m_attenuation(0),
 		m_nosound_mode(machine.osd().no_sound()),
@@ -1157,7 +1152,7 @@ void sound_manager::update(void *ptr, int param)
 	g_profiler.start(PROFILER_SOUND);
 
 	// force all the speaker streams to generate the proper number of samples
-	int samples_this_update = 0;
+	m_samples_this_update = 0;
 	std::vector<std::vector<device_sound_interface *>> sis;
 	std::vector<std::vector<stream_sample_t *>> outs;
 	int idx = 0;
@@ -1165,24 +1160,24 @@ void sound_manager::update(void *ptr, int param)
 	{
 		sis.emplace_back();
 		outs.emplace_back();
-		speaker.pre_mix(sis[idx], outs[idx], &m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
+		speaker.pre_mix(sis[idx], outs[idx], &m_leftmix[0], &m_rightmix[0], m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 		idx++;
 	}
 	for (int i = 0; i < sis[0].size(); i++)
 	{
 		stream_sample_t* sss[] = { outs[0][i] , outs[1][i] };
-		sis[0][i]->apply_filter(sss, samples_this_update);
+		sis[0][i]->apply_filter(sss, m_samples_this_update);
 	}
-	samples_this_update = 0;
+	m_samples_this_update = 0;
 	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
-		speaker.mix(&m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
+		speaker.mix(&m_leftmix[0], &m_rightmix[0], m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// now downmix the final result
 	u32 finalmix_step = machine().video().speed_factor();
 	u32 finalmix_offset = 0;
 	s16 *finalmix = &m_finalmix[0];
 	int sample;
-	for (sample = m_finalmix_leftover; sample < samples_this_update * 1000; sample += finalmix_step)
+	for (sample = m_finalmix_leftover; sample < m_samples_this_update * 1000; sample += finalmix_step)
 	{
 		int sampindex = sample / 1000;
 
@@ -1202,7 +1197,7 @@ void sound_manager::update(void *ptr, int param)
 			samp = 32767;
 		finalmix[finalmix_offset++] = samp;
 	}
-	m_finalmix_leftover = sample - samples_this_update * 1000;
+	m_finalmix_leftover = sample - m_samples_this_update * 1000;
 
 	// play the result
 	if (finalmix_offset > 0)
@@ -1235,6 +1230,9 @@ void sound_manager::update(void *ptr, int param)
 	for (auto &stream : m_stream_list)
 		stream->apply_sample_rate_changes();
 
+	// notify that new samples have been generated
+	emulator_info::sound_hook();
+
 	g_profiler.stop();
 
 	//finalmix[0] left ch
@@ -1244,4 +1242,19 @@ void sound_manager::update(void *ptr, int param)
 	//finalmix[N+1] right ch (N = finalmix_offset / 2)
 
 	SoundUpdated();
+}
+
+
+//-------------------------------------------------
+//  samples - fills the specified buffer with
+//  16-bit stereo audio samples generated during
+//  the current frame
+//-------------------------------------------------
+
+void sound_manager::samples(s16 *buffer)
+{
+	for (int sample = 0; sample < m_samples_this_update * 2; sample++)
+	{
+		*buffer++ = m_finalmix[sample];
+	}
 }

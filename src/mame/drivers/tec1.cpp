@@ -366,8 +366,8 @@ void tec1_state::tecjmon_io(address_map &map)
 	map(0x01, 0x01).w(FUNC(tec1_state::tecjmon_digit_w));
 	map(0x02, 0x02).w(FUNC(tec1_state::tec1_segment_w));
 	map(0x03, 0x03).r(FUNC(tec1_state::latch_r));
-	//AM_RANGE(0x04, 0x04) AM_WRITE(lcd_en_w)
-	//AM_RANGE(0x84, 0x84) AM_WRITE(lcd_2nd_w)
+	//map(0x04, 0x04).w(FUNC(tec1_state::lcd_en_w));
+	//map(0x84, 0x84).w(FUNC(tec1_state::lcd_2nd_w));
 }
 
 
@@ -412,7 +412,7 @@ static INPUT_PORTS_START( tec1 )
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, tec1_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, tec1_state, reset_button, 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(tec1_state::reset_button)

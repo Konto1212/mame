@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dirk Verwiebe, Robbbert, Cowering
+// copyright-holders:Dirk Verwiebe, Cowering
 /***************************************************************************
 Mephisto Glasgow 3 S chess computer
 Dirk V.
@@ -10,19 +10,18 @@ sp_rinter@gmx.de
 16 KB RAM
 4 Digit LCD
 
-3* 74LS138  Decoder/Multiplexer
-1*74LS74    Dual positive edge triggered D Flip Flop
+3*74LS138 Decoder/Multiplexer
+1*74LS74  Dual positive edge triggered D Flip Flop
 1*74LS139 1of4 Demultiplexer
-1*74LS05    HexInverter
-1*NE555     R=100K C=10uF
+1*74LS05  Hex Inverter
+1*NE555   R=100K C=10uF
 2*74LS04  Hex Inverter
-1*74LS164   8 Bit Shift register
-1*74121 Monostable Multivibrator with Schmitt Trigger Inputs
-1*74LS20 Dual 4 Input NAND GAte
+1*74LS164 8 Bit Shift register
+1*74121   Monostable Multivibrator with Schmitt Trigger Inputs
+1*74LS20  Dual 4 Input NAND GAte
 1*74LS367 3 State Hex Buffers
+1*SG-10   Seiko 4-pin plastic XTAL chip "50H", to IPL0+2
 
-
-Made playable by Robbbert in Nov 2009.
 
 How to play (quick guide)
 1. You are the white player.
@@ -33,13 +32,16 @@ How to play (quick guide)
 6. You'll need to read the official user manual for advanced features, or if
     you get messages such as "Err1".
 
+TODO:
+- add waitstates(applies to glasgow, amsterd, others?), CPU is 12MHz but with DTACK
+  waitstates for slow EPROMs, effective speed is less than 10MHz
+- LCD module is 8.8.:8.8 like mephisto_brikett/mm1 (so, add ":" in the middle)
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mmboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -68,7 +70,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(glasgow_lcd_flag_w);
 	DECLARE_READ8_MEMBER(glasgow_keys_r);
 	DECLARE_WRITE8_MEMBER(glasgow_keys_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -97,12 +98,10 @@ public:
 
 protected:
 	DECLARE_WRITE8_MEMBER(write_lcd);
-	DECLARE_WRITE8_MEMBER(write_lcd32);
 	DECLARE_WRITE8_MEMBER(write_lcd_flag);
 	DECLARE_WRITE8_MEMBER(write_beeper);
 	DECLARE_WRITE8_MEMBER(write_board);
 	DECLARE_READ8_MEMBER(read_newkeys);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi32);
 
 	void amsterd_mem(address_map &map);
 	void dallas32_mem(address_map &map);
@@ -153,15 +152,6 @@ WRITE8_MEMBER( glasgow_state::glasgow_keys_w )
 WRITE8_MEMBER( amsterd_state::write_lcd )
 {
 	if (m_lcd_shift_counter & 4)
-		m_digits[m_lcd_shift_counter & 3] = data ^ 0xff;
-
-	m_lcd_shift_counter--;
-	m_lcd_shift_counter &= 7;
-}
-
-WRITE8_MEMBER( amsterd_state::write_lcd32 )
-{
-	if (m_lcd_shift_counter & 4)
 		m_digits[m_lcd_shift_counter & 3] = data;
 
 	m_lcd_shift_counter--;
@@ -170,20 +160,18 @@ WRITE8_MEMBER( amsterd_state::write_lcd32 )
 
 WRITE8_MEMBER( amsterd_state::write_lcd_flag )
 {
-	//beep_set_state(0, (data & 1) ? 1 : 0);
+	// The key function in the rom expects a value from the
+	// second key row after writing to here
 	m_key_select = 1;
 
-	// The key function in the rom expects after writing to
-	// the  a value from the second key row;
 	m_led7 = data ? 255 : 0;
-
 }
 
 WRITE8_MEMBER( amsterd_state::write_board )
 {
 	m_key_select = 0;
-	m_board->led_w(space, offset, 0);
-	m_board->mux_w(space, offset, data);
+	m_board->led_w(0);
+	m_board->mux_w(data);
 }
 
 WRITE8_MEMBER( amsterd_state::write_beeper )
@@ -191,19 +179,9 @@ WRITE8_MEMBER( amsterd_state::write_beeper )
 	m_dac->write(BIT(data, 0));
 }
 
-READ8_MEMBER( amsterd_state::read_newkeys )  //Amsterdam, Roma, Dallas 32, Roma 32
+READ8_MEMBER( amsterd_state::read_newkeys )
 {
 	return m_keyboard[m_key_select & 1]->read();
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( glasgow_state::update_nmi)
-{
-	m_maincpu->set_input_line(7, HOLD_LINE);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( amsterd_state::update_nmi32 )
-{
-	m_maincpu->set_input_line(6, HOLD_LINE); // this was 7 in the old code, which is correct?
 }
 
 void glasgow_state::machine_start()
@@ -253,7 +231,7 @@ void amsterd_state::dallas32_mem(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x010000, 0x01ffff).ram(); // 64KB
-	map(0x800002, 0x800002).w(FUNC(amsterd_state::write_lcd32));
+	map(0x800002, 0x800002).w(FUNC(amsterd_state::write_lcd));
 	map(0x800004, 0x800004).w(FUNC(amsterd_state::write_beeper));
 	map(0x800008, 0x800008).w(FUNC(amsterd_state::write_lcd_flag));
 	map(0x800010, 0x800010).w(FUNC(amsterd_state::write_board));
@@ -311,12 +289,11 @@ void glasgow_state::glasgow(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL);
+	m_maincpu->set_periodic_int(FUNC(glasgow_state::irq5_line_hold), attotime::from_hz(50));
 	m_maincpu->set_addrmap(AS_PROGRAM, &glasgow_state::glasgow_mem);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board);
 	m_board->set_delay(attotime::from_msec(200));
-
-	TIMER(config, "nmi_timer").configure_periodic(FUNC(glasgow_state::update_nmi), attotime::from_hz(50));
 
 	/* video hardware */
 	config.set_default_layout(layout_mephisto_glasgow);
@@ -343,10 +320,8 @@ void amsterd_state::dallas32(machine_config &config)
 
 	/* basic machine hardware */
 	M68020(config.replace(), m_maincpu, 14_MHz_XTAL);
+	m_maincpu->set_periodic_int(FUNC(amsterd_state::irq5_line_hold), attotime::from_hz(50));
 	m_maincpu->set_addrmap(AS_PROGRAM, &amsterd_state::dallas32_mem);
-
-	config.device_remove("nmi_timer");
-	TIMER(config, "nmi_timer").configure_periodic(FUNC(amsterd_state::update_nmi32), attotime::from_hz(50));
 }
 
 
@@ -406,6 +381,14 @@ ROM_START( roma16 )
 	ROM_LOAD16_BYTE("roma16-l.bin", 0x00001, 0x08000, CRC(8245ddd2) SHA1(ab048b60fdc4358913a5d07b6fee863b66dd6734) )
 ROM_END
 
+ROM_START( roma16a )
+	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("roma_r_low",  0x00000, 0x04000, CRC(f2312170) SHA1(82a50ba59f74365aa77478adaadbbace6693dcc1) )
+	ROM_LOAD16_BYTE("roma_l_low",  0x00001, 0x04000, CRC(5fbb72cc) SHA1(458473a62f9f7394c9d02a6ad0939d8e19bae78b) )
+	ROM_LOAD16_BYTE("roma_r_high", 0x08000, 0x04000, CRC(a55917db) SHA1(df9a9a96cdc1c9a7ed0dc70c4ddbb4278236a15f) )
+	ROM_LOAD16_BYTE("roma_l_high", 0x08001, 0x04000, CRC(0b20617b) SHA1(f0296c486ce9009a69de1e50b90b0e1b7555f468) )
+ROM_END
+
 
 /***************************************************************************
   Game drivers
@@ -413,10 +396,14 @@ ROM_END
 
 /*    YEAR, NAME,      PARENT    COMPAT  MACHINE   INPUT         CLASS          INIT        COMPANY             FULLNAME                  FLAGS */
 CONS( 1984, glasgow,   0,        0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 CONS( 1985, amsterd,   0,        0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, amsterda,  amsterd,  0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (older)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, amsterda,  amsterd,  0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 CONS( 1986, dallas32,  0,        0,      dallas32, new_keyboard, amsterd_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, dallas16,  dallas32, 0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, dallas16a, dallas32, 0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (older)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, dallas16a, dallas32, 0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 CONS( 1987, roma32,    0,        0,      dallas32, new_keyboard, amsterd_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68020",    MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, roma16,    roma32,   0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000",    MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, roma16a,   roma32,   0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

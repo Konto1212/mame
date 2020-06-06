@@ -33,6 +33,7 @@ public:
 
 	// configuration
 	void set_bank_type(C140_TYPE bank) { m_banking_type = bank; }
+	auto int1_callback() { return m_int1_callback.bind(); }
 
 	u8 c140_r(offs_t offset);
 	void c140_w(offs_t offset, u8 data);
@@ -80,6 +81,10 @@ private:
 	void init_voice( C140_VOICE *v );
 	long find_sample(long adrs, long bank, int voice);
 
+	TIMER_CALLBACK_MEMBER(int1_on);
+
+	devcb_write_line m_int1_callback;
+
 	int m_sample_rate;
 	sound_stream *m_stream;
 	C140_TYPE m_banking_type;
@@ -93,6 +98,8 @@ private:
 	int16_t m_pcmtbl[8];        //2000.06.26 CAB
 
 	C140_VOICE m_voi[MAX_VOICE];
+
+	emu_timer *m_int1_timer;
 };
 
 DECLARE_DEVICE_TYPE(C140, c140_device)

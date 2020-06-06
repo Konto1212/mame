@@ -4,7 +4,7 @@
 
     Digitek Micrologic 20
 
-	Access control device with dot-matrix display
+    Access control device with dot-matrix display
 
   ML20/232
   ____________________________________________________
@@ -112,8 +112,8 @@ void ml20_state::mem_map(address_map &map)
 void ml20_state::io_map(address_map &map)
 {
 	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x10, 0x10).rw(m_lcdc, FUNC(hd44780_device::data_read), FUNC(hd44780_device::data_write));
-	map(0x14, 0x14).rw(m_lcdc, FUNC(hd44780_device::control_read), FUNC(hd44780_device::control_write));
+	map(0x10, 0x10).rw(m_lcdc, FUNC(hd44780_device::data_r), FUNC(hd44780_device::data_w));
+	map(0x14, 0x14).rw(m_lcdc, FUNC(hd44780_device::control_r), FUNC(hd44780_device::control_w));
 }
 
 static INPUT_PORTS_START( ml20 )
@@ -273,7 +273,7 @@ void ml20_state::ml20(machine_config &config)
 
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(ml20_state::lcd_pixel_update), this);
+	m_lcdc->set_pixel_update_cb(FUNC(ml20_state::lcd_pixel_update));
 
 	config.set_default_layout(layout_ml20);
 

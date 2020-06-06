@@ -42,7 +42,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void corona(machine_config &config);
 
 protected:
@@ -258,13 +258,13 @@ static INPUT_PORTS_START( corona )
 	PORT_INCLUDE( saitek_stratos )
 
 	PORT_MODIFY("IN.5")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CODE(KEYCODE_G) PORT_NAME("LCD Scroll")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("LCD Scroll")
 INPUT_PORTS_END
 
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void corona_state::corona(machine_config &config)
@@ -293,7 +293,7 @@ void corona_state::corona(machine_config &config)
 
 	/* extension rom */
 	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr", "bin");
-	m_extrom->set_device_load(FUNC(corona_state::extrom_load), this);
+	m_extrom->set_device_load(FUNC(corona_state::extrom_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
 }

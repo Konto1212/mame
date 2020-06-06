@@ -45,6 +45,9 @@ public:
 	uint32_t mode_entry(uint32_t entry) const { return m_mode_table[entry]; }
 	bool is_8bpp() const { return BIT(m_config, 2); }
 
+	void serialize(FILE *file);
+	void deserialize(FILE *file);
+
 private:
 	// device_t overrides
 	virtual void device_start() override;
@@ -89,6 +92,9 @@ public:
 
 	// Getters
 	const uint32_t *palette_base() const { return m_palette; }
+
+	void serialize(FILE *file);
+	void deserialize(FILE *file);
 
 private:
 	// device_t overrides
@@ -137,6 +143,9 @@ public:
 
 	auto vert_int() { return m_vert_int.bind(); }
 	auto screen_timing_changed() { return m_screen_timing_changed.bind(); } // Hack. TODO: Figure out a better way
+
+	void serialize(FILE *file);
+	void deserialize(FILE *file);
 
 private:
 	// device_t overrides
@@ -223,6 +232,7 @@ public:
 	// Getters
 	const uint32_t *rgbci(int y) const { return &m_rgbci[1344 * y]; }
 	const uint32_t *cidaux(int y) const { return &m_cidaux[1344 * y]; }
+	uint32_t store_shift() { return m_src_shift; }
 
 	// devcb callbacks
 	void set_write_mask(uint32_t data);
@@ -231,6 +241,9 @@ public:
 	uint32_t read_pixel();
 	void write_pixel(uint32_t data);
 
+	void serialize(FILE *file);
+	void deserialize(FILE *file);
+
 private:
 	// device_t overrides
 	virtual void device_start() override;
@@ -238,6 +251,7 @@ private:
 
 	void logic_pixel(uint32_t src);
 	void store_pixel(uint32_t value);
+	uint32_t expand_to_all_lanes(uint32_t src);
 
 	void set_global_mask(uint32_t global_mask) { m_global_mask = global_mask; }
 
@@ -249,8 +263,10 @@ private:
 	bool      m_dblsrc;
 	uint8_t   m_plane_enable;
 	uint8_t   m_draw_depth;
+	uint32_t  m_draw_bpp;
 	uint8_t   m_logicop;
-	uint8_t   m_store_shift;
+	uint8_t   m_src_shift;
+	uint8_t   m_dst_shift;
 
 	uint32_t *m_dest_buf;
 	uint32_t *m_buf_ptr;
@@ -276,9 +292,6 @@ class newport_base_device : public device_t
 public:
 	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device_gio_slot_interface overrides
-	virtual void install_device() override;
-
 	DECLARE_READ64_MEMBER(rex3_r);
 	DECLARE_WRITE64_MEMBER(rex3_w);
 
@@ -292,6 +305,9 @@ public:
 	auto pixel_address() { return m_set_address.bind(); }
 	auto pixel_write() { return m_write_pixel.bind(); }
 	auto pixel_read() { return m_read_pixel.bind(); }
+
+	void serialize(FILE *file);
+	void deserialize(FILE *file);
 
 protected:
 	// device_t overrides
@@ -439,6 +455,7 @@ protected:
 
 	void iterate_shade();
 
+	uint32_t get_default_color(uint32_t src);
 	uint32_t get_host_color();
 	uint32_t get_rgb_color(int16_t x, int16_t y);
 

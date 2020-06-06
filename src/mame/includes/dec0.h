@@ -61,12 +61,9 @@ public:
 	void init_hippodrm();
 	void init_hbarrel();
 	void init_slyspy();
-	void init_birdtry();
 	void init_drgninja();
 	void init_midresb();
 	void init_ffantasybl();
-
-	DECLARE_VIDEO_START(dec0_nodma);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -87,15 +84,18 @@ protected:
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
 	DECLARE_WRITE16_MEMBER(priority_w);
 
+	DECLARE_VIDEO_START(dec0_nodma);
+	DECLARE_VIDEO_START(slyspy);
+
 	void robocop_colpri_cb(u32 &colour, u32 &pri_mask);
+	void baddudes_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags);
 
 	void set_screen_raw_params_data_east(machine_config &config);
 
 private:
 	enum class mcu_type {
 		EMULATED,
-		BADDUDES_SIM,
-		BIRDTRY_SIM
+		BADDUDES_SIM
 	};
 
 	optional_device<h6280_device> m_subcpu;
@@ -141,22 +141,19 @@ private:
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(slyspy);
 	DECLARE_VIDEO_START(dec0);
+	DECLARE_VIDEO_START(baddudes);
 
 	uint32_t screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_bandit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_robocop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_hippodrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void hbarrel_colpri_cb(u32 &colour, u32 &pri_mask);
 	void bandit_colpri_cb(u32 &colour, u32 &pri_mask);
 	void midres_colpri_cb(u32 &colour, u32 &pri_mask);
 
 	void baddudes_i8751_write(int data);
-	void birdtry_i8751_write(int data);
 	void dec0_i8751_write(int data);
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);

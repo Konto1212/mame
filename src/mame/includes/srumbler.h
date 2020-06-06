@@ -4,6 +4,7 @@
 #include "machine/timer.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class srumbler_state : public driver_device
 {
@@ -32,7 +33,7 @@ private:
 	tilemap_t *m_fg_tilemap;
 	int m_scroll[4];
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	void bankswitch_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(foreground_w);
 	DECLARE_WRITE8_MEMBER(background_w);
 	DECLARE_WRITE8_MEMBER(_4009_w);

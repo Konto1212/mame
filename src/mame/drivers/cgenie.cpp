@@ -34,8 +34,8 @@
 class cgenie_state : public driver_device
 {
 public:
-	cgenie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cgenie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
@@ -50,7 +50,7 @@ public:
 		m_control(0xff),
 		m_rs232_rx(1),
 		m_rs232_dcd(1)
-	{}
+	{ }
 
 	void init_cgenie_eu();
 	void init_cgenie_nz();
@@ -217,7 +217,7 @@ static INPUT_PORTS_START( cgenie )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L.P.") // marked as "L.P." in the manual, lightpen?
 
 	PORT_START("RST")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F5) PORT_NAME("Rst") PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED_MEMBER(DEVICE_SELF, cgenie_state, rst_callback, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F5) PORT_NAME("Rst") PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED_MEMBER(DEVICE_SELF, cgenie_state, rst_callback, 0)
 INPUT_PORTS_END
 
 
@@ -450,8 +450,8 @@ void cgenie_state::cgenie(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(cgenie_state::crtc_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(cgenie_state::crtc_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(cgenie_state::crtc_begin_update));
+	m_crtc->set_update_row_callback(FUNC(cgenie_state::crtc_update_row));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

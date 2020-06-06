@@ -1,19 +1,15 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_legacy.c
- *
- */
 
 #include "nlid_twoterm.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_factory.h"
 #include "netlist/solver/nld_solver.h"
 
-/* FIXME : convert to parameters */
+// FIXME : convert to parameters
 
-#define R_OFF   (1.0 / exec().gmin())
-#define R_ON    0.01
+#define R_OFF   (plib::reciprocal(exec().gmin()))
+#define R_ON    nlconst::magic(0.01)
 
 namespace netlist
 {
@@ -53,17 +49,10 @@ namespace netlist
 
 	NETLIB_UPDATE_PARAM(switch1)
 	{
-		m_R.solve_now();
-		if (!m_POS())
+		m_R.change_state([this]()
 		{
-			m_R.set_R(R_OFF);
-		}
-		else
-		{
-			m_R.set_R(R_ON);
-		}
-		m_R.solve_later();
-
+			m_R.set_R(m_POS() ? R_ON : R_OFF);
+		});
 	}
 
 // ----------------------------------------------------------------------------------------
@@ -112,26 +101,23 @@ namespace netlist
 			m_R1.set_R(R_OFF);
 			m_R2.set_R(R_ON);
 		}
-
-		//m_R1.update_dev(time);
-		//m_R2.update_dev(time);
 	}
 
 	NETLIB_UPDATE_PARAM(switch2)
 	{
-		if (!m_POS())
-		{
-			m_R1.set_R(R_ON);
-			m_R2.set_R(R_OFF);
-		}
+		// R1 and R2 are connected. However this net may be a rail net.
+		// The code here thus is a bit more complex.
+
+		nl_fptype r1 = m_POS() ? R_OFF : R_ON;
+		nl_fptype r2 = m_POS() ? R_ON : R_OFF;
+
+		if (m_R1.solver() == m_R2.solver())
+			m_R1.change_state([this, &r1, &r2]() { m_R1.set_R(r1); m_R2.set_R(r2); });
 		else
 		{
-			m_R1.set_R(R_OFF);
-			m_R2.set_R(R_ON);
+			m_R1.change_state([this, &r1]() { m_R1.set_R(r1); });
+			m_R2.change_state([this, &r2]() { m_R2.set_R(r2); });
 		}
-
-		m_R1.solve_now();
-		m_R2.solve_now();
 	}
 
 	} //namespace analog

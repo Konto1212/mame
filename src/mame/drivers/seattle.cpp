@@ -381,8 +381,8 @@ private:
 	DECLARE_READ32_MEMBER(seattle_interrupt_enable_r);
 	DECLARE_WRITE32_MEMBER(seattle_interrupt_enable_w);
 	DECLARE_WRITE32_MEMBER(vblank_clear_w);
-	DECLARE_READ32_MEMBER(analog_port_r);
-	DECLARE_WRITE32_MEMBER(analog_port_w);
+	uint32_t analog_port_r();
+	void analog_port_w(uint32_t data);
 	DECLARE_READ32_MEMBER(carnevil_gun_r);
 	DECLARE_WRITE32_MEMBER(carnevil_gun_w);
 	DECLARE_WRITE32_MEMBER(cmos_w);
@@ -397,8 +397,8 @@ private:
 	DECLARE_WRITE32_MEMBER(status_leds_w);
 	DECLARE_READ32_MEMBER(ethernet_r);
 	DECLARE_WRITE32_MEMBER(ethernet_w);
-	DECLARE_READ32_MEMBER(output_r);
-	DECLARE_WRITE32_MEMBER(output_w);
+	uint32_t output_r();
+	void output_w(uint32_t data);
 	DECLARE_READ32_MEMBER(widget_r);
 	DECLARE_WRITE32_MEMBER(widget_w);
 	DECLARE_WRITE32_MEMBER(wheel_board_w);
@@ -480,8 +480,8 @@ void seattle_state::machine_reset()
 	/* reset either the DCS2 board or the CAGE board */
 	if (m_dcs != nullptr)
 	{
-		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
+		m_dcs->reset_w(1);
 	}
 	else if (m_cage != nullptr)
 	{
@@ -663,13 +663,13 @@ WRITE_LINE_MEMBER(seattle_state::vblank_assert)
 *
 *************************************/
 
-READ32_MEMBER(seattle_state::analog_port_r)
+uint32_t seattle_state::analog_port_r()
 {
 	return m_pending_analog_read;
 }
 
 
-WRITE32_MEMBER(seattle_state::analog_port_w)
+void seattle_state::analog_port_w(uint32_t data)
 {
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", m_maincpu->pc(), data);
@@ -856,14 +856,14 @@ void seattle_state::update_widget_irq()
 }
 
 
-READ32_MEMBER(seattle_state::output_r)
+uint32_t seattle_state::output_r()
 {
-	logerror("%08X:output_r(%d)\n", m_maincpu->pc(), offset);
+	logerror("%08X:output_r\n", m_maincpu->pc());
 	return 0;
 }
 
 
-WRITE32_MEMBER(seattle_state::output_w)
+void seattle_state::output_w(uint32_t data)
 {
 	uint8_t arg = data & 0xFF;
 
@@ -929,11 +929,11 @@ READ32_MEMBER(seattle_state::widget_r)
 			break;
 
 		case WREG_OUTPUT:
-			result = output_r(m_maincpu->space(AS_PROGRAM), 0, mem_mask);
+			result = output_r();
 			break;
 
 		case WREG_ANALOG:
-			result = analog_port_r(m_maincpu->space(AS_PROGRAM), 0, mem_mask);
+			result = analog_port_r();
 			break;
 
 		case WREG_ETHER_DATA:
@@ -964,11 +964,11 @@ WRITE32_MEMBER(seattle_state::widget_w)
 			break;
 
 		case WREG_OUTPUT:
-			output_w(m_maincpu->space(AS_PROGRAM), 0, data, mem_mask);
+			output_w(data);
 			break;
 
 		case WREG_ANALOG:
-			analog_port_w(m_maincpu->space(AS_PROGRAM), 0, data, mem_mask);
+			analog_port_w(data);
 			break;
 
 		case WREG_ETHER_DATA:
@@ -1351,7 +1351,7 @@ static INPUT_PORTS_START( sfrush )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Track 2") PORT_PLAYER(1) /* track 2 */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Track 3") PORT_PLAYER(1) /* track 3 */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("Track 4") PORT_PLAYER(1) /* track 4 */
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(seattle_state, gearshift_r)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1436,7 +1436,7 @@ static INPUT_PORTS_START( calspeed )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") PORT_PLAYER(1)   /* tailgate cam */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") PORT_PLAYER(1)   /* sky cam */
 	PORT_BIT( 0x0f80, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(seattle_state, gearshift_r)
 
 	PORT_START("GEAR")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1st Gear") PORT_PLAYER(1) /* 1st gear */

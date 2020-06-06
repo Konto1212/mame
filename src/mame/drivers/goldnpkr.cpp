@@ -1289,6 +1289,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "pmpoker.lh"
 #include "goldnpkr.lh"
@@ -1325,6 +1326,7 @@ public:
 	void genie(machine_config &config);
 	void pottnpkr(machine_config &config);
 	void goldnpkr(machine_config &config);
+	void witchcdj(machine_config &config);
 	void wcrdxtnd(machine_config &config);
 	void super21p(machine_config &config);
 	void caspoker(machine_config &config);
@@ -1406,6 +1408,7 @@ private:
 	void genie_map(address_map &map);
 	void goldnpkr_map(address_map &map);
 	void mondial_map(address_map &map);
+	void witchcdj_map(address_map &map);
 	void pottnpkr_map(address_map &map);
 	void wcrdxtnd_map(address_map &map);
 	void wildcard_map(address_map &map);
@@ -1492,7 +1495,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
 	int bank = (attr & 0x02) >> 1;  /* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2; /* bits 2-3-4-5 for color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
@@ -1510,7 +1513,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
 	int bank = (attr & 0x03) + ((attr & 0xc0) >> 4);    /* bits 0, 1, 6 & 7 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2; /* bits 2-3-4-5 for color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
@@ -1528,7 +1531,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
 	int bank = (attr & 0x03);       // bits 0-1, switch the gfx banks
 	int color = (attr & 0x70) >> 3; // bits 4-5-6 for color, shifted x2 to match the color groups used.
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 
 /*
   Color codes GFX bank 0 (chars)
@@ -1545,22 +1548,22 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
   In test mode, the DIP switches status are assigned with code 00,
   so you can't see them since they are black on black background.
 
-*/  
+*/
 }
 
 void goldnpkr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 VIDEO_START_MEMBER(goldnpkr_state, wcrdxtnd)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 VIDEO_START_MEMBER(goldnpkr_state, super21p)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::super21p_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::super21p_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1953,6 +1956,13 @@ void goldnpkr_state::goldnpkr_map(address_map &map)
 	map(0x2000, 0x7fff).rom(); /* superdbl uses 0x2000..0x3fff address space */
 }
 
+void goldnpkr_state::witchcdj_map(address_map &map)
+{
+	goldnpkr_map(map);
+	map(0x0801, 0x0801).unmaprw();
+	map(0x0802, 0x0802).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
+
 void goldnpkr_state::pottnpkr_map(address_map &map)
 {
 	map.global_mask(0x3fff);
@@ -2032,7 +2042,7 @@ void goldnpkr_state::wildcard_map(address_map &map)
 
 void goldnpkr_state::wcrdxtnd_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); //AM_SHARE("nvram") /* battery backed RAM */
+	map(0x0000, 0x07ff).ram(); //.share("nvram"); /* battery backed RAM */
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -2068,7 +2078,7 @@ void goldnpkr_state::wildcrdb_map(address_map &map)
 
 void goldnpkr_state::wildcrdb_mcu_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+//  map.global_mask(0x3fff);
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x2fff).ram();
 }
@@ -4672,6 +4682,13 @@ void goldnpkr_state::witchcrd(machine_config &config)
 	DISCRETE(config, "discrete", goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void goldnpkr_state::witchcdj(machine_config &config)
+{
+	witchcrd(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::witchcdj_map);
+}
+
 void goldnpkr_state::wcfalcon(machine_config &config)
 {
 	goldnpkr_base(config);
@@ -4884,7 +4901,7 @@ READ8_MEMBER(blitz_state::cpubank_decrypt_r)
 
 WRITE8_MEMBER(blitz_state::mcu_command_w)
 {
-	m_mcu->pa_w(space, 0, data);
+	m_mcu->pa_w(data);
 	if (BIT(m_portc_data, 0))
 	{
 		m_mcu->set_input_line(M6805_IRQ_LINE, ASSERT_LINE);
@@ -4913,7 +4930,7 @@ WRITE8_MEMBER(blitz_state::mcu_portc_w)
 
 void blitz_state::megadpkr_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); //AM_SHARE("nvram")   /* battery backed RAM */
+	map(0x0000, 0x07ff).ram(); //.share("nvram");   /* battery backed RAM */
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -6423,6 +6440,47 @@ ROM_END
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "24s10.bin",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
 	ROM_LOAD( "82s137_epoxy.bin",   0x0100, 0x0400, CRC(4ae3ecf5) SHA1(e1e540ae13e7ce5ac6391f325160ec997ea6cc2f) ) /* original epoxy block PROM */
+ROM_END
+
+
+/*
+  Joker Card (witch game)
+  PCB with daugtherboard c/6502 and rom.
+
+  Program tries to show jokers in the attract,
+  but these aren't in the graphics set.
+
+  The GFX roms for cards, have identical halves,
+  and the jokers extended GFX should be placed
+  in the second half.
+
+  Fortunatelly we have an identical GFX set from
+  another game (that match 100% the first half),
+  so for now could assume we can use it instead
+  till the original devices appear...
+
+  The game apparently uses jokers and has 3's
+  and 7's bonus.
+
+  Depending of the bet, you can have one or two
+  witches as bonus if you win a hand.
+
+*/
+ROM_START( jokercar )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1-5.sub", 0x4000, 0x4000, CRC(fa99f263) SHA1(209c8801a253de562bac091e37b091c8176c0943) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                  0x0000, 0x2000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "4u.8a", 0x2000, 0x1000, CRC(85044094) SHA1(06db79dd47a47886480bd7a6546a2252cd48b3e3) )    // chars gfx
+
+	ROM_REGION( 0x3000, "gfx2", 0 )  // these are from another set that match 100% the first half of the original devices, that have identical halves...
+	ROM_LOAD( "7.4a",  0x0000, 0x1000, BAD_DUMP CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    // cards deck gfx, bitplane 1
+	ROM_LOAD( "6.6a",  0x1000, 0x1000, BAD_DUMP CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    // cards deck gfx, bitplane 2
+	ROM_LOAD( "5.7a",  0x2000, 0x1000, BAD_DUMP CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 
@@ -11143,7 +11201,7 @@ ROM_END
 
 /****************************************************
 
-  Unknown poker game, set 2.
+  Witch Card (ICP1 board)
   198?.
 
   This one is totally encrypted.
@@ -11153,11 +11211,11 @@ ROM_END
   Char ROM is identical to the Witch Card one.
 
 *****************************************************/
-ROM_START( pokerduc )
+ROM_START( witchcdj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "b",  0x5000, 0x1000, CRC(8627fba5) SHA1(b94665f0bf425ff71f78c1258f910323c2a948f0) )
-	ROM_LOAD( "c",  0x6000, 0x1000, CRC(b35b4108) SHA1(6504ba55511637334c65e88ee5c60b1503b854b3) )
-	ROM_LOAD( "d",  0x7000, 0x1000, CRC(c48096ed) SHA1(279ba433369c7dc9cd902a19200e889eea45d115) )
+	ROM_LOAD( "c",  0x2000, 0x1000, CRC(b35b4108) SHA1(6504ba55511637334c65e88ee5c60b1503b854b3) )
+	ROM_LOAD( "d",  0x3000, 0x1000, CRC(c48096ed) SHA1(279ba433369c7dc9cd902a19200e889eea45d115) )
+	ROM_LOAD( "b",  0x7000, 0x1000, CRC(8627fba5) SHA1(b94665f0bf425ff71f78c1258f910323c2a948f0) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL(           0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
@@ -11835,65 +11893,44 @@ void goldnpkr_state::init_vkdlswwv()
   The PCB has a daughterboard coated with some plastic
   or epoxy resin.
 
-  pattern:
-
-  0000:  FF FF FF FF FF FF FF FF | FB FB FB FB FB FB FB FB
-  0010:  FD FD FD FD FD FD FD FD | F9 F9 F9 F9 F9 F9 F9 F9
-  0020:  FF FF FF FF FF FF FF FF | FB FB FB FB FB FB FB FB
-  0030:  FD FD FD FD FD FD FD FD | F9 F9 F9 F9 F9 F9 F9 F9
-
-  0040:  FE FE FE FE FE FE FE FE | FA FA FA FA FA FA FA FA
-  0050:  FC FC FC FC FC FC FC FC | F8 F8 F8 F8 F8 F8 F8 F8
-  0060:  FE FE FE FE FE FE FE FE | FA FA FA FA FA FA FA FA
-  0070:  FC FC FC FC FC FC FC FC | F8 F8 F8 F8 F8 F8 F8 F8
-
-  0080:  BF BF BF BF BF BF BF BF | BB BB BB BB BB BB BB BB
-  0090:  BD BD BD BD BD BD BD BD | B9 B9 B9 B9 B9 B9 B9 B9
-  00A0:  BF BF BF BF BF BF BF BF | BB BB BB BB BB BB BB BB
-  00B0:  BD BD BD BD BD BD BD BD | B9 B9 B9 B9 B9 B9 B9 B9
-
-  00C0:  BE BE BE BE BE BE BE BE | BA BA BA BA BA BA BA BA
-  00D0:  BC BC BC BC BC BC BC BC | B8 B8 B8 B8 B8 B8 B8 B8
-  00E0:  BE BE BE BE BE BE BE BE | BA BA BA BA BA BA BA BA
-  00F0:  BC BC BC BC BC BC BC BC | B8 B8 B8 B8 B8 B8 B8 B8
-
-  And repeat for every 0x100 segments...
-
-  If you apply these XOR's to get 00's, the code has no sense,
-  so something is missing. For now will comment out the partial
-  decryption code...
-
 ***********************************************/
 
 void goldnpkr_state::init_icp1db()
 {
-/*
-    uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
-    unsigned char rawData[256] = {
-        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB,
-        0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9,
-        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB,
-        0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9, 0xF9,
-        0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA,
-        0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8,
-        0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA,
-        0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xFC, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8, 0xF8,
-        0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB,
-        0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9,
-        0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB,
-        0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xBD, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9, 0xB9,
-        0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA,
-        0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8,
-        0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBE, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA, 0xBA,
-        0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8,
-    };
+	// apply XORs depending on address
+	for (int i = 0x00000; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
 
-    for (int i = 0; i < 0x10000; i++)
-    {
-        ROM[i] = ROM[i] ^ rawData[i & 0xff];
-    }
-*/
+		switch (i & 0x58)
+		{
+			case 0x00: x ^= 0x00; break;
+			case 0x08: x ^= 0x04; break;
+			case 0x10: x ^= 0x02; break;
+			case 0x18: x ^= 0x06; break;
+			case 0x40: x ^= 0x01; break;
+			case 0x48: x ^= 0x05; break;
+			case 0x50: x ^= 0x03; break;
+			case 0x58: x ^= 0x07; break;
+		}
+
+		if (i & 0x80)
+			x ^= 0x40;
+
+		rom[i] = x;
+	}
+
+	std::vector<uint8_t> buffer(0x10000);
+
+	memcpy(&buffer[0], rom, 0x10000);
+
+	// descramble address
+	for (int i = 0; i < 0x10000; i++)
+	{
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 9, 8, 11, 10, 0, 1, 2, 3, 4, 5, 6, 7)];
+	}
 }
 
 /**********************************************
@@ -12072,9 +12109,12 @@ GAMEL( 1985, witchcdf,  witchcrd, witchcrd, witchcdf, goldnpkr_state, empty_init
 GAMEL( 199?, witchcdg,  witchcrd, wcfalcon, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",        0,                   layout_goldnpkr )
 GAMEL( 1994, witchcdh,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",        0,                   layout_goldnpkr )
 GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",       0,                   layout_goldnpkr )
+GAME(  199?, witchcdj,  witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1)",                         0 )
 
 GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
 GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )
+
+GAME(  199?, jokercar,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Card (witch game)",                    0 )
 
 GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, init_vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",     0,                   layout_goldnpkr )
 
@@ -12148,7 +12188,6 @@ GAMEL( 1984, bonuspkr,  0,        goldnpkr, bonuspkr, goldnpkr_state, init_bonus
 
 GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )   // lacks of 2nd program ROM.
-GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            MACHINE_NOT_WORKING )   // encrypted.
 GAME(  198?, pokersis,  0,        bchancep, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Sisteme France",           "unknown Sisteme France Poker",            MACHINE_NOT_WORKING )   // fix banking (4 prgs?)...
 
 GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, init_bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 1)", MACHINE_NOT_WORKING, layout_goldnpkr )

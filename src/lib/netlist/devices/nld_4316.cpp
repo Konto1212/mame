@@ -20,7 +20,7 @@ namespace netlist { namespace devices {
 		, m_R(*this, "_R")
 		, m_S(*this, "S")
 		, m_E(*this, "E")
-		, m_base_r(*this, "BASER", 45.0)
+		, m_base_r(*this, "BASER", nlconst::magic(45.0))
 		{
 		}
 
@@ -33,22 +33,24 @@ namespace netlist { namespace devices {
 
 		logic_input_t              m_S;
 		logic_input_t              m_E;
-		param_double_t             m_base_r;
+		param_fp_t             m_base_r;
 	};
 
 	NETLIB_RESET(CD4316_GATE)
 	{
-		m_R.set_R(plib::constants<nl_double>::one() / exec().gmin());
+		m_R.set_R(plib::reciprocal(exec().gmin()));
 	}
 
 	NETLIB_UPDATE(CD4316_GATE)
 	{
-		m_R.update();
-		if (m_S() && !m_E())
-			m_R.set_R(m_base_r());
-		else
-			m_R.set_R(plib::constants<nl_double>::one() / exec().gmin());
-		m_R.solve_later(NLTIME_FROM_NS(1));
+		m_R.change_state([this]()
+			{
+			if (m_S() && !m_E())
+				m_R.set_R(m_base_r());
+			else
+				m_R.set_R(plib::reciprocal(exec().gmin()));
+			}
+			, NLTIME_FROM_NS(1));
 	}
 
 	NETLIB_DEVICE_IMPL(CD4316_GATE, "CD4316_GATE", "")

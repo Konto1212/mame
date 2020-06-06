@@ -6,12 +6,6 @@
 AVE Micro Systems ARB chess computer driver, in some regions redistributed
 by Chafitz, and in Germany by Sandy Electronic.
 
-TODO:
-- verify gms40 module memory layout
-- need to add checkers pieces and custom initial position when Avelan gets dumped
-
-*******************************************************************************
-
 Auto Response Board (ARB) overview:
 - R6502P CPU @ 2MHz(4MHz XTAL), R6522P VIA
 - 2KB RAM(4*2114), cartridge port
@@ -37,6 +31,10 @@ Around 2012, Steve Braid(aka Trilobyte/Steve UK) started manufacturing ARB V2 bo
 without a module slot. CPU and VIA were replaced with new WDC 14MHz-rated chips,
 running at 16MHz.
 
+TODO:
+- verify gms40 module memory layout
+- need to add checkers pieces and custom initial position when Avelan gets dumped
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -48,9 +46,10 @@ running at 16MHz.
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "speaker.h"
 #include "softlist.h"
 
 // internal artwork
@@ -78,7 +77,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { update_reset(); }
 	DECLARE_INPUT_CHANGED_MEMBER(halt_button) { m_maincpu->set_input_line(M6502_NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE); update_reset(); }
 
-	// machine drivers
+	// machine configs
 	void arb(machine_config &config);
 	void v2(machine_config &config);
 
@@ -250,14 +249,14 @@ static INPUT_PORTS_START( arb )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_0) PORT_NAME("New Game / Options / Pawn / 0")
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, 0)
 INPUT_PORTS_END
 
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void arb_state::v2(machine_config &config)
@@ -299,8 +298,8 @@ void arb_state::arb(machine_config &config)
 	m_via->set_clock(4_MHz_XTAL/4); // R6522P
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb", "bin");
-	m_cart->set_device_load(FUNC(arb_state::cart_load), this);
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb");
+	m_cart->set_device_load(FUNC(arb_state::cart_load));
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("arb");

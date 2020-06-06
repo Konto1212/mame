@@ -12,35 +12,12 @@ class floppy_image_device;
 /*
  * ready = true if the ready line is physically connected to the floppy drive
  * select = true if the fdc controls the floppy drive selection
- * mode = MODE_AT, MODE_PS2 or MODE_M30 for the fdcs that have reset-time selection
+ * mode = mode_t::AT, mode_t::PS2 or mode_t::M30 for the fdcs that have reset-time selection
  */
 
-/* Interface required for PC ISA wrapping */
-class pc_fdc_interface : public device_t {
-protected:
-	using device_t::device_t;
-
+class upd765_family_device : public device_t {
 public:
-	typedef delegate<uint8_t ()> byte_read_cb;
-	typedef delegate<void (uint8_t)> byte_write_cb;
-
-	/* Note that the address map must cover and handle the whole 0-7
-	 * range.  The upd765, while conforming to the rest of the
-	 * interface, is not eligible as a result.
-	 */
-
-	virtual void map(address_map &map) = 0;
-
-	virtual uint8_t dma_r() = 0;
-	virtual void dma_w(uint8_t data) = 0;
-
-	virtual void tc_w(bool val) = 0;
-	virtual uint8_t do_dir_r() = 0;
-};
-
-class upd765_family_device : public pc_fdc_interface {
-public:
-	enum { MODE_AT, MODE_PS2, MODE_M30 };
+	enum class mode_t { AT, PS2, M30 };
 
 	auto intrq_wr_callback() { return intrq_cb.bind(); }
 	auto drq_wr_callback() { return drq_cb.bind(); }
@@ -48,7 +25,7 @@ public:
 	auto us_wr_callback() { return us_cb.bind(); }
 	auto idx_wr_callback() { return idx_cb.bind(); }
 
-	virtual void map(address_map &map) override = 0;
+	virtual void map(address_map &map) = 0;
 
 	uint8_t sra_r();
 	uint8_t srb_r();
@@ -63,21 +40,21 @@ public:
 	uint8_t dir_r() { return do_dir_r(); }
 	void ccr_w(uint8_t data);
 
-	virtual uint8_t do_dir_r() override;
+	uint8_t do_dir_r();
 
-	uint8_t dma_r() override;
-	void dma_w(uint8_t data) override;
+	uint8_t dma_r();
+	void dma_w(uint8_t data);
 
 	bool get_irq() const;
 	bool get_drq() const;
-	void tc_w(bool val) override;
+	void tc_w(bool val);
 	void ready_w(bool val);
 
 	DECLARE_WRITE_LINE_MEMBER(tc_line_w) { tc_w(state == ASSERT_LINE); }
 
 	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
 
-	void set_mode(int mode);
+	void set_mode(mode_t mode);
 	void set_ready_line_connected(bool ready);
 	void set_select_lines_connected(bool select);
 	void set_floppy(floppy_image_device *image);
@@ -261,7 +238,7 @@ protected:
 
 	bool external_ready;
 
-	int mode;
+	mode_t mode;
 	int main_phase;
 
 	live_info cur_live, checkpoint_live;
@@ -470,10 +447,17 @@ public:
 	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
-	void auxcmd_w(uint8_t data);
+	virtual void auxcmd_w(uint8_t data);
 
 protected:
 	upd72065_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class upd72067_device : public upd72065_device {
+public:
+	upd72067_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void auxcmd_w(uint8_t data) override;
 };
 
 class upd72069_device : public upd72065_device {
@@ -483,8 +467,8 @@ public:
 
 class n82077aa_device : public upd765_family_device {
 public:
-	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int mode)
-		: n82077aa_device(mconfig, tag, owner, clock)
+	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, mode_t mode)
+		: n82077aa_device(mconfig, tag, owner, 0U)
 	{
 		set_mode(mode);
 	}
@@ -570,6 +554,7 @@ DECLARE_DEVICE_TYPE(UPD765A,        upd765a_device)
 DECLARE_DEVICE_TYPE(UPD765B,        upd765b_device)
 DECLARE_DEVICE_TYPE(I8272A,         i8272a_device)
 DECLARE_DEVICE_TYPE(UPD72065,       upd72065_device)
+DECLARE_DEVICE_TYPE(UPD72067,       upd72067_device)
 DECLARE_DEVICE_TYPE(UPD72069,       upd72069_device)
 DECLARE_DEVICE_TYPE(I82072,         i82072_device)
 DECLARE_DEVICE_TYPE(SMC37C78,       smc37c78_device)

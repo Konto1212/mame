@@ -8,6 +8,7 @@
 #include "machine/er2055.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class runaway_state : public driver_device
 {
@@ -31,7 +32,7 @@ private:
 	DECLARE_WRITE8_MEMBER(runaway_irq_ack_w);
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	void earom_control_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(runaway_paletteram_w);
 	DECLARE_WRITE8_MEMBER(runaway_video_ram_w);
 	DECLARE_WRITE_LINE_MEMBER(tile_bank_w);

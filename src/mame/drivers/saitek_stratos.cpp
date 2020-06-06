@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, hap
 // thanks-to:Berger
-/***************************************************************************
+/******************************************************************************
 
 SciSys/Saitek Stratos chesscomputer family (1987-1990)
 (SciSys renamed themselves to Saitek in 1987)
@@ -18,7 +18,17 @@ When not using -autosave, press that button before exiting MAME, or NVRAM can ge
 If that happens, the chesscomputer will become unresponsive on next boot. To force a
 cold boot, press ACL, then hold the PLAY button and press GO.
 
-*******************************************************************************
+TODO:
+- emulate LCD at lower level, probably an MCU with embedded LCDC
+- LCD status bit handling is guessed. stratos expects it to be high after lcd command 0xf,
+  but tking2 won't work if it's done that way, and corona is different too
+- irq timing is derived from the main XTAL, but result should be similar with 5MHz and 5.67MHz,
+  there are a couple of "FREQ. SEL" nodes on the PCB, maybe related (not the ones in input ports)
+- tking(old revisions) and stratos slow responsive buttons, related to irq timing, but if that's changed,
+  the led blinking and in-game clock is too fast
+- does nvram.u7 work? it's cleared during boot, but not used after
+
+===============================================================================
 
 Hardware notes:
 - W65C02 or R65C02 at 5MHz or ~5.6MHz (for latter, box says 6MHz but that's a marketing lie)
@@ -40,17 +50,7 @@ as such by the chesscomputer community. Saitek simply advertised them as an impr
 The initial Stratos/Turbo King (PRG ROM labels known: M,K,L,P) are probably engine version B,
 very few bytes difference between revisions. The first Corona is engine version C.
 
-TODO:
-- emulate LCD at lower level, probably an MCU with embedded LCDC
-- LCD status bit handling is guessed. stratos expects it to be high after lcd command 0xf,
-  but tking2 won't work if it's done that way, and corona is different too
-- irq timing is derived from the main XTAL, but result should be similar with 5MHz and 5.67MHz,
-  there are a couple of "FREQ. SEL" nodes on the PCB, maybe related (not the ones in input ports)
-- tking(old revisions) and stratos slow responsive buttons, related to irq timing, but if that's changed,
-  the led blinking and in-game clock is too fast
-- does nvram.u7 work? it's cleared during boot, but not used after
-
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "includes/saitek_stratos.h"
@@ -84,7 +84,7 @@ public:
 
 	int lcd_ready_r() { return m_lcd_ready ? 1 : 0; }
 
-	// machine drivers
+	// machine configs
 	void stratos(machine_config &config);
 	void tking(machine_config &config);
 	void tking2(machine_config &config);
@@ -218,7 +218,7 @@ void saitek_stratos_state::power_off()
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// clear display
-	m_display->matrix(0, 0);
+	m_display->clear();
 	clear_lcd();
 	update_lcd();
 }
@@ -452,11 +452,11 @@ INPUT_PORTS_START( saitek_stratos )
 	PORT_CONFSETTING(    0x80, DEF_STR( Normal ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, go_button, nullptr) PORT_NAME("Go")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, acl_button, nullptr) PORT_NAME("ACL")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, go_button, 0) PORT_NAME("Go")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, acl_button, 0) PORT_NAME("ACL")
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, switch_cpu_freq, nullptr) // factory set
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, switch_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "5MHz" )
 	PORT_CONFSETTING(    0x01, "5.626MHz" )
 	PORT_CONFSETTING(    0x02, "5.67MHz" )
@@ -485,7 +485,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void stratos_state::stratos(machine_config &config)
@@ -512,8 +512,8 @@ void stratos_state::stratos(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr", "bin");
-	m_extrom->set_device_load(FUNC(stratos_state::extrom_load), this);
+	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr");
+	m_extrom->set_device_load(FUNC(stratos_state::extrom_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
 }

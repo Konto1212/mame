@@ -243,7 +243,9 @@ void snes_sound_device::device_timer(emu_timer &timer, device_timer_id id, int p
 {
 	if (id != TIMER_TICK_ID)
 	{
+		/*
 		assert_always(false, "Unknown id in snes_sound_device::device_timer");
+		*/
 		return;
 	}
 

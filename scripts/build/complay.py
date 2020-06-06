@@ -460,9 +460,6 @@ class LayoutChecker(Minifyer):
                 self.checkTag(attrs['inputtag'], name, 'inputtag')
             elif 'inputmask' in attrs:
                 self.handleError('Element %s has inputmask attribute without inputtag attribute' % (name, ))
-            inputmask = self.checkIntAttribute(name, attrs, 'inputmask', None)
-            if (inputmask is not None) and (0 == inputmask):
-                self.handleError('Element %s has attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
             inputraw = self.checkIntAttribute(name, attrs, 'inputraw', None)
             if (inputraw is not None):
                 if 'inputmask' not in attrs:
@@ -471,6 +468,10 @@ class LayoutChecker(Minifyer):
                     self.handleError('Element %s has inputraw attribute without inputtag attribute' % (name, ))
                 if ((0 > inputraw) or (1 < inputraw)):
                     self.handleError('Element %s attribute inputraw "%s" not in valid range 0-1' % (name, attrs['inputraw']))
+            inputmask = self.checkIntAttribute(name, attrs, 'inputmask', None)
+            if (inputmask is not None) and (0 == inputmask):
+                if (inputraw is None) or (0 == inputraw):
+                    self.handleError('Element %s has attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
             self.handlers.append((self.objectStartHandler, self.objectEndHandler))
             self.have_bounds.append(False)
             self.have_orientation.append(False)
@@ -648,14 +649,14 @@ if __name__ == '__main__':
             varname = base
         varname = 'layout_' + re.sub('[^0-9A-Za-z_]', '_', varname)
 
-    comp_type = 1
+    comp_type = 'internal_layout::compression::ZLIB'
     try:
         dst = open(dstfile,'w') if dstfile is not None else BlackHole()
         dst.write('static const unsigned char %s_data[] = {\n' % (varname))
         byte_count, comp_size = compressLayout(srcfile, lambda x: dst.write(x), zlib.compressobj())
         dst.write('};\n\n')
         dst.write('const internal_layout %s = {\n' % (varname))
-        dst.write('\t%d, sizeof(%s_data), %d, %s_data\n' % (byte_count, varname, comp_type, varname))
+        dst.write('\t%d, sizeof(%s_data), %s, %s_data\n' % (byte_count, varname, comp_type, varname))
         dst.write('};\n')
         dst.close()
     except XmlError:

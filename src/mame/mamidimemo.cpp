@@ -411,7 +411,7 @@ extern "C"
 
 			namco_cus30_devices[unitNumber] = cus30;
 		}
-		namco_cus30_devices[unitNumber]->namcos1_cus30_w(*dummy, address, data);
+		namco_cus30_devices[unitNumber]->namcos1_cus30_w(address, data);
 	}
 
 	DllExport unsigned char namco_cus30_r(unsigned int unitNumber, unsigned int address)
@@ -433,7 +433,7 @@ extern "C"
 
 			namco_cus30_devices[unitNumber] = cus30;
 		}
-		return namco_cus30_devices[unitNumber]->namcos1_cus30_r(*dummy, address);
+		return namco_cus30_devices[unitNumber]->namcos1_cus30_r(address);
 	}
 
 	nesapu_device *nesapu_devices[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
@@ -637,7 +637,7 @@ extern "C"
 
 			msm5232_devices[unitNumber] = msm5232;
 		}
-		msm5232_devices[unitNumber]->write(*dummy, address, data);
+		msm5232_devices[unitNumber]->write(address, data);
 	}
 
 	DllExport void msm5232_set_volume(unsigned int unitNumber, unsigned int ch, unsigned char data)
@@ -873,7 +873,7 @@ extern "C"
 
 			c6280_devices[unitNumber] = c6280;
 		}
-		c6280_devices[unitNumber]->c6280_w(*dummy, address, data);
+		c6280_devices[unitNumber]->c6280_w(address, data);
 	}
 
 

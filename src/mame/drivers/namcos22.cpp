@@ -13,7 +13,8 @@
  * TODO:
  * - finish slave DSP emulation
  * - emulate System22 I/O board C74 instead of HLE (inputs, outputs, volume control - HLE only handles the inputs)
- * - alpinesa doesn't work, protection related?
+ * - alpinesa doesn't work, protection related? - depending on value written, it looks like it changes the addressing
+ *   of some of the gfx chips on the fly
  * - C139 for linked cabinets, as well as in RR fullscale
  * - confirm DSP and MCU clocks and their IRQ timing
  * - EEPROM write timing should be around 5ms, it doesn't do any data/rdy polling
@@ -37,7 +38,7 @@
  * - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
  * - cybrcycc speed dial needle is missing
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
- * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?
+ * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom? - need to verify the pointrom dumps
  * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
  *       czram contents is rather odd here and partly cleared (probably the cause?):
  *        $0000-$0d7f - gradual increase from $00-$7c
@@ -2736,8 +2737,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::mcu_irq)
 	/* TODO: real sources of these */
 	if (scanline == 480)
 		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
-	else if (scanline == 0)
-		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 	else if (scanline == 240)
 		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
@@ -3337,9 +3336,10 @@ INPUT_PORTS_END
 
 /*********************************************************************************************/
 
-CUSTOM_INPUT_MEMBER(namcos22s_state::alpine_motor_read)
+template <int N>
+READ_LINE_MEMBER(namcos22s_state::alpine_motor_r)
 {
-	return m_motor_status >> (uintptr_t)param & 1;
+	return BIT(m_motor_status, N);
 }
 
 static INPUT_PORTS_START( alpiner )
@@ -3351,8 +3351,8 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) // Decision / View Change
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22s_state, alpine_motor_read, 0) // steps are free
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22s_state, alpine_motor_read, 1) // steps are locked
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(namcos22s_state, alpine_motor_r<0>) // steps are free
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(namcos22s_state, alpine_motor_r<1>) // steps are locked
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC.0")
@@ -3950,7 +3950,7 @@ void namcos22s_state::namcos22s(machine_config &config)
 	m_mcu->an2_cb().set(FUNC(namcos22s_state::mcu_adc_r<2>));
 	m_mcu->an3_cb().set(FUNC(namcos22s_state::mcu_adc_r<3>));
 	TIMER(config, "mcu_irq").configure_scanline(FUNC(namcos22s_state::mcu_irq), "screen", 0, 240);
-	config.m_minimum_quantum = attotime::from_hz(9000); // erratic inputs otherwise, probably mcu vs maincpu shareram
+	config.set_maximum_quantum(attotime::from_hz(9000)); // erratic inputs otherwise, probably mcu vs maincpu shareram
 
 	config.device_remove("iomcu");
 
@@ -3967,9 +3967,8 @@ void namcos22s_state::airco22b(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "bodysonic").subwoofer();
-
-	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer
+	SPEAKER(config, "bodysonic").backrest();
+	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer behind back
 }
 
 void namcos22s_state::alpine(machine_config &config)
@@ -3993,7 +3992,6 @@ void namcos22s_state::cybrcycc(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "tank", 0.0, 0.0, 0.0);
-
 	m_c352->add_route(2, "tank", 1.00);
 }
 
@@ -4002,7 +4000,6 @@ void namcos22s_state::dirtdash(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "road", 0.0, 0.0, 0.0);
-
 	m_c352->add_route(3, "road", 1.00);
 }
 
@@ -4017,8 +4014,8 @@ void namcos22s_state::tokyowar(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "vibration").subwoofer();
-	SPEAKER(config, "seat").rear_center();
+	SPEAKER(config, "vibration").seat();
+	SPEAKER(config, "seat").headrest_center();
 
 	m_c352->add_route(2, "vibration", 0.50); // to "bass shaker"
 	m_c352->add_route(3, "seat", 1.00);
@@ -5458,15 +5455,15 @@ ROM_START( dirtdash )
 	ROM_LOAD( "dt1ccrh.1d",   0x200000, 0x080000, CRC(af257064) SHA1(0da561d9f8824618c00209ccef6146e9f3ad72bb) )
 
 	ROM_REGION( 0x480000, "pointrom", 0 ) /* 3d model data */
-	ROM_LOAD( "dt1ptrl0.18k", 0x000000, 0x080000, CRC(4e0cac3a) SHA1(c2778e9e93be2de729c6f118caf62ac9f48efbb0) )
-	ROM_LOAD( "dt1ptrl1.16k", 0x080000, 0x080000, CRC(59ba9dba) SHA1(a2e9488cf0ff255284c06a1ef653ae86c0d98adc) )
-	ROM_LOAD( "dt1ptrl2.15k", 0x100000, 0x080000, CRC(cfe80c67) SHA1(ba3bc48aa39712e63c915070a76974fbd560dee6) )
-	ROM_LOAD( "dt1ptrm0.18j", 0x180000, 0x080000, CRC(41f34337) SHA1(7e624e7b6fdefe156168b1c9cc5e919db3b2fbaa) )
-	ROM_LOAD( "dt1ptrm1.16j", 0x200000, 0x080000, CRC(d68541fc) SHA1(6b00079bd8f2db26e71968de289cea93458aebe9) )
-	ROM_LOAD( "dt1ptrm2.15j", 0x280000, 0x080000, CRC(71e6714d) SHA1(6aad6db3be5020213d7add61c7d927ae9c4fea4e) )
-	ROM_LOAD( "dt1ptru0.18f", 0x300000, 0x080000, CRC(4909bd7d) SHA1(0e4ef3987c43ef0438331b82b50dcc97363a45d0) )
-	ROM_LOAD( "dt1ptru1.16f", 0x380000, 0x080000, CRC(4a5097df) SHA1(a9c814b0ed4bd92accd0e57be8e3d887114b06a5) )
-	ROM_LOAD( "dt1ptru2.15f", 0x400000, 0x080000, CRC(1171eaf5) SHA1(168365ea619386f218585c49025cdd7fd1224082) )
+	ROM_LOAD( "dt1ptrl0.18k", 0x000000, 0x080000, BAD_DUMP CRC(4e0cac3a) SHA1(c2778e9e93be2de729c6f118caf62ac9f48efbb0) )
+	ROM_LOAD( "dt1ptrl1.16k", 0x080000, 0x080000, BAD_DUMP CRC(59ba9dba) SHA1(a2e9488cf0ff255284c06a1ef653ae86c0d98adc) )
+	ROM_LOAD( "dt1ptrl2.15k", 0x100000, 0x080000, BAD_DUMP CRC(cfe80c67) SHA1(ba3bc48aa39712e63c915070a76974fbd560dee6) )
+	ROM_LOAD( "dt1ptrm0.18j", 0x180000, 0x080000, BAD_DUMP CRC(41f34337) SHA1(7e624e7b6fdefe156168b1c9cc5e919db3b2fbaa) )
+	ROM_LOAD( "dt1ptrm1.16j", 0x200000, 0x080000, BAD_DUMP CRC(d68541fc) SHA1(6b00079bd8f2db26e71968de289cea93458aebe9) )
+	ROM_LOAD( "dt1ptrm2.15j", 0x280000, 0x080000, BAD_DUMP CRC(71e6714d) SHA1(6aad6db3be5020213d7add61c7d927ae9c4fea4e) )
+	ROM_LOAD( "dt1ptru0.18f", 0x300000, 0x080000, BAD_DUMP CRC(4909bd7d) SHA1(0e4ef3987c43ef0438331b82b50dcc97363a45d0) )
+	ROM_LOAD( "dt1ptru1.16f", 0x380000, 0x080000, BAD_DUMP CRC(4a5097df) SHA1(a9c814b0ed4bd92accd0e57be8e3d887114b06a5) )
+	ROM_LOAD( "dt1ptru2.15f", 0x400000, 0x080000, BAD_DUMP CRC(1171eaf5) SHA1(168365ea619386f218585c49025cdd7fd1224082) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
 	ROM_LOAD( "dt1wavea.2l",  0x000000, 0x400000, CRC(cbd52e40) SHA1(dc995dd919548c96a90efb0375e5b5f1055e05cb) )
@@ -5644,21 +5641,21 @@ READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
 void namcos22_state::install_c74_speedup()
 {
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x80, 0x81, read16_delegate(FUNC(namcos22_state::mcuc74_speedup_r),this), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x80, 0x81, read16_delegate(*this, FUNC(namcos22_state::mcuc74_speedup_r)), write16_delegate(*this, FUNC(namcos22_state::mcu_speedup_w)));
 }
 
 void namcos22s_state::install_130_speedup()
 {
 	// install speedup cheat for 1.20/1.30 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22s_state::mcu130_speedup_r),this), write16_delegate(FUNC(namcos22s_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos22s_state::mcu130_speedup_r)), write16_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
 }
 
 void namcos22s_state::install_141_speedup()
 {
 	// install speedup cheat for 1.41 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22s_state::mcu141_speedup_r),this), write16_delegate(FUNC(namcos22s_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos22s_state::mcu141_speedup_r)), write16_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
 }
 
 

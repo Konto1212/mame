@@ -14,6 +14,7 @@
 #include "machine/gen_latch.h"
 #include "screen.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class yunsun16_state : public driver_device
 {
@@ -45,6 +46,8 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
+	void int_ack_w(uint8_t data);
+
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 2> m_vram;
 	required_shared_ptr_array<uint16_t, 2> m_scrollram;

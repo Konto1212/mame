@@ -64,15 +64,17 @@ class md_base_state : public driver_device
 public:
 	md_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
 		/*
 		m_z80snd(*this, "genesis_snd_z80"),
 		m_ymsnd(*this, "ymsnd"),
 		m_scan_timer(*this, "md_scan_timer"),
 		m_vdp(*this, "gen_vdp"),
 		m_megadrive_ram(*this, "megadrive_ram"),
-		m_io_reset(*this, "RESET")
+		m_io_reset(*this, "RESET"),
 		*/
+		m_megadrive_io_read_data_port_ptr(*this),
+		m_megadrive_io_write_data_port_ptr(*this)
 	{
 		//mamidimemo
 
