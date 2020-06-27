@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "vgmwrite.h"
+
 class c6280_device : public device_t, public device_sound_interface
 {
 public:
@@ -14,6 +16,9 @@ public:
 
 	// write only
 	void c6280_w(offs_t offset, uint8_t data);
+
+	void vgm_start(char *name);
+	void vgm_stop(void);
 
 protected:
 	// device-level overrides
@@ -47,6 +52,8 @@ private:
 	u8 m_lfo_control;
 	channel m_channel[8];
 	s16 m_volume_table[32];
+
+	vgm_writer *m_vgm_writer;
 };
 
 DECLARE_DEVICE_TYPE(C6280, c6280_device)

@@ -220,6 +220,8 @@ void c6280_device::c6280_w(offs_t offset, uint8_t data)
 	/* Update stream */
 	m_stream->update();
 
+	//m_vgm_writer->vgm_write(0x00, offset, data);
+
 	switch (offset & 0x0f)
 	{
 		case 0x00: /* Channel select */
@@ -346,7 +348,22 @@ void c6280_device::device_start()
 	save_item(STRUCT_MEMBER(m_channel, noise_counter));
 	save_item(STRUCT_MEMBER(m_channel, noise_seed));
 	save_item(STRUCT_MEMBER(m_channel, tick));
+
+	//m_vgm_writer = new vgm_writer(machine());
 }
+
+void c6280_device::vgm_start(char *name)
+{
+	//m_vgm_writer->vgm_start(name);
+
+	//m_vgm_writer->vgm_open(VGMC_C6280, clock());
+};
+
+void c6280_device::vgm_stop(void)
+{
+	//m_vgm_writer->vgm_stop();
+};
+
 
 void c6280_device::device_reset()
 {

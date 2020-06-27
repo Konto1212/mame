@@ -38,7 +38,7 @@ void vgm_writer::vgm_start(char* vgmname)
 {
 	const game_driver* gamedrv;
 	device_image_interface* devimg;
-	wchar_t vgmNotes[0x50];
+	//wchar_t vgmNotes[0x50];
 
 	if (LOG_VGM_FILE)
 		return;
