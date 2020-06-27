@@ -127,6 +127,9 @@
             this.extendBeepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton20 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton21 = new System.Windows.Forms.ToolStripButton();
             this.multiMediaTimerComponent1 = new zanac.MAmidiMEmo.ComponentModel.MultiMediaTimerComponent(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -240,7 +243,7 @@
             // 
             resources.ApplyResources(this.toolStrip3, "toolStrip3");
             this.toolStrip3.ClickThrough = false;
-            this.toolStrip3.ImageScalingSize = new System.Drawing.Size(121, 121);
+            this.toolStrip3.ImageScalingSize = new System.Drawing.Size(609, 609);
             this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButtonCat,
             this.toolStripButtonA2Z,
@@ -307,7 +310,7 @@
             // 
             resources.ApplyResources(this.toolStrip2, "toolStrip2");
             this.toolStrip2.ClickThrough = false;
-            this.toolStrip2.ImageScalingSize = new System.Drawing.Size(271, 271);
+            this.toolStrip2.ImageScalingSize = new System.Drawing.Size(1369, 1369);
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel3,
             this.toolStripButton19,
@@ -811,13 +814,16 @@
             // 
             resources.ApplyResources(this.toolStrip1, "toolStrip1");
             this.toolStrip1.ClickThrough = false;
-            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(121, 121);
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(609, 609);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel1,
             this.toolStripComboBoxMidiIf,
             this.toolStripDropDownButton1,
             this.toolStripButton1,
-            this.toolStripButton2});
+            this.toolStripButton2,
+            this.toolStripSeparator1,
+            this.toolStripButton20,
+            this.toolStripButton21});
             this.toolStrip1.Name = "toolStrip1";
             // 
             // toolStripLabel1
@@ -1036,6 +1042,25 @@
             this.toolStripButton2.Name = "toolStripButton2";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            resources.ApplyResources(this.toolStripSeparator1, "toolStripSeparator1");
+            // 
+            // toolStripButton20
+            // 
+            resources.ApplyResources(this.toolStripButton20, "toolStripButton20");
+            this.toolStripButton20.Name = "toolStripButton20";
+            this.toolStripButton20.CheckedChanged += new System.EventHandler(this.toolStripButton20_CheckedChanged);
+            this.toolStripButton20.Click += new System.EventHandler(this.toolStripButton20_Click);
+            // 
+            // toolStripButton21
+            // 
+            resources.ApplyResources(this.toolStripButton21, "toolStripButton21");
+            this.toolStripButton21.Name = "toolStripButton21";
+            this.toolStripButton21.CheckedChanged += new System.EventHandler(this.toolStripButton21_CheckedChanged);
+            this.toolStripButton21.Click += new System.EventHandler(this.toolStripButton21_Click);
+            // 
             // multiMediaTimerComponent1
             // 
             this.multiMediaTimerComponent1.Enabled = false;
@@ -1172,6 +1197,9 @@
         private System.Windows.Forms.ToolStripMenuItem lAToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mT32ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem extendCM32PToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton toolStripButton20;
+        private System.Windows.Forms.ToolStripButton toolStripButton21;
     }
 }
 

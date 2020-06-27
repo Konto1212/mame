@@ -28,7 +28,7 @@ namespace zanac.MAmidiMEmo.Gui
         {
             try
             {
-                using (var t = File.CreateText(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "mame.ini")))
+                using (var t = new StreamWriter(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "mame.ini"), false, new UTF8Encoding(true)))
                 {
                     t.WriteLine("sound " + SoundTypes[comboBoxSoundType.SelectedIndex]);
                     t.WriteLine("samplerate " + comboBoxSampleRate.Text);
@@ -71,6 +71,13 @@ namespace zanac.MAmidiMEmo.Gui
                 MessageBeep(0);
                 e.Cancel = true;
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var r = folderBrowserDialog1.ShowDialog(this);
+            if(r == DialogResult.OK)
+                textBox1.Text = folderBrowserDialog1.SelectedPath;
         }
     }
 }

@@ -123,6 +123,9 @@ public:
 	unsigned int lastOutBufferSamples;
 	unsigned int lastOutBufferNumber;
 
+	virtual void vgm_start(char *name) {};
+	virtual void vgm_stop(void) {};
+
 protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
 

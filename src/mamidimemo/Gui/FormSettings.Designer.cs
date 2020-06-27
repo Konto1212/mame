@@ -34,10 +34,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.comboBoxAudioLatency = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.comboBoxSoundType = new System.Windows.Forms.ComboBox();
-            this.comboBoxSampleRate = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.textBoxPaLatency = new System.Windows.Forms.TextBox();
@@ -46,9 +43,18 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.textBoxPaApi = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.comboBoxAudioLatency = new System.Windows.Forms.ComboBox();
+            this.comboBoxSoundType = new System.Windows.Forms.ComboBox();
+            this.comboBoxSampleRate = new System.Windows.Forms.ComboBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonOk
@@ -85,55 +91,14 @@
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.comboBoxSampleRate, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.label7, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel3, 1, 4);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            // 
-            // comboBoxAudioLatency
-            // 
-            this.comboBoxAudioLatency.DataBindings.Add(new System.Windows.Forms.Binding("SelectedIndex", global::zanac.MAmidiMEmo.Properties.Settings.Default, "AudioLatency", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            resources.ApplyResources(this.comboBoxAudioLatency, "comboBoxAudioLatency");
-            this.comboBoxAudioLatency.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxAudioLatency.FormattingEnabled = true;
-            this.comboBoxAudioLatency.Items.AddRange(new object[] {
-            resources.GetString("comboBoxAudioLatency.Items"),
-            resources.GetString("comboBoxAudioLatency.Items1"),
-            resources.GetString("comboBoxAudioLatency.Items2"),
-            resources.GetString("comboBoxAudioLatency.Items3")});
-            this.comboBoxAudioLatency.Name = "comboBoxAudioLatency";
-            this.comboBoxAudioLatency.TabIndex = global::zanac.MAmidiMEmo.Properties.Settings.Default.AudioLatency;
             // 
             // label3
             // 
             resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
-            // 
-            // comboBoxSoundType
-            // 
-            this.comboBoxSoundType.DataBindings.Add(new System.Windows.Forms.Binding("SelectedIndex", global::zanac.MAmidiMEmo.Properties.Settings.Default, "SoundType", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            resources.ApplyResources(this.comboBoxSoundType, "comboBoxSoundType");
-            this.comboBoxSoundType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxSoundType.FormattingEnabled = true;
-            this.comboBoxSoundType.Items.AddRange(new object[] {
-            resources.GetString("comboBoxSoundType.Items"),
-            resources.GetString("comboBoxSoundType.Items1"),
-            resources.GetString("comboBoxSoundType.Items2"),
-            resources.GetString("comboBoxSoundType.Items3")});
-            this.comboBoxSoundType.Name = "comboBoxSoundType";
-            this.comboBoxSoundType.TabIndex = global::zanac.MAmidiMEmo.Properties.Settings.Default.SoundType;
-            // 
-            // comboBoxSampleRate
-            // 
-            this.comboBoxSampleRate.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::zanac.MAmidiMEmo.Properties.Settings.Default, "SampleRate", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            resources.ApplyResources(this.comboBoxSampleRate, "comboBoxSampleRate");
-            this.comboBoxSampleRate.FormattingEnabled = true;
-            this.comboBoxSampleRate.Items.AddRange(new object[] {
-            resources.GetString("comboBoxSampleRate.Items"),
-            resources.GetString("comboBoxSampleRate.Items1"),
-            resources.GetString("comboBoxSampleRate.Items2"),
-            resources.GetString("comboBoxSampleRate.Items3"),
-            resources.GetString("comboBoxSampleRate.Items4")});
-            this.comboBoxSampleRate.Name = "comboBoxSampleRate";
-            this.comboBoxSampleRate.Text = global::zanac.MAmidiMEmo.Properties.Settings.Default.SampleRate;
-            this.comboBoxSampleRate.Validating += new System.ComponentModel.CancelEventHandler(this.comboBoxText_Validating);
             // 
             // groupBox1
             // 
@@ -187,11 +152,83 @@
             this.textBoxPaApi.Name = "textBoxPaApi";
             this.textBoxPaApi.Validating += new System.ComponentModel.CancelEventHandler(this.textBox_Validating);
             // 
+            // label7
+            // 
+            resources.ApplyResources(this.label7, "label7");
+            this.label7.Name = "label7";
+            // 
+            // textBox1
+            // 
+            this.textBox1.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::zanac.MAmidiMEmo.Properties.Settings.Default, "OutputDir", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            resources.ApplyResources(this.textBox1, "textBox1");
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Text = global::zanac.MAmidiMEmo.Properties.Settings.Default.OutputDir;
+            // 
+            // comboBoxAudioLatency
+            // 
+            this.comboBoxAudioLatency.DataBindings.Add(new System.Windows.Forms.Binding("SelectedIndex", global::zanac.MAmidiMEmo.Properties.Settings.Default, "AudioLatency", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            resources.ApplyResources(this.comboBoxAudioLatency, "comboBoxAudioLatency");
+            this.comboBoxAudioLatency.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxAudioLatency.FormattingEnabled = true;
+            this.comboBoxAudioLatency.Items.AddRange(new object[] {
+            resources.GetString("comboBoxAudioLatency.Items"),
+            resources.GetString("comboBoxAudioLatency.Items1"),
+            resources.GetString("comboBoxAudioLatency.Items2"),
+            resources.GetString("comboBoxAudioLatency.Items3")});
+            this.comboBoxAudioLatency.Name = "comboBoxAudioLatency";
+            this.comboBoxAudioLatency.TabIndex = global::zanac.MAmidiMEmo.Properties.Settings.Default.AudioLatency;
+            // 
+            // comboBoxSoundType
+            // 
+            this.comboBoxSoundType.DataBindings.Add(new System.Windows.Forms.Binding("SelectedIndex", global::zanac.MAmidiMEmo.Properties.Settings.Default, "SoundType", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            resources.ApplyResources(this.comboBoxSoundType, "comboBoxSoundType");
+            this.comboBoxSoundType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxSoundType.FormattingEnabled = true;
+            this.comboBoxSoundType.Items.AddRange(new object[] {
+            resources.GetString("comboBoxSoundType.Items"),
+            resources.GetString("comboBoxSoundType.Items1"),
+            resources.GetString("comboBoxSoundType.Items2"),
+            resources.GetString("comboBoxSoundType.Items3")});
+            this.comboBoxSoundType.Name = "comboBoxSoundType";
+            this.comboBoxSoundType.TabIndex = global::zanac.MAmidiMEmo.Properties.Settings.Default.SoundType;
+            // 
+            // comboBoxSampleRate
+            // 
+            this.comboBoxSampleRate.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::zanac.MAmidiMEmo.Properties.Settings.Default, "SampleRate", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            resources.ApplyResources(this.comboBoxSampleRate, "comboBoxSampleRate");
+            this.comboBoxSampleRate.FormattingEnabled = true;
+            this.comboBoxSampleRate.Items.AddRange(new object[] {
+            resources.GetString("comboBoxSampleRate.Items"),
+            resources.GetString("comboBoxSampleRate.Items1"),
+            resources.GetString("comboBoxSampleRate.Items2"),
+            resources.GetString("comboBoxSampleRate.Items3"),
+            resources.GetString("comboBoxSampleRate.Items4")});
+            this.comboBoxSampleRate.Name = "comboBoxSampleRate";
+            this.comboBoxSampleRate.Text = global::zanac.MAmidiMEmo.Properties.Settings.Default.SampleRate;
+            this.comboBoxSampleRate.Validating += new System.ComponentModel.CancelEventHandler(this.comboBoxText_Validating);
+            // 
+            // button1
+            // 
+            resources.ApplyResources(this.button1, "button1");
+            this.button1.Name = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // tableLayoutPanel3
+            // 
+            resources.ApplyResources(this.tableLayoutPanel3, "tableLayoutPanel3");
+            this.tableLayoutPanel3.Controls.Add(this.button1, 1, 0);
+            this.tableLayoutPanel3.Controls.Add(this.textBox1, 0, 0);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            // 
+            // folderBrowserDialog1
+            // 
+            resources.ApplyResources(this.folderBrowserDialog1, "folderBrowserDialog1");
+            // 
             // FormSettings
             // 
             this.AcceptButton = this.buttonOk;
             resources.ApplyResources(this, "$this");
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.Controls.Add(this.tableLayoutPanel1);
@@ -209,6 +246,8 @@
             this.groupBox1.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
+            this.tableLayoutPanel3.ResumeLayout(false);
+            this.tableLayoutPanel3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -232,5 +271,10 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBoxPaLatency;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
     }
 }

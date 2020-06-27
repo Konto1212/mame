@@ -32,7 +32,7 @@ namespace zanac.MAmidiMEmo
         /// <summary>
         /// 
         /// </summary>
-        public const string FILE_VERSION = "1.2.1.0";
+        public const string FILE_VERSION = "1.3.0.0";
 
         public const string FILE_COPYRIGHT = @"Virtual chiptune sound MIDI module ""MAmidiMEmo"" Version {0}
 Copyright(C) 2019, 2020 Itoken.All rights reserved.";
@@ -77,7 +77,7 @@ Copyright(C) 2019, 2020 Itoken.All rights reserved.";
                 {
                     assemblieTypes = new Dictionary<string, Type>();
                     var ts = AppDomain.CurrentDomain.GetAssemblies()
-                                .Where(a => a.FullName.StartsWith("MAmidiMEmo,"))
+                                .Where(a => a.FullName.StartsWith("MAmidiMEmoUI,"))
                                 .SelectMany(a => a.GetTypes()).ToArray();
                     foreach (var t in ts)
                     {
@@ -134,6 +134,9 @@ Copyright(C) 2019, 2020 Itoken.All rights reserved.";
             {
                 threadStart.Set();
                 Settings.Default.Reload();
+
+                if (string.IsNullOrWhiteSpace(Settings.Default.OutputDir))
+                    Settings.Default.OutputDir = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
                 f_CurrentSamplingRate = 48000;
                 int.TryParse(Settings.Default.SampleRate, out f_CurrentSamplingRate);

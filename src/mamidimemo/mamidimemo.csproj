@@ -7,7 +7,7 @@
     <ProjectGuid>{60192987-27BB-4ADC-AC5A-03EA2846A569}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>zanac.MAmidiMEmo</RootNamespace>
-    <AssemblyName>MAmidiMEmo</AssemblyName>
+    <AssemblyName>MAmidiMEmoUI</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -326,6 +326,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormPcmTableEditor.resx">
       <DependentUpon>FormPcmTableEditor.cs</DependentUpon>
@@ -440,6 +441,12 @@
     <None Include="..\..\build\generated\version.cpp">
       <Link>version.cpp</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\Rec.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Rec.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

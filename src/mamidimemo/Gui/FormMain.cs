@@ -20,6 +20,7 @@ using System.IO;
 using Melanchall.DryWetMidi.Common;
 using System.Reflection;
 using Melanchall.DryWetMidi.Core;
+using System.Runtime.InteropServices;
 
 namespace zanac.MAmidiMEmo.Gui
 {
@@ -717,6 +718,110 @@ namespace zanac.MAmidiMEmo.Gui
                 fp.Location = this.Location;
 
                 fp.Show(this);
+            }
+        }
+
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delg_start_recording_to(string wavfile);
+
+        private static delg_start_recording_to start_recording_to;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delg_start_recording_to StartRecordingTo
+        {
+            get
+            {
+                if (start_recording_to == null)
+                {
+                    IntPtr funcPtr = MameIF.GetProcAddress("start_recording_to");
+                    if (funcPtr != IntPtr.Zero)
+                        start_recording_to = (delg_start_recording_to)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delg_start_recording_to));
+                }
+                return start_recording_to;
+            }
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delg_stop_recording();
+
+        private static delg_stop_recording stop_recording;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static delg_stop_recording StopRecording
+        {
+            get
+            {
+                if (stop_recording == null)
+                {
+                    IntPtr funcPtr = MameIF.GetProcAddress("stop_recording");
+                    if (funcPtr != IntPtr.Zero)
+                        stop_recording = (delg_stop_recording)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delg_stop_recording));
+                }
+                return stop_recording;
+            }
+        }
+
+        private void toolStripButton20_Click(object sender, EventArgs e)
+        {
+            toolStripButton20.Checked = !toolStripButton20.Checked;
+        }
+
+        private void toolStripButton20_CheckedChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(Settings.Default.OutputDir))
+                Settings.Default.OutputDir = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+            var now = DateTime.Now;
+            string op = Path.Combine(Settings.Default.OutputDir, "MAmi_" + now.ToShortDateString().Replace('/', '-') + "_" + now.ToLongTimeString().Replace(':', '-') + ".wav");
+
+            try
+            {
+                Program.SoundUpdating();
+                if (toolStripButton20.Checked)
+                {
+                    StartRecordingTo(op);
+                }
+                else
+                {
+                    StopRecording();
+                }
+            }
+            finally
+            {
+                Program.SoundUpdated();
+            }
+        }
+
+
+
+        private void toolStripButton21_Click(object sender, EventArgs e)
+        {
+            toolStripButton21.Checked = !toolStripButton21.Checked;
+        }
+
+        private void toolStripButton21_CheckedChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(Settings.Default.OutputDir))
+                Settings.Default.OutputDir = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+            if (toolStripButton21.Checked)
+            {
+                var now = DateTime.Now;
+                string op = Path.Combine(Settings.Default.OutputDir, "MAmi_VGM_" +
+                    now.ToShortDateString().Replace('/', '-') + "_" + now.ToLongTimeString().Replace(':', '-'));
+                Directory.CreateDirectory(op);
+
+                InstrumentManager.StartVgmRecordingTo(op);
+            }
+            else
+            {
+                InstrumentManager.StopVgmRecording();
+                Process.Start(InstrumentManager.LastVgmOutputDir);
             }
         }
 

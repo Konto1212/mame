@@ -314,7 +314,21 @@ void pokey_device::device_start()
 
 	// set our instruction counter
 	set_icountptr(m_icount);
+
+	m_vgm_writer = new vgm_writer(machine());
 }
+
+void pokey_device::vgm_start(char *name)
+{
+	m_vgm_writer->vgm_start(name);
+
+	m_vgm_writer->vgm_open(VGMC_POKEY, clock());
+};
+
+void pokey_device::vgm_stop(void)
+{
+	m_vgm_writer->vgm_stop();
+};
 
 //-------------------------------------------------
 //  device_reset - device-specific reset

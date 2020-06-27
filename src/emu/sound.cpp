@@ -962,6 +962,11 @@ void sound_manager::start_recording()
 		m_wavfile = wav_open(wavfile, machine().sample_rate(), 2);
 }
 
+void sound_manager::start_recording_to(char *wavfile)
+{
+	// open the output WAV file if specified
+	m_wavfile = wav_open(wavfile, machine().sample_rate(), 2);
+}
 
 //-------------------------------------------------
 //  stop_recording - end audio recording

@@ -178,10 +178,80 @@ namespace zanac.MAmidiMEmo.Instruments
                     inst.PrepareSound();
                     instruments[(int)instrumentType].Add(inst);
                     InstrumentAdded?.Invoke(typeof(InstrumentManager), EventArgs.Empty);
+                    if (VgmRecodring)
+                        inst.StartVgmRecordingTo(LastVgmOutputDir);
                 }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public static bool VgmRecodring
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static string LastVgmOutputDir
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="outputDir"></param>
+        public static void StartVgmRecordingTo(string outputDir)
+        {
+            if (!VgmRecodring)
+            {
+                try
+                {
+                    Program.SoundUpdating();
+
+                    VgmRecodring = true;
+                    LastVgmOutputDir = outputDir;
+
+                    foreach (var inst in InstrumentManager.GetAllInstruments())
+                        inst.StartVgmRecordingTo(outputDir);
+                }
+                finally
+                {
+                    Program.SoundUpdated();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="outputDir"></param>
+        public static void StopVgmRecording()
+        {
+            if (VgmRecodring)
+            {
+                try
+                {
+                    Program.SoundUpdating();
+
+                    VgmRecodring = false;
+
+                    foreach (var inst in InstrumentManager.GetAllInstruments())
+                        inst.StopVgmRecording();
+                }
+                finally
+                {
+                    Program.SoundUpdated();
+                }
+            }
+        }
 
         /// <summary>
         /// 

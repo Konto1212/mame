@@ -1056,6 +1056,77 @@ namespace zanac.MAmidiMEmo.Instruments
 
         private GCHandle vstHandle;
 
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delg_start_vgm_recording_to(uint unitNumber, string tagName, string vgmPath);
+
+        private delg_start_vgm_recording_to start_vgm_recording_to;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private delg_start_vgm_recording_to StartVgmRecordingToInternal
+        {
+            get
+            {
+                if (start_vgm_recording_to == null)
+                {
+                    IntPtr funcPtr = MameIF.GetProcAddress("start_vgm_recording_to");
+                    if (funcPtr != IntPtr.Zero)
+                        start_vgm_recording_to = (delg_start_vgm_recording_to)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delg_start_vgm_recording_to));
+                }
+                return start_vgm_recording_to;
+            }
+        }
+
+        private bool vgmRecording;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vgmPath"></param>
+        public void StartVgmRecordingTo(string vgmPath)
+        {
+            vgmRecording = true;
+
+            var now = DateTime.Now;
+            string op = Path.Combine(vgmPath, this.Name + "_" + this.UnitNumber + "_" +
+                now.ToShortDateString().Replace('/', '-') + "_" + now.ToLongTimeString().Replace(':', '-'));
+
+            StartVgmRecordingToInternal(UnitNumber, SoundInterfaceTagNamePrefix, op);
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void delg_stop_vgm_recording(uint unitNumber, string tagName);
+
+        private delg_stop_vgm_recording stop_vgm_recording;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private delg_stop_vgm_recording StopVgmRecordingInternal
+        {
+            get
+            {
+                if (stop_vgm_recording == null)
+                {
+                    IntPtr funcPtr = MameIF.GetProcAddress("stop_vgm_recording");
+                    if (funcPtr != IntPtr.Zero)
+                        stop_vgm_recording = (delg_stop_vgm_recording)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(delg_stop_vgm_recording));
+                }
+                return stop_vgm_recording;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void StopVgmRecording()
+        {
+            vgmRecording = false;
+            StopVgmRecordingInternal(UnitNumber, SoundInterfaceTagNamePrefix);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1290,6 +1361,8 @@ namespace zanac.MAmidiMEmo.Instruments
                     //マネージ状態を破棄します (マネージ オブジェクト)。
 
                 }
+                if (vgmRecording)
+                    StopVgmRecordingInternal(UnitNumber, SoundInterfaceTagNamePrefix);
 
                 // TODO: アンマネージ リソース (アンマネージ オブジェクト) を解放し、下のファイナライザーをオーバーライドします。
                 // TODO: 大きなフィールドを null に設定します。

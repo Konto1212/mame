@@ -2,6 +2,7 @@
 #include "emu.h"
 #include "emumem.h"
 #include "machine.h"
+#include "vgmwrite.h"
 #include "..\frontend\mame\mame.h"
 #include "..\frontend\mame\cheat.h"
 #include "..\devices\sound\fm.h"
@@ -35,6 +36,65 @@ extern "C"
 {
 	//memodimemo
 
+	DllExport void start_recording_to(char* name)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		rm->sound().start_recording_to(name);
+	}
+
+	DllExport void stop_recording()
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		rm->sound().stop_recording();
+	}
+
+	DllExport void start_vgm_recording_to(unsigned int unitNumber, char* name, char * filePath)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+		//device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
+		if (sd == nullptr)
+			return;
+
+		sd->vgm_start(filePath);
+	}
+
+	DllExport void stop_vgm_recording(unsigned int unitNumber, char* name)
+	{
+		mame_machine_manager *mmm = mame_machine_manager::instance();
+		if (mmm == nullptr)
+			return;
+		running_machine *rm = mmm->machine();
+		if (rm == nullptr || rm->phase() == machine_phase::EXIT)
+			return;
+
+		std::string num = std::to_string(unitNumber);
+		device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->device((std::string(name) + num).c_str()));
+		//device_sound_interface *sd = dynamic_cast<device_sound_interface *>(rm->root_device().subdevice((std::string(name) + num).c_str()));
+		if (sd == nullptr)
+			return;
+
+		sd->vgm_stop();
+	}
 
 	DllExport void device_reset(unsigned int unitNumber, char* name)
 	{

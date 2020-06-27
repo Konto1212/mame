@@ -26,5 +26,8 @@
     <Setting Name="PaLatency" Type="System.String" Scope="User">
       <Value Profile="(Default)">0.003334</Value>
     </Setting>
+    <Setting Name="OutputDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

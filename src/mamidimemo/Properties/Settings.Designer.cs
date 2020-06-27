@@ -118,5 +118,17 @@ namespace zanac.MAmidiMEmo.Properties {
                 this["PaLatency"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string OutputDir {
+            get {
+                return ((string)(this["OutputDir"]));
+            }
+            set {
+                this["OutputDir"] = value;
+            }
+        }
     }
 }

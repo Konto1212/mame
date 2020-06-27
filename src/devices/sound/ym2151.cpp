@@ -664,6 +664,8 @@ void ym2151_device::write_reg(int r, int v)
 	status |= 0x80;   /* set busy flag for 64 chip clock cycles */
 #endif
 
+	m_vgm_writer->vgm_write(0x00, r, v);
+
 	switch(r & 0xe0)
 	{
 	case 0x00:
@@ -1051,7 +1053,21 @@ void ym2151_device::device_start()
 	save_item(NAME(connect));
 
 	save_item(NAME(m_reset_active));
+
+	m_vgm_writer = new vgm_writer(machine());
 }
+
+void ym2151_device::vgm_start(char *name)
+{
+	m_vgm_writer->vgm_start(name);
+
+	m_vgm_writer->vgm_open(VGMC_YM2151, clock());
+};
+
+void ym2151_device::vgm_stop(void)
+{
+	m_vgm_writer->vgm_stop();
+};
 
 void ym2151_device::device_clock_changed()
 {

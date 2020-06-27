@@ -1,4 +1,4 @@
-MAmidiMEmo V1.2.1.0 / Itoken (c)2019, 2020 / GPL-2.0
+MAmidiMEmo V1.3.0.0 / Itoken (c)2019, 2020 / GPL-2.0
 
 *** What is the MAmidiMEmo? ***
 
@@ -224,6 +224,10 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 *** Changes ***
 
+1.3.0.0 Sync to MAME 0221 (Improved some sound accuracy).
+        Added wave file output feature. Please re-open option dialog and press [OK] to commit new settings.
+        Added VGM file output feature. Only supported the following chips.
+			YM2151, YM2612, YM3812, YM2413, POKEY, SN76496, NES APU, AY-3-8910
 1.2.1.0 Added CM-32P SN-U110-10 simulation 
 1.2.0.0 Added CM-32P (This is an incomplete simulator)
             Using FluidLite https://github.com/divideconcept/FluidLite , 
