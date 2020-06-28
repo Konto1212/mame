@@ -224,7 +224,7 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 *** Changes ***
 
-1.3.0.0 Sync to MAME 0221 (Improved some sound accuracy).
+1.3.0.0 Synced sound engine to MAME 0221 (May improved some sound accuracy).
         Added wave file output feature. Please re-open option dialog and press [OK] to commit new settings.
         Added VGM file separetedly output feature. Only supported the following chips.
 			YM2151, YM2612, YM3812, YM2413, POKEY, SN76496, NES APU, AY-3-8910
