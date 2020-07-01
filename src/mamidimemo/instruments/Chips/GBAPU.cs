@@ -297,6 +297,19 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="vgmPath"></param>
+        public override void StartVgmRecordingTo(string vgmPath)
+        {
+            base.StartVgmRecordingTo(vgmPath);
+
+            //Sound On
+            GbApuWriteData(UnitNumber, 0x16, 0x80);
+            GbApuWriteData(UnitNumber, 0x14, 0x77);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void setPresetInstruments()
         {
             Timbres[0].SoundType = SoundType.PSG;

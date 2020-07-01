@@ -1,4 +1,4 @@
-MAmidiMEmo V1.3.0.0 / Itoken (c)2019, 2020 / GPL-2.0
+MAmidiMEmo V1.3.1.0 / Itoken (c)2019, 2020 / GPL-2.0
 
 *** What is the MAmidiMEmo? ***
 
@@ -224,6 +224,8 @@ e.g.) YM2151 has 8ch FM sounds, so you can play 8 chords on MIDI 1ch or sharing 
 
 *** Changes ***
 
+1.3.1.0 Added VGM supported chips.
+			GB APU, HuC6280
 1.3.0.0 Synced sound engine to MAME 0221 (May improved some sound accuracy).
         Added wave file output feature. Please re-open option dialog and press [OK] to commit new settings.
         Added VGM file separetedly output feature. Only supported the following chips.

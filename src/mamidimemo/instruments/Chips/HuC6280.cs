@@ -232,6 +232,17 @@ namespace zanac.MAmidiMEmo.Instruments.Chips
                 0x00, 0x00, 0x01, 0x03, 0x05, 0x07, 0x09, 0x0c  };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vgmPath"></param>
+        public override void StartVgmRecordingTo(string vgmPath)
+        {
+            base.StartVgmRecordingTo(vgmPath);
+
+            //Sound On
+            C6280WriteData(UnitNumber, 0x801, null, (byte)0xff);
+        }
 
         /// <summary>
         /// 

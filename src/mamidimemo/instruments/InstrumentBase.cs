@@ -1085,7 +1085,7 @@ namespace zanac.MAmidiMEmo.Instruments
         /// 
         /// </summary>
         /// <param name="vgmPath"></param>
-        public void StartVgmRecordingTo(string vgmPath)
+        public virtual void StartVgmRecordingTo(string vgmPath)
         {
             vgmRecording = true;
 

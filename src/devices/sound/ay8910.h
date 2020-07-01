@@ -124,8 +124,8 @@ public:
 		double m_Kn[32];
 	};
 
-	void vgm_start(char *name);
-	void vgm_stop(void);
+	virtual void vgm_start(char *name);
+	virtual void vgm_stop(void);
 
 	// internal interface for PSG component of YM device
 	// FIXME: these should be private, but vector06 accesses them directly
